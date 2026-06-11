@@ -1970,7 +1970,10 @@ function TrustHero({ copy, theme }) {
 function Gateway() {
   const [hover, setHover] = useState(null);
   const [leaving, setLeaving] = useState(null);
+  const [mobileIntent, setMobileIntent] = useState(null);
   const rootRef = React.useRef(null);
+  const mobileSplitRef = React.useRef(50);
+  const tiltPermissionRef = React.useRef(false);
   const neo = DATA.gateway.neo;
   const trust = DATA.gateway.trust;
   const sections = DATA.nav.filter(item => item.page !== "contact");
@@ -1996,6 +1999,75 @@ function Gateway() {
       if (raf) window.cancelAnimationFrame(raf);
     };
   }, []);
+  React.useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const coarse = window.matchMedia("(pointer: coarse)");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!coarse.matches || reduce.matches) return;
+
+    let dragging = false;
+    let raf = 0;
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const setSplit = (split, source) => {
+      const next = clamp(split, 34, 66);
+      mobileSplitRef.current = next;
+      el.style.setProperty("--gate-split", next.toFixed(2) + "%");
+      const intent = next > 53 ? "neo" : next < 47 ? "trust" : null;
+      setMobileIntent(intent);
+      if (source) el.dataset.mobileInput = source;
+    };
+    const updateFromY = (clientY) => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        const y = clamp(clientY / Math.max(window.innerHeight, 1), 0, 1);
+        setSplit(66 - y * 32, "touch");
+      });
+    };
+    const requestTilt = () => {
+      if (tiltPermissionRef.current) return;
+      tiltPermissionRef.current = true;
+      if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+        DeviceOrientationEvent.requestPermission().catch(() => {});
+      }
+    };
+    const onPointerDown = (event) => {
+      dragging = true;
+      requestTilt();
+      el.setPointerCapture?.(event.pointerId);
+      updateFromY(event.clientY);
+    };
+    const onPointerMove = (event) => {
+      if (!dragging) return;
+      updateFromY(event.clientY);
+    };
+    const onPointerUp = (event) => {
+      dragging = false;
+      el.releasePointerCapture?.(event.pointerId);
+    };
+    const onOrientation = (event) => {
+      if (dragging || event.gamma == null) return;
+      const tilt = clamp(event.gamma, -18, 18) / 18;
+      setSplit(50 + tilt * 10, "tilt");
+    };
+
+    setSplit(50);
+    el.addEventListener("pointerdown", onPointerDown);
+    el.addEventListener("pointermove", onPointerMove);
+    el.addEventListener("pointerup", onPointerUp);
+    el.addEventListener("pointercancel", onPointerUp);
+    window.addEventListener("deviceorientation", onOrientation, { passive: true });
+    return () => {
+      el.removeEventListener("pointerdown", onPointerDown);
+      el.removeEventListener("pointermove", onPointerMove);
+      el.removeEventListener("pointerup", onPointerUp);
+      el.removeEventListener("pointercancel", onPointerUp);
+      window.removeEventListener("deviceorientation", onOrientation);
+      if (raf) window.cancelAnimationFrame(raf);
+      delete el.dataset.mobileInput;
+    };
+  }, []);
   const enter = (theme) => {
     if (leaving) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2005,6 +2077,7 @@ function Gateway() {
   };
   const cls = "gateway" +
     (hover && !leaving ? " is-" + hover : "") +
+    (mobileIntent && !leaving ? " mobile-" + mobileIntent : "") +
     (leaving ? " is-leaving leave-" + leaving : "");
   return (
     <main className={cls} ref={rootRef}>
