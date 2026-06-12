@@ -1974,6 +1974,7 @@ function Gateway() {
   const rootRef = React.useRef(null);
   const mobileSplitRef = React.useRef(50);
   const tiltPermissionRef = React.useRef(false);
+  const dragMovedRef = React.useRef(false);
   const neo = DATA.gateway.neo;
   const trust = DATA.gateway.trust;
   const sections = DATA.nav.filter(item => item.page !== "contact");
@@ -2007,6 +2008,7 @@ function Gateway() {
     if (!coarse.matches || reduce.matches) return;
 
     let dragging = false;
+    let startY = 0;
     let raf = 0;
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
     const setSplit = (split, source) => {
@@ -2034,12 +2036,15 @@ function Gateway() {
     };
     const onPointerDown = (event) => {
       dragging = true;
+      startY = event.clientY;
+      dragMovedRef.current = false;
       requestTilt();
       el.setPointerCapture?.(event.pointerId);
       updateFromY(event.clientY);
     };
     const onPointerMove = (event) => {
       if (!dragging) return;
+      if (Math.abs(event.clientY - startY) > 10) dragMovedRef.current = true;
       updateFromY(event.clientY);
     };
     const onPointerUp = (event) => {
@@ -2070,6 +2075,7 @@ function Gateway() {
   }, []);
   const enter = (theme) => {
     if (leaving) return;
+    if (dragMovedRef.current) { dragMovedRef.current = false; return; }
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { routeTo(theme); return; }
     setLeaving(theme);
@@ -3818,9 +3824,12 @@ function NeoSectionHeroUnravel({ theme, section }) {
         <canvas ref={canvasRef} className="neo-hero-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
         <div className="neo-hero-chapter" style={{ opacity: 1, pointerEvents: 'auto' }}>
           <p className="kicker">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {section.name.toUpperCase()}</p>
-          <h1 className="ch-name" style={{ color: '#fff', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 800, textTransform: 'uppercase' }}>
-            {copy.title}<br />
-            <span className="serif" style={{ color: section.id === "academy" ? '#7c5cff' : section.id === "labs" ? '#ff5c8a' : '#00e5a0' }}>{copy.accent}</span>
+          <h1 className="ch-name" style={{ color: '#fff', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 800, textTransform: section.id === "academy" ? 'none' : 'uppercase' }}>
+            {section.id === "academy" ? (
+              <>We don't hire engineers.<br />We <em style={{ fontStyle: 'normal', color: '#7c5cff' }}>compile</em> them.</>
+            ) : (
+              <>{copy.title}<br /><span className="serif" style={{ color: section.id === "labs" ? '#ff5c8a' : '#00e5a0' }}>{copy.accent}</span></>
+            )}
           </h1>
           <p className="lede" style={{ marginTop: '14px', maxWidth: '34em', color: 'var(--muted)' }}>{copy.body}</p>
           <div className="hero-actions" style={{ marginTop: '24px' }}>
@@ -3836,6 +3845,432 @@ function NeoSectionHeroUnravel({ theme, section }) {
   );
 }
 
+
+
+function AcademyTerminalSection() {
+  const wrapRef = React.useRef(null);
+  const bodyRef = React.useRef(null);
+
+  // useLayoutEffect + ctx.revert: pin-spacer must unwrap before React unmount
+  React.useLayoutEffect(() => {
+    const wrap = wrapRef.current;
+    const body = bodyRef.current;
+    if (!wrap || !body || !window.gsap) return;
+
+    const lines = [
+      ['p', 'nexara@academy:~$ ', 'k', 'init career --track=engineering'],
+      ['c', '  resolving curriculum graph...'],
+      ['c', '  [1/4] foundations        ', 's', '✓ systems · networks · git'],
+      ['c', '  [2/4] core engineering   ', 's', '✓ apis · databases · cloud'],
+      ['c', '  [3/4] specialisation     ', 's', '✓ ai/ml · security · devops'],
+      ['c', '  [4/4] industry residency ', 's', '✓ 12-week placement sprint'],
+      ['p', 'nexara@academy:~$ ', 'k', 'run graduate --mode=hired'],
+      ['s', '  → offer received. compensation: above market.'],
+      ['p', 'nexara@academy:~$ '],
+    ];
+
+    const charSpans = [];
+    lines.forEach((parts) => {
+      const ln = document.createElement('span');
+      ln.className = 'acad-tl-ln';
+      for (let i = 0; i < parts.length; i += 2) {
+        const cls = parts[i];
+        const text = parts[i + 1];
+        if (!text) continue;
+        for (const ch of text) {
+          const sp = document.createElement('span');
+          sp.className = 'acad-tc-' + cls;
+          sp.textContent = ch;
+          sp.style.visibility = 'hidden';
+          ln.appendChild(sp);
+          charSpans.push(sp);
+        }
+      }
+      body.appendChild(ln);
+    });
+
+    const cursor = document.createElement('span');
+    cursor.className = 'acad-term-cursor';
+    body.appendChild(cursor);
+
+    const st = { n: 0 };
+    const apply = () => {
+      const upto = Math.floor(st.n);
+      charSpans.forEach((sp, i) => (sp.style.visibility = i < upto ? 'visible' : 'hidden'));
+      const last = charSpans[Math.max(0, Math.min(upto, charSpans.length) - 1)];
+      if (last) last.after(cursor);
+    };
+
+    const ctx = gsap.context(() => {
+      gsap.to(st, {
+        n: charSpans.length,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: wrap,
+          start: 'top top',
+          end: '+=220%',
+          scrub: 0.4,
+          pin: true,
+          pinSpacing: true,
+        },
+        onUpdate: apply,
+      });
+    }, wrap);
+
+    return () => { ctx.revert(); body.innerHTML = ''; };
+  }, []);
+
+  return (
+    <section ref={wrapRef} className="acad-terminal-section">
+      <div className="acad-terminal-inner">
+        <p className="acad-mono" style={{ marginBottom: '20px' }}>// Scroll to execute the curriculum</p>
+        <div className="acad-terminal">
+          <div className="acad-term-bar">
+            <span className="acad-dot acad-dot-r"></span>
+            <span className="acad-dot acad-dot-y"></span>
+            <span className="acad-dot acad-dot-g"></span>
+            <span className="acad-term-title">nexara-academy — zsh — career.sh</span>
+          </div>
+          <div ref={bodyRef} className="acad-term-body"></div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AcademyBootSequence() {
+  const progressRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const line = progressRef.current;
+    if (!line || !window.gsap) return;
+    const tween = gsap.to(line, {
+      height: 'calc(100% - 12px)',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: line.closest('.acad-boot-timeline'),
+        start: 'top 70%',
+        end: 'bottom 60%',
+        scrub: true,
+      },
+    });
+    return () => tween.kill();
+  }, []);
+
+  const phases = [
+    { when: 'Months 01–03', title: 'Foundations', desc: 'Unix, networking, version control, one language deep. No frameworks until you can explain what they abstract.' },
+    { when: 'Months 04–07', title: 'Core engineering', desc: 'APIs, data modelling, testing culture, cloud primitives. Weekly ship cadence with code review from Labs engineers.' },
+    { when: 'Months 08–09', title: 'Specialisation', desc: 'Branch into AI/ML, security, or platform engineering. Capstone scoped like a client engagement — because it is one.' },
+    { when: 'Months 10–12', title: 'Industry residency', desc: 'Embedded in a Nexara Labs squad or partner company. Real standups, real deadlines, real production access.' },
+  ];
+
+  return (
+    <section className="acad-boot-section">
+      <div className="acad-boot-inner">
+        <div className="acad-boot-head">
+          <p className="acad-mono">// The twelve months</p>
+          <h2 className="acad-boot-title">Boot sequence<br /><em>for a career.</em></h2>
+        </div>
+        <div className="acad-boot-timeline">
+          <span className="acad-boot-track"></span>
+          <span ref={progressRef} className="acad-boot-progress"></span>
+          {phases.map((p) => (
+            <div key={p.when} className="acad-boot-item">
+              <span className="acad-boot-when">{p.when}</span>
+              <h4 className="acad-boot-phase">{p.title}</h4>
+              <p className="acad-boot-desc">{p.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LabsBlueprintSection() {
+  const wrapRef = React.useRef(null);
+
+  // useLayoutEffect: pin cleanup must revert the pin-spacer BEFORE React
+  // removes the node, or unmount throws removeChild NotFoundError
+  React.useLayoutEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap || !window.gsap) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const svg = wrap.querySelector('.nx-labs-visual svg');
+    const paths = svg.querySelectorAll('[data-draw]');
+    const fills = svg.querySelectorAll('[data-fill]');
+    const caps = Array.from(wrap.querySelectorAll('.nx-build-cap'));
+
+    if (reduced) {
+      fills.forEach((f) => { f.style.opacity = 1; });
+      caps.forEach((c, i) => { if (i < caps.length - 1) c.style.visibility = 'hidden'; });
+      return;
+    }
+
+    paths.forEach((p) => {
+      const len = p.getTotalLength ? p.getTotalLength() : 600;
+      p.style.strokeDasharray = len;
+      p.style.strokeDashoffset = len;
+    });
+    const ctx = gsap.context(() => {
+      gsap.to(paths, {
+        strokeDashoffset: 0,
+        ease: 'none',
+        stagger: 0.18,
+        scrollTrigger: { trigger: wrap, start: 'top top', end: '+=250%', scrub: 0.5, pin: true },
+      });
+      gsap.to(fills, {
+        opacity: 1,
+        stagger: 0.1,
+        scrollTrigger: { trigger: wrap, start: 'top top', end: '+=250%', scrub: 0.5 },
+      });
+      caps.forEach((c, i) => { if (i > 0) gsap.set(c, { autoAlpha: 0 }); });
+      const ctl = gsap.timeline({
+        scrollTrigger: { trigger: wrap, start: 'top top', end: '+=250%', scrub: 0.5 },
+      });
+      caps.forEach((c, i) => {
+        if (i === 0) return;
+        ctl.to(caps[i - 1], { autoAlpha: 0, y: -20, duration: 1 }, i * 2.4)
+           .to(c, { autoAlpha: 1, y: 0, duration: 1 }, i * 2.4 + 0.6);
+      });
+    }, wrap);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section ref={wrapRef} className="nx-labs-build">
+      <div className="nx-labs-split">
+        <div className="nx-labs-copy">
+          <p className="nx-mono nx-mono-labs">// Scroll to assemble</p>
+          <div className="nx-build-cap">
+            <h3>Every build starts as a wireframe.</h3>
+            <p>Architecture first. We draw the system before we write the system.</p>
+          </div>
+          <div className="nx-build-cap">
+            <h3>Then the layers stack.</h3>
+            <p>Data, services, interface — each layer tested before the next lands on top of it.</p>
+          </div>
+          <div className="nx-build-cap">
+            <h3>Then it ships. <em>Live.</em></h3>
+            <p>Instrumented, observable, on-call rotation assigned. Production is the only finish line we recognise.</p>
+          </div>
+        </div>
+        <div className="nx-labs-visual">
+          <svg viewBox="0 0 480 408" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="rgba(233,238,242,0.06)" strokeWidth="1">
+              <path d="M0 51h480M0 102h480M0 153h480M0 204h480M0 255h480M0 306h480M0 357h480" />
+              <path d="M60 0v408M120 0v408M180 0v408M240 0v408M300 0v408M360 0v408M420 0v408" />
+            </g>
+            <path data-draw="" d="M120 300 L240 240 L360 300 L240 360 Z" stroke="#f97316" strokeWidth="1.5" />
+            <path data-draw="" d="M120 300 V322 L240 382 L360 322 V300" stroke="#f97316" strokeWidth="1.5" />
+            <path data-draw="" d="M240 360 V382" stroke="#f97316" strokeWidth="1.5" />
+            <text data-fill="" x="378" y="318" fill="#f97316" fontFamily="JetBrains Mono" fontSize="10" opacity="0">DATA</text>
+            <path data-draw="" d="M140 230 L240 180 L340 230 L240 280 Z" stroke="rgba(233,238,242,0.7)" strokeWidth="1.5" />
+            <path data-draw="" d="M140 230 V248 L240 298 L340 248 V230" stroke="rgba(233,238,242,0.7)" strokeWidth="1.5" />
+            <path data-draw="" d="M240 280 V298" stroke="rgba(233,238,242,0.7)" strokeWidth="1.5" />
+            <text data-fill="" x="358" y="244" fill="rgba(233,238,242,0.7)" fontFamily="JetBrains Mono" fontSize="10" opacity="0">SERVICES</text>
+            <path data-draw="" d="M160 160 L240 120 L320 160 L240 200 Z" stroke="#00f0ff" strokeWidth="1.5" />
+            <path data-draw="" d="M160 160 V176 L240 216 L320 176 V160" stroke="#00f0ff" strokeWidth="1.5" />
+            <path data-draw="" d="M240 200 V216" stroke="#00f0ff" strokeWidth="1.5" />
+            <text data-fill="" x="338" y="172" fill="#00f0ff" fontFamily="JetBrains Mono" fontSize="10" opacity="0">INTERFACE</text>
+            <path data-draw="" d="M240 36 V112" stroke="#00f0ff" strokeWidth="1.5" strokeDasharray="4 6" />
+            <circle data-fill="" cx="240" cy="36" r="5" stroke="#00f0ff" strokeWidth="1.5" opacity="0" />
+            <text data-fill="" x="252" y="44" fill="rgba(233,238,242,0.5)" fontFamily="JetBrains Mono" fontSize="10" opacity="0">LIVE TRAFFIC</text>
+            <path data-draw="" d="M96 240 V382 M88 240 h16 M88 382 h16" stroke="rgba(233,238,242,0.3)" strokeWidth="1" />
+            <text data-fill="" x="52" y="316" fill="rgba(233,238,242,0.4)" fontFamily="JetBrains Mono" fontSize="9" opacity="0">3 LAYERS</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MarketingSignalSection() {
+  const canvasRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ctx = canvas.getContext('2d');
+    let ww, wh, dpr, rafId = 0;
+    const fit = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      ww = canvas.clientWidth; wh = canvas.clientHeight;
+      canvas.width = ww * dpr; canvas.height = wh * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    const draw = (ts) => {
+      const t0 = ts / 1000;
+      ctx.clearRect(0, 0, ww, wh);
+      for (let r = 0; r < 3; r++) {
+        const baseY = wh * (0.35 + r * 0.18);
+        const amp = wh * 0.06 * (1 + r * 0.4);
+        ctx.beginPath();
+        for (let x = 0; x <= ww; x += 4) {
+          const v = Math.sin(x * 0.008 + t0 * (0.7 + r * 0.3)) * amp * Math.sin(x * 0.0013 + t0 * 0.2);
+          const y = baseY + v;
+          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = r === 1 ? 'rgba(255,61,245,0.5)' : 'rgba(233,238,242,0.12)';
+        ctx.lineWidth = r === 1 ? 1.5 : 1;
+        ctx.stroke();
+      }
+      if (!reduced) rafId = window.requestAnimationFrame(draw);
+    };
+    rafId = window.requestAnimationFrame(draw);
+    return () => {
+      window.removeEventListener('resize', fit);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  return (
+    <section className="nx-mkt-signal">
+      <canvas ref={canvasRef} className="nx-mkt-wave" aria-hidden="true"></canvas>
+      <div className="nx-mkt-signal-copy">
+        <p className="nx-mono nx-mono-mkt">// Growth engineering</p>
+        <h2>Attention is a <em>signal.</em> We tune it.</h2>
+        <p className="nx-mkt-sub">No vibes-based marketing. Every campaign is instrumented, every claim has a dashboard behind it, every dollar reports to a metric.</p>
+      </div>
+    </section>
+  );
+}
+
+function MarketingFunnelSection() {
+  const wrapRef = React.useRef(null);
+  const canvasRef = React.useRef(null);
+
+  // useLayoutEffect: see LabsBlueprintSection — pin must revert before unmount
+  React.useLayoutEffect(() => {
+    const wrap = wrapRef.current;
+    const canvas = canvasRef.current;
+    if (!wrap || !canvas || !window.gsap) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ctx = canvas.getContext('2d');
+    let fw, fh, dpr, rafId = 0;
+    const fit = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      fw = canvas.clientWidth; fh = canvas.clientHeight;
+      canvas.width = fw * dpr; canvas.height = fh * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    fit();
+    window.addEventListener('resize', fit);
+
+    const sub = (t, a, b) => Math.max(0, Math.min(1, (t - a) / (b - a)));
+    const eo = (t) => 1 - Math.pow(1 - t, 3);
+    const rngP = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+    const parts = Array.from({ length: 90 }, () => ({ x: rngP(), speed: 0.5 + rngP(), keep: rngP() }));
+    const names = ['REACH', 'ENGAGE', 'CONVERT', 'RETAIN'];
+    const pct = ['100%', '62%', '36%', '18%'];
+    const widths = [0.86, 0.6, 0.38, 0.2];
+    const keepRates = [1, 0.62, 0.36, 0.18];
+
+    const drawFunnel = (t) => {
+      ctx.clearRect(0, 0, fw, fh);
+      const cx = fw / 2;
+      const top = fh * 0.08, bot = fh * 0.9;
+      const stages = 4;
+      for (let s = 0; s < stages; s++) {
+        const st = eo(sub(t, s * 0.18, s * 0.18 + 0.25));
+        if (st <= 0) continue;
+        const y0 = top + ((bot - top) / stages) * s;
+        const y1 = top + ((bot - top) / stages) * (s + 1) - 14;
+        const w0 = fw * widths[s] * 0.5 * st;
+        const w1 = fw * (widths[s + 1] !== undefined ? (widths[s] + (widths[s + 1] - widths[s]) * 0.8) : widths[s] * 0.8) * 0.5 * st;
+        ctx.strokeStyle = 'rgba(233,238,242,0.35)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(cx - w0, y0); ctx.lineTo(cx + w0, y0);
+        ctx.moveTo(cx - w0, y0); ctx.lineTo(cx - w1, y1);
+        ctx.moveTo(cx + w0, y0); ctx.lineTo(cx + w1, y1);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255,61,245,' + 0.85 * st + ')';
+        ctx.font = "500 10px 'JetBrains Mono', monospace";
+        ctx.textAlign = 'left';
+        ctx.fillText(names[s], cx + w0 + 14, y0 + 14);
+        ctx.fillStyle = 'rgba(233,238,242,' + 0.4 * st + ')';
+        ctx.fillText(pct[s], cx + w0 + 14, y0 + 30);
+      }
+      const flow = sub(t, 0.25, 1);
+      if (flow > 0) {
+        const time = performance.now() / 1000;
+        parts.forEach((p) => {
+          const prog = (time * 0.12 * p.speed + p.x) % 1;
+          if (prog > flow) return;
+          const y = top + (bot - top) * prog;
+          const s = Math.min(stages - 1, Math.floor(prog * stages));
+          if (p.keep > keepRates[s]) return;
+          const wHere = fw * (widths[s] - (widths[s] - (widths[s + 1] ?? widths[s] * 0.8)) * ((prog * stages) % 1)) * 0.5;
+          const px = cx + (p.x - 0.5) * 2 * wHere * 0.9;
+          ctx.fillStyle = p.keep < keepRates[stages - 1] ? '#ff3df5' : 'rgba(233,238,242,0.45)';
+          ctx.fillRect(px - 1.5, y - 1.5, 3, 3);
+        });
+      }
+    };
+
+    const blocks = Array.from(wrap.querySelectorAll('.nx-step-block'));
+    const fstate = { t: 0 };
+    let gctx = null;
+    if (reduced) {
+      drawFunnel(1);
+      if (blocks[0]) blocks[0].style.opacity = 1;
+    } else {
+      gctx = gsap.context(() => {
+        gsap.to(fstate, {
+          t: 1,
+          ease: 'none',
+          scrollTrigger: { trigger: wrap, start: 'top top', end: '+=260%', scrub: 0.5, pin: true },
+        });
+        if (blocks.length) {
+          gsap.set(blocks[0], { opacity: 1 });
+          const ctl = gsap.timeline({
+            scrollTrigger: { trigger: wrap, start: 'top top', end: '+=260%', scrub: 0.5 },
+          });
+          blocks.forEach((b, i) => {
+            if (i === 0) return;
+            ctl.to(blocks[i - 1], { opacity: 0, y: -24, duration: 1 }, i * 2.5)
+               .fromTo(b, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 1 }, i * 2.5 + 0.7);
+          });
+        }
+      }, wrap);
+      const tick = () => { drawFunnel(fstate.t); rafId = window.requestAnimationFrame(tick); };
+      rafId = window.requestAnimationFrame(tick);
+    }
+    return () => {
+      window.removeEventListener('resize', fit);
+      if (rafId) window.cancelAnimationFrame(rafId);
+      if (gctx) gctx.revert();
+    };
+  }, []);
+
+  const steps = [
+    { label: 'Stage 01 / Reach', title: 'Find the people who already have the problem.', body: 'Paid, organic, and technical SEO working one keyword graph. We buy intent, not impressions.' },
+    { label: 'Stage 02 / Engage', title: 'Earn the second visit.', body: 'Content engineered like product: versioned, tested, retired when it stops converting. 62% make it past hello.' },
+    { label: 'Stage 03 / Convert', title: 'Remove every reason to say no.', body: 'CRO experiments shipped weekly. Forms shortened, friction logged, objections answered before they’re asked.' },
+    { label: 'Stage 04 / Retain', title: 'The funnel ends in a flywheel.', body: 'Lifecycle email, product telemetry, win-back loops. The 18% who stay are worth more than the 100% who arrived.' },
+  ];
+
+  return (
+    <section ref={wrapRef} className="nx-funnel-pin">
+      <div className="nx-funnel-stage">
+        <div className="nx-funnel-copy">
+          {steps.map((s) => (
+            <div key={s.label} className="nx-step-block">
+              <span className="nx-mono nx-mono-mkt">{s.label}</span>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+            </div>
+          ))}
+        </div>
+        <canvas ref={canvasRef} className="nx-funnel-canvas" aria-hidden="true"></canvas>
+      </div>
+    </section>
+  );
+}
 
 function SectionPage({ theme, section, detail }) {
   const active = useMemo(() => section.subpages.find((p) => p.slug === detail), [section, detail]);
@@ -3853,6 +4288,19 @@ function SectionPage({ theme, section, detail }) {
         <LabsHero theme={theme} section={section} />
       ) : (
         <HeroBanner compact theme={theme} section={section} eyebrow={section.hero[theme].eyebrow} title={section.hero[theme].title} accent={section.hero[theme].accent} body={section.hero[theme].body} />
+      )}
+      {section.id === 'academy' && !active && (
+        <>
+          <AcademyTerminalSection />
+          <AcademyBootSequence />
+        </>
+      )}
+      {section.id === 'labs' && !active && <LabsBlueprintSection />}
+      {section.id === 'marketing' && !active && (
+        <>
+          <MarketingSignalSection />
+          <MarketingFunnelSection />
+        </>
       )}
       <SubNav theme={theme} section={section} active={active} />
       <div key={active?.slug || "overview"} className="section-content-enter">

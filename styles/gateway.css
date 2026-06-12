@@ -1,4 +1,6 @@
 .gateway {
+  --gate-accent-neo: #ccff00;
+  --gate-accent-trust: #1e40af; /* matches Trust in-site CTA navy */
   position: relative;
   min-height: 100vh;
   display: grid;
@@ -77,7 +79,7 @@
 .gate-motion-grid {
   position: absolute;
   inset: 0;
-  background: linear-gradient(rgba(204,255,0,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(204,255,0,.12) 1px,transparent 1px);
+  background: linear-gradient(color-mix(in srgb, var(--gate-accent-neo) 16%, transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb, var(--gate-accent-neo) 12%, transparent) 1px,transparent 1px);
   background-size: 44px 44px;
   mask-image: radial-gradient(circle at 30% 70%,#000,transparent 65%);
   animation: gridShift 7s linear infinite;
@@ -128,14 +130,14 @@
 }
 
 .gate-trust .gate-kicker {
-  color: #0ea5e9;
+  color: var(--gate-accent-trust);
   margin-bottom: 0;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(30, 41, 59, 0.18);
 }
 
 .gate-neo .gate-kicker {
-  color: #ccff00;
+  color: var(--gate-accent-neo);
 }
 
 .gate-content h1 {
@@ -208,26 +210,26 @@
 }
 
 .gate-neo button {
-  background: #ccff00;
+  background: var(--gate-accent-neo);
   color: #000;
-  box-shadow: 0 0 24px rgba(204,255,0,0.22);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--gate-accent-neo) 22%, transparent);
 }
 
 .gate-neo button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 36px rgba(204,255,0,0.45);
+  box-shadow: 0 0 36px color-mix(in srgb, var(--gate-accent-neo) 45%, transparent);
 }
 
 .gate-trust button {
-  background: #0ea5e9;
+  background: var(--gate-accent-trust);
   color: #fff;
   border-radius: 8px;
-  box-shadow: 0 12px 28px rgba(14,165,233,0.18);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--gate-accent-trust) 18%, transparent);
 }
 
 .gate-trust button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 36px rgba(14,165,233,0.35);
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--gate-accent-trust) 35%, transparent);
 }
 
 .gate-brand {
@@ -245,12 +247,12 @@
 
 .gateway.is-neo .gate-brand {
   transform: translateX(calc(-50% - 2.3vw)) scale(1.05);
-  box-shadow: 0 0 80px rgba(204,255,0,.22), 0 0 96px rgba(0,240,255,.13);
+  box-shadow: 0 0 80px color-mix(in srgb, var(--gate-accent-neo) 22%, transparent), 0 0 96px rgba(0,240,255,.13);
 }
 
 .gateway.is-trust .gate-brand {
   transform: translateX(calc(-50% + 2.3vw)) scale(1.05);
-  box-shadow: 0 0 80px rgba(14,165,233,.24), 0 0 96px rgba(30,58,138,.13);
+  box-shadow: 0 0 80px color-mix(in srgb, var(--gate-accent-trust) 24%, transparent), 0 0 96px rgba(30,58,138,.13);
 }
 
 .gate-brand strong {
@@ -287,14 +289,15 @@
   text-transform: uppercase;
 }
 
-.gate-panel:hover .gate-preview {
+.gate-panel:hover .gate-preview,
+.gate-panel:focus-within .gate-preview {
   max-height: 150px;
   opacity: 1;
   transform: none;
 }
 
 .gate-neo .gate-preview {
-  color: #ccff00;
+  color: var(--gate-accent-neo);
 }
 
 .gate-neo .gate-preview li {
@@ -302,7 +305,7 @@
 }
 
 .gate-trust .gate-preview {
-  color: #0ea5e9;
+  color: var(--gate-accent-trust);
   justify-items: end;
 }
 
@@ -426,11 +429,11 @@
   filter: blur(70px);
 }
 
-.gate-neo .aurora-blob.b1 { width: 44vw; height: 44vw; left: -12%; top: -14%; background: radial-gradient(circle, rgba(204,255,0,.20), transparent 65%); }
+.gate-neo .aurora-blob.b1 { width: 44vw; height: 44vw; left: -12%; top: -14%; background: radial-gradient(circle, color-mix(in srgb, var(--gate-accent-neo) 20%, transparent), transparent 65%); }
 .gate-neo .aurora-blob.b2 { width: 36vw; height: 36vw; right: 2%; bottom: -10%; background: radial-gradient(circle, rgba(0,240,255,.17), transparent 65%); }
 .gate-neo .aurora-blob.b3 { width: 28vw; height: 28vw; left: 32%; top: 44%; background: radial-gradient(circle, rgba(255,61,245,.11), transparent 65%); }
 
-.gate-trust .aurora-blob.b1 { width: 44vw; height: 44vw; right: -12%; top: -14%; background: radial-gradient(circle, rgba(14,165,233,.18), transparent 65%); }
+.gate-trust .aurora-blob.b1 { width: 44vw; height: 44vw; right: -12%; top: -14%; background: radial-gradient(circle, color-mix(in srgb, var(--gate-accent-trust) 18%, transparent), transparent 65%); }
 .gate-trust .aurora-blob.b2 { width: 36vw; height: 36vw; left: 4%; bottom: -10%; background: radial-gradient(circle, rgba(99,102,241,.13), transparent 65%); }
 .gate-trust .aurora-blob.b3 { width: 28vw; height: 28vw; right: 30%; top: 46%; background: radial-gradient(circle, rgba(125,211,252,.30), transparent 65%); }
 
@@ -444,7 +447,7 @@
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  background: linear-gradient(270deg, rgba(204,255,0,.5), rgba(204,255,0,.14) 26px, transparent 110px);
+  background: linear-gradient(270deg, color-mix(in srgb, var(--gate-accent-neo) 50%, transparent), color-mix(in srgb, var(--gate-accent-neo) 14%, transparent) 26px, transparent 110px);
   animation: seamPulse 4.5s ease-in-out infinite alternate;
 }
 
@@ -454,7 +457,7 @@
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  background: linear-gradient(90deg, rgba(14,165,233,.42), rgba(14,165,233,.12) 26px, transparent 110px);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--gate-accent-trust) 42%, transparent), color-mix(in srgb, var(--gate-accent-trust) 12%, transparent) 26px, transparent 110px);
   animation: seamPulse 4.5s ease-in-out infinite alternate;
 }
 
@@ -475,14 +478,14 @@
   inset: -16% -22%;
   z-index: -1;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(204,255,0,.12), transparent);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--gate-accent-neo) 12%, transparent), transparent);
   filter: blur(22px);
   opacity: 0;
   transition: opacity .6s ease;
 }
 
 .gate-trust .gate-content::before {
-  background: radial-gradient(closest-side, rgba(14,165,233,.14), transparent);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--gate-accent-trust) 14%, transparent), transparent);
 }
 
 .gate-panel:hover .gate-content::before {
@@ -525,8 +528,8 @@
     overflow: hidden;
     touch-action: none;
     background:
-      radial-gradient(circle at 14% 18%, rgba(204,255,0,.14), transparent 30%),
-      radial-gradient(circle at 92% 72%, rgba(14,165,233,.24), transparent 34%),
+      radial-gradient(circle at 14% 18%, color-mix(in srgb, var(--gate-accent-neo) 14%, transparent), transparent 30%),
+      radial-gradient(circle at 92% 72%, color-mix(in srgb, var(--gate-accent-trust) 24%, transparent), transparent 34%),
       #05070d;
     transition: none;
   }
@@ -617,7 +620,7 @@
   }
 
   .gate-kicker {
-    font-size: 9px;
+    font-size: 10px;
     margin-bottom: 8px;
   }
 
@@ -644,14 +647,14 @@
 
   .gate-mini-stats span,
   .gate-trust .gate-mini-stats span {
-    padding: 5px 7px;
-    font-size: 8px;
+    padding: 5px 8px;
+    font-size: 10px;
     letter-spacing: .06em;
   }
 
   .gate-content button {
-    padding: 11px 13px;
-    font-size: 9px;
+    padding: 12px 16px;
+    font-size: 11px;
   }
 
   .gate-preview {
@@ -684,7 +687,7 @@
     background:
       radial-gradient(circle, rgba(248,250,252,.96) 0 14%, rgba(147,197,253,.26) 15% 49%, rgba(15,23,42,.94) 50%);
     border: 1px solid rgba(147,197,253,.45);
-    box-shadow: 0 0 44px rgba(14,165,233,.22), 0 0 50px rgba(204,255,0,.12);
+    box-shadow: 0 0 44px color-mix(in srgb, var(--gate-accent-trust) 22%, transparent), 0 0 50px color-mix(in srgb, var(--gate-accent-neo) 12%, transparent);
     transition: top .28s cubic-bezier(.22,1,.36,1), box-shadow .28s ease;
   }
 
@@ -698,11 +701,11 @@
   }
 
   .gateway.mobile-neo .gate-brand {
-    box-shadow: 0 0 54px rgba(204,255,0,.3), 0 0 44px rgba(0,240,255,.14);
+    box-shadow: 0 0 54px color-mix(in srgb, var(--gate-accent-neo) 30%, transparent), 0 0 44px rgba(0,240,255,.14);
   }
 
   .gateway.mobile-trust .gate-brand {
-    box-shadow: 0 0 58px rgba(14,165,233,.34), 0 0 44px rgba(30,58,138,.16);
+    box-shadow: 0 0 58px color-mix(in srgb, var(--gate-accent-trust) 34%, transparent), 0 0 44px rgba(30,58,138,.16);
   }
 
   .gateway.is-neo,

@@ -189,10 +189,11 @@ function TrustNav({ page, detail }) {
           </ul>
         </nav>
         <div className="tsx-nav-right">
-          <div className="theme-pill">
-            <button className="" onClick={() => routeTo('neo', page, detail)}>Neo</button>
-            <button className="active" onClick={() => routeTo('trust', page, detail)}>Trust</button>
+          <div className="tsx-mode-dots" role="group" aria-label="Theme mode">
+            <button className="tsx-dot-neo" title="Neo" aria-label="Switch to Neo mode" onClick={() => routeTo('neo', page, detail)}></button>
+            <button className="tsx-dot-trust active" title="Trust" aria-label="Trust mode" onClick={() => routeTo('trust', page, detail)}></button>
           </div>
+          <span className="tsx-mode-sep" aria-hidden="true"></span>
           <button className="tsx-nav-cta" onClick={() => routeTo('trust', 'contact')}>Start a Project</button>
         </div>
       </div>
@@ -229,7 +230,9 @@ function TrustHeroFlat() {
         </div>
         <div>
           {Object.values(DATA.sections).map((section) => (
-            <div className="tsx-stat" key={section.id}>
+            <div className="tsx-stat tsx-stat-link" key={section.id} role="link" tabIndex={0}
+              onClick={() => routeTo('trust', section.id)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') routeTo('trust', section.id); }}>
               <div className="tsx-stat-label">{getTrustSectionLabel(section)}</div>
               <div className="tsx-stat-value">{section.index}<span>{section.stackDetails.length} modules</span></div>
               <div className="tsx-stat-dot" />
@@ -344,7 +347,7 @@ function TrustFeatureStrip() {
         <div className="tsx-gov-grid">
           {DATA.company.standards.map((standard, i) => (
             <div className={`tsx-gov-card tsx-fade tsx-fade-d${i + 1}`} key={standard.title}>
-              <div className={`tsx-gov-header ${i % 2 === 0 ? 'navy' : 'dark'}`}>
+              <div className="tsx-gov-header navy">
                 <span className="tsx-gov-num">{String(i + 1).padStart(2, '0')}</span>
                 <span className="tsx-gov-cat">{TSX_GOV_CATEGORIES[i]}</span>
               </div>
@@ -419,29 +422,15 @@ function TrustMarketContext() {
   );
 }
 
-function TrustCTABand() {
-  return (
-    <section className="tsx-cta-band" aria-labelledby="tsx-cta-h">
-      <div className="tsx-section-inner">
-        <div className="tsx-cta-inner tsx-fade">
-          <p className="tsx-cta-eyebrow">Enterprise intake</p>
-          <h2 className="tsx-cta-heading" id="tsx-cta-h">Ready to work with Nexara?</h2>
-          <p className="tsx-cta-sub">Pick a solution line and open an engagement. Nexara reviews the brief and responds with fit and next steps.</p>
-          <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>Start a Project</button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function TrustFooter() {
   const solutionLinks = DATA.nav.slice(0, 3).map(item => ({ text: getTrustNavLabel(item), page: item.page }));
-  const moduleLinks = Object.values(DATA.sections).flatMap(section =>
-    section.subpages.map(sp => ({ text: `${getTrustSectionLabel(section)} / ${getTrustSubpageLabel(section, sp)}`, page: section.id, detail: sp.slug }))
-  );
+  const moduleGroups = Object.values(DATA.sections).map(section => ({
+    label: getTrustSectionLabel(section),
+    links: section.subpages.map(sp => ({ text: getTrustSubpageLabel(section, sp), page: section.id, detail: sp.slug })),
+  }));
   const cols = [
     { label: 'Solutions', links: solutionLinks },
-    { label: 'Modules', links: moduleLinks },
+    { label: 'Modules', groups: moduleGroups },
     { label: 'Company', links: [{ text: 'Delivery Proof', page: 'customers' }, { text: 'About Nexara', page: 'company' }, { text: 'Enterprise Enquiry', page: 'contact' }] },
   ];
   return (
@@ -461,11 +450,24 @@ function TrustFooter() {
         {cols.map(col => (
           <div key={col.label}>
             <span className="tsx-footer-col-label">{col.label}</span>
-            <ul className="tsx-footer-links">
-              {col.links.map(l => (
-                <li key={l.text}><button onClick={() => routeTo('trust', l.page, l.detail)}>{l.text}</button></li>
-              ))}
-            </ul>
+            {col.groups ? (
+              col.groups.map(group => (
+                <div className="tsx-footer-group" key={group.label}>
+                  <span className="tsx-footer-group-label">{group.label}</span>
+                  <ul className="tsx-footer-links">
+                    {group.links.map(l => (
+                      <li key={l.text}><button onClick={() => routeTo('trust', l.page, l.detail)}>{l.text}</button></li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            ) : (
+              <ul className="tsx-footer-links">
+                {col.links.map(l => (
+                  <li key={l.text}><button onClick={() => routeTo('trust', l.page, l.detail)}>{l.text}</button></li>
+                ))}
+              </ul>
+            )}
           </div>
         ))}
       </div>
@@ -492,11 +494,11 @@ function TrustHeroUnravel() {
     const TAU = Math.PI * 2;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Monochromatic colors (Classic blue, medium blue, slate)
+    // Drafting-table ink on paper: cobalt, deep blue, ink
     const STRANDS = [
-      { id: "academy",   rgb: [15, 76, 129] },  // var(--tsx-accent)
-      { id: "labs",      rgb: [26, 95, 155] },  // var(--tsx-accent-mid)
-      { id: "marketing", rgb: [100, 116, 139] }, // var(--muted)
+      { id: "academy",   rgb: [29, 78, 216] },  // var(--accent) cobalt
+      { id: "labs",      rgb: [30, 64, 175] },  // deep blue
+      { id: "marketing", rgb: [22, 24, 29] },   // ink
     ];
 
     const makeSprite = (rgb) => {
@@ -504,9 +506,9 @@ function TrustHeroUnravel() {
       s.width = s.height = 64;
       const c = s.getContext("2d");
       const grad = c.createRadialGradient(32, 32, 0, 32, 32, 32);
-      grad.addColorStop(0, "rgba(255,255,255,0.95)");
-      grad.addColorStop(0.18, "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.85)");
-      grad.addColorStop(0.5, "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.22)");
+      grad.addColorStop(0, "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.9)");
+      grad.addColorStop(0.3, "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.5)");
+      grad.addColorStop(0.6, "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.14)");
       grad.addColorStop(1, "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0)");
       c.fillStyle = grad;
       c.fillRect(0, 0, 64, 64);
@@ -756,7 +758,7 @@ function TrustHeroUnravel() {
       updateChapters(p);
 
       ctx.clearRect(0, 0, W, H);
-      ctx.globalCompositeOperation = "lighter";
+      ctx.globalCompositeOperation = "source-over";
 
       const seg = segmentAt(p);
       const ry = p * 4.4 + time * 0.05 + mouse.x * 0.28;
@@ -851,34 +853,34 @@ function TrustHeroUnravel() {
 
         <div className="tsx-hero-chapter" data-from="0.125" data-to="0.225" aria-hidden="true">
           <p className="tsx-section-eyebrow">The premise</p>
-          <h2 className="tsx-section-heading">One core.<br /><span className="serif" style={{ color: '#93C5FD' }}>Three forces.</span></h2>
+          <h2 className="tsx-section-heading">One core.<br /><span className="serif" style={{ color: '#1D4ED8' }}>Three forces.</span></h2>
           <p className="tsx-sec-body" style={{ maxWidth: '34em', marginInline: 'auto' }}>Every engagement runs through a single operating core — then unravels into three disciplined divisions.</p>
         </div>
 
-        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#93C5FD' }} data-from="0.27" data-to="0.45" aria-hidden="true">
+        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#1D4ED8' }} data-from="0.27" data-to="0.45" aria-hidden="true">
           <p className="tsx-panel-idx">01 / DIVISION</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Academy<br /><span className="serif" style={{ color: '#93C5FD' }}>the talent engine.</span></h2>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Academy<br /><span className="serif" style={{ color: '#1D4ED8' }}>the talent engine.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Structured, cohort-based programmes that turn ambitious learners into capable engineers — sprint by sprint, review by review.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'academy')} style={{ marginTop: '20px' }}>Enter Academy →</button>
         </div>
 
-        <div className="tsx-hero-chapter ch-right" style={{ '--accent': '#7DD3FC' }} data-from="0.45" data-to="0.63" aria-hidden="true">
+        <div className="tsx-hero-chapter ch-right" style={{ '--accent': '#1E40AF' }} data-from="0.45" data-to="0.63" aria-hidden="true">
           <p className="tsx-panel-idx" style={{ right: 'clamp(24px, 9vw, 140px)', left: 'auto' }}>02 / DIVISION</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'right' }}>Labs<br /><span className="serif" style={{ color: '#7DD3FC' }}>the systems forge.</span></h2>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'right' }}>Labs<br /><span className="serif" style={{ color: '#1E40AF' }}>the systems forge.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'right' }}>Applied AI and automation systems, engineered from prototype to production with written specs and weekly demos.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'labs')} style={{ marginTop: '20px' }}>Enter Labs →</button>
         </div>
 
-        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#CBD5E1' }} data-from="0.63" data-to="0.81" aria-hidden="true">
+        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#5B6472' }} data-from="0.63" data-to="0.81" aria-hidden="true">
           <p className="tsx-panel-idx">03 / DIVISION</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Marketing<br /><span className="serif" style={{ color: '#CBD5E1' }}>the growth signal.</span></h2>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Marketing<br /><span className="serif" style={{ color: '#5B6472' }}>the growth signal.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Brand systems, web experiences and performance creative — built like software, measured like engineering.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'marketing')} style={{ marginTop: '20px' }}>Enter Marketing →</button>
         </div>
 
         <div className="tsx-hero-chapter" data-from="0.86" data-to="1" aria-hidden="true">
           <p className="tsx-section-eyebrow">The weave</p>
-          <h2 className="tsx-section-heading">Three disciplines.<br /><span className="serif" style={{ color: '#93C5FD' }}>One standard.</span></h2>
+          <h2 className="tsx-section-heading">Three disciplines.<br /><span className="serif" style={{ color: '#1D4ED8' }}>One standard.</span></h2>
           <div className="tsx-sec-actions" style={{ display: 'flex', gap: '16px', marginTop: '24px', justifyContent: 'center' }}>
             <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>Start a brief <span className="arr">→</span></button>
             <button className="tsx-sec-btn-ghost" onClick={() => {
@@ -1017,13 +1019,9 @@ function TrustDivisionsRail() {
 function TrustFinalCTA() {
   return (
     <section className="tsx-final-cta">
-      <p className="tsx-section-eyebrow">Ready when you are</p>
-      <button onClick={() => routeTo('trust', 'contact')} aria-label="Begin — start a brief" style={{ border: 0, background: 'none', padding: 0 }}>
-        <span className="tsx-final-cta">
-          <a href="#contact" onClick={(e) => { e.preventDefault(); routeTo('trust', 'contact'); }}>Begin.</a>
-        </span>
-      </button>
-      <p className="tsx-sec-body">Tell us which force you need — or let the brief decide.</p>
+      <p className="tsx-section-eyebrow">Enterprise intake</p>
+      <a href="#contact" onClick={(e) => { e.preventDefault(); routeTo('trust', 'contact'); }}>Start <em>the brief.</em></a>
+      <p>Scoped response within two working days.</p>
     </section>
   );
 }
@@ -1036,14 +1034,14 @@ function TrustHome() {
           <TrustHeroFlat />
           <TrustProofStrip />
           <TrustSolutionsGrid />
-          <TrustFeatureStrip />
           <TrustEnterpriseStacks />
           <TrustMarketContext />
-          <TrustCTABand />
+          <TrustFinalCTA />
         </>
       ) : (
         <>
           <TrustHeroUnravel />
+          <TrustProofStrip />
           <TrustManifesto />
           <TrustDivisionsRail />
           <section className="tsx-section-inner" style={{ paddingBlock: 'clamp(60px, 10vh, 120px)' }}>
@@ -1074,6 +1072,8 @@ function TrustHome() {
               </div>
             </div>
           </section>
+          <TrustEnterpriseStacks />
+          <TrustMarketContext />
           <TrustFinalCTA />
         </>
       )}
@@ -1171,7 +1171,7 @@ function TrustProofCards({ items }) {
 function TrustProofStrips({ items }) { return <TrustProofCards items={items} />; }
 
 const PKG_THEMES = [
-  { head: 'tsx-pkg-head-slate', badge: null },
+  { head: 'tsx-pkg-head-dark',  badge: null },
   { head: 'tsx-pkg-head-navy',  badge: 'Most Common' },
   { head: 'tsx-pkg-head-dark',  badge: null },
 ];
@@ -1437,17 +1437,17 @@ function TrustSectionHeroUnravel({ theme, section }) {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const shape = section.id === "academy" ? "spiral" : section.id === "labs" ? "sphere" : "signal";
-    // Monochromatic strands matching the section
-    const rgb = section.id === "academy" ? [15, 76, 129] : section.id === "labs" ? [26, 95, 155] : [100, 116, 139];
+    // Ink-on-paper strands matching the section
+    const rgb = section.id === "academy" ? [29, 78, 216] : section.id === "labs" ? [30, 64, 175] : [22, 24, 29];
 
     const makeSprite = (cRgb) => {
       const s = document.createElement("canvas");
       s.width = s.height = 64;
       const c = s.getContext("2d");
       const grad = c.createRadialGradient(32, 32, 0, 32, 32, 32);
-      grad.addColorStop(0, "rgba(255,255,255,0.95)");
-      grad.addColorStop(0.18, "rgba(" + cRgb[0] + "," + cRgb[1] + "," + cRgb[2] + ",0.85)");
-      grad.addColorStop(0.5, "rgba(" + cRgb[0] + "," + cRgb[1] + "," + cRgb[2] + ",0.22)");
+      grad.addColorStop(0, "rgba(" + cRgb[0] + "," + cRgb[1] + "," + cRgb[2] + ",0.9)");
+      grad.addColorStop(0.3, "rgba(" + cRgb[0] + "," + cRgb[1] + "," + cRgb[2] + ",0.5)");
+      grad.addColorStop(0.6, "rgba(" + cRgb[0] + "," + cRgb[1] + "," + cRgb[2] + ",0.14)");
       grad.addColorStop(1, "rgba(" + cRgb[0] + "," + cRgb[1] + "," + cRgb[2] + ",0)");
       c.fillStyle = grad;
       c.fillRect(0, 0, 64, 64);
@@ -1513,7 +1513,7 @@ function TrustSectionHeroUnravel({ theme, section }) {
 
       const p = state.p;
       ctx.clearRect(0, 0, W, H);
-      ctx.globalCompositeOperation = "lighter";
+      ctx.globalCompositeOperation = "source-over";
 
       const ry = p * 1.8 + time * 0.08;
       const rx = -0.15 + p * 0.3;
@@ -1600,11 +1600,11 @@ function TrustSectionHeroUnravel({ theme, section }) {
         <canvas ref={canvasRef} className="tsx-hero-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
         <div className="tsx-hero-chapter" style={{ opacity: 1, pointerEvents: 'auto' }}>
           <p className="tsx-section-eyebrow">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {getTrustSectionLabel(section).toUpperCase()}</p>
-          <h1 className="tsx-section-heading" style={{ color: '#fff', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 800, textTransform: 'uppercase' }}>
+          <h1 className="tsx-section-heading" style={{ color: 'var(--text)', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 600 }}>
             {copy.title}<br />
-            <span className="serif" style={{ color: section.id === "academy" ? '#93C5FD' : section.id === "labs" ? '#7DD3FC' : '#CBD5E1' }}>{copy.accent}</span>
+            <span className="serif" style={{ color: section.id === "academy" ? '#1D4ED8' : section.id === "labs" ? '#1E40AF' : '#5B6472' }}>{copy.accent}</span>
           </h1>
-          <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'rgba(226, 232, 240, 0.86)', marginInline: 'auto' }}>{copy.body}</p>
+          <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'var(--muted)', marginInline: 'auto' }}>{copy.body}</p>
           <div className="tsx-sec-actions" style={{ marginTop: '24px', display: 'flex', gap: '16px', justifyContent: 'center' }}>
             <button className="tsx-btn-cta" onClick={() => {
               const subnav = document.querySelector(".tsx-subnav");
