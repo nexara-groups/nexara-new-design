@@ -3905,3 +3905,44 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust .tsx-unbox-face { padding-top: clamp(22px,2.4vw,32px); }
 .trust .tsx-unbox-face::after { content: ""; position: absolute; top: -31px; left: 50%; transform: translateX(-50%); width: 11px; height: 11px; border-radius: 50%; background: var(--paper); border: 2px solid var(--blueprint); }
 .trust .tsx-unbox-stem { background: var(--blueprint); width: 2px; }
+
+/* ── Audit fix: legibility floors (≥12px meaningful labels, AA contrast) ── */
+.trust.tsx-site .tsx-stat-sublabel { font-size: 12px; color: var(--muted); font-weight: 600; }
+.trust .tsx-hero-dimline-label { font-size: 0.72rem; }
+.trust.tsx-site .tsx-proof-case-org { font-size: 12px; color: var(--blueprint); }
+.trust.tsx-site .tsx-enterprise-stacks .tsx-matrix-num { color: rgba(22,24,29,.42); }
+.trust .tsx-panel-tags span, .trust .tsx-stack-tags span, .trust .tsx-matrix-tag { font-size: 11px; }
+.trust.tsx-site .tsx-manifesto-text .w, .trust .tsx-manifesto-text .w { color: rgba(22,24,29,.52); }
+
+/* ── Audit fix round 2: funnel center, plate framing, unbox top-row-only wiring ── */
+.trust .tsx-funnel { align-items: center; }
+.trust .tsx-funnel-stage { align-self: center; margin-inline: 0; }
+/* Ledger plates: clearer card framing, watermark contained */
+.trust .tsx-ledger-plate { border: 1px solid var(--line); box-shadow: var(--shadow-sheet); }
+.trust .tsx-ledger-plate .tsx-panel-watermark { font-size: clamp(5rem,8vw,7rem); right: 10px; top: -14px; opacity: .6; }
+.trust.tsx-site .tsx-overview-top { gap: clamp(20px,2.4vw,36px); align-items: stretch; }
+/* Unbox: only the top row of 3 wires to the bus; bottom row subordinate */
+.trust .tsx-unbox-face:nth-child(n+4)::before, .trust .tsx-unbox-face:nth-child(n+4)::after { display: none; }
+.trust .tsx-unbox-grid { row-gap: clamp(18px,2vw,28px); }
+
+/* ── Audit fix: cohort ladder fills width (was hugging left third) ── */
+.trust .tsx-ladder { max-width: 1000px; }
+.trust .tsx-ladder-step { grid-template-columns: 56px minmax(180px, 0.7fr) 1.5fr; gap: clamp(16px,2.2vw,32px); align-items: baseline; }
+.trust .tsx-ladder-node { width: 56px; height: 56px; font-size: 0.95rem; }
+.trust .tsx-ladder-body { padding-top: 0; display: contents; }
+.trust .tsx-ladder-body h3 { grid-column: auto; align-self: baseline; }
+.trust .tsx-ladder-body p { max-width: none; }
+
+/* ── Audit fix: subpage own hero + denser customers ── */
+.trust .tsx-subpage-hero-inner { min-height: clamp(360px, 46vh, 500px); }
+.trust .tsx-subpage-hero-actions { display: flex; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
+.trust .tsx-subpage-cards-head { margin-bottom: clamp(28px,4vw,48px); }
+.trust .tsx-proof-bysection { padding-top: clamp(20px,3vw,40px); }
+.trust .tsx-proof-group { margin-bottom: clamp(40px,6vw,72px); }
+.trust .tsx-proof-group-head { margin-bottom: 24px; }
+.trust .tsx-proof-group-head .tsx-section-heading { font-size: clamp(1.35rem,2.2vw,1.9rem); margin-bottom: 0; }
+
+/* ── Audit fix: funnel centering (definitive — block + margin auto) ── */
+.trust .tsx-funnel { display: block; }
+.trust .tsx-funnel-stage { width: var(--w, 100%); margin: 0 auto 14px; align-self: auto; }
+.trust .tsx-funnel-stage:last-child { margin-bottom: 0; }

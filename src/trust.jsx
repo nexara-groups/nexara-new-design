@@ -1659,10 +1659,9 @@ function TrustSubpageDetail({ section, page }) {
   return (
     <div className="tsx-subpage">
       <div className="tsx-section-inner">
-        <div className="tsx-subpage-callout tsx-callout-plate tsx-fade">
-          <span className="tsx-panel-watermark" aria-hidden="true">§</span>
-          <div className="tsx-dimline" data-label="Brief" aria-hidden="true" />
-          <h2 className="tsx-subpage-h2">{page.callout.trust}</h2>
+        <div className="tsx-subpage-cards-head tsx-fade">
+          <span className="tsx-section-eyebrow">What's inside</span>
+          <h2 className="tsx-section-heading">The <span className="serif">{page.title.toLowerCase()}</span> toolkit.</h2>
         </div>
         <div className="tsx-subpage-icon-grid">
           {page.cards.map((card, i) => (
@@ -1982,12 +1981,40 @@ function TrustSignatureModule({ section }) {
   return null;
 }
 
+function TrustSubpageHero({ section, page }) {
+  const idx = section.subpages.findIndex(p => p.slug === page.slug);
+  return (
+    <section className="tsx-sec-header tsx-subpage-hero">
+      <div className="tsx-sec-header-inner tsx-subpage-hero-inner">
+        <div>
+          <span className="tsx-sec-eyebrow">{getTrustSectionLabel(section)} · {String(idx + 1).padStart(2, '0')} / {page.title}</span>
+          <h1 className="tsx-sec-h1">{page.callout.trust}</h1>
+          <div className="tsx-subpage-hero-actions">
+            <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>{TRUST_SECTION_CTA[section.id] || 'Start a Project'}</button>
+            <button className="tsx-sec-btn-ghost" onClick={() => routeTo('trust', section.id)}>← Back to {getTrustSectionLabel(section)}</button>
+          </div>
+        </div>
+        <div className="tsx-spec-panel">
+          <span className="tsx-spec-panel-label">{page.title}</span>
+          {page.cards.slice(0, 4).map((c) => (
+            <div className="tsx-spec-row" key={c.title}>
+              <span className="tsx-spec-label">{c.title}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function TrustSectionPage({ section, detail }) {
   const active = useMemo(() => detail ? section.subpages.find(p => p.slug === detail) : null, [section, detail]);
   if (detail && !active) return <NotFound theme="trust" page={`${section.id}/${detail}`} />;
   return (
     <main className="tsx-section-page" style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' }}>
-      {HAS_SCROLL_ANIMATION ? (
+      {active ? (
+        <TrustSubpageHero section={section} page={active} />
+      ) : HAS_SCROLL_ANIMATION ? (
         <TrustSectionHeroUnravel theme="trust" section={section} />
       ) : (
         <TrustSectionHeader section={section} />
@@ -2038,6 +2065,22 @@ function TrustCustomers({ detail }) {
           columns={["Section", "Engagement type", "What was produced"]}
           rows={proofItems.map(c => [c.section, c.company, c.trust])}
         />
+      </section>
+      {!activeSection && (
+        <section className="tsx-section-inner tsx-proof-bysection">
+          <div className="tsx-dimline" data-label="By solution line" aria-hidden="true" />
+          {Object.values(DATA.sections).map((sec) => (
+            <div className="tsx-proof-group" key={sec.id}>
+              <div className="tsx-proof-group-head">
+                <span className="tsx-section-eyebrow">{getTrustSectionLabel(sec)}</span>
+                <h3 className="tsx-section-heading">{sec.short.trust}</h3>
+              </div>
+              <TrustProofCards items={sec.proof} />
+            </div>
+          ))}
+        </section>
+      )}
+      <section className="tsx-section-inner">
         <TrustIntakeBand spaced heading="Start a scoped engagement" sub="Tell us what you need. Nexara maps the right next step." />
       </section>
     </main>
