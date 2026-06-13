@@ -31,6 +31,71 @@ function setupTsxFade() {
 const TRUST_ACCENT = { academy: '#2F4A6B', marketing: '#2F4A6B', labs: '#2F4A6B' };
 const TRUST_VERMILION = '#D9472B';
 
+const TRUST_OPERATING_STANDARD = [
+  { title: 'Written before built', body: "Every engagement starts with a written brief and scope. If it isn't written down, it isn't agreed." },
+  { title: 'Demo every week', body: 'Working software, live cohorts, running campaigns — shown weekly, not described in decks.' },
+  { title: 'One accountable lead', body: 'Every cohort, system and campaign has a single named owner from kickoff to handover.' },
+  { title: 'Handover by design', body: 'Documentation, access and training are part of the deliverable — never an afterthought.' },
+];
+
+/* ─── Shared Blueprint-Ledger primitives (kill repeated text boxes) ─── */
+
+function TrustIntakeBand({ heading, sub, cta = 'Start a Project', onClick, spaced }) {
+  return (
+    <div className={"tsx-intake-band tsx-intake-band--plate tsx-fade" + (spaced ? " tsx-intake-spaced" : "")}>
+      <span className="tsx-intake-mark" aria-hidden="true">§</span>
+      <div className="tsx-intake-copy">
+        <span className="tsx-intake-tick" aria-hidden="true" />
+        <p className="tsx-intake-heading">{heading}</p>
+        {sub && <p className="tsx-intake-sub">{sub}</p>}
+      </div>
+      {cta && <button className="tsx-btn-cta" onClick={onClick || (() => routeTo('trust', 'contact'))}>{cta}</button>}
+    </div>
+  );
+}
+
+function TrustLedgerTable({ columns, rows, label }) {
+  const tpl = '46px ' + columns.map((_, i) => (i === 0 ? '1.1fr' : '1.6fr')).join(' ');
+  return (
+    <div className="tsx-ledger" role="table" aria-label={label || 'Ledger'}>
+      <div className="tsx-ledger-head" role="row" style={{ gridTemplateColumns: tpl }}>
+        <span className="tsx-ledger-rownum" aria-hidden="true" />
+        {columns.map((c) => <span className="tsx-ledger-h" role="columnheader" key={c}>{c}</span>)}
+      </div>
+      {rows.map((cells, i) => (
+        <div className={`tsx-ledger-row tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} role="row" key={i} style={{ gridTemplateColumns: tpl }}>
+          <span className="tsx-ledger-rownum" aria-hidden="true">/{String(i + 1).padStart(2, '0')}</span>
+          {cells.map((cell, j) => (
+            <span className={"tsx-ledger-cell" + (j === 0 ? " tsx-ledger-lead" : "")} role="cell" key={j}>{cell}</span>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TrustLedgerRows({ items, titleKey = 'title', bodyKey = 'body', framed, numerals = true, label }) {
+  const body = (
+    <div className="tsx-ledger-rows" role="list">
+      {items.map((it, i) => (
+        <div className={`tsx-ledger-rowitem tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} role="listitem" key={(it[titleKey] || i) + ''}>
+          {numerals && <span className="tsx-ledger-rownum" aria-hidden="true">/{String(i + 1).padStart(2, '0')}</span>}
+          <span className="tsx-ledger-rowtitle">{it[titleKey]}</span>
+          <span className="tsx-ledger-rowdesc">{it[bodyKey]}</span>
+        </div>
+      ))}
+    </div>
+  );
+  if (framed) return (
+    <div className="tsx-ledger-plate">
+      <span className="tsx-panel-watermark" aria-hidden="true">§</span>
+      {label && <span className="tsx-ledger-plate-label">{label}</span>}
+      {body}
+    </div>
+  );
+  return body;
+}
+
 function TrustParticleCanvas() {
   const canvasRef = React.useRef(null);
   React.useEffect(() => {
@@ -1112,28 +1177,7 @@ function TrustHome() {
               <p className="tsx-section-eyebrow">The operating standard</p>
               <h2 className="tsx-section-heading">Every division runs<br />on the same <span className="serif">spine.</span></h2>
             </div>
-            <div className="tsx-standards-grid">
-              <div className="tsx-standard-card">
-                <span className="tsx-std-idx">/01</span>
-                <h3>Written before built</h3>
-                <p>Every engagement starts with a written brief and scope. If it isn't written down, it isn't agreed.</p>
-              </div>
-              <div className="tsx-standard-card">
-                <span className="tsx-std-idx">/02</span>
-                <h3>Demo every week</h3>
-                <p>Working software, live cohorts, running campaigns — shown weekly, not described in decks.</p>
-              </div>
-              <div className="tsx-standard-card">
-                <span className="tsx-std-idx">/03</span>
-                <h3>One accountable lead</h3>
-                <p>Every cohort, system and campaign has a single named owner from kickoff to handover.</p>
-              </div>
-              <div className="tsx-standard-card">
-                <span className="tsx-std-idx">/04</span>
-                <h3>Handover by design</h3>
-                <p>Documentation, access and training are part of the deliverable — never an afterthought.</p>
-              </div>
-            </div>
+            <TrustLedgerRows framed label="§ Operating standard" items={TRUST_OPERATING_STANDARD} titleKey="title" bodyKey="body" />
           </section>
           <TrustEnterpriseStacks />
           <TrustMarketContext />
@@ -1217,13 +1261,14 @@ function TrustFaqAccordion({ faqs }) {
 function TrustProofCards({ items }) {
   return (
     <div className="tsx-proof-cards-grid">
-      {items.map(p => (
-        <div className="tsx-proof-case-card" key={p.name}>
+      {items.map((p, i) => (
+        <div className={`tsx-proof-case-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={p.name}>
+          <span className="tsx-proof-case-idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
           <div className="tsx-proof-case-top">
             <span className="tsx-proof-case-org">{p.org}</span>
           </div>
           <p className="tsx-proof-case-headline">{p.name}</p>
-          <p className="tsx-proof-case-body">{p.result.trust}</p>
+          <p className="tsx-proof-case-body"><span className="tsx-proof-tick" aria-hidden="true" />{p.result.trust}</p>
         </div>
       ))}
     </div>
@@ -1345,30 +1390,15 @@ function TrustSectionOverview({ section }) {
     <div className="tsx-overview">
       <div className="tsx-section-inner">
 
-        {/* ─── Capabilities + Audience ─────────────────────────── */}
+        {/* ─── Capabilities + Audience — facing ledger plates ──── */}
         <div className="tsx-overview-top">
           <div className="tsx-cap-col">
             <span className="tsx-overview-label">Capabilities</span>
-            <div className="tsx-cap-card-grid">
-              {section.modules.map((m, i) => (
-                <div className={`tsx-cap-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={m.title}>
-                  <span className="tsx-cap-card-index">{String(i + 1).padStart(2, '0')}</span>
-                  <p className="tsx-cap-card-title">{m.title}</p>
-                  <p className="tsx-cap-card-body">{m.trust}</p>
-                </div>
-              ))}
-            </div>
+            <TrustLedgerRows framed label="§ Capability stack" items={section.modules} titleKey="title" bodyKey="trust" />
           </div>
           <div className="tsx-audience-col">
-            <div className="tsx-audience-panel tsx-fade tsx-fade-d2">
-              <span className="tsx-panel-title">Who this serves</span>
-              {section.audiences.map(a => (
-                <div className="tsx-audience-row" key={a.title}>
-                  <strong>{a.title}</strong>
-                  <p>{a.trust}</p>
-                </div>
-              ))}
-            </div>
+            <span className="tsx-overview-label">Who this serves</span>
+            <TrustLedgerRows framed label="§ Audience" items={section.audiences} titleKey="title" bodyKey="trust" />
           </div>
         </div>
 
@@ -1399,13 +1429,7 @@ function TrustSectionOverview({ section }) {
           <TrustFaqAccordion faqs={section.faqs} />
         </TrustSectionBlock>
 
-        <div className="tsx-intake-band">
-          <div>
-            <p className="tsx-intake-heading">{section.intake.primary}</p>
-            <p className="tsx-intake-sub">{section.intake.secondary}</p>
-          </div>
-          <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>{TRUST_SECTION_CTA[section.id] || 'Start a Project'}</button>
-        </div>
+        <TrustIntakeBand heading={section.intake.primary} sub={section.intake.secondary} cta={TRUST_SECTION_CTA[section.id] || 'Start a Project'} />
       </div>
     </div>
   );
@@ -1461,7 +1485,9 @@ function TrustSubpageDetail({ section, page }) {
   return (
     <div className="tsx-subpage">
       <div className="tsx-section-inner">
-        <div className="tsx-subpage-callout tsx-fade">
+        <div className="tsx-subpage-callout tsx-callout-plate tsx-fade">
+          <span className="tsx-panel-watermark" aria-hidden="true">§</span>
+          <div className="tsx-dimline" data-label="Brief" aria-hidden="true" />
           <h2 className="tsx-subpage-h2">{page.callout.trust}</h2>
         </div>
         <div className="tsx-subpage-icon-grid">
@@ -1475,13 +1501,7 @@ function TrustSubpageDetail({ section, page }) {
             </div>
           ))}
         </div>
-        <div className="tsx-intake-band">
-          <div>
-            <p className="tsx-intake-heading">{section.intake.primary}</p>
-            <p className="tsx-intake-sub">{section.intake.secondary}</p>
-          </div>
-          <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>{TRUST_SECTION_CTA[section.id] || 'Start a Project'}</button>
-        </div>
+        <TrustIntakeBand heading={section.intake.primary} sub={section.intake.secondary} cta={TRUST_SECTION_CTA[section.id] || 'Start a Project'} />
       </div>
     </div>
   );
@@ -1837,27 +1857,12 @@ function TrustCustomers({ detail }) {
       </div>
       <section className="tsx-section-inner tsx-proof-table-section">
         <h2 className="tsx-section-heading tsx-overview-h">Delivery model proof</h2>
-        <table className="tsx-del-table">
-          <thead>
-            <tr><th>Section</th><th>Engagement type</th><th>What was produced</th></tr>
-          </thead>
-          <tbody>
-            {proofItems.map(customer => (
-              <tr key={customer.id}>
-                <td><strong>{customer.section}</strong></td>
-                <td>{customer.company}</td>
-                <td>{customer.trust}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="tsx-intake-band tsx-intake-spaced">
-          <div>
-            <p className="tsx-intake-heading">Start a scoped engagement</p>
-            <p className="tsx-intake-sub">Tell us what you need. Nexara maps the right next step.</p>
-          </div>
-          <button className="tsx-btn-cta" onClick={() => routeTo("trust", "contact")}>Start a Project</button>
-        </div>
+        <TrustLedgerTable
+          label="Delivery model proof"
+          columns={["Section", "Engagement type", "What was produced"]}
+          rows={proofItems.map(c => [c.section, c.company, c.trust])}
+        />
+        <TrustIntakeBand spaced heading="Start a scoped engagement" sub="Tell us what you need. Nexara maps the right next step." />
       </section>
     </main>
   );
@@ -1887,40 +1892,16 @@ function TrustCompany() {
       </div>
       <section className="tsx-section-inner tsx-principles-section">
         <h2 className="tsx-section-heading tsx-overview-h">Operating principles</h2>
-        <ul className="tsx-capability-list">
-          {company.principles.map((principle, index) => (
-            <li className="tsx-capability-item" key={principle.title}>
-              <span className="tsx-cap-index">{String(index + 1).padStart(2, "0")}</span>
-              <div className="tsx-cap-body">
-                <strong>{principle.title}</strong>
-                <p>{principle.body}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <TrustLedgerRows items={company.principles} titleKey="title" bodyKey="body" />
       </section>
       <section className="tsx-section-inner tsx-standards-section">
         <h2 className="tsx-section-heading tsx-overview-h">Delivery governance</h2>
-        <table className="tsx-del-table">
-          <thead>
-            <tr><th>Standard</th><th>Commitment</th></tr>
-          </thead>
-          <tbody>
-            {DATA.company.standards.map(item => (
-              <tr key={item.title}>
-                <td><strong>{item.title}</strong></td>
-                <td>{item.body}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="tsx-intake-band tsx-intake-spaced">
-          <div>
-            <p className="tsx-intake-heading">Work with Nexara</p>
-            <p className="tsx-intake-sub">Pick a solution line and open an engagement.</p>
-          </div>
-          <button className="tsx-btn-cta" onClick={() => routeTo("trust", "contact")}>Start a Project</button>
-        </div>
+        <TrustLedgerTable
+          label="Delivery governance"
+          columns={["Standard", "Commitment"]}
+          rows={DATA.company.standards.map(item => [item.title, item.body])}
+        />
+        <TrustIntakeBand spaced heading="Work with Nexara" sub="Pick a solution line and open an engagement." />
       </section>
     </main>
   );
@@ -1968,12 +1949,7 @@ function TrustContact({ detail }) {
         <h2 className="tsx-section-heading tsx-heading-flush">{DATA.contact.enquiry.title}</h2>
         <p className="tsx-brief-intro">{DATA.contact.enquiry.body}</p>
         {showSuccess ? (
-          <div className="tsx-intake-band">
-            <div>
-              <p className="tsx-intake-heading">Enquiry prepared. Your mail client will open shortly.</p>
-              <p className="tsx-intake-sub">If it does not open, use the email link on this page and include the project details manually.</p>
-            </div>
-          </div>
+          <TrustIntakeBand heading="Enquiry prepared. Your mail client will open shortly." sub="If it does not open, use the email link on this page and include the project details manually." cta={null} />
         ) : (
           <div className="tsx-brief-grid">
             <form className="tsx-brief-form" onSubmit={handleSubmit}>

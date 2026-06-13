@@ -3736,3 +3736,67 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust .tsx-rail-baseline::after { right: 0; }
 .trust .tsx-rail-tick { position: absolute; top: 50%; left: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--vermilion); transform: translate(-50%, -50%); box-shadow: 0 0 0 4px color-mix(in srgb, var(--vermilion) 18%, transparent); transition: left .1s linear; }
 @media (max-width: 760px) { .trust .tsx-rail-baseline { display: none; } }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEDGER MODULE CRAFTING PASS — kill the plain text boxes
+   shared primitives: intake plate · ledger table · ledger rows
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Intake band → plate card */
+.trust.tsx-site .tsx-intake-band--plate { position: relative; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--blueprint); border-radius: 12px; box-shadow: var(--shadow-sheet); padding: clamp(24px,3vw,40px); align-items: center; }
+.trust .tsx-intake-band--plate .tsx-intake-mark { position: absolute; right: clamp(14px,3vw,44px); top: -22px; font-family: "Fraunces", Georgia, serif; font-size: clamp(6rem,12vw,11rem); line-height: 1; color: color-mix(in srgb, var(--blueprint) 7%, transparent); pointer-events: none; user-select: none; z-index: 0; }
+.trust .tsx-intake-band--plate .tsx-intake-copy { position: relative; z-index: 1; }
+.trust .tsx-intake-band--plate .tsx-intake-tick { display: block; width: 22px; height: 2px; background: var(--vermilion); margin-bottom: 14px; }
+.trust .tsx-intake-band--plate .tsx-btn-cta { position: relative; z-index: 1; }
+
+/* Ledger table (replaces raw <table>) */
+.trust .tsx-ledger { border-top: 2px solid var(--blueprint); margin-block: clamp(24px,3vw,36px); }
+.trust .tsx-ledger-head { display: grid; gap: clamp(12px,2vw,28px); padding: 12px 0; border-bottom: 1px solid var(--line); }
+.trust .tsx-ledger-h { font-family: "Inter", sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.trust .tsx-ledger-row { display: grid; gap: clamp(12px,2vw,28px); padding: 16px 0; border-bottom: 1px solid var(--line); align-items: baseline; transition: padding-left .25s ease; }
+.trust .tsx-ledger-row:hover { padding-left: 8px; }
+.trust .tsx-ledger-rownum { font-family: "Inter", sans-serif; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.06em; color: var(--blueprint); font-variant-numeric: tabular-nums; }
+.trust .tsx-ledger-cell { font-family: "Inter", sans-serif; font-size: 0.92rem; line-height: 1.55; color: var(--muted); }
+.trust .tsx-ledger-lead { font-family: "Fraunces", Georgia, serif; font-size: clamp(1.05rem,1.5vw,1.3rem); font-weight: 500; color: var(--text); letter-spacing: -0.01em; }
+
+/* Ledger rows (framed plate variant — the canonical stack) */
+.trust .tsx-ledger-plate { position: relative; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--blueprint); border-radius: 12px; box-shadow: var(--shadow-sheet); padding: clamp(22px,2.6vw,34px); height: 100%; }
+.trust .tsx-ledger-plate .tsx-panel-watermark { top: -30px; right: 18px; font-size: clamp(7rem,13vw,12rem); }
+.trust .tsx-ledger-plate-label { display: block; font-family: "Inter", sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--blueprint); margin-bottom: 16px; position: relative; z-index: 1; }
+.trust .tsx-ledger-rows { position: relative; z-index: 1; }
+.trust .tsx-ledger-rowitem { display: grid; grid-template-columns: 40px minmax(130px, 0.85fr) 1.5fr; gap: clamp(10px,1.4vw,22px); align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--line); transition: padding-left .25s ease; }
+.trust .tsx-ledger-rowitem:last-child { border-bottom: 0; }
+.trust .tsx-ledger-rowitem:hover { padding-left: 8px; }
+.trust .tsx-ledger-rowtitle { font-family: "Fraunces", Georgia, serif; font-size: clamp(1rem,1.3vw,1.18rem); font-weight: 500; color: var(--text); letter-spacing: -0.01em; }
+.trust .tsx-ledger-rowdesc { font-family: "Inter", sans-serif; font-size: 0.85rem; line-height: 1.5; color: var(--muted); }
+
+/* Proof case → plate card with ghost index + vermilion tick */
+.trust.tsx-site .tsx-proof-case-card { position: relative; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--blueprint); border-radius: 12px; box-shadow: var(--shadow-sheet); }
+.trust .tsx-proof-case-idx { position: absolute; right: 14px; top: -8px; font-family: "Fraunces", Georgia, serif; font-size: 4.2rem; line-height: 1; color: color-mix(in srgb, var(--blueprint) 8%, transparent); pointer-events: none; z-index: 0; font-variant-numeric: tabular-nums; }
+.trust .tsx-proof-case-top, .trust .tsx-proof-case-headline, .trust .tsx-proof-case-body { position: relative; z-index: 1; }
+.trust .tsx-proof-tick { display: inline-block; width: 14px; height: 2px; background: var(--vermilion); margin-right: 8px; vertical-align: middle; }
+
+/* Subpage callout → plate */
+.trust .tsx-callout-plate { position: relative; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--blueprint); border-radius: 12px; box-shadow: var(--shadow-sheet); padding: clamp(28px,4vw,52px); }
+.trust .tsx-callout-plate .tsx-panel-watermark { top: -28px; right: 22px; font-size: clamp(7rem,14vw,13rem); }
+.trust .tsx-callout-plate .tsx-dimline { margin: 0 0 20px; width: 120px; position: relative; z-index: 1; }
+.trust .tsx-callout-plate .tsx-subpage-h2 { position: relative; z-index: 1; }
+
+/* Contact channel cards → selectable plates */
+.trust.tsx-site .tsx-channel-card { position: relative; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-sheet); transition: border-color .2s, transform .25s, box-shadow .25s; }
+.trust.tsx-site .tsx-channel-card:hover { transform: translateY(-3px); }
+.trust.tsx-site .tsx-channel-card.active { border-top-color: var(--vermilion); background: var(--panel); }
+.trust.tsx-site .tsx-channel-card.active h3 { color: var(--vermilion); }
+
+/* Contact checklist → ledger spec list */
+.trust.tsx-site .tsx-checklist-panel { background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--blueprint); border-radius: 12px; box-shadow: var(--shadow-sheet); }
+.trust.tsx-site .tsx-checklist-panel li::before { content: "✓"; color: var(--blueprint); }
+
+/* Mobile collapse */
+@media (max-width: 700px) {
+  .trust .tsx-ledger-head { display: none; }
+  .trust .tsx-ledger-row { grid-template-columns: 40px 1fr !important; row-gap: 4px; }
+  .trust .tsx-ledger-row .tsx-ledger-cell { grid-column: 2; }
+  .trust .tsx-ledger-rowitem { grid-template-columns: 34px 1fr; row-gap: 4px; }
+  .trust .tsx-ledger-rowdesc { grid-column: 2; }
+}
