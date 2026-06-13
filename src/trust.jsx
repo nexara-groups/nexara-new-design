@@ -26,8 +26,10 @@ function setupTsxFade() {
   };
 }
 
-/* Per-division accent trio — shared by rail + section pages. AA-safe on warm paper. */
-const TRUST_ACCENT = { academy: '#1D4ED8', marketing: '#0D9488', labs: '#6D28D9' };
+/* Blueprint Ledger — divisions share one structural blueprint accent; they
+   differ by plate numeral + serif tagline, not hue. Vermilion is the rare highlight. */
+const TRUST_ACCENT = { academy: '#2F4A6B', marketing: '#2F4A6B', labs: '#2F4A6B' };
+const TRUST_VERMILION = '#D9472B';
 
 function TrustParticleCanvas() {
   const canvasRef = React.useRef(null);
@@ -527,9 +529,9 @@ function TrustHeroUnravel() {
 
     // Drafting-table ink on paper: cobalt, deep blue, ink
     const STRANDS = [
-      { id: "academy",   rgb: [29, 78, 216] },  // var(--accent) cobalt
-      { id: "labs",      rgb: [30, 64, 175] },  // deep blue
-      { id: "marketing", rgb: [22, 24, 29] },   // ink
+      { id: "academy",   rgb: [47, 74, 107] },   // blueprint
+      { id: "labs",      rgb: [26, 24, 19] },    // ink
+      { id: "marketing", rgb: [217, 71, 43] },   // vermilion
     ];
 
     const makeSprite = (rgb) => {
@@ -1490,7 +1492,7 @@ function TrustSectionHeroUnravel({ theme, section }) {
 
     const shape = section.id === "academy" ? "spiral" : section.id === "labs" ? "sphere" : "signal";
     // Ink-on-paper strands matching the section
-    const rgb = section.id === "academy" ? [29, 78, 216] : section.id === "labs" ? [109, 40, 217] : section.id === "marketing" ? [13, 148, 136] : [22, 24, 29];
+    const rgb = section.id === "marketing" ? [217, 71, 43] : section.id === "labs" ? [26, 24, 19] : [47, 74, 107];
 
     const makeSprite = (cRgb) => {
       const s = document.createElement("canvas");
@@ -1654,7 +1656,7 @@ function TrustSectionHeroUnravel({ theme, section }) {
           <p className="tsx-section-eyebrow">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {getTrustSectionLabel(section).toUpperCase()}</p>
           <h1 className="tsx-section-heading" style={{ color: 'var(--text)', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 600 }}>
             {copy.title}<br />
-            <span className="serif" style={{ color: TRUST_ACCENT[section.id] || '#1D4ED8' }}>{copy.accent}</span>
+            <span className="serif" style={{ color: TRUST_VERMILION }}>{copy.accent}</span>
           </h1>
           <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'var(--muted)', marginInline: 'auto' }}>{copy.body}</p>
           <div className="tsx-sec-actions" style={{ marginTop: '24px', display: 'flex', gap: '16px', justifyContent: 'center' }}>
