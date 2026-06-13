@@ -186,6 +186,66 @@ function TrustLedgerRows({ items, titleKey = 'title', bodyKey = 'body', framed, 
   return body;
 }
 
+function useTrustReveal(threshold = 0.3) {
+  const ref = React.useRef(null);
+  const [shown, setShown] = React.useState(false);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || !('IntersectionObserver' in window)) { setShown(true); return; }
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { setShown(true); obs.disconnect(); } });
+    }, { threshold });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, shown];
+}
+
+function TrustSignalLine() {
+  const [ref, drawn] = useTrustReveal(0.3);
+  return (
+    <div className={"tsx-signal" + (drawn ? " is-drawn" : "")} ref={ref}>
+      <div className="tsx-dimline" data-label="Signal" aria-hidden="true" />
+      <svg className="tsx-signal-svg" viewBox="0 0 1200 200" aria-hidden="true">
+        <path className="tsx-signal-guide" d="M0,100 H1200" vectorEffect="non-scaling-stroke" />
+        <path className="tsx-signal-guide tsx-signal-guide2" d="M0,150 H1200" vectorEffect="non-scaling-stroke" />
+        <path className="tsx-signal-wave" vectorEffect="non-scaling-stroke"
+          d="M0,100 C110,100 150,38 230,40 C320,42 360,168 470,150 C590,131 650,24 770,58 C880,89 960,156 1060,120 C1130,96 1170,92 1200,96" />
+      </svg>
+      <p className="tsx-signal-caption">Attention is a signal. <em>We tune it.</em></p>
+    </div>
+  );
+}
+
+function TrustUnboxAssembly() {
+  const copy = DATA.unbox.trust;
+  const faces = DATA.unbox.faces;
+  const [ref, drawn] = useTrustReveal(0.25);
+  return (
+    <section className="tsx-unbox tsx-section-inner" ref={ref} aria-label={copy.eyebrow}>
+      <div className="tsx-signature-head tsx-fade">
+        <p className="tsx-section-eyebrow">{copy.eyebrow}</p>
+        <h2 className="tsx-section-heading">One operating core.<br /><span className="serif">Six capabilities.</span></h2>
+      </div>
+      <div className={"tsx-unbox-assembly" + (drawn ? " is-drawn" : "")}>
+        <div className="tsx-unbox-core" aria-hidden="true">{copy.sequence}</div>
+        <div className="tsx-unbox-stem" aria-hidden="true" />
+        <div className="tsx-unbox-grid">
+          {faces.map((f, i) => (
+            <button className="tsx-unbox-face tsx-fade" style={{ transitionDelay: (i * 70) + 'ms' }} onClick={() => routeTo('trust', f.section)} key={f.label}>
+              <span className="tsx-unbox-num" aria-hidden="true">/{String(i + 1).padStart(2, '0')}</span>
+              <span className="tsx-unbox-label">{f.label}</span>
+              <span className="tsx-unbox-sub">{f.sub}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function TrustParticleCanvas() {
   const canvasRef = React.useRef(null);
   React.useEffect(() => {
@@ -1261,6 +1321,7 @@ function TrustHome() {
           <TrustProofStrip />
           <TrustManifesto />
           <TrustDivisionsRail />
+          <TrustUnboxAssembly />
           <section className="tsx-section-inner" style={{ paddingBlock: 'clamp(60px, 10vh, 120px)' }}>
             <div className="tsx-dimline" data-label="Sheet 04 · Standard" aria-hidden="true" />
             <div className="tsx-standard-head" style={{ marginBottom: '40px', marginTop: 'clamp(40px,6vw,72px)' }}>
@@ -1498,6 +1559,8 @@ function TrustSectionOverview({ section }) {
             <TrustRunLog config={TRUST_RUNLOG[section.id]} />
           </div>
         )}
+
+        {section.id === 'marketing' && <TrustSignalLine />}
 
         <TrustStatement section={section} />
 
@@ -1848,6 +1911,7 @@ function TrustCohortLadder({ section }) {
 
 function TrustBlueprint({ section }) {
   const mods = (section.modules || []).slice(0, 4);
+  const [ref, drawn] = useTrustReveal(0.3);
   if (!mods.length) return null;
   return (
     <section className="tsx-signature tsx-blueprint-section" aria-label="System architecture">
@@ -1856,7 +1920,8 @@ function TrustBlueprint({ section }) {
           <span className="tsx-section-eyebrow">System architecture</span>
           <h2 className="tsx-section-heading">How a Labs build<br /><span className="serif">fits together.</span></h2>
         </div>
-        <div className="tsx-blueprint-grid">
+        <div className={"tsx-blueprint-grid" + (drawn ? " is-drawn" : "")} ref={ref}>
+          <span className="tsx-blueprint-bus" aria-hidden="true" />
           {mods.map((m, i) => (
             <div className="tsx-blueprint-node tsx-fade" style={{ transitionDelay: (i * 80) + 'ms' }} key={m.title}>
               <span className="tsx-blueprint-num">{String(i + 1).padStart(2, '0')}</span>

@@ -3817,3 +3817,41 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 @keyframes tsxCaretBlink { 50% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .trust .tsx-runlog-caret { animation: none; } }
 @media (max-width: 700px) { .trust .tsx-runlog-body { min-height: 0; } }
+
+/* ── Neo import: Marketing signal line (canvas waveform → self-drawing SVG) ── */
+.trust .tsx-signal { margin-top: clamp(20px,4vw,40px); }
+.trust .tsx-signal-svg { width: 100%; height: auto; display: block; margin-block: clamp(14px,2vw,26px); overflow: visible; }
+.trust .tsx-signal-guide { fill: none; stroke: var(--line); stroke-width: 1; }
+.trust .tsx-signal-guide2 { stroke-dasharray: 2 7; }
+.trust .tsx-signal-wave { fill: none; stroke: var(--blueprint); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 2800; stroke-dashoffset: 2800; transition: stroke-dashoffset 1.5s var(--ease); }
+.trust .tsx-signal.is-drawn .tsx-signal-wave { stroke-dashoffset: 0; }
+.trust .tsx-signal-caption { font-family: "Fraunces", Georgia, serif; font-size: clamp(1.15rem,1.9vw,1.6rem); color: var(--text); letter-spacing: -0.01em; }
+.trust .tsx-signal-caption em { font-style: italic; color: var(--vermilion); }
+@media (prefers-reduced-motion: reduce) { .trust .tsx-signal-wave { transition: none; } }
+
+/* ── Neo import: Unbox exploded assembly (3D cube → flat plate assembly) ── */
+.trust .tsx-unbox { padding-block: clamp(48px,8vw,100px); }
+.trust .tsx-unbox-assembly { position: relative; margin-top: clamp(56px,8vw,96px); padding-top: 52px; }
+.trust .tsx-unbox-core { position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 2; background: var(--ink); color: var(--paper-0); font-family: "Inter", sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; padding: 8px 18px; border-radius: 100px; white-space: nowrap; box-shadow: var(--shadow-sheet); }
+.trust .tsx-unbox-stem { position: absolute; top: 30px; left: 50%; width: 1px; height: 22px; background: var(--blueprint); transform: translateX(-50%) scaleY(0); transform-origin: top; transition: transform .6s var(--ease) .2s; }
+.trust .tsx-unbox-assembly.is-drawn .tsx-unbox-stem { transform: translateX(-50%) scaleY(1); }
+.trust .tsx-unbox-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px,1.6vw,22px); position: relative; }
+.trust .tsx-unbox-grid::before { content: ""; position: absolute; top: -22px; left: 8%; right: 8%; height: 1px; background: var(--line); transform: scaleX(0); transform-origin: center; transition: transform .9s var(--ease) .25s; }
+.trust .tsx-unbox-assembly.is-drawn .tsx-unbox-grid::before { transform: scaleX(1); }
+.trust .tsx-unbox-face { position: relative; text-align: left; background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--blueprint); border-radius: 12px; box-shadow: var(--shadow-sheet); padding: clamp(18px,2vw,28px); cursor: pointer; transition: transform .25s, box-shadow .25s; display: flex; flex-direction: column; gap: 5px; font-family: inherit; }
+.trust .tsx-unbox-face::before { content: ""; position: absolute; top: -22px; left: 50%; width: 1px; height: 22px; background: var(--line); transform: translateX(-50%); }
+.trust .tsx-unbox-face:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(22,24,29,.10); }
+.trust .tsx-unbox-num { font-family: "Inter", sans-serif; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.06em; color: var(--blueprint); font-variant-numeric: tabular-nums; }
+.trust .tsx-unbox-label { font-family: "Fraunces", Georgia, serif; font-size: clamp(1.1rem,1.5vw,1.4rem); font-weight: 500; color: var(--text); letter-spacing: -0.01em; }
+.trust .tsx-unbox-sub { font-family: "Inter", sans-serif; font-size: 0.82rem; color: var(--muted); }
+@media (max-width: 760px) {
+  .trust .tsx-unbox-grid { grid-template-columns: 1fr; }
+  .trust .tsx-unbox-grid::before, .trust .tsx-unbox-face::before { display: none; }
+}
+
+/* ── Neo import: Labs blueprint self-drawing connector bus ── */
+.trust .tsx-blueprint-grid { position: relative; }
+.trust .tsx-blueprint-bus { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--blueprint); transform: scaleX(0); transform-origin: left; transition: transform 1s var(--ease); z-index: 1; pointer-events: none; }
+.trust .tsx-blueprint-grid.is-drawn .tsx-blueprint-bus { transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce) { .trust .tsx-blueprint-bus { transform: scaleX(1); } }
+@media (max-width: 760px) { .trust .tsx-blueprint-bus { display: none; } }
