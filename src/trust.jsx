@@ -38,6 +38,96 @@ const TRUST_OPERATING_STANDARD = [
   { title: 'Handover by design', body: 'Documentation, access and training are part of the deliverable — never an afterthought.' },
 ];
 
+/* Run-log content (Neo terminal → light command ledger). [class,text] pairs per line:
+   p=prompt(blueprint) k=command(ink) c=output(muted) s=success(vermilion) */
+const TRUST_RUNLOG = {
+  academy: {
+    label: 'RUN LOG · career.sh',
+    lines: [
+      ['p', 'nexara@academy:~$ ', 'k', 'init career --track=engineering'],
+      ['c', '  resolving curriculum graph...'],
+      ['c', '  [1/4] foundations        ', 's', '✓ systems · networks · git'],
+      ['c', '  [2/4] core engineering   ', 's', '✓ apis · databases · cloud'],
+      ['c', '  [3/4] specialisation     ', 's', '✓ ai/ml · security · devops'],
+      ['c', '  [4/4] industry residency ', 's', '✓ 12-week placement sprint'],
+      ['p', 'nexara@academy:~$ ', 'k', 'run graduate --mode=hired'],
+      ['s', '  → portfolio shipped before the résumé. offer received.'],
+      ['p', 'nexara@academy:~$ '],
+    ],
+  },
+  labs: {
+    label: 'RUN LOG · deploy.sh',
+    lines: [
+      ['p', 'nexara@labs:~$ ', 'k', 'deploy system --env=production'],
+      ['c', '  building pipeline...'],
+      ['c', '  [1/4] discovery          ', 's', '✓ workflow mapped · specs written'],
+      ['c', '  [2/4] prototype          ', 's', '✓ evals green · guardrails set'],
+      ['c', '  [3/4] hardening          ', 's', '✓ observability · access controls'],
+      ['c', '  [4/4] handover           ', 's', '✓ docs · training · ownership'],
+      ['p', 'nexara@labs:~$ ', 'k', 'status --uptime'],
+      ['s', '  → live. measured, governed, owned.'],
+      ['p', 'nexara@labs:~$ '],
+    ],
+  },
+};
+
+function TrustRunLog({ config }) {
+  const ref = React.useRef(null);
+  const { lines, label } = config;
+  const total = React.useMemo(
+    () => lines.reduce((n, parts) => { let s = 0; for (let i = 1; i < parts.length; i += 2) s += (parts[i] || '').length; return n + s; }, 0),
+    [lines]
+  );
+  const [typed, setTyped] = React.useState(0);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || !('IntersectionObserver' in window)) { setTyped(total); return; }
+    let timer = 0, started = false;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting && !started) {
+          started = true;
+          obs.disconnect();
+          timer = window.setInterval(() => {
+            setTyped((t) => { if (t >= total) { window.clearInterval(timer); return t; } return t + 2; });
+          }, 16);
+        }
+      });
+    }, { threshold: 0.3 });
+    obs.observe(el);
+    return () => { obs.disconnect(); if (timer) window.clearInterval(timer); };
+  }, [total]);
+
+  // Pre-compute visible char count per line + find the active (caret) line.
+  let consumed = 0;
+  const perLine = lines.map((parts) => {
+    const segs = [];
+    let lineShown = 0;
+    for (let i = 0; i < parts.length; i += 2) {
+      const cls = parts[i]; const text = parts[i + 1] || '';
+      const start = consumed; consumed += text.length;
+      const shown = Math.max(0, Math.min(text.length, typed - start));
+      lineShown += shown;
+      if (shown > 0) segs.push(<span className={'tsx-rl-' + cls} key={i}>{text.slice(0, shown)}</span>);
+    }
+    return { segs, lineShown };
+  });
+  let caretLine = -1;
+  for (let i = perLine.length - 1; i >= 0; i--) { if (perLine[i].lineShown > 0) { caretLine = i; break; } }
+  return (
+    <div className="tsx-runlog tsx-fade" ref={ref} role="img" aria-label="Programme run log">
+      <div className="tsx-runlog-bar"><span className="tsx-runlog-label">{label}</span></div>
+      <div className="tsx-runlog-body">
+        {perLine.map(({ segs }, li) => (
+          <div className="tsx-rl-line" key={li}>{segs}{li === caretLine ? <span className="tsx-runlog-caret" /> : null}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Shared Blueprint-Ledger primitives (kill repeated text boxes) ─── */
 
 function TrustIntakeBand({ heading, sub, cta = 'Start a Project', onClick, spaced }) {
@@ -1401,6 +1491,13 @@ function TrustSectionOverview({ section }) {
             <TrustLedgerRows framed label="§ Audience" items={section.audiences} titleKey="title" bodyKey="trust" />
           </div>
         </div>
+
+        {TRUST_RUNLOG[section.id] && (
+          <div className="tsx-runlog-wrap">
+            <div className="tsx-dimline" data-label="Run log" aria-hidden="true" />
+            <TrustRunLog config={TRUST_RUNLOG[section.id]} />
+          </div>
+        )}
 
         <TrustStatement section={section} />
 

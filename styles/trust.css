@@ -3800,3 +3800,20 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   .trust .tsx-ledger-rowitem { grid-template-columns: 34px 1fr; row-gap: 4px; }
   .trust .tsx-ledger-rowdesc { grid-column: 2; }
 }
+
+/* ── Neo import: Academy/Labs run-log (terminal → light command ledger) ── */
+.trust .tsx-runlog-wrap { margin-top: clamp(20px,4vw,40px); }
+.trust .tsx-runlog { position: relative; background: var(--paper-2); border: 1px solid var(--line); border-top: 2px solid var(--blueprint); border-radius: 12px; box-shadow: var(--shadow-sheet); overflow: hidden; }
+.trust .tsx-runlog-bar { display: flex; align-items: center; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--blueprint) 4%, var(--panel)); }
+.trust .tsx-runlog-bar::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--vermilion); box-shadow: 16px 0 0 color-mix(in srgb, var(--blueprint) 40%, transparent), 32px 0 0 color-mix(in srgb, var(--ink) 22%, transparent); margin-right: 34px; flex-shrink: 0; }
+.trust .tsx-runlog-label { font-family: "Inter", sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--blueprint); }
+.trust .tsx-runlog-body { padding: clamp(18px,2.4vw,30px) clamp(18px,2.4vw,32px); font-family: "Inter", ui-monospace, monospace; font-variant-numeric: tabular-nums; font-size: clamp(0.78rem, 1vw, 0.92rem); line-height: 1.85; white-space: pre-wrap; word-break: break-word; min-height: 18em; }
+.trust .tsx-rl-line { display: block; }
+.trust .tsx-rl-p { color: var(--blueprint); font-weight: 600; }
+.trust .tsx-rl-k { color: var(--ink); font-weight: 600; }
+.trust .tsx-rl-c { color: var(--muted); }
+.trust .tsx-rl-s { color: var(--vermilion); font-weight: 500; }
+.trust .tsx-runlog-caret { display: inline-block; width: 8px; height: 1.05em; background: var(--vermilion); vertical-align: text-bottom; margin-left: 2px; animation: tsxCaretBlink 1s steps(1) infinite; }
+@keyframes tsxCaretBlink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .trust .tsx-runlog-caret { animation: none; } }
+@media (max-width: 700px) { .trust .tsx-runlog-body { min-height: 0; } }
