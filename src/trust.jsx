@@ -985,6 +985,8 @@ function TrustDivisionsRail() {
   }, []);
 
   const sections = Object.values(DATA.sections);
+  const ACCENT = { academy: '#1D4ED8', marketing: '#0D9488', labs: '#6D28D9' };
+  const TAGLINE = { academy: 'the talent engine.', marketing: 'the growth signal.', labs: 'the systems forge.' };
 
   return (
     <section className="tsx-rail-wrap" id="divisions" ref={wrapRef}>
@@ -997,19 +999,38 @@ function TrustDivisionsRail() {
           <p className="rail-progress"><b ref={progressRef}>01</b> / 03</p>
         </div>
         <div className="tsx-rail-track" ref={trackRef}>
-          {sections.map((sec, i) => (
-            <button key={sec.id} className="tsx-rail-panel" style={{ '--accent': i === 0 ? '#0F4C81' : i === 1 ? '#1A5F9B' : '#64748B' }} onClick={() => routeTo('trust', sec.id)}>
-              <span className="tsx-panel-idx">0{i + 1} / {getTrustSectionLabel(sec).toUpperCase()}</span>
-              <span className="tsx-panel-orb" />
-              <span className="tsx-panel-ring" />
-              <h3>{getTrustSectionLabel(sec)}<br /><span className="serif">{sec.headline || (i === 0 ? "the talent engine." : i === 1 ? "the systems forge." : "the growth signal.")}</span></h3>
-              <p>{sec.short.trust || sec.desc}</p>
-              <span className="panel-tags">
-                {sec.stack.slice(0, 4).map(tag => <span key={tag}>{tag}</span>)}
-              </span>
-              <span className="btn">Enter {getTrustSectionLabel(sec)} <span className="arr">→</span></span>
-            </button>
-          ))}
+          {sections.map((sec, i) => {
+            const accent = ACCENT[sec.id] || '#1D4ED8';
+            const modules = (sec.modules || []).slice(0, 4);
+            return (
+              <article key={sec.id} className="tsx-rail-panel" style={{ '--accent': accent }}>
+                <span className="tsx-panel-watermark" aria-hidden="true">0{i + 1}</span>
+                <span className="tsx-panel-ring" aria-hidden="true" />
+                <div className="tsx-panel-head">
+                  <span className="tsx-panel-idx">0{i + 1} / {getTrustSectionLabel(sec).toUpperCase()}</span>
+                  <h3>{getTrustSectionLabel(sec)}<br /><span className="serif">{sec.headline || TAGLINE[sec.id]}</span></h3>
+                  <p>{sec.short.trust || sec.desc}</p>
+                </div>
+                <div className="tsx-panel-modules" role="list" aria-label={getTrustSectionLabel(sec) + ' modules'}>
+                  {modules.map((m, mi) => (
+                    <div className="tsx-panel-module" role="listitem" key={m.title}>
+                      <span className="tsx-panel-module-num">0{mi + 1}</span>
+                      <span className="tsx-panel-module-title">{m.title}</span>
+                      <span className="tsx-panel-module-desc">{m.trust}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="tsx-panel-foot">
+                  <span className="panel-tags">
+                    {sec.stack.slice(0, 4).map(tag => <span key={tag}>{tag}</span>)}
+                  </span>
+                  <button className="tsx-panel-cta" onClick={() => routeTo('trust', sec.id)}>
+                    Enter {getTrustSectionLabel(sec)} <span className="arr">→</span>
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>
