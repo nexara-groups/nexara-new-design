@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Rail — Right Nav Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #080808;
+  font-family: 'JetBrains Mono', monospace;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Layout ── */
+.page-title {
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #444;
+  padding: 32px 40px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.options-row {
+  display: flex;
+  gap: 0;
+  flex: 1;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.option-col {
+  flex: 1;
+  border-right: 1px solid rgba(255,255,255,.05);
+  display: flex;
+  flex-direction: column;
+}
+.option-col:last-child { border-right: 0; }
+
+.option-header {
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.option-header .opt-label {
+  font-size: 9px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 4px;
+}
+.option-header .opt-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ccc;
+}
+.badge-current {
+  display: inline-block;
+  background: rgba(255,255,255,.07);
+  color: #555;
+  font-size: 8px;
+  letter-spacing: .14em;
+  border-radius: 3px;
+  padding: 2px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.badge-rec {
+  display: inline-block;
+  background: rgba(200,255,0,.12);
+  color: #c8ff00;
+  font-size: 8px;
+  letter-spacing: .14em;
+  border-radius: 3px;
+  padding: 2px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* Hero stage mock */
+.hero-mock {
+  flex: 1;
+  background: radial-gradient(ellipse at 30% 50%, rgba(124,92,255,.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 30%, rgba(200,255,0,.06) 0%, transparent 50%),
+              #0a0a0c;
+  position: relative;
+  min-height: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Chapter text mock */
+.chapter-mock {
+  text-align: left;
+  padding: 0 40px;
+  max-width: 360px;
+}
+.chapter-mock .kicker {
+  font-size: 9px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  margin-bottom: 8px;
+}
+.chapter-mock h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.chapter-mock h2 em {
+  font-style: italic;
+  font-weight: 700;
+  color: rgba(255,255,255,.5);
+}
+.chapter-mock p { font-size: 11px; color: rgba(255,255,255,.4); line-height: 1.6; }
+
+/* Note at bottom */
+.option-note {
+  padding: 14px 24px;
+  font-size: 9px;
+  letter-spacing: .06em;
+  color: #444;
+  line-height: 1.6;
+  border-top: 1px solid rgba(255,255,255,.04);
+}
+.option-note strong { color: rgba(255,255,255,.3); }
+
+/* ═══════════════════════════════════════════
+   CURRENT — 8px circles
+═══════════════════════════════════════════ */
+.rail-current {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  z-index: 5;
+}
+.rail-current button {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(242,241,236,.18);
+  cursor: pointer;
+  transition: all .3s;
+  position: relative;
+}
+.rail-current button.active {
+  background: #fff;
+  transform: scale(1.45);
+  box-shadow: 0 0 14px rgba(124,92,255,.6);
+}
+.rail-current button::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .25s;
+  pointer-events: none;
+}
+.rail-current button:hover::after,
+.rail-current button.active::after { opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   A — Segment Dashes
+═══════════════════════════════════════════ */
+.rail-dashes {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 5;
+}
+.rail-dashes button {
+  width: 2px;
+  height: 14px;
+  border: 0;
+  background: rgba(255,255,255,.2);
+  cursor: pointer;
+  transition: all .3s ease;
+  position: relative;
+  border-radius: 1px;
+}
+.rail-dashes button.active {
+  height: 32px;
+  background: #c8ff00;
+  box-shadow: 0 0 12px rgba(200,255,0,.6), 0 0 4px rgba(200,255,0,.9);
+}
+.rail-dashes button::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 8px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+}
+.rail-dashes button:hover::after,
+.rail-dashes button.active::after { opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   B — Numbered Ticks
+═══════════════════════════════════════════ */
+.rail-nums {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 5;
+  align-items: flex-end;
+}
+.rail-nums button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255,255,255,.18);
+  letter-spacing: .1em;
+  transition: all .25s;
+  position: relative;
+  line-height: 1;
+}
+.rail-nums button.active {
+  font-size: 13px;
+  color: #c8ff00;
+  text-shadow: 0 0 16px rgba(200,255,0,.7);
+}
+.rail-nums button::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 8px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+}
+.rail-nums button.active::after { opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   C — Lozenge Morph (pill on active)
+═══════════════════════════════════════════ */
+.rail-lozenge {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 5;
+  align-items: flex-end;
+}
+.rail-lozenge button {
+  border: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255,255,255,.2);
+  cursor: pointer;
+  transition: all .35s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  overflow: visible;
+}
+.rail-lozenge button.active {
+  width: 5px;
+  height: 28px;
+  background: linear-gradient(180deg, #c8ff00, #00e5a0);
+  box-shadow: 0 0 16px rgba(200,255,0,.5);
+  border-radius: 3px;
+}
+.rail-lozenge button::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 8px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+}
+.rail-lozenge button.active::after { opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   D — Track + Scrubber (recommended)
+═══════════════════════════════════════════ */
+.rail-track {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.rail-track-line {
+  width: 1px;
+  height: 160px;
+  background: rgba(255,255,255,.1);
+  position: relative;
+}
+.rail-track-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  background: linear-gradient(180deg, #c8ff00, #00c8ff);
+  transition: height .4s ease;
+  box-shadow: 0 0 6px rgba(200,255,0,.5);
+}
+.rail-track-thumb {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #c8ff00;
+  box-shadow: 0 0 14px rgba(200,255,0,.8), 0 0 4px #fff;
+  transition: top .4s ease;
+  pointer-events: none;
+}
+.rail-track-chapter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(200,255,0,.7);
+  margin-top: 10px;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 0 8px rgba(200,255,0,.4);
+  transition: opacity .3s;
+}
+.rail-track-dots {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.rail-track-dots span {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  display: block;
+  transform: translateX(-1.5px);
+  transition: background .3s, box-shadow .3s;
+}
+.rail-track-dots span.passed {
+  background: rgba(200,255,0,.5);
+}
+
+/* ═══════════════════════════════════════════
+   E — Label Stack
+═══════════════════════════════════════════ */
+.rail-labels {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 5;
+  align-items: flex-end;
+}
+.rail-labels button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.15);
+  transition: all .3s;
+  white-space: nowrap;
+  position: relative;
+  padding-right: 10px;
+}
+.rail-labels button::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  transition: all .3s;
+}
+.rail-labels button.active {
+  font-size: 9px;
+  color: #c8ff00;
+  letter-spacing: .14em;
+}
+.rail-labels button.active::before {
+  background: #c8ff00;
+  box-shadow: 0 0 8px rgba(200,255,0,.7);
+  width: 5px; height: 5px;
+}
+
+/* ── Interactive controls ── */
+.controls {
+  padding: 24px 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.controls span {
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #444;
+}
+.step-btn {
+  border: 1px solid rgba(255,255,255,.1);
+  background: transparent;
+  color: rgba(255,255,255,.5);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.step-btn:hover { border-color: rgba(200,255,0,.4); color: #c8ff00; }
+.step-btn.active-step { border-color: #c8ff00; color: #c8ff00; }
+
+</style>
+</head>
+<body>
+
+<div class="page-title">hero-rail — right scroll nav options &nbsp;·&nbsp; click step buttons to preview active state</div>
+
+<!-- Controls -->
+<div class="controls">
+  <span>Active chapter:</span>
+  <button class="step-btn active-step" data-step="0" onclick="setStep(0)">Nexara</button>
+  <button class="step-btn" data-step="1" onclick="setStep(1)">Premise</button>
+  <button class="step-btn" data-step="2" onclick="setStep(2)">Academy</button>
+  <button class="step-btn" data-step="3" onclick="setStep(3)">Labs</button>
+  <button class="step-btn" data-step="4" onclick="setStep(4)">Marketing</button>
+  <button class="step-btn" data-step="5" onclick="setStep(5)">Begin</button>
+</div>
+
+<div class="options-row">
+
+  <!-- CURRENT -->
+  <div class="option-col">
+    <div class="option-header">
+      <div class="opt-label">current</div>
+      <div class="opt-title">Circle Dots <span class="badge-current">now</span></div>
+    </div>
+    <div class="hero-mock">
+      <div class="chapter-mock">
+        <p class="kicker">An engineering company</p>
+        <h2>NEXARA</h2>
+        <p>Scroll to unravel</p>
+      </div>
+      <div class="rail-current" id="rail-current">
+        <button data-label="Nexara" class="active"></button>
+        <button data-label="Premise"></button>
+        <button data-label="Academy"></button>
+        <button data-label="Labs"></button>
+        <button data-label="Marketing"></button>
+        <button data-label="Begin"></button>
+      </div>
+    </div>
+    <div class="option-note">8px circles. Active = white + purple glow. Works but generic — looks like every landing page since 2018.</div>
+  </div>
+
+  <!-- A — Dashes -->
+  <div class="option-col">
+    <div class="option-header">
+      <div class="opt-label">option A</div>
+      <div class="opt-title">Segment Dashes</div>
+    </div>
+    <div class="hero-mock">
+      <div class="chapter-mock">
+        <p class="kicker">An engineering company</p>
+        <h2>NEXARA</h2>
+        <p>Scroll to unravel</p>
+      </div>
+      <div class="rail-dashes" id="rail-dashes">
+        <button data-label="Nexara" class="active"></button>
+        <button data-label="Premise"></button>
+        <button data-label="Academy"></button>
+        <button data-label="Labs"></button>
+        <button data-label="Marketing"></button>
+        <button data-label="Begin"></button>
+      </div>
+    </div>
+    <div class="option-note">2px wide dashes. Active stretches to 32px + lime glow. Very code-terminal energy. Clean.</div>
+  </div>
+
+  <!-- B — Numbers -->
+  <div class="option-col">
+    <div class="option-header">
+      <div class="opt-label">option B</div>
+      <div class="opt-title">Numbered Ticks</div>
+    </div>
+    <div class="hero-mock">
+      <div class="chapter-mock">
+        <p class="kicker">An engineering company</p>
+        <h2>NEXARA</h2>
+        <p>Scroll to unravel</p>
+      </div>
+      <div class="rail-nums" id="rail-nums">
+        <button data-label="Nexara" class="active">01</button>
+        <button data-label="Premise">02</button>
+        <button data-label="Academy">03</button>
+        <button data-label="Labs">04</button>
+        <button data-label="Marketing">05</button>
+        <button data-label="Begin">06</button>
+      </div>
+    </div>
+    <div class="option-note">Monospace numbers — inactive tiny/ghost, active jumps up + lime glow. Debugger/IDE energy.</div>
+  </div>
+
+  <!-- C — Lozenge -->
+  <div class="option-col">
+    <div class="option-header">
+      <div class="opt-label">option C</div>
+      <div class="opt-title">Lozenge Morph</div>
+    </div>
+    <div class="hero-mock">
+      <div class="chapter-mock">
+        <p class="kicker">An engineering company</p>
+        <h2>NEXARA</h2>
+        <p>Scroll to unravel</p>
+      </div>
+      <div class="rail-lozenge" id="rail-lozenge">
+        <button data-label="Nexara" class="active"></button>
+        <button data-label="Premise"></button>
+        <button data-label="Academy"></button>
+        <button data-label="Labs"></button>
+        <button data-label="Marketing"></button>
+        <button data-label="Begin"></button>
+      </div>
+    </div>
+    <div class="option-note">5px dot morphs into 28px vertical pill on active. Lime→teal gradient fill. Biggest visual pop.</div>
+  </div>
+
+  <!-- D — Track + Scrubber -->
+  <div class="option-col">
+    <div class="option-header">
+      <div class="opt-label">option D</div>
+      <div class="opt-title">Track + Scrubber <span class="badge-rec">rec</span></div>
+    </div>
+    <div class="hero-mock">
+      <div class="chapter-mock">
+        <p class="kicker">An engineering company</p>
+        <h2>NEXARA</h2>
+        <p>Scroll to unravel</p>
+      </div>
+      <div class="rail-track">
+        <div class="rail-track-line" id="track-line">
+          <div class="rail-track-fill" id="track-fill" style="height: 0%"></div>
+          <div class="rail-track-thumb" id="track-thumb" style="top: 0%"></div>
+          <div class="rail-track-dots" id="track-dots">
+            <span class="passed"></span>
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="rail-track-chapter" id="track-label">NEXARA</div>
+      </div>
+    </div>
+    <div class="option-note">Single vertical track, glowing scrubber travels down. Shows continuous progress not just steps. Most spatial.</div>
+  </div>
+
+  <!-- E — Labels -->
+  <div class="option-col">
+    <div class="option-header">
+      <div class="opt-label">option E</div>
+      <div class="opt-title">Label Stack</div>
+    </div>
+    <div class="hero-mock">
+      <div class="chapter-mock">
+        <p class="kicker">An engineering company</p>
+        <h2>NEXARA</h2>
+        <p>Scroll to unravel</p>
+      </div>
+      <div class="rail-labels" id="rail-labels">
+        <button data-label="Nexara" class="active">Nexara</button>
+        <button data-label="Premise">Premise</button>
+        <button data-label="Academy">Academy</button>
+        <button data-label="Labs">Labs</button>
+        <button data-label="Marketing">Marketing</button>
+        <button data-label="Begin">Begin</button>
+      </div>
+    </div>
+    <div class="option-note">Always-visible labels. Active = full lime weight + dot. Inactive = ghost text. Most readable, most wordy.</div>
+  </div>
+
+</div>
+
+<script>
+const LABELS = ['Nexara','Premise','Academy','Labs','Marketing','Begin'];
+let currentStep = 0;
+
+function setStep(n) {
+  currentStep = n;
+
+  // Update step buttons
+  document.querySelectorAll('.step-btn').forEach((b,i) => {
+    b.classList.toggle('active-step', i === n);
+  });
+
+  // Current (circles)
+  document.querySelectorAll('#rail-current button').forEach((b,i) => {
+    b.classList.toggle('active', i === n);
+  });
+
+  // A (dashes)
+  document.querySelectorAll('#rail-dashes button').forEach((b,i) => {
+    b.classList.toggle('active', i === n);
+  });
+
+  // B (numbers)
+  document.querySelectorAll('#rail-nums button').forEach((b,i) => {
+    b.classList.toggle('active', i === n);
+  });
+
+  // C (lozenge)
+  document.querySelectorAll('#rail-lozenge button').forEach((b,i) => {
+    b.classList.toggle('active', i === n);
+  });
+
+  // D (track)
+  const pct = n / 5;
+  document.getElementById('track-fill').style.height = (pct * 100) + '%';
+  document.getElementById('track-thumb').style.top = (pct * 100) + '%';
+  document.getElementById('track-label').textContent = LABELS[n].toUpperCase();
+  document.querySelectorAll('#track-dots span').forEach((s,i) => {
+    s.classList.toggle('passed', i <= n);
+  });
+
+  // E (labels)
+  document.querySelectorAll('#rail-labels button').forEach((b,i) => {
+    b.classList.toggle('active', i === n);
+  });
+}
+</script>
+</body>
+</html>
