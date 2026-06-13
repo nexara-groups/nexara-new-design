@@ -3728,3 +3728,11 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 @keyframes tsxDimDraw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .trust .tsx-hero-dimline { transform-origin: center; }
 @media (prefers-reduced-motion: reduce) { .trust .tsx-hero-dimline { animation: none; } }
+
+/* ── Rail vermilion progress tick on a ruled baseline (the "Three Plates" scrub) ── */
+.trust .tsx-rail-baseline { position: absolute; left: clamp(20px, 6vw, 80px); right: clamp(20px, 6vw, 80px); bottom: clamp(20px, 4vh, 44px); height: 1px; background: var(--line); z-index: 4; }
+.trust .tsx-rail-baseline::before, .trust .tsx-rail-baseline::after { content: ""; position: absolute; top: -4px; width: 1px; height: 9px; background: var(--blueprint); }
+.trust .tsx-rail-baseline::before { left: 0; }
+.trust .tsx-rail-baseline::after { right: 0; }
+.trust .tsx-rail-tick { position: absolute; top: 50%; left: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--vermilion); transform: translate(-50%, -50%); box-shadow: 0 0 0 4px color-mix(in srgb, var(--vermilion) 18%, transparent); transition: left .1s linear; }
+@media (max-width: 760px) { .trust .tsx-rail-baseline { display: none; } }

@@ -4,7 +4,7 @@
 
 function setupTsxFade() {
   document.documentElement.classList.add('js-reveal-ready');
-  const els = document.querySelectorAll('.tsx-fade:not(.visible)');
+  const els = document.querySelectorAll('.tsx-fade:not(.visible), .tsx-dimline:not(.visible)');
   if (!('IntersectionObserver' in window)) {
     els.forEach(el => el.classList.add('visible'));
     return () => document.documentElement.classList.remove('js-reveal-ready');
@@ -996,6 +996,7 @@ function TrustDivisionsRail() {
   const wrapRef = React.useRef(null);
   const trackRef = React.useRef(null);
   const progressRef = React.useRef(null);
+  const tickRef = React.useRef(null);
 
   React.useEffect(() => {
     if (!wrapRef.current || !trackRef.current) return;
@@ -1013,6 +1014,9 @@ function TrustDivisionsRail() {
         if (progressRef.current) {
           const n = Math.min(3, 1 + Math.floor(self.progress * 2.99));
           progressRef.current.textContent = "0" + n;
+        }
+        if (tickRef.current) {
+          tickRef.current.style.left = (self.progress * 100) + "%";
         }
       }
     });
@@ -1034,6 +1038,7 @@ function TrustDivisionsRail() {
           </div>
           <p className="rail-progress"><b ref={progressRef}>01</b> / 03</p>
         </div>
+        <div className="tsx-rail-baseline" aria-hidden="true"><span className="tsx-rail-tick" ref={tickRef} /></div>
         <div className="tsx-rail-track" ref={trackRef}>
           {sections.map((sec, i) => {
             const accent = ACCENT[sec.id] || '#1D4ED8';
@@ -1102,9 +1107,10 @@ function TrustHome() {
           <TrustManifesto />
           <TrustDivisionsRail />
           <section className="tsx-section-inner" style={{ paddingBlock: 'clamp(60px, 10vh, 120px)' }}>
-            <div className="tsx-standard-head" style={{ marginBottom: '40px' }}>
+            <div className="tsx-dimline" data-label="Sheet 04 · Standard" aria-hidden="true" />
+            <div className="tsx-standard-head" style={{ marginBottom: '40px', marginTop: 'clamp(40px,6vw,72px)' }}>
               <p className="tsx-section-eyebrow">The operating standard</p>
-              <h2 className="tsx-section-heading">Every division runs<br />on the same spine.</h2>
+              <h2 className="tsx-section-heading">Every division runs<br />on the same <span className="serif">spine.</span></h2>
             </div>
             <div className="tsx-standards-grid">
               <div className="tsx-standard-card">
