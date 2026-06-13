@@ -247,6 +247,34 @@ function TrustHeroFlat() {
   );
 }
 
+function TrustCountUp({ value, className }) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const target = parseInt(String(value).replace(/\D/g, ''), 10);
+    const suffix = String(value).replace(/[0-9]/g, '');
+    if (!target || !('IntersectionObserver' in window)) { el.textContent = value; return; }
+    let done = false;
+    const run = () => {
+      const t0 = performance.now(), dur = 1100;
+      const tick = (now) => {
+        const p = Math.min(1, (now - t0) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(eased * target) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting && !done) { done = true; run(); obs.disconnect(); } });
+    }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [value]);
+  return <span ref={ref} className={className}>{value}</span>;
+}
+
 function TrustProofStrip() {
   const stats = [
     { num: '3', label: 'Solution Lines',       accent: false },
@@ -259,7 +287,7 @@ function TrustProofStrip() {
       <div className="tsx-stat-band-inner">
         {stats.map(({ num, label, accent }) => (
           <div className="tsx-stat-cell" key={label}>
-            <span className={`tsx-stat-num${accent ? ' accent' : ''}`}>{num}</span>
+            <TrustCountUp value={num} className={`tsx-stat-num${accent ? ' accent' : ''}`} />
             <span className="tsx-stat-sublabel">{label}</span>
           </div>
         ))}
@@ -1646,6 +1674,26 @@ function TrustSectionHeroUnravel({ theme, section }) {
 
 function TrustCohortLadder({ section }) {
   const steps = section.process || [];
+  const railRef = React.useRef(null);
+  React.useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { el.style.setProperty('--draw', '1'); return; }
+    let raf = 0;
+    const compute = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const start = vh * 0.82, end = vh * 0.32;
+      const p = (start - r.top) / (start - end + r.height);
+      el.style.setProperty('--draw', String(Math.max(0, Math.min(1, p))));
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(compute); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    compute();
+    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); if (raf) cancelAnimationFrame(raf); };
+  }, [steps.length]);
   if (!steps.length) return null;
   return (
     <section className="tsx-signature tsx-ladder-section" aria-label="The cohort path">
@@ -1654,7 +1702,7 @@ function TrustCohortLadder({ section }) {
           <span className="tsx-section-eyebrow">The cohort path</span>
           <h2 className="tsx-section-heading">From intake<br /><span className="serif">to hiring outcome.</span></h2>
         </div>
-        <ol className="tsx-ladder">
+        <ol className="tsx-ladder" ref={railRef}>
           {steps.map((s, i) => (
             <li className="tsx-ladder-step tsx-fade" style={{ transitionDelay: (i * 90) + 'ms' }} key={s.step}>
               <span className="tsx-ladder-node">{s.step}</span>
@@ -1967,6 +2015,28 @@ function TrustContact({ detail }) {
   );
 }
 
+function TrustConcierge({ page }) {
+  const [shown, setShown] = React.useState(false);
+  React.useEffect(() => {
+    const onScroll = () => setShown(window.scrollY > 640);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [page]);
+  if (page === 'contact') return null;
+  return (
+    <button
+      className={`tsx-concierge${shown ? ' is-shown' : ''}`}
+      onClick={() => routeTo('trust', 'contact')}
+      aria-label="Talk to Nexara — start a brief"
+    >
+      <span className="tsx-concierge-dot" aria-hidden="true" />
+      <span className="tsx-concierge-label">Talk to us</span>
+      <span className="tsx-concierge-arr" aria-hidden="true">→</span>
+    </button>
+  );
+}
+
 function TrustSite({ page, detail }) {
   const section = DATA.sections[page];
   React.useEffect(() => { window.scrollTo(0, 0); }, [page]);
@@ -1984,6 +2054,7 @@ function TrustSite({ page, detail }) {
         {page === 'contact'   && <TrustContact detail={detail} />}
         {!validPage           && <NotFound theme="trust" page={page} />}
       </div>
+      <TrustConcierge page={page} />
       <TrustFooter />
     </div>
   );
