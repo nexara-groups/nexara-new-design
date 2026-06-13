@@ -1,0 +1,8 @@
+# gstack browse/QA tooling state
+.gstack/
+
+# editor / tool backups
+*.bak
+
+# scratch design mockups (not part of the site)
+design-directions.html

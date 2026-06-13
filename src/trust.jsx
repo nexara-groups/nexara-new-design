@@ -1566,6 +1566,12 @@ function TrustModuleCards({ rows }) {
   );
 }
 
+const TRUST_SECTION_CTA = {
+  academy:   'Plan a Talent Programme',
+  marketing: 'Scope a Digital Project',
+  labs:      'Scope an AI System',
+};
+
 function TrustSectionBlock({ eyebrow, children }) {
   return (
     <div className="tsx-section-block">
