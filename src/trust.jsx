@@ -379,6 +379,7 @@ function getTrustSubpageLabel(section, page) {
 
 function TrustNav({ page, detail }) {
   const navRef = React.useRef(null);
+  const [menuOpen, setMenuOpen] = React.useState(false);
   React.useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
@@ -386,6 +387,11 @@ function TrustNav({ page, detail }) {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+  React.useEffect(() => { setMenuOpen(false); }, [page, detail]);
+  React.useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
   return (
     <header className="tsx-nav" ref={navRef} role="banner">
       <div className="tsx-nav-inner">
@@ -415,15 +421,22 @@ function TrustNav({ page, detail }) {
           </div>
           <span className="tsx-mode-sep" aria-hidden="true"></span>
           <button className="tsx-nav-cta" onClick={() => routeTo('trust', 'contact')}>Start a Project</button>
+          <button className="tsx-nav-burger" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(o => !o)}>
+            <span className={"tsx-burger-icon" + (menuOpen ? ' is-open' : '')}><i /><i /></span>
+          </button>
         </div>
       </div>
-      <nav className="tsx-mobile-nav-scroll" aria-label="Primary mobile">
-        {DATA.nav.map(item => (
-          <button key={item.page} className={page === item.page ? 'active' : ''} onClick={() => routeTo('trust', item.page)}>
-            {getTrustNavLabel(item)}
-          </button>
-        ))}
-      </nav>
+      <div className={"tsx-nav-sheet" + (menuOpen ? ' is-open' : '')} role="dialog" aria-label="Menu" aria-hidden={!menuOpen}>
+        <nav className="tsx-nav-sheet-links" aria-label="Primary mobile">
+          {DATA.nav.map((item, i) => (
+            <button key={item.page} className={page === item.page ? 'active' : ''} style={{ transitionDelay: (i * 35) + 'ms' }} onClick={() => routeTo('trust', item.page)}>
+              <span className="tsx-nav-sheet-num">/{String(i + 1).padStart(2, '0')}</span>
+              {getTrustNavLabel(item)}
+            </button>
+          ))}
+        </nav>
+        <button className="tsx-btn-cta tsx-nav-sheet-cta" onClick={() => routeTo('trust', 'contact')}>Start a Project <span className="arr">→</span></button>
+      </div>
     </header>
   );
 }
@@ -1299,6 +1312,7 @@ function TrustFinalCTA() {
       <p className="tsx-section-eyebrow">Enterprise intake</p>
       <a href="#contact" onClick={(e) => { e.preventDefault(); routeTo('trust', 'contact'); }}>Start <em>the brief.</em></a>
       <p>Scoped response within two working days.</p>
+      <button className="tsx-btn-cta tsx-final-cta-btn" onClick={() => routeTo('trust', 'contact')}>Start a Project <span className="arr">→</span></button>
     </section>
   );
 }
@@ -1999,15 +2013,15 @@ function TrustCustomers({ detail }) {
         <div className="tsx-sec-header-inner">
           <div>
             <span className="tsx-sec-eyebrow">{activeSection ? `${activeSection.name} — Proof` : "Operating Proof"}</span>
-            <h1 className="tsx-sec-h1">Delivery proof across the same Nexara capability map.</h1>
-            <p className="tsx-sec-body">Trust presents the same work areas as Neo, but frames proof as delivery models, scope evidence and operating readiness.</p>
+            <h1 className="tsx-sec-h1">Delivery proof across every Nexara capability.</h1>
+            <p className="tsx-sec-body">Each engagement is framed as a delivery model — scope evidence, the work produced, and the operating readiness handed over. No invented logos, no vanity metrics.</p>
           </div>
           <div className="tsx-spec-panel">
             <span className="tsx-spec-panel-label">Coverage</span>
             {[
-              ["3", "sections covered"],
+              ["3", "solution lines"],
               ["3", "proof records"],
-              ["0", "invented claims"],
+              ["100%", "scoped & owned"],
             ].map(([value, label]) => (
               <div className="tsx-spec-row" key={label}>
                 <span className="tsx-spec-label">{label}</span>
