@@ -1271,7 +1271,7 @@
 .trust .tsx-stat-band-inner{max-width:1200px;margin-inline:auto;padding-inline:clamp(20px,5vw,80px);display:grid;grid-template-columns:repeat(4,1fr)}
 .trust .tsx-stat-cell{padding:28px 0;text-align:center;border-right:1px solid var(--line);position:relative}
 .trust .tsx-stat-cell:last-child{border-right:none}
-.trust .tsx-stat-num{font-family:'Fraunces',Georgia,serif;font-size:clamp(1.6rem,2.5vw,2.2rem);font-weight:800;color:var(--text);letter-spacing:-.025em;display:block;line-height:1}
+.trust .tsx-stat-num{font-family:'Fraunces',Georgia,serif;font-size:clamp(2.6rem,4.5vw,4rem);font-weight:600;color:var(--text);letter-spacing:-.03em;display:block;line-height:.95}
 .trust .tsx-stat-num.accent{color:var(--tsx-accent)}
 .trust .tsx-stat-sublabel{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-top:6px;display:block}
 @media(max-width:640px){.trust .tsx-stat-band-inner{grid-template-columns:repeat(2,1fr)}.trust .tsx-stat-cell:nth-child(2){border-right:none}.trust .tsx-stat-cell:nth-child(3){border-right:1px solid var(--line)}}
@@ -3196,7 +3196,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 
 .trust .tsx-manifesto { padding: clamp(90px, 14vh, 170px) clamp(20px, 6vw, 80px); text-align: center; }
 .trust .tsx-manifesto-text { font-family: "Fraunces", Georgia, serif; font-size: clamp(1.7rem, 4.2vw, 3.4rem); font-weight: 700; line-height: 1.22; max-width: 21em; margin: 28px auto 0; }
-.trust .tsx-manifesto-text .w { color: rgba(15, 23, 42, 0.16); transition: color 0.18s linear; }
+.trust .tsx-manifesto-text .w { color: rgba(22, 24, 29, 0.34); transition: color 0.18s linear; }
 .trust .tsx-manifesto-text .w.on { color: var(--text); }
 .trust .tsx-manifesto-text .w.accent.on { font-family: "Fraunces", Georgia, serif; font-weight: 700; color: var(--tsx-accent); }
 
@@ -3206,7 +3206,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 }
 
 .trust.tsx-site .tsx-manifesto-text .w {
-  color: rgba(22, 24, 29, .18);
+  color: rgba(22, 24, 29, .34);
 }
 
 .trust.tsx-site .tsx-manifesto-text .w.on {
@@ -3885,3 +3885,23 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background: radial-gradient(ellipse 58% 46% at 50% 46%, var(--paper-0) 34%, color-mix(in srgb, var(--paper-0) 55%, transparent) 60%, transparent 78%);
 }
+
+/* ── Audit fix: make signature diagrams actually read as diagrams ── */
+/* Funnel: center stages so decreasing widths form a real taper */
+.trust .tsx-funnel { align-items: center; }
+.trust .tsx-funnel-stage { margin-inline: auto; }
+.trust .tsx-funnel-bar { justify-content: center; }
+.trust .tsx-funnel-desc { text-align: center; margin-inline: auto; }
+
+/* Blueprint: nodes sit on a wire — prominent bus + node dots + connectors */
+.trust .tsx-blueprint-bus { height: 2px; background: var(--blueprint); opacity: 1; top: -1px; }
+.trust .tsx-blueprint-node::before { content: ""; top: -7px; left: 50%; transform: translateX(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--paper); border: 2px solid var(--blueprint); z-index: 2; }
+.trust .tsx-blueprint-grid.is-drawn .tsx-blueprint-node:nth-child(2)::before { background: var(--vermilion); border-color: var(--vermilion); }
+.trust .tsx-blueprint-node { padding-top: clamp(30px,3vw,44px); }
+
+/* Unbox: visible blueprint bus + stems (was too faint) */
+.trust .tsx-unbox-grid::before { height: 2px; background: var(--blueprint); top: -26px; left: 0; right: 0; }
+.trust .tsx-unbox-face::before { background: var(--blueprint); height: 26px; top: -26px; width: 2px; }
+.trust .tsx-unbox-face { padding-top: clamp(22px,2.4vw,32px); }
+.trust .tsx-unbox-face::after { content: ""; position: absolute; top: -31px; left: 50%; transform: translateX(-50%); width: 11px; height: 11px; border-radius: 50%; background: var(--paper); border: 2px solid var(--blueprint); }
+.trust .tsx-unbox-stem { background: var(--blueprint); width: 2px; }
