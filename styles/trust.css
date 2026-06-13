@@ -1999,12 +1999,8 @@
 }
 
 .trust.tsx-site .tsx-intake-band {
-  margin-inline: calc(clamp(20px, 5vw, 80px) * -1);
-  padding: var(--s-16) clamp(20px, 5vw, 80px);
-  border: 0;
-  border-radius: 0;
-  background: var(--ink);
-  color: var(--paper);
+  margin-inline: 0;
+  color: var(--text);
 }
 
 .trust.tsx-site .tsx-intake-spaced {
@@ -2012,11 +2008,13 @@
 }
 
 .trust.tsx-site .tsx-intake-heading {
-  color: var(--paper);
+  color: var(--text);
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
 }
 
 .trust.tsx-site .tsx-intake-sub {
-  color: rgba(255, 255, 255, .68);
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
 .trust.tsx-site .tsx-btn-cta,
@@ -3442,12 +3440,8 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   --accent-cta: #243A55;
 }
 
-.trust.tsx-site .tsx-intake-band,
-.trust.tsx-site .tsx-cta-band {
-  background:
-    radial-gradient(ellipse at 18% 50%, rgba(59, 130, 246, .16), transparent 46%),
-    radial-gradient(ellipse at 85% 100%, rgba(47,74,107, .22), transparent 52%),
-    #0f172a;
+.trust.tsx-site .tsx-intake-band {
+  background: var(--panel);
 }
 
 /* 2. Unified card-header treatment — one deep-navy band; the featured
@@ -3883,4 +3877,11 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   .trust .tsx-nav-sheet-links button.active { color: var(--vermilion); }
   .trust .tsx-nav-sheet-num { font-family: "Inter", sans-serif; font-size: 0.7rem; font-weight: 700; color: var(--blueprint); letter-spacing: 0.06em; }
   .trust .tsx-nav-sheet-cta { position: relative; z-index: 1; margin-top: auto; width: 100%; justify-content: center; padding-block: 18px; }
+}
+
+/* ── Audit fix: vellum scrim behind hero text so particles never occlude/strike headlines ── */
+.trust .tsx-hero-chapter > * { position: relative; z-index: 1; }
+.trust .tsx-hero-chapter::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse 58% 46% at 50% 46%, var(--paper-0) 34%, color-mix(in srgb, var(--paper-0) 55%, transparent) 60%, transparent 78%);
 }
