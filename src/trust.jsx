@@ -881,6 +881,9 @@ function TrustHeroUnravel() {
           <h1 ref={titleRef} className="tsx-hero-title" aria-label="Nexara">
             <span>N</span><span>E</span><span>X</span><span>A</span><span>R</span><span>A</span>
           </h1>
+          <div className="tsx-hero-dimline" aria-hidden="true">
+            <span className="tsx-hero-dimline-label">3 DIVISIONS · 1 STANDARD</span>
+          </div>
           <p className="tsx-hero-sub">Scroll to unravel</p>
         </div>
 
