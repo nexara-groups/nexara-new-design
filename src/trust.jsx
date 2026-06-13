@@ -26,6 +26,9 @@ function setupTsxFade() {
   };
 }
 
+/* Per-division accent trio — shared by rail + section pages. AA-safe on warm paper. */
+const TRUST_ACCENT = { academy: '#1D4ED8', marketing: '#0D9488', labs: '#6D28D9' };
+
 function TrustParticleCanvas() {
   const canvasRef = React.useRef(null);
   React.useEffect(() => {
@@ -985,7 +988,7 @@ function TrustDivisionsRail() {
   }, []);
 
   const sections = Object.values(DATA.sections);
-  const ACCENT = { academy: '#1D4ED8', marketing: '#0D9488', labs: '#6D28D9' };
+  const ACCENT = TRUST_ACCENT;
   const TAGLINE = { academy: 'the talent engine.', marketing: 'the growth signal.', labs: 'the systems forge.' };
 
   return (
@@ -1459,7 +1462,7 @@ function TrustSectionHeroUnravel({ theme, section }) {
 
     const shape = section.id === "academy" ? "spiral" : section.id === "labs" ? "sphere" : "signal";
     // Ink-on-paper strands matching the section
-    const rgb = section.id === "academy" ? [29, 78, 216] : section.id === "labs" ? [30, 64, 175] : [22, 24, 29];
+    const rgb = section.id === "academy" ? [29, 78, 216] : section.id === "labs" ? [109, 40, 217] : section.id === "marketing" ? [13, 148, 136] : [22, 24, 29];
 
     const makeSprite = (cRgb) => {
       const s = document.createElement("canvas");
@@ -1623,7 +1626,7 @@ function TrustSectionHeroUnravel({ theme, section }) {
           <p className="tsx-section-eyebrow">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {getTrustSectionLabel(section).toUpperCase()}</p>
           <h1 className="tsx-section-heading" style={{ color: 'var(--text)', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 600 }}>
             {copy.title}<br />
-            <span className="serif" style={{ color: section.id === "academy" ? '#1D4ED8' : section.id === "labs" ? '#1E40AF' : '#5B6472' }}>{copy.accent}</span>
+            <span className="serif" style={{ color: TRUST_ACCENT[section.id] || '#1D4ED8' }}>{copy.accent}</span>
           </h1>
           <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'var(--muted)', marginInline: 'auto' }}>{copy.body}</p>
           <div className="tsx-sec-actions" style={{ marginTop: '24px', display: 'flex', gap: '16px', justifyContent: 'center' }}>
@@ -1639,16 +1642,102 @@ function TrustSectionHeroUnravel({ theme, section }) {
   );
 }
 
+/* ─── Per-division signature modules (Trust-native, light, no canvas/pin) ─── */
+
+function TrustCohortLadder({ section }) {
+  const steps = section.process || [];
+  if (!steps.length) return null;
+  return (
+    <section className="tsx-signature tsx-ladder-section" aria-label="The cohort path">
+      <div className="tsx-section-inner">
+        <div className="tsx-signature-head tsx-fade">
+          <span className="tsx-section-eyebrow">The cohort path</span>
+          <h2 className="tsx-section-heading">From intake<br /><span className="serif">to hiring outcome.</span></h2>
+        </div>
+        <ol className="tsx-ladder">
+          {steps.map((s, i) => (
+            <li className="tsx-ladder-step tsx-fade" style={{ transitionDelay: (i * 90) + 'ms' }} key={s.step}>
+              <span className="tsx-ladder-node">{s.step}</span>
+              <div className="tsx-ladder-body">
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+function TrustBlueprint({ section }) {
+  const mods = (section.modules || []).slice(0, 4);
+  if (!mods.length) return null;
+  return (
+    <section className="tsx-signature tsx-blueprint-section" aria-label="System architecture">
+      <div className="tsx-section-inner">
+        <div className="tsx-signature-head tsx-fade">
+          <span className="tsx-section-eyebrow">System architecture</span>
+          <h2 className="tsx-section-heading">How a Labs build<br /><span className="serif">fits together.</span></h2>
+        </div>
+        <div className="tsx-blueprint-grid">
+          {mods.map((m, i) => (
+            <div className="tsx-blueprint-node tsx-fade" style={{ transitionDelay: (i * 80) + 'ms' }} key={m.title}>
+              <span className="tsx-blueprint-num">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{m.title}</h3>
+              <p>{m.trust}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TrustFunnel({ section }) {
+  const mods = (section.modules || []).slice(0, 4);
+  if (!mods.length) return null;
+  return (
+    <section className="tsx-signature tsx-funnel-section" aria-label="The growth funnel">
+      <div className="tsx-section-inner">
+        <div className="tsx-signature-head tsx-fade">
+          <span className="tsx-section-eyebrow">The growth funnel</span>
+          <h2 className="tsx-section-heading">Attention<br /><span className="serif">to outcome.</span></h2>
+        </div>
+        <div className="tsx-funnel">
+          {mods.map((m, i) => (
+            <div className="tsx-funnel-stage tsx-fade" style={{ transitionDelay: (i * 90) + 'ms', '--w': (100 - i * 15) + '%' }} key={m.title}>
+              <div className="tsx-funnel-bar">
+                <span className="tsx-funnel-step">{String(i + 1).padStart(2, '0')}</span>
+                <span className="tsx-funnel-name">{m.title}</span>
+              </div>
+              <p className="tsx-funnel-desc">{m.trust}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TrustSignatureModule({ section }) {
+  if (section.id === 'academy') return <TrustCohortLadder section={section} />;
+  if (section.id === 'labs') return <TrustBlueprint section={section} />;
+  if (section.id === 'marketing') return <TrustFunnel section={section} />;
+  return null;
+}
+
 function TrustSectionPage({ section, detail }) {
   const active = useMemo(() => detail ? section.subpages.find(p => p.slug === detail) : null, [section, detail]);
   if (detail && !active) return <NotFound theme="trust" page={`${section.id}/${detail}`} />;
   return (
-    <main className="tsx-section-page">
+    <main className="tsx-section-page" style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' }}>
       {HAS_SCROLL_ANIMATION ? (
         <TrustSectionHeroUnravel theme="trust" section={section} />
       ) : (
         <TrustSectionHeader section={section} />
       )}
+      {!active && <TrustSignatureModule section={section} />}
       <TrustSubNav section={section} activeSlug={detail} />
       <div key={detail || 'overview'}>
         {active

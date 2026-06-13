@@ -3563,3 +3563,57 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust.tsx-site::after { content: ""; position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; opacity: .022; mix-blend-mode: multiply; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E"); background-size: 180px 180px; }
 .trust .tsx-hero-chapter .serif, .trust .tsx-section-heading .serif { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 450; }
 @media (prefers-reduced-motion: reduce) { .trust .tsx-nav-links button::after { transition: none; } }
+
+/* ═══════════════════════════════════════════════════════════════════
+   TRUST SIGNATURE MODULES — per-division, light/editorial (Neo-parity)
+   Academy → cohort ladder · Labs → blueprint · Marketing → funnel
+   Accent flows from --sec-accent set on .tsx-section-page
+   ═══════════════════════════════════════════════════════════════════ */
+.trust .tsx-signature { padding-block: clamp(60px, 8vw, 110px); position: relative; }
+.trust .tsx-signature-head { margin-bottom: clamp(34px, 5vw, 58px); }
+.trust .tsx-signature-head .tsx-section-eyebrow { color: var(--sec-accent, var(--accent)); }
+.trust .tsx-signature-head .tsx-section-heading { color: var(--text); }
+.trust .tsx-signature-head .tsx-section-heading .serif { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 450; color: var(--sec-accent, var(--accent)); }
+
+/* carry division accent onto the section hero + overview eyebrows */
+.trust .tsx-section-page .tsx-hero-chapter .tsx-section-eyebrow,
+.trust .tsx-section-page .tsx-hero-chapter .tsx-panel-idx,
+.trust .tsx-section-page .tsx-cap-card-index,
+.trust .tsx-section-page .tsx-overview-label { color: var(--sec-accent, var(--accent)); }
+
+/* ── Academy: cohort ladder ── */
+.trust .tsx-ladder { list-style: none; position: relative; max-width: 780px; margin: 0; padding: 0; }
+.trust .tsx-ladder::before { content: ""; position: absolute; left: 23px; top: 14px; bottom: 14px; width: 2px; background: linear-gradient(var(--sec-accent, var(--accent)), color-mix(in srgb, var(--sec-accent, #1D4ED8) 10%, transparent)); }
+.trust .tsx-ladder-step { position: relative; display: grid; grid-template-columns: 48px 1fr; gap: 22px; padding-bottom: clamp(28px, 4vw, 44px); }
+.trust .tsx-ladder-step:last-child { padding-bottom: 0; }
+.trust .tsx-ladder-node { position: relative; z-index: 1; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); border: 2px solid var(--sec-accent, var(--accent)); color: var(--sec-accent, var(--accent)); font-family: "Inter", sans-serif; font-size: 0.82rem; font-weight: 700; }
+.trust .tsx-ladder-body { padding-top: 7px; }
+.trust .tsx-ladder-body h3 { font-family: "Fraunces", Georgia, serif; font-size: clamp(1.25rem, 2vw, 1.7rem); font-weight: 500; color: var(--text); margin-bottom: 8px; letter-spacing: -0.015em; }
+.trust .tsx-ladder-body p { color: var(--muted); font-size: 1rem; line-height: 1.6; max-width: 48ch; }
+
+/* ── Labs: blueprint nodes ── */
+.trust .tsx-blueprint-section { background: linear-gradient(color-mix(in srgb, var(--sec-accent, #6D28D9) 4%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--sec-accent, #6D28D9) 3%, transparent) 1px, transparent 1px), var(--bg); background-size: 44px 44px; border-block: 1px solid var(--line); }
+.trust .tsx-blueprint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
+.trust .tsx-blueprint-node { position: relative; padding: clamp(24px, 2.6vw, 36px); border-right: 1px solid var(--line); }
+.trust .tsx-blueprint-node:last-child { border-right: 0; }
+.trust .tsx-blueprint-node::before { content: ""; position: absolute; top: 0; left: 0; width: 28px; height: 2px; background: var(--sec-accent, var(--accent)); }
+.trust .tsx-blueprint-node:not(:last-child)::after { content: "→"; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); z-index: 2; color: var(--sec-accent, var(--accent)); font-size: 12px; background: var(--panel); width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); }
+.trust .tsx-blueprint-num { font-family: "Inter", sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; color: var(--sec-accent, var(--accent)); }
+.trust .tsx-blueprint-node h3 { font-family: "Fraunces", Georgia, serif; font-size: 1.25rem; font-weight: 500; color: var(--text); margin: 12px 0 8px; letter-spacing: -0.01em; }
+.trust .tsx-blueprint-node p { color: var(--muted); font-size: 0.9rem; line-height: 1.55; }
+
+/* ── Marketing: funnel ── */
+.trust .tsx-funnel { display: flex; flex-direction: column; gap: 14px; max-width: 900px; }
+.trust .tsx-funnel-stage { width: var(--w, 100%); transition-property: opacity, transform, width; }
+.trust .tsx-funnel-bar { display: flex; align-items: center; gap: 14px; padding: 18px 24px; border-radius: 10px; background: linear-gradient(100deg, color-mix(in srgb, var(--sec-accent, #0D9488) 13%, var(--panel)), var(--panel) 80%); border: 1px solid var(--line); border-left: 3px solid var(--sec-accent, var(--accent)); }
+.trust .tsx-funnel-step { font-family: "Inter", sans-serif; font-size: 0.72rem; font-weight: 700; color: var(--sec-accent, var(--accent)); letter-spacing: 0.1em; }
+.trust .tsx-funnel-name { font-family: "Fraunces", Georgia, serif; font-size: clamp(1.1rem, 1.7vw, 1.5rem); font-weight: 500; color: var(--text); letter-spacing: -0.01em; }
+.trust .tsx-funnel-desc { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin: 8px 0 0 24px; max-width: 54ch; }
+
+@media (max-width: 760px) {
+  .trust .tsx-funnel-stage { width: 100% !important; }
+  .trust .tsx-blueprint-node { border-right: 0; border-bottom: 1px solid var(--line); }
+  .trust .tsx-blueprint-node:last-child { border-bottom: 0; }
+  .trust .tsx-blueprint-node:not(:last-child)::after { content: none; }
+  .trust .tsx-ladder-body p { max-width: none; }
+}
