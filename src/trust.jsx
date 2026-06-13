@@ -28,8 +28,8 @@ function setupTsxFade() {
 
 /* Blueprint Ledger — divisions share one structural blueprint accent; they
    differ by plate numeral + serif tagline, not hue. Vermilion is the rare highlight. */
-const TRUST_ACCENT = { academy: '#2F4A6B', marketing: '#2F4A6B', labs: '#2F4A6B' };
-const TRUST_VERMILION = '#D9472B';
+const TRUST_ACCENT = { academy: '#1A6DFF', marketing: '#1A6DFF', labs: '#1A6DFF' };
+const TRUST_VERMILION = '#1A6DFF';
 
 const TRUST_OPERATING_STANDARD = [
   { title: 'Written before built', body: "Every engagement starts with a written brief and scope. If it isn't written down, it isn't agreed." },
@@ -133,7 +133,6 @@ function TrustRunLog({ config }) {
 function TrustIntakeBand({ heading, sub, cta = 'Start a Project', onClick, spaced }) {
   return (
     <div className={"tsx-intake-band tsx-intake-band--plate tsx-fade" + (spaced ? " tsx-intake-spaced" : "")}>
-      <span className="tsx-intake-mark" aria-hidden="true">§</span>
       <div className="tsx-intake-copy">
         <span className="tsx-intake-tick" aria-hidden="true" />
         <p className="tsx-intake-heading">{heading}</p>
@@ -178,7 +177,6 @@ function TrustLedgerRows({ items, titleKey = 'title', bodyKey = 'body', framed, 
   );
   if (framed) return (
     <div className="tsx-ledger-plate">
-      <span className="tsx-panel-watermark" aria-hidden="true">§</span>
       {label && <span className="tsx-ledger-plate-label">{label}</span>}
       {body}
     </div>
@@ -252,7 +250,7 @@ function TrustParticleCanvas() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const BG = '#0A0F1E', LINE = 'rgba(15,76,129,', DOT = 'rgba(15,76,129,1)';
+    const BG = '#081726', LINE = 'rgba(91,157,255,', DOT = 'rgba(91,157,255,1)';
     const MAX_DIST = 160, N = 320;
     let W, H, particles, raf;
     
@@ -630,6 +628,7 @@ function TrustEnterpriseStacks() {
       <div className="tsx-section-inner">
         <p className="tsx-section-eyebrow tsx-fade">Capability stacks</p>
         <h2 className="tsx-section-heading tsx-fade tsx-fade-d1" id="tsx-stack-h">Integrated stacks built from the same Nexara capabilities.</h2>
+        <p className="tsx-section-lede tsx-fade tsx-fade-d2">How the three lines interlock into combined plays — one capability set, recomposed for the outcome.</p>
         <div className="tsx-matrix">
           {DATA.superSkills.map((item, index) => (
             <div className={`tsx-matrix-row tsx-fade tsx-fade-d${Math.min(index + 1, 4)}`} key={item.title}>
@@ -685,13 +684,12 @@ function TrustMarketContext() {
 
 function TrustFooter() {
   const solutionLinks = DATA.nav.slice(0, 3).map(item => ({ text: getTrustNavLabel(item), page: item.page }));
-  const moduleGroups = Object.values(DATA.sections).map(section => ({
-    label: getTrustSectionLabel(section),
-    links: section.subpages.map(sp => ({ text: getTrustSubpageLabel(section, sp), page: section.id, detail: sp.slug })),
+  const moduleLinks = Object.values(DATA.sections).map(section => ({
+    text: getTrustSectionLabel(section), page: section.id,
   }));
   const cols = [
     { label: 'Solutions', links: solutionLinks },
-    { label: 'Modules', groups: moduleGroups },
+    { label: 'Modules', links: moduleLinks },
     { label: 'Company', links: [{ text: 'Delivery Proof', page: 'customers' }, { text: 'About Nexara', page: 'company' }, { text: 'Enterprise Enquiry', page: 'contact' }] },
   ];
   return (
@@ -755,11 +753,11 @@ function TrustHeroUnravel() {
     const TAU = Math.PI * 2;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Drafting-table ink on paper: cobalt, deep blue, ink
+    // Steel: enterprise blue accent + slate ink on cool ground
     const STRANDS = [
-      { id: "academy",   rgb: [47, 74, 107] },   // blueprint
-      { id: "labs",      rgb: [26, 24, 19] },    // ink
-      { id: "marketing", rgb: [217, 71, 43] },   // vermilion
+      { id: "academy",   rgb: [26, 109, 255] },  // accent blue
+      { id: "labs",      rgb: [11, 31, 51] },    // slate ink
+      { id: "marketing", rgb: [26, 109, 255] },  // accent blue
     ];
 
     const makeSprite = (rgb) => {
@@ -1137,7 +1135,7 @@ function TrustHeroUnravel() {
 
         <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#5B6472' }} data-from="0.63" data-to="0.81" aria-hidden="true">
           <p className="tsx-panel-idx">03 / DIVISION</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Marketing<br /><span className="serif" style={{ color: '#5B6472' }}>the growth signal.</span></h2>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Digital<br /><span className="serif" style={{ color: '#5B6472' }}>the growth signal.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Brand systems, web experiences and performance creative — built like software, measured like engineering.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'marketing')} style={{ marginTop: '20px' }}>Enter Marketing →</button>
         </div>
@@ -1322,20 +1320,27 @@ function TrustHome() {
     <main>
       {!HAS_SCROLL_ANIMATION ? (
         <>
+          {/* Problem / Premise */}
           <TrustHeroFlat />
-          <TrustProofStrip />
+          {/* Three forces, equal weight */}
           <TrustSolutionsGrid />
+          {/* Proof — combined plays interlock */}
           <TrustEnterpriseStacks />
+          {/* Outcome — governed capability in figures */}
+          <TrustProofStrip />
           <TrustMarketContext />
+          {/* Invitation */}
           <TrustFinalCTA />
         </>
       ) : (
         <>
+          {/* Problem → Premise → Three forces → weave (one continuous scroll) */}
           <TrustHeroUnravel />
-          <TrustProofStrip />
+          {/* Premise — the standard, before any numbers */}
           <TrustManifesto />
+          {/* Three forces, equal weight */}
           <TrustDivisionsRail />
-          <TrustUnboxAssembly />
+          {/* Mechanism — the shared spine every division runs on */}
           <section className="tsx-section-inner" style={{ paddingBlock: 'clamp(60px, 10vh, 120px)' }}>
             <div className="tsx-dimline" data-label="Sheet 04 · Standard" aria-hidden="true" />
             <div className="tsx-standard-head" style={{ marginBottom: '40px', marginTop: 'clamp(40px,6vw,72px)' }}>
@@ -1344,8 +1349,12 @@ function TrustHome() {
             </div>
             <TrustLedgerRows framed label="§ Operating standard" items={TRUST_OPERATING_STANDARD} titleKey="title" bodyKey="body" />
           </section>
+          {/* Proof — the three forces interlock into combined plays */}
           <TrustEnterpriseStacks />
+          {/* Outcome — governed capability in figures */}
+          <TrustProofStrip />
           <TrustMarketContext />
+          {/* Invitation */}
           <TrustFinalCTA />
         </>
       )}
@@ -1380,17 +1389,6 @@ function TrustSectionHeader({ section }) {
         </div>
       </div>
     </div>
-  );
-}
-
-function TrustSubNav({ section, activeSlug }) {
-  return (
-    <nav className="tsx-subnav" aria-label="Section navigation">
-      <button className={!activeSlug ? 'tsx-tab active' : 'tsx-tab'} onClick={() => routeTo('trust', section.id)}>Overview</button>
-          {section.subpages.map(sp => (
-        <button key={sp.slug} className={activeSlug === sp.slug ? 'tsx-tab active' : 'tsx-tab'} onClick={() => routeTo('trust', section.id, sp.slug)}>{getTrustSubpageLabel(section, sp)}</button>
-      ))}
-    </nav>
   );
 }
 
@@ -1499,34 +1497,74 @@ function TrustProcessTrack({ steps }) {
 /* Legacy alias */
 function TrustProcessTimeline({ steps }) { return <TrustProcessTrack steps={steps} />; }
 
+const DELIVER_ICONS = {
+  code:    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M7 6l-4 4 4 4M13 6l4 4-4 4"/></svg>,
+  data:    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2.6l1.7 4.1 4.1 1.7-4.1 1.7L10 14l-1.7-3.9L4.2 8.4l4.1-1.7z"/><path d="M15.5 13.5l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z"/></svg>,
+  design:  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 16l1-3.4 7.6-7.6a1.8 1.8 0 012.5 2.5L7.4 15 4 16z"/><path d="M11.5 5.5l3 3"/></svg>,
+  cloud:   <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6.6 15.5a3.6 3.6 0 01-.4-7.18A4.6 4.6 0 0115.2 8.6a3.35 3.35 0 01-.2 6.9z"/></svg>,
+  growth:  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 14l4-4 3 2 5.5-6.5"/><path d="M12.5 5.5H16V9"/></svg>,
+  proof:   <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2.4l5.6 2.2v4.3c0 3.5-2.4 5.8-5.6 6.7-3.2-.9-5.6-3.2-5.6-6.7V4.6z"/><path d="M7.4 9.7l1.8 1.8 3.5-3.9"/></svg>,
+  web:     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="14" height="12" rx="1.6"/><path d="M3 8h14M6 6.1h.01M8 6.1h.01"/></svg>,
+  doc:     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2.6h5L14.6 6.2V16.4a1 1 0 01-1 1H6a1 1 0 01-1-1V3.6a1 1 0 011-1z"/><path d="M11 2.6V6.4h3.6M7.5 11h5M7.5 13.6h3.5"/></svg>,
+  layers:  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2.8l7 3.5-7 3.5-7-3.5z"/><path d="M3.2 10.3L10 13.7l6.8-3.4M3.2 13.5L10 16.9l6.8-3.4"/></svg>,
+};
+function deliverIcon(title = '') {
+  const t = title.toLowerCase();
+  if (/engineer|full|stack|develop|\bbuild|api|software/.test(t)) return DELIVER_ICONS.code;
+  if (/data|\bai\b|model|rag|agent|machine|analy/.test(t))        return DELIVER_ICONS.data;
+  if (/design|ux|ui|brand|visual|identity/.test(t))              return DELIVER_ICONS.design;
+  if (/cloud|devops|deploy|host|observ|infra|ops/.test(t))       return DELIVER_ICONS.cloud;
+  if (/market|growth|\bads?\b|seo|social|content|performance|campaign/.test(t)) return DELIVER_ICONS.growth;
+  if (/portfolio|review|eval|quality|interview|proof/.test(t))    return DELIVER_ICONS.proof;
+  if (/web|site/.test(t))                                         return DELIVER_ICONS.web;
+  if (/document|\bdoc\b/.test(t))                                 return DELIVER_ICONS.doc;
+  return DELIVER_ICONS.layers;
+}
+
 function TrustDeliverableCards({ rows }) {
   return (
-    <div className="tsx-del-card-grid">
-      {rows.map(row => (
-        <div className="tsx-del-service-card" key={row.title}>
-          <div className="tsx-del-service-top">
-            <span className="tsx-del-service-name">{row.title}</span>
-            <span className="tsx-del-service-outcome">{row.outcome}</span>
+    <div className="tsx-deliver-grid">
+      {rows.map((row, i) => (
+        <article className={`tsx-deliver-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={row.title}>
+          <span className="tsx-deliver-glow" aria-hidden="true" />
+          <div className="tsx-deliver-head">
+            <span className="tsx-deliver-icon" aria-hidden="true">{deliverIcon(row.title)}</span>
+            <h3 className="tsx-deliver-title">{row.title}</h3>
+            <span className="tsx-deliver-badge">{row.outcome}</span>
           </div>
-          <div className="tsx-del-service-chips">
-            {row.deliverables.map(d => (
-              <span className="tsx-del-service-chip" key={d}>{d}</span>
+          <div className="tsx-deliver-chips">
+            {row.deliverables.map((d) => (
+              <span className="tsx-deliver-chip" key={d}>
+                <svg className="tsx-deliver-chk" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                {d}
+              </span>
             ))}
           </div>
-        </div>
+        </article>
       ))}
     </div>
   );
 }
 
-/* Legacy alias */
 function TrustDeliverableRows({ rows }) { return <TrustDeliverableCards rows={rows} />; }
 
-const TRUST_SECTION_CTA = {
-  academy:   'Plan a Talent Programme',
-  marketing: 'Scope a Digital Project',
-  labs:      'Scope an AI System',
-};
+/* Capability / stack modules as elevated icon cards (reuses the deliverable card kit). */
+function TrustModuleCards({ rows }) {
+  return (
+    <div className="tsx-deliver-grid">
+      {rows.map((row, i) => (
+        <article className={`tsx-deliver-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={row.title}>
+          <span className="tsx-deliver-glow" aria-hidden="true" />
+          <div className="tsx-deliver-head">
+            <span className="tsx-deliver-icon" aria-hidden="true">{deliverIcon(row.title)}</span>
+            <h3 className="tsx-deliver-title">{row.title}</h3>
+          </div>
+          <p className="tsx-deliver-body">{row.trust || row.body}</p>
+        </article>
+      ))}
+    </div>
+  );
+}
 
 function TrustSectionBlock({ eyebrow, children }) {
   return (
@@ -1550,60 +1588,91 @@ function TrustStatement({ section }) {
   );
 }
 
-function TrustSectionOverview({ section }) {
+/* Storytelling chapter — clean title, subtitle, then the module(s) for that beat. */
+function TrustChapter({ eyebrow, title, sub, children }) {
   return (
-    <div className="tsx-overview">
-      <div className="tsx-section-inner">
+    <section className="tsx-chapter tsx-fade">
+      <header className="tsx-chapter-head">
+        {eyebrow && <span className="tsx-chapter-eyebrow">{eyebrow}</span>}
+        <h2 className="tsx-chapter-title">{title}</h2>
+        {sub && <p className="tsx-chapter-sub">{sub}</p>}
+      </header>
+      <div className="tsx-chapter-body">{children}</div>
+    </section>
+  );
+}
 
-        {/* ─── Capabilities + Audience — facing ledger plates ──── */}
-        <div className="tsx-overview-top">
-          <div className="tsx-cap-col">
-            <span className="tsx-overview-label">Capabilities</span>
-            <TrustLedgerRows framed label="§ Capability stack" items={section.modules} titleKey="title" bodyKey="trust" />
-          </div>
-          <div className="tsx-audience-col">
-            <span className="tsx-overview-label">Who this serves</span>
-            <TrustLedgerRows framed label="§ Audience" items={section.audiences} titleKey="title" bodyKey="trust" />
-          </div>
+/* The section page told as one story. phase="intro" runs before the mechanism,
+   phase="depth" after it — so the page reads who -> why -> what -> how -> proof -> ask. */
+function TrustSectionStory({ section, phase }) {
+  if (phase === 'intro') {
+    return (
+      <div className="tsx-overview tsx-story">
+        <div className="tsx-section-inner">
+          <TrustChapter
+            eyebrow="Who this serves"
+            title="Who this is for"
+            sub="The people and teams an engagement is built around - and the outcome each one is after.">
+            <TrustLedgerRows framed items={section.audiences} titleKey="title" bodyKey="trust" />
+          </TrustChapter>
+
+          {section.statement && (
+            <TrustChapter
+              eyebrow="The premise"
+              title="Why it matters"
+              sub="The belief that shapes every decision before the work begins.">
+              <TrustStatement section={section} />
+            </TrustChapter>
+          )}
+
+          <TrustChapter
+            eyebrow="Capabilities"
+            title="What we do"
+            sub="The building blocks we combine into your engagement.">
+            <TrustModuleCards rows={section.modules} />
+          </TrustChapter>
         </div>
+      </div>
+    );
+  }
 
-        {TRUST_RUNLOG[section.id] && (
-          <div className="tsx-runlog-wrap">
-            <div className="tsx-dimline" data-label="Run log" aria-hidden="true" />
-            <TrustRunLog config={TRUST_RUNLOG[section.id]} />
-          </div>
-        )}
-
-        {section.id === 'marketing' && <TrustSignalLine />}
-
-        <TrustStatement section={section} />
-
-        {/* ─── What We Deliver ─────────────────────────────────── */}
-        <TrustSectionBlock eyebrow="What we deliver">
+  return (
+    <div className="tsx-overview tsx-story">
+      <div className="tsx-section-inner">
+        <TrustChapter
+          eyebrow="What we deliver"
+          title="What you get"
+          sub="The concrete artifacts you walk away with.">
           <TrustDeliverableCards rows={section.stackDetails} />
-        </TrustSectionBlock>
+        </TrustChapter>
 
-        {/* ─── How It Works ────────────────────────────────────── */}
-        <TrustSectionBlock eyebrow="How it works">
-          <TrustProcessTrack steps={section.process} />
-        </TrustSectionBlock>
-
-        {/* ─── Engagement Packages ─────────────────────────────── */}
-        <TrustSectionBlock eyebrow="Engagement packages">
-          <TrustPackageCards packages={section.packages} />
-        </TrustSectionBlock>
-
-        {/* ─── Delivery Proof ──────────────────────────────────── */}
-        <TrustSectionBlock eyebrow="Delivery proof">
+        <TrustChapter
+          eyebrow="Delivery proof"
+          title="Proof it holds"
+          sub="Evidence from work already shipped - not promises.">
           <TrustProofCards items={section.proof} />
-        </TrustSectionBlock>
+          {TRUST_RUNLOG[section.id] && section.id !== 'academy' && (
+            <div className="tsx-runlog-wrap">
+              <div className="tsx-dimline" data-label="Run log" aria-hidden="true" />
+              <TrustRunLog config={TRUST_RUNLOG[section.id]} />
+            </div>
+          )}
+          {section.id === 'marketing' && <TrustSignalLine />}
+        </TrustChapter>
 
-        {/* ─── Common Questions ────────────────────────────────── */}
-        <TrustSectionBlock eyebrow="Common questions">
+        <TrustChapter
+          eyebrow="Engagement packages"
+          title="Ways to engage"
+          sub="Scoped entry points, matched to where you are.">
+          <TrustPackageCards packages={section.packages} />
+        </TrustChapter>
+
+        <TrustChapter
+          eyebrow="Common questions"
+          title="Before you commit"
+          sub="The questions teams ask most, answered up front.">
           <TrustFaqAccordion faqs={section.faqs} />
-        </TrustSectionBlock>
-
-        <TrustIntakeBand heading={section.intake.primary} sub={section.intake.secondary} cta={TRUST_SECTION_CTA[section.id] || 'Start a Project'} />
+        </TrustChapter>
       </div>
     </div>
   );
@@ -1655,13 +1724,13 @@ const DEFAULT_CARD_ICON = (
   </svg>
 );
 
-function TrustSubpageDetail({ section, page }) {
+function TrustSubpageBand({ section, page }) {
   return (
-    <div className="tsx-subpage">
+    <div className="tsx-subpage-band" id={`${section.id}-${page.slug}`}>
       <div className="tsx-section-inner">
         <div className="tsx-subpage-cards-head tsx-fade">
-          <span className="tsx-section-eyebrow">What's inside</span>
-          <h2 className="tsx-section-heading">The <span className="serif">{page.title.toLowerCase()}</span> toolkit.</h2>
+          <span className="tsx-section-eyebrow">{page.title}</span>
+          <h2 className="tsx-section-heading">{page.callout.trust}</h2>
         </div>
         <div className="tsx-subpage-icon-grid">
           {page.cards.map((card, i) => (
@@ -1674,7 +1743,6 @@ function TrustSubpageDetail({ section, page }) {
             </div>
           ))}
         </div>
-        <TrustIntakeBand heading={section.intake.primary} sub={section.intake.secondary} cta={TRUST_SECTION_CTA[section.id] || 'Start a Project'} />
       </div>
     </div>
   );
@@ -1694,7 +1762,7 @@ function TrustSectionHeroUnravel({ theme, section }) {
 
     const shape = section.id === "academy" ? "spiral" : section.id === "labs" ? "sphere" : "signal";
     // Ink-on-paper strands matching the section
-    const rgb = section.id === "marketing" ? [217, 71, 43] : section.id === "labs" ? [26, 24, 19] : [47, 74, 107];
+    const rgb = section.id === "labs" ? [11, 31, 51] : [26, 109, 255];
 
     const makeSprite = (cRgb) => {
       const s = document.createElement("canvas");
@@ -1856,15 +1924,15 @@ function TrustSectionHeroUnravel({ theme, section }) {
         <canvas ref={canvasRef} className="tsx-hero-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
         <div className="tsx-hero-chapter" style={{ opacity: 1, pointerEvents: 'auto' }}>
           <p className="tsx-section-eyebrow">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {getTrustSectionLabel(section).toUpperCase()}</p>
-          <h1 className="tsx-section-heading" style={{ color: 'var(--text)', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 600 }}>
+          <h1 className="tsx-section-heading" style={{ color: '#F4F8FF', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 700 }}>
             {copy.title}<br />
-            <span className="serif" style={{ color: TRUST_VERMILION }}>{copy.accent}</span>
+            <span className="serif" style={{ color: '#5B9DFF' }}>{copy.accent}</span>
           </h1>
-          <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'var(--muted)', marginInline: 'auto' }}>{copy.body}</p>
+          <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'rgba(220,232,248,.66)', marginInline: 'auto' }}>{copy.body}</p>
           <div className="tsx-sec-actions" style={{ marginTop: '24px', display: 'flex', gap: '16px', justifyContent: 'center' }}>
             <button className="tsx-btn-cta" onClick={() => {
-              const subnav = document.querySelector(".tsx-subnav");
-              subnav?.scrollIntoView({ behavior: "smooth" });
+              const band = document.querySelector(".tsx-subpage-band");
+              band?.scrollIntoView({ behavior: "smooth" });
             }}>{copy.primary}</button>
             <button className="tsx-sec-btn-ghost" onClick={() => routeTo('trust', 'customers', section.id)}>{copy.secondary}</button>
           </div>
@@ -1905,18 +1973,27 @@ function TrustCohortLadder({ section }) {
         <div className="tsx-signature-head tsx-fade">
           <span className="tsx-section-eyebrow">The cohort path</span>
           <h2 className="tsx-section-heading">From intake<br /><span className="serif">to hiring outcome.</span></h2>
+          <p className="tsx-signature-sub">One path every cohort runs - assess, build, then prove.</p>
         </div>
-        <ol className="tsx-ladder" ref={railRef}>
-          {steps.map((s, i) => (
-            <li className="tsx-ladder-step tsx-fade" style={{ transitionDelay: (i * 90) + 'ms' }} key={s.step}>
-              <span className="tsx-ladder-node">{s.step}</span>
-              <div className="tsx-ladder-body">
-                <h3>{s.title}</h3>
-                <p>{s.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
+        <div className="tsx-ladder-layout">
+          <ol className="tsx-ladder" ref={railRef}>
+            {steps.map((s, i) => (
+              <li className="tsx-ladder-step tsx-fade" style={{ transitionDelay: (i * 90) + 'ms' }} key={s.step}>
+                <span className="tsx-ladder-node">{s.step}</span>
+                <div className="tsx-ladder-body">
+                  <h3>{s.title}</h3>
+                  <p>{s.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          {TRUST_RUNLOG[section.id] && (
+            <div className="tsx-ladder-runlog tsx-fade">
+              <div className="tsx-dimline" data-label="Run log" aria-hidden="true" />
+              <TrustRunLog config={TRUST_RUNLOG[section.id]} />
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
@@ -1932,6 +2009,7 @@ function TrustBlueprint({ section }) {
         <div className="tsx-signature-head tsx-fade">
           <span className="tsx-section-eyebrow">System architecture</span>
           <h2 className="tsx-section-heading">How a Labs build<br /><span className="serif">fits together.</span></h2>
+          <p className="tsx-signature-sub">How discovery, build and controls connect into one system.</p>
         </div>
         <div className={"tsx-blueprint-grid" + (drawn ? " is-drawn" : "")} ref={ref}>
           <span className="tsx-blueprint-bus" aria-hidden="true" />
@@ -1957,6 +2035,7 @@ function TrustFunnel({ section }) {
         <div className="tsx-signature-head tsx-fade">
           <span className="tsx-section-eyebrow">The growth funnel</span>
           <h2 className="tsx-section-heading">Attention<br /><span className="serif">to outcome.</span></h2>
+          <p className="tsx-signature-sub">How attention becomes a decision, stage by stage.</p>
         </div>
         <div className="tsx-funnel">
           {mods.map((m, i) => (
@@ -1981,55 +2060,32 @@ function TrustSignatureModule({ section }) {
   return null;
 }
 
-function TrustSubpageHero({ section, page }) {
-  const idx = section.subpages.findIndex(p => p.slug === page.slug);
-  return (
-    <section className="tsx-sec-header tsx-subpage-hero">
-      <div className="tsx-sec-header-inner tsx-subpage-hero-inner">
-        <div>
-          <span className="tsx-sec-eyebrow">{getTrustSectionLabel(section)} · {String(idx + 1).padStart(2, '0')} / {page.title}</span>
-          <h1 className="tsx-sec-h1">{page.callout.trust}</h1>
-          <div className="tsx-subpage-hero-actions">
-            <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>{TRUST_SECTION_CTA[section.id] || 'Start a Project'}</button>
-            <button className="tsx-sec-btn-ghost" onClick={() => routeTo('trust', section.id)}>← Back to {getTrustSectionLabel(section)}</button>
-          </div>
-        </div>
-        <div className="tsx-spec-panel">
-          <span className="tsx-spec-panel-label">{page.title}</span>
-          {page.cards.slice(0, 4).map((c) => (
-            <div className="tsx-spec-row" key={c.title}>
-              <span className="tsx-spec-label">{c.title}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function TrustSectionPage({ section, detail }) {
-  const active = useMemo(() => detail ? section.subpages.find(p => p.slug === detail) : null, [section, detail]);
-  if (detail && !active) return <NotFound theme="trust" page={`${section.id}/${detail}`} />;
+function TrustSectionPage({ section }) {
   return (
     <main className="tsx-section-page" style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' }}>
-      {active ? (
-        <TrustSubpageHero section={section} page={active} />
-      ) : HAS_SCROLL_ANIMATION ? (
+      {/* Hook */}
+      {HAS_SCROLL_ANIMATION ? (
         <TrustSectionHeroUnravel theme="trust" section={section} />
       ) : (
         <TrustSectionHeader section={section} />
       )}
-      {!active && <TrustSignatureModule section={section} />}
-      <TrustSubNav section={section} activeSlug={detail} />
-      <div key={detail || 'overview'}>
-        {active
-          ? <TrustSubpageDetail section={section} page={active} />
-          : <TrustSectionOverview section={section} />}
-      </div>
+      {/* Who this is for -> Why it matters -> What we do */}
+      <TrustSectionStory section={section} phase="intro" />
+      {/* How it works - the one mechanism, full-width centerpiece */}
+      <TrustSignatureModule section={section} />
+      {/* What you get -> Proof -> Packages -> Questions */}
+      <TrustSectionStory section={section} phase="depth" />
+      {/* Go deeper */}
+      {section.subpages.map(sp => (
+        <TrustSubpageBand key={sp.slug} section={section} page={sp} />
+      ))}
+      {/* Invitation - one clear close */}
+      <section className="tsx-section-inner">
+        <TrustIntakeBand spaced heading={section.intake.primary} sub={section.intake.secondary} cta={TRUST_SECTION_CTA[section.id] || 'Start a Project'} />
+      </section>
     </main>
   );
 }
-
 function TrustCustomers({ detail }) {
   const activeSection = detail ? DATA.sections[detail] : null;
   if (detail && !activeSection) return <NotFound theme="trust" page={`customers/${detail}`} />;
@@ -2059,7 +2115,11 @@ function TrustCustomers({ detail }) {
         </div>
       </div>
       <section className="tsx-section-inner tsx-proof-table-section">
-        <h2 className="tsx-section-heading tsx-overview-h">Delivery model proof</h2>
+        <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
+          <span className="tsx-chapter-eyebrow">Operating proof</span>
+          <h2 className="tsx-chapter-title">Delivery model proof</h2>
+          <p className="tsx-chapter-sub">Every engagement framed as scope evidence, the work produced, and the readiness handed over.</p>
+        </header>
         <TrustLedgerTable
           label="Delivery model proof"
           columns={["Section", "Engagement type", "What was produced"]}
@@ -2110,11 +2170,19 @@ function TrustCompany() {
         </div>
       </div>
       <section className="tsx-section-inner tsx-principles-section">
-        <h2 className="tsx-section-heading tsx-overview-h">Operating principles</h2>
+        <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
+          <span className="tsx-chapter-eyebrow">How we operate</span>
+          <h2 className="tsx-chapter-title">Operating principles</h2>
+          <p className="tsx-chapter-sub">The commitments that hold steady across every engagement.</p>
+        </header>
         <TrustLedgerRows items={company.principles} titleKey="title" bodyKey="body" />
       </section>
       <section className="tsx-section-inner tsx-standards-section">
-        <h2 className="tsx-section-heading tsx-overview-h">Delivery governance</h2>
+        <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
+          <span className="tsx-chapter-eyebrow">Governance</span>
+          <h2 className="tsx-chapter-title">Delivery governance</h2>
+          <p className="tsx-chapter-sub">The standards each engagement is measured against.</p>
+        </header>
         <TrustLedgerTable
           label="Delivery governance"
           columns={["Standard", "Commitment"]}
@@ -2148,7 +2216,11 @@ function TrustContact({ detail }) {
       </section>
 
       <section className="tsx-section-inner tsx-channel-section">
-        <h2 className="tsx-section-heading tsx-heading-flush">Select a section</h2>
+        <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
+          <span className="tsx-chapter-eyebrow">Where to start</span>
+          <h2 className="tsx-chapter-title">Select a section</h2>
+          <p className="tsx-chapter-sub">Pick the line closest to what you need — it routes your brief to the right team.</p>
+        </header>
         <div className="tsx-channel-grid">
           {DATA.contact.channels.map(channel => (
             <button
@@ -2165,7 +2237,10 @@ function TrustContact({ detail }) {
       </section>
 
       <section className="tsx-section-inner tsx-brief-section">
-        <h2 className="tsx-section-heading tsx-heading-flush">{DATA.contact.enquiry.title}</h2>
+        <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
+          <span className="tsx-chapter-eyebrow">Your brief</span>
+          <h2 className="tsx-chapter-title">{DATA.contact.enquiry.title}</h2>
+        </header>
         <p className="tsx-brief-intro">{DATA.contact.enquiry.body}</p>
         {showSuccess ? (
           <TrustIntakeBand heading="Enquiry prepared. Your mail client will open shortly." sub="If it does not open, use the email link on this page and include the project details manually." cta={null} />
@@ -2247,6 +2322,18 @@ function TrustSite({ page, detail }) {
   const section = DATA.sections[page];
   React.useEffect(() => { window.scrollTo(0, 0); }, [page]);
   React.useEffect(() => setupTsxFade(), [page, detail]);
+  React.useEffect(() => {
+    const sel = '.tsx-sol-card,.tsx-gov-card,.tsx-proof-case-card,.tsx-pkg-card,.tsx-subpage-icon-card,.tsx-matrix-row,.tsx-channel-card,.tsx-deliver-card';
+    const move = (e) => {
+      const c = e.target.closest && e.target.closest(sel);
+      if (!c) return;
+      const r = c.getBoundingClientRect();
+      c.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+      c.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+    };
+    window.addEventListener('mousemove', move, { passive: true });
+    return () => window.removeEventListener('mousemove', move);
+  }, []);
   const validPage = section || STATIC_PAGES.includes(page);
   return (
     <div className="site trust tsx-site">
@@ -2254,7 +2341,7 @@ function TrustSite({ page, detail }) {
       <TrustNav page={page} detail={detail} />
       <div id="main" className={page !== 'home' ? 'tsx-main-offset' : ''}>
         {page === 'home'      && <TrustHome />}
-        {section              && <TrustSectionPage section={section} detail={detail} />}
+        {section              && <TrustSectionPage section={section} />}
         {page === 'customers' && <TrustCustomers detail={detail} />}
         {page === 'company'   && <TrustCompany />}
         {page === 'contact'   && <TrustContact detail={detail} />}
