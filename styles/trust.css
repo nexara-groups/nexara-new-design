@@ -3946,3 +3946,11 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust .tsx-funnel { display: block; }
 .trust .tsx-funnel-stage { width: var(--w, 100%); margin: 0 auto 14px; align-self: auto; }
 .trust .tsx-funnel-stage:last-child { margin-bottom: 0; }
+
+/* ── Audit fix: cohort ladder stacks cleanly on mobile ── */
+@media (max-width: 640px) {
+  .trust .tsx-ladder-step { grid-template-columns: 44px 1fr; gap: 16px; }
+  .trust .tsx-ladder-body { display: block; }
+  .trust .tsx-ladder-body h3 { margin-bottom: 6px; }
+  .trust .tsx-ladder-node { width: 44px; height: 44px; font-size: 0.85rem; }
+}
