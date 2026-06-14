@@ -526,8 +526,8 @@ function TrustProofStrip() {
 
 const TSX_SOLUTIONS = [
   {
-    index: '01 — Labs', name: 'Labs', page: 'labs', linkLabel: 'Explore Labs',
-    desc: 'Operational systems and AI infrastructure — from workflow discovery to governed rollout. Built for teams that need measurable automation, not demos.',
+    index: '01 — Product Studio', name: 'Product Studio', page: 'labs', linkLabel: 'Explore Product Studio',
+    desc: 'We build the system that solves the problem — SaaS, B2B products, integrations and internal tools, with AI and automation applied where it earns its place.',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>,
   },
   {
@@ -1252,7 +1252,7 @@ function TrustDivisionsRail() {
 
   const sections = Object.values(DATA.sections);
   const ACCENT = TRUST_ACCENT;
-  const TAGLINE = { academy: 'the talent engine.', marketing: 'the growth signal.', labs: 'the systems forge.' };
+  const TAGLINE = { academy: 'the talent engine.', marketing: 'the growth signal.', labs: 'the build studio.' };
 
   return (
     <section className="tsx-rail-wrap" id="divisions" ref={wrapRef}>
@@ -1507,16 +1507,18 @@ const DELIVER_ICONS = {
   web:     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="14" height="12" rx="1.6"/><path d="M3 8h14M6 6.1h.01M8 6.1h.01"/></svg>,
   doc:     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2.6h5L14.6 6.2V16.4a1 1 0 01-1 1H6a1 1 0 01-1-1V3.6a1 1 0 011-1z"/><path d="M11 2.6V6.4h3.6M7.5 11h5M7.5 13.6h3.5"/></svg>,
   layers:  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2.8l7 3.5-7 3.5-7-3.5z"/><path d="M3.2 10.3L10 13.7l6.8-3.4M3.2 13.5L10 16.9l6.8-3.4"/></svg>,
+  link:    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M8 11a3 3 0 004.5.4l2.5-2.5a3 3 0 00-4.2-4.2l-1.3 1.3"/><path d="M12 9a3 3 0 00-4.5-.4L5 11.1a3 3 0 004.2 4.2l1.3-1.3"/></svg>,
 };
 function deliverIcon(title = '') {
   const t = title.toLowerCase();
-  if (/engineer|full|stack|develop|\bbuild|api|software/.test(t)) return DELIVER_ICONS.code;
+  if (/engineer|full|stack|develop|\bbuild|software|architect/.test(t)) return DELIVER_ICONS.code;
   if (/data|\bai\b|model|rag|agent|machine|analy/.test(t))        return DELIVER_ICONS.data;
   if (/design|ux|ui|brand|visual|identity/.test(t))              return DELIVER_ICONS.design;
-  if (/cloud|devops|deploy|host|observ|infra|ops/.test(t))       return DELIVER_ICONS.cloud;
+  if (/cloud|devops|deploy|host|observ|infra|\bops\b/.test(t))    return DELIVER_ICONS.cloud;
+  if (/integration|systems|pipeline|connect|\bapi\b/.test(t))    return DELIVER_ICONS.link;
   if (/market|growth|\bads?\b|seo|social|content|performance|campaign/.test(t)) return DELIVER_ICONS.growth;
   if (/portfolio|review|eval|quality|interview|proof/.test(t))    return DELIVER_ICONS.proof;
-  if (/web|site/.test(t))                                         return DELIVER_ICONS.web;
+  if (/web|site|b2b|platform|portal|dashboard|product/.test(t))   return DELIVER_ICONS.web;
   if (/document|\bdoc\b/.test(t))                                 return DELIVER_ICONS.doc;
   return DELIVER_ICONS.layers;
 }
@@ -1652,19 +1654,21 @@ function TrustSectionStory({ section, phase }) {
           <TrustDeliverableCards rows={section.stackDetails} />
         </TrustChapter>
 
-        <TrustChapter
-          eyebrow="Delivery proof"
-          title="Proof it holds"
-          sub="Evidence from work already shipped - not promises.">
-          <TrustProofCards items={section.proof} />
-          {TRUST_RUNLOG[section.id] && section.id !== 'academy' && (
-            <div className="tsx-runlog-wrap">
-              <div className="tsx-dimline" data-label="Run log" aria-hidden="true" />
-              <TrustRunLog config={TRUST_RUNLOG[section.id]} />
-            </div>
-          )}
-          {section.id === 'marketing' && <TrustSignalLine />}
-        </TrustChapter>
+        {section.id !== 'academy' && (
+          <TrustChapter
+            eyebrow="Delivery proof"
+            title="Proof it holds"
+            sub="Evidence from work already shipped - not promises.">
+            <TrustProofCards items={section.proof} />
+            {TRUST_RUNLOG[section.id] && (
+              <div className="tsx-runlog-wrap">
+                <div className="tsx-dimline" data-label="Run log" aria-hidden="true" />
+                <TrustRunLog config={TRUST_RUNLOG[section.id]} />
+              </div>
+            )}
+            {section.id === 'marketing' && <TrustSignalLine />}
+          </TrustChapter>
+        )}
 
         <TrustChapter
           eyebrow="Engagement packages"
@@ -1950,7 +1954,7 @@ function TrustSectionHeroUnravel({ theme, section }) {
 
 /* ─── Per-division signature modules (Trust-native, light, no canvas/pin) ─── */
 
-function TrustCohortLadder({ section }) {
+function TrustCohortLadder({ section, eyebrow = 'The cohort path', title, sub = 'One path every cohort runs - assess, build, then prove.', ariaLabel = 'The cohort path' }) {
   const steps = section.process || [];
   const railRef = React.useRef(null);
   React.useEffect(() => {
@@ -1974,12 +1978,12 @@ function TrustCohortLadder({ section }) {
   }, [steps.length]);
   if (!steps.length) return null;
   return (
-    <section className="tsx-signature tsx-ladder-section" aria-label="The cohort path">
+    <section className="tsx-signature tsx-ladder-section" aria-label={ariaLabel}>
       <div className="tsx-section-inner">
         <div className="tsx-signature-head tsx-fade">
-          <span className="tsx-section-eyebrow">The cohort path</span>
-          <h2 className="tsx-section-heading">From intake<br /><span className="serif">to hiring outcome.</span></h2>
-          <p className="tsx-signature-sub">One path every cohort runs - assess, build, then prove.</p>
+          <span className="tsx-section-eyebrow">{eyebrow}</span>
+          <h2 className="tsx-section-heading">{title || <>From intake<br /><span className="serif">to hiring outcome.</span></>}</h2>
+          <p className="tsx-signature-sub">{sub}</p>
         </div>
         <div className="tsx-ladder-layout">
           <ol className="tsx-ladder" ref={railRef}>
@@ -2014,7 +2018,7 @@ function TrustBlueprint({ section }) {
       <div className="tsx-section-inner">
         <div className="tsx-signature-head tsx-fade">
           <span className="tsx-section-eyebrow">System architecture</span>
-          <h2 className="tsx-section-heading">How a Labs build<br /><span className="serif">fits together.</span></h2>
+          <h2 className="tsx-section-heading">How a Product Studio build<br /><span className="serif">fits together.</span></h2>
           <p className="tsx-signature-sub">How discovery, build and controls connect into one system.</p>
         </div>
         <div className={"tsx-blueprint-grid" + (drawn ? " is-drawn" : "")} ref={ref}>
@@ -2061,7 +2065,15 @@ function TrustFunnel({ section }) {
 
 function TrustSignatureModule({ section }) {
   if (section.id === 'academy') return <TrustCohortLadder section={section} />;
-  if (section.id === 'labs') return <TrustBlueprint section={section} />;
+  if (section.id === 'labs') return (
+    <TrustCohortLadder
+      section={section}
+      ariaLabel="How we build"
+      eyebrow="How we build"
+      title={<>From problem<br /><span className="serif">to shipped product.</span></>}
+      sub="One path: frame the problem, design the system, build, then launch."
+    />
+  );
   if (section.id === 'marketing') return <TrustFunnel section={section} />;
   return null;
 }

@@ -4225,13 +4225,25 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 }
 
 /* ════ "What you get" — upgraded deliverable cards (shadcn + cursor spotlight) ════ */
+/* Flex (not grid) so an incomplete final row centers instead of orphaning
+   bottom-left. 3-up / 2-up / 1-up basis keeps card sizing; cards stay centered
+   at every resolution. */
 .trust.tsx-site .tsx-deliver-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: clamp(14px, 1.4vw, 20px);
 }
-@media (max-width: 940px){ .trust.tsx-site .tsx-deliver-grid{ grid-template-columns: repeat(2,1fr); } }
-@media (max-width: 560px){ .trust.tsx-site .tsx-deliver-grid{ grid-template-columns: 1fr; } }
+.trust.tsx-site .tsx-deliver-grid > * {
+  flex: 0 1 calc((100% - 2 * clamp(14px, 1.4vw, 20px)) / 3);
+  min-width: 0;
+}
+@media (max-width: 940px){
+  .trust.tsx-site .tsx-deliver-grid > * { flex-basis: calc((100% - clamp(14px, 1.4vw, 20px)) / 2); }
+}
+@media (max-width: 560px){
+  .trust.tsx-site .tsx-deliver-grid > * { flex-basis: 100%; }
+}
 
 .trust.tsx-site .tsx-deliver-card{
   position: relative; isolation: isolate; overflow: hidden;
@@ -4430,3 +4442,11 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 
 /* ── Chapter head reused on Home/Customers/Company/Contact ───────── */
 .trust.tsx-site .tsx-page-chapter { margin-bottom: clamp(20px, 3vw, 34px); max-width: 60ch; }
+
+/* ════ Funnel — centered symmetric taper (authoritative, flex-based) ════ */
+.trust .tsx-funnel {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px; max-width: 1000px; margin-inline: auto;
+}
+.trust .tsx-funnel-stage { width: var(--w, 100%); margin: 0; align-self: center; }
+.trust .tsx-funnel-desc { text-align: center; margin: 8px auto 0; max-width: 54ch; }
