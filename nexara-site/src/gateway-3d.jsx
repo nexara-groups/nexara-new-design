@@ -8,8 +8,8 @@ function NeoObject() {
   const g = useRef();
   useFrame((state, dt) => {
     const o = g.current; if (!o) return;
-    o.rotation.x += dt * 0.22;
-    o.rotation.y += dt * 0.38;
+    o.rotation.x += dt * 0.06;
+    o.rotation.y += dt * 0.11;
     o.rotation.z = state.pointer.x * 0.45;
     const s = 1.45 * (1 + state.pointer.y * 0.06);
     o.scale.setScalar(s);
@@ -19,7 +19,7 @@ function NeoObject() {
       <mesh>
         <icosahedronGeometry args={[1, 8]} />
         <MeshDistortMaterial color="#c8ff00" emissive="#c8ff00" emissiveIntensity={0.55}
-          wireframe distort={0.5} speed={3.4} roughness={0.2} />
+          wireframe distort={0.5} speed={1.0} roughness={0.2} />
       </mesh>
     </group>
   );
@@ -27,8 +27,8 @@ function NeoObject() {
 
 export function NeoScene() {
   return (
-    <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 4], fov: 45 }}
-      gl={{ alpha: true, antialias: true }} style={{ position: "absolute", inset: 0 }}>
+    <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 4], fov: 45 }}
+      gl={{ alpha: true, antialias: false }} style={{ position: "absolute", inset: 0 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[3, 2, 4]} intensity={2.2} color="#c8ff00" />
       <pointLight position={[-3, -2, 2]} intensity={0.8} color="#5b9dff" />
@@ -61,8 +61,8 @@ function TrustObject() {
 
 export function TrustScene() {
   return (
-    <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 4.2], fov: 45 }}
-      gl={{ alpha: true, antialias: true }} style={{ position: "absolute", inset: 0 }}>
+    <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 4.2], fov: 45 }}
+      gl={{ alpha: true, antialias: false }} style={{ position: "absolute", inset: 0 }}>
       <TrustObject />
     </Canvas>
   );

@@ -490,12 +490,12 @@ export const DATA = {
     channels: [
       { title: "Talent Programmes", section: "academy", body: "Learner count, target roles, city, duration, placement-readiness needs and reporting expectations." },
       { title: "Digital Solutions", section: "marketing", body: "Business category, offer, current website or channels, launch timeline and growth goal." },
-      { title: "AI & Automation", section: "labs", body: "Workflow, data sources, current tools, access constraints, risk level and success metric." },
+      { title: "Product Studio", section: "labs", body: "Business problem, current tools, product users, integrations, risk level and success metric." },
       { title: "Combined engagement", section: "home", body: "When the project needs talent, market presence and systems working together under one owner." },
     ],
     enquiry: {
       title: "Scope your project",
-      body: "Work through the planner. When it's done, your mail client opens a formatted brief addressed to our intake team — the same checklist we scope every engagement against.",
+      body: "Work through the planner. When it's done, your mail client opens a formatted request addressed to our intake team — the same checklist we scope every engagement against.",
       label: "Send to info@nexaragroups.com",
       href: "mailto:info@nexaragroups.com",
     },

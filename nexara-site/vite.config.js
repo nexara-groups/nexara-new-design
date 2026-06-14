@@ -14,6 +14,7 @@ export default defineConfig({
           three: ["three"],
           gsap: ["gsap", "gsap/ScrollTrigger"],
           react: ["react", "react-dom"],
+          motion: ["framer-motion"],
         },
       },
     },

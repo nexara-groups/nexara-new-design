@@ -1,7 +1,8 @@
 import React from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { MapPin, Users, Package, Handshake, Zap, Link as LinkIcon, ArrowRight, GraduationCap, TrendingUp, Cpu, Shield, Mail } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { GraduationCap, TrendingUp, Cpu, Shield, Mail } from 'lucide-react';
 import { DATA } from './data.js';
 import { voice, parseRoute, routeTo, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from './shared.js';
 import { NotFound } from './notfound.jsx';
@@ -63,6 +64,162 @@ function setupTsxFade() {
    differ by plate numeral + serif tagline, not hue. Vermilion is the rare highlight. */
 const TRUST_ACCENT = { academy: '#1A6DFF', marketing: '#1A6DFF', labs: '#1A6DFF' };
 const TRUST_VERMILION = '#1A6DFF';
+
+const TRUST_HERO_PARTICLES = [
+  { x: 8, y: 20, s: 8, d: 0.0, dur: 9.5 },
+  { x: 16, y: 64, s: 4, d: 0.6, dur: 8.8 },
+  { x: 25, y: 36, s: 6, d: 1.4, dur: 10.5 },
+  { x: 34, y: 78, s: 5, d: 0.9, dur: 9.2 },
+  { x: 43, y: 18, s: 3, d: 1.8, dur: 7.8 },
+  { x: 53, y: 58, s: 7, d: 0.3, dur: 10.8 },
+  { x: 61, y: 30, s: 4, d: 1.1, dur: 8.4 },
+  { x: 69, y: 72, s: 9, d: 1.6, dur: 11.2 },
+  { x: 77, y: 42, s: 5, d: 0.5, dur: 9.7 },
+  { x: 86, y: 22, s: 7, d: 1.9, dur: 10.2 },
+  { x: 91, y: 66, s: 4, d: 1.2, dur: 8.6 },
+  { x: 48, y: 86, s: 3, d: 2.2, dur: 7.6 },
+];
+
+function TrustHeroParticles({ variant = 'parent' }) {
+  const reduceMotion = useReducedMotion();
+  return (
+    <div className={`tsx-hero-particles tsx-hero-particles-${variant}`} aria-hidden="true">
+      {TRUST_HERO_PARTICLES.map((p, i) => (
+        <motion.span
+          key={`${variant}-${i}`}
+          className="tsx-hero-particle"
+          style={{ '--x': `${p.x}%`, '--y': `${p.y}%`, '--s': `${p.s}px` }}
+          initial={{ opacity: reduceMotion ? 0.5 : 0.2, y: 0, scale: 1 }}
+          animate={reduceMotion ? { opacity: 0.58 } : {
+            opacity: [0.22, 0.92, 0.36],
+            y: [-10, 18, -10],
+            x: [-6, 10, -6],
+            scale: [0.9, 1.22, 0.9],
+          }}
+          transition={reduceMotion ? { duration: 0 } : {
+            duration: p.dur,
+            delay: p.d,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }) {
+  const reduceMotion = useReducedMotion();
+  const sectionNumber = sectionId === 'academy' ? '01' : sectionId === 'marketing' ? '02' : '03';
+  const loopRef = React.useRef(null);
+  const threadRef = React.useRef(null);
+  const cometRef = React.useRef(null);
+  const digitRef = React.useRef(null);
+  const reflectionRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const loop = loopRef.current;
+    const thread = threadRef.current;
+    const comet = cometRef.current;
+    const digit = digitRef.current;
+    const reflection = reflectionRef.current;
+    if (!loop || !thread || !comet || !digit || !reflection) return;
+
+    let rafId = 0;
+    let t0 = performance.now();
+
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    const ease = (t) => t * t * (3 - 2 * t);
+    const setSegment = (el, x1, y1, x2, y2, opacity) => {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const len = Math.max(1, Math.hypot(dx, dy));
+      const angle = Math.atan2(dy, dx);
+      el.style.opacity = opacity.toFixed(3);
+      el.style.transform = `translate(${x1}px,${y1}px) rotate(${angle}rad) scaleX(${len})`;
+    };
+
+    function frame(now) {
+      const box = loop.getBoundingClientRect();
+      const target = targetRef?.current?.getBoundingClientRect();
+      const w = box.width || window.innerWidth;
+      const h = box.height || window.innerHeight;
+      const sourceX = clamp(w * 0.09, 64, 180);
+      const fallbackY = clamp(h * 0.36, 142, 250);
+      const targetBox = target
+        ? {
+            left: target.left - box.left,
+            right: target.right - box.left,
+            top: target.top - box.top,
+            bottom: target.bottom - box.top,
+          }
+        : null;
+      const beamY = targetBox
+        ? clamp(targetBox.top + (targetBox.bottom - targetBox.top) * 0.58, 96, h - 72)
+        : fallbackY;
+      const duration = reduceMotion ? 100000 : 3200;
+      const phase = reduceMotion ? 0.38 : ((now - t0) % duration) / duration;
+      const outbound = phase < 0.72;
+      const pass = outbound ? ease(phase / 0.72) : 1 - ease((phase - 0.72) / 0.28);
+      const rawX = sourceX + pass * (w * 0.68);
+      const rawY = beamY + Math.sin(phase * Math.PI * 2) * 16;
+
+      const hasHit = Boolean(
+        targetBox &&
+        outbound &&
+        rawX >= targetBox.left &&
+        rawX <= targetBox.right + 24 &&
+        beamY >= targetBox.top - 12 &&
+        beamY <= targetBox.bottom + 12
+      );
+      const hitX = targetBox ? clamp(rawX, targetBox.left, targetBox.right) : rawX;
+      const hitY = beamY;
+      const cometX = hasHit ? hitX - Math.max(18, (rawX - targetBox.left) * 0.72) : rawX;
+      const cometY = hasHit ? hitY + Math.max(10, (rawX - targetBox.left) * 0.14) : rawY;
+      const threadEndX = hasHit ? hitX : cometX;
+      const threadEndY = hasHit ? hitY : cometY;
+      const live = 0.54 + Math.sin(phase * Math.PI) * 0.28;
+
+      setSegment(thread, sourceX, beamY, threadEndX, threadEndY, hasHit ? 0.96 : live);
+      setSegment(reflection, hitX, hitY, cometX, cometY, hasHit ? 0.88 : 0.14);
+
+      comet.style.opacity = hasHit ? '1' : '0.82';
+      comet.style.transform = `translate(${cometX}px,${cometY}px) translate(-50%,-50%) scale(${hasHit ? 1.34 : 1.02 + Math.sin(phase * Math.PI) * 0.16})`;
+
+      digit.style.opacity = hasHit ? '1' : '0.78';
+      digit.style.transform = `translate(${hitX}px,${hitY}px) translate(-50%,-50%) scale(${hasHit ? 1.16 : 1})`;
+      digit.style.boxShadow = hasHit ? '0 0 42px rgba(26,109,255,.92)' : '0 0 0 rgba(26,109,255,0)';
+
+      rafId = requestAnimationFrame(frame);
+    }
+
+    rafId = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(rafId);
+  }, [reduceMotion, targetRef]);
+
+  return (
+    <div ref={loopRef} className="tsx-hero-energy-loop" aria-hidden="true">
+      <span
+        ref={threadRef}
+        className="tsx-hero-energy-thread"
+      />
+      <span
+        ref={cometRef}
+        className="tsx-hero-energy-comet"
+      />
+      <span
+        ref={digitRef}
+        className="tsx-hero-energy-digit"
+      >
+        {sectionNumber}
+      </span>
+      <span
+        ref={reflectionRef}
+        className="tsx-hero-energy-reflection"
+      />
+    </div>
+  );
+}
 
 const TRUST_OPERATING_STANDARD = [
   { title: 'Written before built', body: "Every engagement starts with a written brief and scope. If it isn't written down, it isn't agreed." },
@@ -345,9 +502,21 @@ function TrustParticleCanvas() {
         ctx.globalAlpha = 0.55; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
       }
       ctx.globalAlpha = 1;
-      raf = requestAnimationFrame(draw);
+      raf = canvasVisible ? requestAnimationFrame(draw) : 0;
     }
-    
+
+    let canvasVisible = true;
+    const visObs = new IntersectionObserver(([e]) => {
+      canvasVisible = e.isIntersecting;
+      if (canvasVisible && !raf) { raf = requestAnimationFrame(draw); }
+    }, { threshold: 0 });
+    visObs.observe(canvas);
+    const onVisChange = () => {
+      if (document.hidden) { cancelAnimationFrame(raf); raf = 0; }
+      else if (canvasVisible) { raf = requestAnimationFrame(draw); }
+    };
+    document.addEventListener('visibilitychange', onVisChange);
+
     // Mouse event handlers
     const onMouseMove = (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -367,9 +536,11 @@ function TrustParticleCanvas() {
     const onResize = () => { clearTimeout(rt); rt = setTimeout(() => { cancelAnimationFrame(raf); init(); draw(); }, 120); };
     window.addEventListener('resize', onResize);
     
-    return () => { 
-      cancelAnimationFrame(raf); 
-      clearTimeout(rt); 
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(rt);
+      visObs.disconnect();
+      document.removeEventListener('visibilitychange', onVisChange);
       window.removeEventListener('resize', onResize);
       canvas.removeEventListener('mousemove', onMouseMove);
       canvas.removeEventListener('mouseleave', onMouseLeave);
@@ -411,6 +582,7 @@ function getTrustSubpageLabel(section, page) {
 function TrustNav({ page, detail }) {
   const navRef = React.useRef(null);
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [hoveredPage, setHoveredPage] = React.useState(null);
   React.useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
@@ -427,22 +599,22 @@ function TrustNav({ page, detail }) {
     <header className="tsx-nav" ref={navRef} role="banner">
       <div className="tsx-nav-inner">
         <button className="tsx-logo" onClick={() => routeTo('trust', 'home')} aria-label="Nexara home">
-          <div className="tsx-logo-mark" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none">
-              <path d="M4 13V3L12 13V3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
           Nexara
         </button>
         <nav aria-label="Primary">
-          <ul className="tsx-nav-links tsx-tubelight">
+          <ul className="tsx-nav-links tsx-tubelight" onMouseLeave={() => setHoveredPage(null)}>
             {DATA.nav.map(item => {
               const active = page === item.page;
+              const glowing = hoveredPage ? hoveredPage === item.page : active;
               return (
                 <li key={item.page}>
-                  <button className={`tsx-tubelight-btn${active ? ' active' : ''}`} onClick={() => routeTo('trust', item.page)}>
-                    {active && (
-                      <span className="tsx-tubelight-glow" aria-hidden="true">
+                  <button
+                    className={`tsx-tubelight-btn${active ? ' active' : ''}${!active && hoveredPage === item.page ? ' hovered' : ''}`}
+                    onClick={() => routeTo('trust', item.page)}
+                    onMouseEnter={() => setHoveredPage(item.page)}
+                  >
+                    {glowing && (
+                      <span className={`tsx-tubelight-glow${!active && hoveredPage === item.page ? ' tsx-tubelight-glow--hover' : ''}`} aria-hidden="true">
                         <span className="tsx-tubelight-bar" />
                         <span className="tsx-tubelight-blur1" />
                         <span className="tsx-tubelight-blur2" />
@@ -458,12 +630,11 @@ function TrustNav({ page, detail }) {
           </ul>
         </nav>
         <div className="tsx-nav-right">
-          <div className="tsx-mode-dots" role="group" aria-label="Theme mode">
-            <button className="tsx-dot-neo" title="Neo" aria-label="Switch to Neo mode" onClick={() => routeTo('neo', page, detail)}></button>
-            <button className="tsx-dot-trust active" title="Trust" aria-label="Trust mode" onClick={() => routeTo('trust', page, detail)}></button>
+          <div className="theme-pill tsx-theme-pill" role="group" aria-label="Theme mode">
+            <button type="button" onClick={() => routeTo('neo', page, detail)}>Neo</button>
+            <button type="button" className="active" onClick={() => routeTo('trust', page, detail)}>Trust</button>
           </div>
-          <span className="tsx-mode-sep" aria-hidden="true"></span>
-          <button className="tsx-nav-cta" onClick={() => routeTo('trust', 'contact')}>Start a Project</button>
+          <button className="tsx-nav-cta" onClick={() => routeTo('trust', 'contact')}>Talk to us <span aria-hidden="true">→</span></button>
           <button className="tsx-nav-burger" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(o => !o)}>
             <span className={"tsx-burger-icon" + (menuOpen ? ' is-open' : '')}><i /><i /></span>
           </button>
@@ -528,22 +699,22 @@ function TrustCountUp({ value, className }) {
     const target = parseInt(String(value).replace(/\D/g, ''), 10);
     const suffix = String(value).replace(/[0-9]/g, '');
     if (!target || !('IntersectionObserver' in window)) { el.textContent = value; return; }
-    let done = false;
+    let done = false, tickId = 0;
     const run = () => {
       const t0 = performance.now(), dur = 1100;
       const tick = (now) => {
         const p = Math.min(1, (now - t0) / dur);
         const eased = 1 - Math.pow(1 - p, 3);
         el.textContent = Math.round(eased * target) + suffix;
-        if (p < 1) requestAnimationFrame(tick);
+        if (p < 1) tickId = requestAnimationFrame(tick);
       };
-      requestAnimationFrame(tick);
+      tickId = requestAnimationFrame(tick);
     };
     const obs = new IntersectionObserver((entries) => {
       entries.forEach(e => { if (e.isIntersecting && !done) { done = true; run(); obs.disconnect(); } });
     }, { threshold: 0.5 });
     obs.observe(el);
-    return () => obs.disconnect();
+    return () => { obs.disconnect(); cancelAnimationFrame(tickId); };
   }, [value]);
   return <span ref={ref} className={className}>{value}</span>;
 }
@@ -674,27 +845,36 @@ function TrustEnterpriseStacks() {
         <p className="tsx-section-eyebrow tsx-fade">Capability stacks</p>
         <h2 className="tsx-section-heading tsx-fade tsx-fade-d1" id="tsx-stack-h">Integrated stacks built from the same Nexara capabilities.</h2>
         <p className="tsx-section-lede tsx-fade tsx-fade-d2">How the three lines interlock into combined plays — one capability set, recomposed for the outcome.</p>
-        <div className="tsx-matrix">
+        <div className="tsx-stackcard-grid">
           {DATA.superSkills.map((item, index) => (
-            <div className={`tsx-matrix-row tsx-fade tsx-fade-d${Math.min(index + 1, 4)}`} key={item.title}>
-              <div className="tsx-matrix-main">
-                <span className="tsx-matrix-num">{String(index + 1).padStart(2, '0')}</span>
-                <div>
-                  <p className="tsx-matrix-title">{item.title}</p>
-                  <p className="tsx-matrix-desc">{item.trust}</p>
+            <article
+              className={`tsx-stackcard${index === 0 ? ' tsx-stackcard--lead' : ''} tsx-fade tsx-fade-d${Math.min(index + 1, 4)}`}
+              key={item.title}
+            >
+              <div className="tsx-stackcard-body">
+                <div className="tsx-stackcard-top">
+                  <span className="tsx-stackcard-num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                  <div className="tsx-stackcard-tags">
+                    {item.sections.map(s => (
+                      <span className="tsx-stackcard-tag" key={s}>{s}</span>
+                    ))}
+                  </div>
                 </div>
-                <div className="tsx-matrix-tags">
-                  {item.sections.map(s => (
-                    <span className="tsx-matrix-tag" key={s}>{s}</span>
+                <h3 className="tsx-stackcard-title">{item.title}</h3>
+                <p className="tsx-stackcard-desc">{item.trust}</p>
+              </div>
+              <div className="tsx-stackcard-stack">
+                <span className="tsx-stackcard-stack-label">Capability stack</span>
+                <div className="tsx-stackcard-chips">
+                  {item.stack.map(module => (
+                    <span className="tsx-stackcard-chip" key={module}>
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>
+                      {module}
+                    </span>
                   ))}
                 </div>
               </div>
-              <div className="tsx-matrix-detail">
-                {item.stack.map(module => (
-                  <span className="tsx-matrix-chip" key={module}>{module}</span>
-                ))}
-              </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>
@@ -742,11 +922,6 @@ function TrustFooter() {
       <div className="tsx-footer-top">
         <div>
           <button className="tsx-logo" onClick={() => routeTo('trust', 'home')} aria-label="Nexara home">
-            <div className="tsx-logo-mark" aria-hidden="true">
-              <svg viewBox="0 0 16 16" fill="none">
-                <path d="M4 13V3L12 13V3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
             Nexara
           </button>
           <p className="tsx-footer-brand-desc">Enterprise IT capability programmes for talent, digital growth and applied automation.</p>
@@ -798,161 +973,244 @@ function TrustHeroUnravel() {
     const TAU = Math.PI * 2;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Steel: enterprise blue accent + slate ink on cool ground
-    const STRANDS = [
-      { id: "academy",   rgb: [26, 109, 255] },  // accent blue
-      { id: "labs",      rgb: [11, 31, 51] },    // slate ink
-      { id: "marketing", rgb: [26, 109, 255] },  // accent blue
+    // ── Three divisions: blob + particle stream system ────────────────────────
+    //
+    //  Scroll path:
+    //   p 0.00→0.07   scatter    blobs at wide triangle, particles drift
+    //   p 0.07→0.23   converge   all three stream INTO core
+    //   p 0.23→0.27   unified    core fully formed, blobs dissolved
+    //   p 0.27→0.45   academy    academy breaks LEFT, core → academy stream
+    //   p 0.45→0.63   labs       labs breaks RIGHT, core → labs stream
+    //   p 0.63→0.81   digital    digital breaks DOWN, core → digital stream
+    //   p 0.81→0.86   re-emerge  blobs fade back in at spread
+    //   p 0.86→1.00   re-conv    all three stream back into core
+    //
+    const DIVS = [
+      { label: 'Academy', r: 26,  g: 109, b: 255 },
+      { label: 'Labs',    r: 109, g: 74,  b: 255 },
+      { label: 'Digital', r: 0,   g: 170, b: 204 },
     ];
 
-    const makeSprite = (rgb) => {
-      const s = document.createElement("canvas");
+    const makeSprite = (r, g, b) => {
+      const s = document.createElement('canvas');
       s.width = s.height = 64;
-      const c = s.getContext("2d");
-      const grad = c.createRadialGradient(32, 32, 0, 32, 32, 32);
-      grad.addColorStop(0, "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.9)");
-      grad.addColorStop(0.3, "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.5)");
-      grad.addColorStop(0.6, "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.14)");
-      grad.addColorStop(1, "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0)");
-      c.fillStyle = grad;
-      c.fillRect(0, 0, 64, 64);
+      const sc = s.getContext('2d');
+      const grd = sc.createRadialGradient(32, 32, 0, 32, 32, 32);
+      grd.addColorStop(0,    `rgba(${r},${g},${b},1.0)`);
+      grd.addColorStop(0.20, `rgba(${r},${g},${b},0.9)`);
+      grd.addColorStop(0.48, `rgba(${r},${g},${b},0.5)`);
+      grd.addColorStop(0.78, `rgba(${r},${g},${b},0.14)`);
+      grd.addColorStop(1,    `rgba(${r},${g},${b},0)`);
+      sc.fillStyle = grd;
+      sc.fillRect(0, 0, 64, 64);
       return s;
     };
+    const sprites = DIVS.map(d => makeSprite(d.r, d.g, d.b));
 
-    const sprites = STRANDS.map(s => makeSprite(s.rgb));
+    const COUNT = window.innerWidth < 760 ? 90 : 140;
+    const particles = DIVS.map(() =>
+      Array.from({ length: COUNT }, (_, i) => ({
+        t:  i / COUNT,
+        jx: Math.random() - .5,
+        jy: Math.random() - .5,
+        sz: 1.0 + Math.random() * 1.4,
+      }))
+    );
 
-    let parts = [];
-    let COUNT = window.innerWidth < 760 ? 340 : 720;
+    // Helpers
+    function ss(t)         { return t * t * (3 - 2 * t); }
+    function cl(v)         { return v < 0 ? 0 : v > 1 ? 1 : v; }
+    function pr(p, a, b)   { return ss(cl((p - a) / (b - a))); }
+    function lrp(a, b, t)  { return a + (b - a) * t; }
+    function lrpP(a, b, t) { return { x: lrp(a.x, b.x, t), y: lrp(a.y, b.y, t) }; }
 
-    function buildParticles() {
-      COUNT = window.innerWidth < 760 ? 340 : 720;
-      parts = STRANDS.map(() => {
-        const arr = new Array(COUNT);
-        for (let i = 0; i < COUNT; i++) {
-          let x = Math.random() * 2 - 1;
-          let y = Math.random() * 2 - 1;
-          let z = Math.random() * 2 - 1;
-          const l = Math.hypot(x, y, z) || 1;
-          const rad = 1.6 + Math.random() * 1.5;
-          arr[i] = {
-            t: i / COUNT,
-            cx: (x / l) * rad, cy: (y / l) * rad, cz: (z / l) * rad,
-            j: Math.random() * TAU,
-            sz: 0.55 + Math.random() * 1.05,
-          };
+    // Per-strand state at scroll progress p
+    function getState(p, si, time) {
+      const spread = [
+        { x: W * .16, y: H * .15 },
+        { x: W * .84, y: H * .15 },
+        { x: CX,      y: H * .86 },
+      ];
+      const core  = { x: CX, y: CY };
+      const spots = [
+        { x: W * .20, y: CY },
+        { x: W * .80, y: CY },
+        { x: CX,      y: H * .76 },
+      ];
+
+      let bPos = { ...spread[si] };
+      let bAlpha = 1, isFocused = false;
+      let ptSrc = { ...spread[si] }, ptDst = { ...core }, ptAlpha = 0;
+
+      if (p < 0.07) {
+        const d = pr(p, 0.02, 0.07);
+        bPos = lrpP(spread[si], lrpP(spread[si], core, .1), d);
+        bAlpha = lrp(0.6, 1, d);
+        ptSrc = { ...bPos }; ptDst = { ...core };
+        ptAlpha = lrp(0.18, 0.42, d);
+
+      } else if (p < 0.27) {
+        const t = pr(p, 0.07, 0.23);
+        bPos = lrpP(spread[si], core, t);
+        bAlpha = lrp(1, 0, t * t * t);
+        ptSrc = lrpP(spread[si], lrpP(spread[si], core, .12), t);
+        ptDst = { ...core };
+        ptAlpha = lrp(0.38, 0.72, pr(p, 0.07, 0.18));
+
+      } else if (p < 0.45) {
+        if (si === 0) {
+          isFocused = true;
+          const tIn  = pr(p, 0.27, 0.32);
+          const tOut = pr(p, 0.43, 0.45);
+          bPos = tOut > 0 ? lrpP(spots[0], core, tOut) : lrpP(core, spots[0], tIn);
+          bAlpha = tOut > 0 ? lrp(1, 0, tOut * tOut) : tIn;
+          ptSrc = { ...core }; ptDst = { ...bPos };
+          ptAlpha = bAlpha * 0.65;
+        } else {
+          bPos = { ...core }; bAlpha = 0;
+          ptSrc = { ...core }; ptDst = { ...core };
+          ptAlpha = 0.06;
         }
-        return arr;
-      });
-    }
 
-    buildParticles();
+      } else if (p < 0.63) {
+        if (si === 1) {
+          isFocused = true;
+          const tIn  = pr(p, 0.45, 0.50);
+          const tOut = pr(p, 0.61, 0.63);
+          bPos = tOut > 0 ? lrpP(spots[1], core, tOut) : lrpP(core, spots[1], tIn);
+          bAlpha = tOut > 0 ? lrp(1, 0, tOut * tOut) : tIn;
+          ptSrc = { ...core }; ptDst = { ...bPos };
+          ptAlpha = bAlpha * 0.65;
+        } else {
+          bPos = { ...core }; bAlpha = 0;
+          ptSrc = { ...core }; ptDst = { ...core };
+          ptAlpha = 0.06;
+        }
 
-    const v = [0, 0, 0];
-    function fCloud(si, pt) {
-      v[0] = pt.cx; v[1] = pt.cy; v[2] = pt.cz;
-    }
-    function fMonolith(si, pt, time) {
-      const a = pt.t * TAU * 3 + si * (TAU / 3) + time * 0.3;
-      const r = 0.17 + Math.sin(pt.j + time * 1.4) * 0.022;
-      v[0] = Math.cos(a) * r;
-      v[1] = (pt.t - 0.5) * 2.7;
-      v[2] = Math.sin(a) * r;
-    }
-    function fBloom(si, pt, time) {
-      const A = si * (TAU / 3) + time * 0.12;
-      const ox = Math.cos(A) * 0.9, oz = Math.sin(A) * 0.9;
-      const a = pt.t * TAU * 2.4 + time * 0.5;
-      v[0] = ox + Math.cos(a) * 0.3;
-      v[1] = (pt.t - 0.5) * 2.1;
-      v[2] = oz + Math.sin(a) * 0.3;
-    }
-    function fSignature(si, pt, time) {
-      if (si === 0) {
-        const a = pt.t * TAU * 1.7 + time * 0.32;
-        const r = 0.5 + pt.t * 0.72;
-        v[0] = Math.cos(a) * r;
-        v[1] = (pt.t - 0.5) * 2.35;
-        v[2] = Math.sin(a) * r;
-      } else if (si === 1) {
-        const ga = pt.t * COUNT * 2.39996323;
-        const y = 1 - pt.t * 2;
-        const rr = Math.sqrt(Math.max(0, 1 - y * y));
-        const R = 1.18 + Math.sin(time * 1.3 + pt.j) * 0.05;
-        v[0] = Math.cos(ga) * rr * R;
-        v[1] = y * R;
-        v[2] = Math.sin(ga) * rr * R;
+      } else if (p < 0.81) {
+        if (si === 2) {
+          isFocused = true;
+          const tIn  = pr(p, 0.63, 0.68);
+          const tOut = pr(p, 0.79, 0.81);
+          bPos = tOut > 0 ? lrpP(spots[2], core, tOut) : lrpP(core, spots[2], tIn);
+          bAlpha = tOut > 0 ? lrp(1, 0, tOut * tOut) : tIn;
+          ptSrc = { ...core }; ptDst = { ...bPos };
+          ptAlpha = bAlpha * 0.65;
+        } else {
+          bPos = { ...core }; bAlpha = 0;
+          ptSrc = { ...core }; ptDst = { ...core };
+          ptAlpha = 0.07;
+        }
+
+      } else if (p < 0.86) {
+        const t = pr(p, 0.81, 0.86);
+        const stagger = si * 0.12;
+        bPos = lrpP(core, spread[si], t);
+        bAlpha = pr(t, stagger, Math.min(stagger + 0.55, 1));
+        ptSrc = { ...core }; ptDst = { ...bPos };
+        ptAlpha = bAlpha * 0.45;
+
       } else {
-        const a = pt.t * TAU * 3.4 + time * 0.55;
-        const r = 0.14 + pt.t * 1.55;
-        v[0] = Math.cos(a) * r;
-        v[1] = Math.sin(pt.t * TAU * 2 + time * 1.1) * 0.13;
-        v[2] = Math.sin(a) * r * 0.62;
+        const t = pr(p, 0.86, 0.99);
+        bPos = lrpP(spread[si], core, t);
+        bAlpha = Math.max(0.30, lrp(1, 0, t * t * t));
+        ptSrc = lrpP(spread[si], lrpP(spread[si], core, .12), t);
+        ptDst = { ...core };
+        ptAlpha = lrp(0.45, 0.92, pr(p, 0.86, 0.96));
       }
-    }
-    function fOrbit(si, pt, time) {
-      const a = pt.t * TAU + si * 2.1 + time * 0.14;
-      v[0] = Math.cos(a) * 2.0;
-      v[1] = Math.sin(a * 2 + pt.j) * 0.16 + (si - 1) * -0.42;
-      v[2] = Math.sin(a) * 2.0;
-    }
-    function fLattice(si, pt, time) {
-      const u = pt.t * TAU * 3 + si * (TAU / 3) + time * 0.18;
-      const w = pt.t * TAU * 7 + pt.j;
-      const k = 1.05 + 0.42 * Math.cos(w);
-      v[0] = k * Math.cos(u);
-      v[1] = 0.42 * Math.sin(w);
-      v[2] = k * Math.sin(u);
+
+      return { bPos, bAlpha, isFocused, ptSrc, ptDst, ptAlpha };
     }
 
-    function evalFormation(name, si, pt, time) {
-      switch (name) {
-        case "cloud":    fCloud(si, pt); break;
-        case "monolith": fMonolith(si, pt, time); break;
-        case "bloom":    fBloom(si, pt, time); break;
-        case "focus0":   si === 0 ? fSignature(si, pt, time) : fOrbit(si, pt, time); break;
-        case "focus1":   si === 1 ? fSignature(si, pt, time) : fOrbit(si, pt, time); break;
-        case "focus2":   si === 2 ? fSignature(si, pt, time) : fOrbit(si, pt, time); break;
-        case "lattice":  fLattice(si, pt, time); break;
-      }
-    }
-
-    function formationAlpha(name, si) {
-      switch (name) {
-        case "cloud":    return 0.45;
-        case "monolith": return 0.95;
-        case "bloom":    return 0.95;
-        case "focus0":   return si === 0 ? 1 : 0.13;
-        case "focus1":   return si === 1 ? 1 : 0.13;
-        case "focus2":   return si === 2 ? 1 : 0.13;
-        case "lattice":  return 0.9;
-      }
+    function coreIntensity(p) {
+      if (p < 0.07)  return pr(p, 0.03, 0.07) * 0.28;
+      if (p < 0.23)  return lrp(0.28, 1, pr(p, 0.07, 0.23));
       return 1;
     }
 
-    const KEYS = [
-      { p: 0.00, f: "cloud"    },
-      { p: 0.07, f: "monolith" },
-      { p: 0.13, f: "monolith" },
-      { p: 0.20, f: "bloom"    },
-      { p: 0.255, f: "bloom"   },
-      { p: 0.31, f: "focus0"   },
-      { p: 0.42, f: "focus0"   },
-      { p: 0.49, f: "focus1"   },
-      { p: 0.60, f: "focus1"   },
-      { p: 0.67, f: "focus2"   },
-      { p: 0.78, f: "focus2"   },
-      { p: 0.88, f: "lattice"  },
-      { p: 1.00, f: "lattice"  },
-    ];
+    function drawBlob(si, bx, by, alpha, time, isFocused) {
+      if (alpha < 0.02) return;
+      const d = DIVS[si];
+      const ph = si * 2.09 + time * 1.35;
+      const ringR = (isFocused ? W * .054 : W * .034) + Math.sin(ph) * W * .003;
 
-    function segmentAt(p) {
-      let i = 0;
-      while (i < KEYS.length - 2 && p > KEYS[i + 1].p) i++;
-      const a = KEYS[i], b = KEYS[i + 1];
-      const diff = b.p - a.p || 1;
-      const progress = (p - a.p) / diff;
-      const e = progress * progress * (3 - 2 * progress);
-      return { from: a.f, to: b.f, e };
+      // Outer atmosphere
+      const atm = ctx.createRadialGradient(bx, by, ringR * .5, bx, by, ringR * 2.6);
+      atm.addColorStop(0,  `rgba(${d.r},${d.g},${d.b},${.22 * alpha})`);
+      atm.addColorStop(1,  `rgba(${d.r},${d.g},${d.b},0)`);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = atm;
+      ctx.beginPath(); ctx.arc(bx, by, ringR * 2.6, 0, TAU); ctx.fill();
+
+      // Ring stroke
+      ctx.globalAlpha = alpha * (isFocused ? 0.88 : 0.55);
+      ctx.strokeStyle = `rgb(${d.r},${d.g},${d.b})`;
+      ctx.lineWidth   = isFocused ? 1.5 : 1.0;
+      ctx.beginPath(); ctx.arc(bx, by, ringR, 0, TAU); ctx.stroke();
+
+      // Subtle inner fill
+      const fill = ctx.createRadialGradient(bx, by, 0, bx, by, ringR);
+      fill.addColorStop(0, `rgba(${d.r},${d.g},${d.b},${.14 * alpha})`);
+      fill.addColorStop(1, `rgba(${d.r},${d.g},${d.b},0)`);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = fill;
+      ctx.beginPath(); ctx.arc(bx, by, ringR, 0, TAU); ctx.fill();
+
+      // Rotating arc highlight when focused
+      if (isFocused) {
+        const arcA = time * 2.1;
+        ctx.globalAlpha = alpha * 0.75;
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(bx, by, ringR, arcA, arcA + Math.PI * .3);
+        ctx.stroke();
+      }
+
+      // Center dot
+      const dotR = isFocused ? W * .013 : W * .009;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = `rgb(${d.r},${d.g},${d.b})`;
+      ctx.beginPath(); ctx.arc(bx, by, dotR, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(bx, by, dotR * .48, 0, TAU); ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Label
+      if (alpha > 0.20) {
+        const labelA = cl((alpha - 0.20) / 0.32);
+        ctx.globalAlpha = labelA;
+        ctx.fillStyle = `rgb(${d.r},${d.g},${d.b})`;
+        ctx.font = `600 ${Math.round(W * (isFocused ? .022 : .018))}px Inter, system-ui, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(d.label.toUpperCase(), bx, by + ringR * 2.6 + W * .02);
+        ctx.textAlign = 'left';
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    function drawCore(intensity, time) {
+      if (intensity < 0.01) return;
+      const pulse = W * .05 + Math.sin(time * 2.2) * W * .012;
+
+      const atm = ctx.createRadialGradient(CX, CY, 0, CX, CY, pulse * 2.8);
+      atm.addColorStop(0,  `rgba(200,220,255,${.06 * intensity})`);
+      atm.addColorStop(.4, `rgba(26,109,255,${.1 * intensity})`);
+      atm.addColorStop(1,  'rgba(26,109,255,0)');
+      ctx.fillStyle = atm;
+      ctx.beginPath(); ctx.arc(CX, CY, pulse * 2.8, 0, TAU); ctx.fill();
+
+      const grd = ctx.createRadialGradient(CX, CY, 0, CX, CY, pulse);
+      grd.addColorStop(0,  `rgba(255,255,255,${.95 * intensity})`);
+      grd.addColorStop(.3, `rgba(140,180,255,${.72 * intensity})`);
+      grd.addColorStop(1,  'rgba(26,109,255,0)');
+      ctx.fillStyle = grd;
+      ctx.beginPath(); ctx.arc(CX, CY, pulse, 0, TAU); ctx.fill();
+
+      ctx.globalAlpha = intensity;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(CX, CY, W * .014, 0, TAU); ctx.fill();
+      ctx.globalAlpha = 1;
     }
 
     let W = 0, H = 0, CX = 0, CY = 0, SCALE = 1;
@@ -981,6 +1239,37 @@ function TrustHeroUnravel() {
     }));
     const dots = Array.from(wrapRef.current.querySelectorAll(".tsx-hero-rail button"));
     const titleSpans = Array.from(titleRef.current?.querySelectorAll("span") || []);
+
+    // ── Beam-on-scroll: a blade of light scrubs across NEXARA as you scroll,
+    //    igniting each letter (it latches lit). The first STRIKE of the runway
+    //    is dedicated to this; the convergence is remapped to start after it. ──
+    const STRIKE = 0.16;
+    const beamEl = titleRef.current ? titleRef.current.querySelector('.tsx-wordmark-beam') : null;
+    const litArr = titleSpans.map(() => 0);
+    function applyLit(el, lit, prox) {
+      const r = Math.round(120 + 124 * lit), g = Math.round(152 + 96 * lit), b = Math.round(198 + 57 * lit);
+      el.style.color = `rgba(${r},${g},${b},${(0.24 + 0.76 * lit).toFixed(2)})`;
+      const glow = lit * 0.32 + prox * 0.9;
+      el.style.textShadow = `0 0 ${(20 + prox * 22).toFixed(0)}px rgba(150,196,255,${glow.toFixed(2)})`
+        + (prox > 0.02 ? `,0 0 ${(74 * prox).toFixed(0)}px rgba(26,109,255,${(prox * 0.6).toFixed(2)})` : '');
+    }
+    function strikeUpdate(bp) {
+      if (!beamEl || !titleRef.current) return;
+      const leftPct = -14 + 118 * bp;
+      beamEl.style.left = leftPct + '%';
+      beamEl.style.opacity = (bp > 0.002 && bp < 0.998) ? '0.95' : '0';
+      const wmRect = titleRef.current.getBoundingClientRect();
+      if (!wmRect.width) return;
+      const halfPct = (beamEl.offsetWidth / 2) / wmRect.width * 100;
+      const beamCx = wmRect.left + wmRect.width * (leftPct + halfPct) / 100;
+      titleSpans.forEach((el, i) => {
+        const r = el.getBoundingClientRect();
+        const reach = cl((beamCx - (r.left - 12)) / (r.width + 24));
+        if (reach > litArr[i]) litArr[i] = reach;
+        const prox = Math.max(0, 1 - Math.abs(beamCx - (r.left + r.width / 2)) / (r.width * 0.9));
+        applyLit(el, ss(litArr[i]), ss(prox));
+      });
+    }
 
     function chapterOpacity(p, a, b) {
       const fade = Math.min(0.045, (b - a) * 0.4);
@@ -1059,59 +1348,57 @@ function TrustHeroUnravel() {
       mouse.y += (mouse.ty - mouse.y) * 0.05;
 
       const p = state.p;
-      updateChapters(p);
-
+      // Beam strike owns p ∈ [0, STRIKE]; the convergence is remapped to run
+      // over the remaining scroll so nothing fires until the wordmark is lit.
+      const pc = p <= STRIKE ? 0 : (p - STRIKE) / (1 - STRIKE);
+      strikeUpdate(p >= STRIKE ? 1 : p / STRIKE);
+      updateChapters(pc);
       ctx.clearRect(0, 0, W, H);
-      ctx.globalCompositeOperation = "source-over";
+      ctx.globalCompositeOperation = 'source-over';
 
-      const seg = segmentAt(p);
-      const ry = p * 4.4 + time * 0.05 + mouse.x * 0.28;
-      const rx = -0.16 + Math.sin(p * Math.PI) * 0.12 + mouse.y * 0.2;
-      const cy_ = Math.cos(ry), sy_ = Math.sin(ry);
-      const cx_ = Math.cos(rx), sx_ = Math.sin(rx);
+      // Compute all strand states once per frame
+      const states = DIVS.map((_, si) => getState(pc, si, time));
+      const ci = coreIntensity(pc);
 
-      parts.forEach((strandParts, si) => {
+      // Particles (drawn first — beneath blobs and core)
+      ctx.globalCompositeOperation = 'lighter';
+      DIVS.forEach((_, si) => {
+        const st = states[si];
+        if (st.ptAlpha < 0.01) return;
         const sprite = sprites[si];
-        const alpha = formationAlpha(seg.from, si) * (1 - seg.e) + formationAlpha(seg.to, si) * seg.e;
-        if (alpha <= 0.002) return;
-
-        const pA = [0, 0, 0];
-        const pB = [0, 0, 0];
-
-        strandParts.forEach((pt) => {
-          evalFormation(seg.from, si, pt, time);
-          pA[0] = v[0]; pA[1] = v[1]; pA[2] = v[2];
-
-          evalFormation(seg.to, si, pt, time);
-          pB[0] = v[0]; pB[1] = v[1]; pB[2] = v[2];
-
-          const mx = pA[0] * (1 - seg.e) + pB[0] * seg.e;
-          const my = pA[1] * (1 - seg.e) + pB[1] * seg.e;
-          const mz = pA[2] * (1 - seg.e) + pB[2] * seg.e;
-
-          const x1 = mx * cy_ - mz * sy_;
-          const z1 = mx * sy_ + mz * cy_;
-          const y2 = my * cx_ - z1 * sx_;
-          const z2 = my * sx_ + z1 * cx_;
-
-          const persp = 3.6 / (3.6 + z2);
-          const px = CX + x1 * persp * SCALE;
-          const py = CY + y2 * persp * SCALE;
-          const d = pt.sz * persp * 2.8 * (W < 760 ? 1.4 : 2.0);
-
-          if (px < -d || px > W + d || py < -d || py > H + d) return;
-
-          ctx.globalAlpha = alpha;
+        particles[si].forEach(pt => {
+          pt.t = (pt.t + .0058) % 1;
+          const e  = ss(pt.t);
+          const mx = mouse.x * W * .032 * (1 - e);
+          const my = mouse.y * H * .032 * (1 - e);
+          const px = st.ptSrc.x + (st.ptDst.x - st.ptSrc.x) * e + pt.jx * W * .03 * (1 - e) + mx;
+          const py = st.ptSrc.y + (st.ptDst.y - st.ptSrc.y) * e + pt.jy * H * .03 * (1 - e) + my;
+          const a  = Math.sin(pt.t * Math.PI) * st.ptAlpha;
+          const d  = pt.sz * (5.5 + (1 - e) * 2.5) * (W < 760 ? 1.8 : 2.8);
+          if (a < 0.005 || px < -d || px > W + d || py < -d || py > H + d) return;
+          ctx.globalAlpha = a;
           ctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
         });
       });
+      ctx.globalCompositeOperation = 'source-over';
 
-      rafId = requestAnimationFrame(renderLoop);
+      ctx.globalAlpha = 1;
+
+      // Blobs (drawn over particles)
+      states.forEach((st, si) => {
+        drawBlob(si, st.bPos.x, st.bPos.y, st.bAlpha, time, st.isFocused);
+      });
+
+      // Core (always topmost)
+      drawCore(ci, time);
+
+      rafId = heroVisible ? requestAnimationFrame(renderLoop) : 0;
     }
 
     let heroVisible = true;
     const io = new IntersectionObserver(([e]) => {
       heroVisible = e.isIntersecting;
+      if (heroVisible && !rafId) rafId = requestAnimationFrame(renderLoop);
     }, { threshold: 0 });
     io.observe(wrapRef.current);
 
@@ -1143,19 +1430,16 @@ function TrustHeroUnravel() {
   }, []);
 
   return (
-    <div ref={wrapRef} className="tsx-hero-runway">
+    <div ref={wrapRef} className="tsx-hero-runway" style={{ height: '600vh' }}>
       <div className="tsx-hero-stage">
         <canvas ref={canvasRef} className="tsx-hero-canvas" aria-hidden="true" />
         
         <div className="tsx-hero-chapter" data-from="0" data-to="0.07">
           <p className="tsx-section-eyebrow">Enterprise IT systems</p>
-          <h1 ref={titleRef} className="tsx-hero-title" aria-label="Nexara">
+          <h1 ref={titleRef} className="tsx-hero-title tsx-hero-title--strike" aria-label="Nexara">
             <span>N</span><span>E</span><span>X</span><span>A</span><span>R</span><span>A</span>
+            <i className="tsx-wordmark-beam" aria-hidden="true"></i>
           </h1>
-          <div className="tsx-hero-dimline" aria-hidden="true">
-            <span className="tsx-hero-dimline-label">3 DIVISIONS · 1 STANDARD</span>
-          </div>
-          <p className="tsx-hero-sub">Scroll to unravel</p>
         </div>
 
         <div className="tsx-hero-chapter" data-from="0.125" data-to="0.225" aria-hidden="true">
@@ -1189,7 +1473,7 @@ function TrustHeroUnravel() {
           <p className="tsx-section-eyebrow">The weave</p>
           <h2 className="tsx-section-heading">Three disciplines.<br /><span className="serif" style={{ color: '#1D4ED8' }}>One standard.</span></h2>
           <div className="tsx-sec-actions" style={{ display: 'flex', gap: '16px', marginTop: '24px', justifyContent: 'center' }}>
-            <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>Start a brief <span className="arr">→</span></button>
+            <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>Start a request <span className="arr">→</span></button>
             <button className="tsx-sec-btn-ghost" onClick={() => {
               const el = document.getElementById("divisions");
               el?.scrollIntoView({ behavior: "smooth" });
@@ -1287,7 +1571,7 @@ function TrustDivisionsRail() {
           progressRef.current.textContent = "0" + n;
         }
         if (tickRef.current) {
-          tickRef.current.style.left = (self.progress * 100) + "%";
+          tickRef.current.style.transform = `translate(calc(${(self.progress * 100)}% - 50%), -50%)`;
         }
       }
     });
@@ -1353,7 +1637,7 @@ function TrustFinalCTA() {
   return (
     <section className="tsx-final-cta">
       <p className="tsx-section-eyebrow">Enterprise intake</p>
-      <a href="#contact" onClick={(e) => { e.preventDefault(); routeTo('trust', 'contact'); }}>Start <em>the brief.</em></a>
+      <a href="#contact" onClick={(e) => { e.preventDefault(); routeTo('trust', 'contact'); }}>Start <em>the request.</em></a>
       <p>Scoped response within two working days.</p>
       <button className="tsx-btn-cta tsx-final-cta-btn" onClick={() => routeTo('trust', 'contact')}>Start a Project <span className="arr">→</span></button>
     </section>
@@ -1470,14 +1754,26 @@ function TrustProofCards({ items }) {
   return (
     <div className="tsx-proof-cards-grid">
       {items.map((p, i) => (
-        <div className={`tsx-proof-case-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={p.name}>
+        <article className={`tsx-proof-case-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={p.name}>
           <span className="tsx-proof-case-idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-          <div className="tsx-proof-case-top">
-            <span className="tsx-proof-case-org">{p.org}</span>
+          <div className="tsx-proof-case-content">
+            <div className="tsx-proof-case-top">
+              <span className="tsx-proof-case-org">{p.org}</span>
+            </div>
+            <p className="tsx-proof-case-headline">{p.name}</p>
+            <div className="tsx-proof-case-divider" aria-hidden="true" />
+            <div className="tsx-proof-case-outcome">
+              <span className="tsx-proof-case-label">What held up</span>
+              <p className="tsx-proof-case-body"><span className="tsx-proof-tick" aria-hidden="true" />{p.result.trust}</p>
+            </div>
           </div>
-          <p className="tsx-proof-case-headline">{p.name}</p>
-          <p className="tsx-proof-case-body"><span className="tsx-proof-tick" aria-hidden="true" />{p.result.trust}</p>
-        </div>
+          <div className="tsx-proof-case-foot">
+            <span className="tsx-proof-case-verified" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 8.2l3 3L14 3"/></svg>
+              Verified delivery
+            </span>
+          </div>
+        </article>
       ))}
     </div>
   );
@@ -1511,17 +1807,18 @@ function AcademyDisplayCard({ pkg, index, isActive, onEnter }) {
       style={{
         position: 'absolute',
         left: pos.left,
-        top: isActive ? pos.top - 14 : pos.top,
+        top: pos.top,
         width: 260,
         zIndex: isActive ? 40 : CARD_Z_BASE[index],
         opacity: isActive ? 1 : 0.68,
         filter: isActive ? 'none' : 'grayscale(35%) brightness(0.98)',
+        transform: isActive ? 'translateY(-14px)' : 'translateY(0)',
         boxShadow: isActive
           ? (featured
               ? '0 16px 44px rgba(26,109,255,0.18), 0 2px 8px rgba(0,0,0,0.07)'
               : '0 10px 32px rgba(0,0,0,0.13)')
           : '0 1px 4px rgba(0,0,0,0.06)',
-        transition: 'top 0.32s cubic-bezier(.22,1,.36,1), opacity 0.22s ease, filter 0.22s ease, box-shadow 0.22s ease',
+        transition: 'transform 0.32s cubic-bezier(.22,1,.36,1), opacity 0.22s ease, filter 0.22s ease, box-shadow 0.22s ease',
         cursor: 'default',
       }}
       className={[
@@ -1552,7 +1849,7 @@ function AcademyDisplayCard({ pkg, index, isActive, onEnter }) {
       <button
         className={`mt-4 w-full py-2 rounded-lg text-xs font-semibold transition-colors ${
           featured
-            ? 'bg-[#1A6DFF] text-white hover:bg-[#1559d8]'
+            ? 'bg-[#1A6DFF] text-white hover:bg-[#1551C9]'
             : 'border border-slate-200 text-slate-600 hover:border-[#1A6DFF] hover:text-[#1A6DFF]'
         }`}
         onClick={() => routeTo('trust', 'contact')}
@@ -1676,13 +1973,16 @@ function TrustDeliverableCards({ rows }) {
   return (
     <div className="tsx-deliver-grid">
       {rows.map((row, i) => (
-        <article className={`tsx-deliver-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={row.title}>
-          <span className="tsx-deliver-glow" aria-hidden="true" />
+        <article className={`tsx-deliver-card tsx-deliver-card--indexed tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={row.title}>
+          <div className="tsx-deliver-meta">
+            <span className="tsx-deliver-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            {row.outcome && <span className="tsx-deliver-badge">{row.outcome}</span>}
+          </div>
           <div className="tsx-deliver-head">
             <span className="tsx-deliver-icon" aria-hidden="true">{deliverIcon(row.title)}</span>
             <h3 className="tsx-deliver-title">{row.title}</h3>
-            <span className="tsx-deliver-badge">{row.outcome}</span>
           </div>
+          <hr className="tsx-deliver-rule" aria-hidden="true" />
           <div className="tsx-deliver-chips">
             {row.deliverables.map((d) => (
               <span className="tsx-deliver-chip" key={d}>
@@ -1699,19 +1999,18 @@ function TrustDeliverableCards({ rows }) {
 
 function TrustDeliverableRows({ rows }) { return <TrustDeliverableCards rows={rows} />; }
 
-/* Capability / stack modules as elevated icon cards (reuses the deliverable card kit). */
+/* Capability / stack modules — shadcn feature card pattern. */
 function TrustModuleCards({ rows }) {
   return (
-    <div className="tsx-deliver-grid">
+    <div className="tsx-module-grid">
       {rows.map((row, i) => (
-        <article className={`tsx-deliver-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={row.title}>
-          <span className="tsx-deliver-glow" aria-hidden="true" />
-          <div className="tsx-deliver-head">
-            <span className="tsx-deliver-icon" aria-hidden="true">{deliverIcon(row.title)}</span>
-            <h3 className="tsx-deliver-title">{row.title}</h3>
+        <div className={`tsx-module-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={row.title}>
+          <div className="tsx-module-card-head">
+            <span className="tsx-module-icon" aria-hidden="true">{deliverIcon(row.title)}</span>
+            <h3 className="tsx-module-title">{row.title}</h3>
           </div>
-          <p className="tsx-deliver-body">{row.trust || row.body}</p>
-        </article>
+          <p className="tsx-module-body">{row.trust || row.body}</p>
+        </div>
       ))}
     </div>
   );
@@ -1720,7 +2019,7 @@ function TrustModuleCards({ rows }) {
 const TRUST_SECTION_CTA = {
   academy:   'Plan a Talent Programme',
   marketing: 'Scope a Digital Project',
-  labs:      'Scope an AI System',
+  labs:      'Scope a Product Build',
 };
 
 function TrustSectionBlock({ eyebrow, children }) {
@@ -1764,7 +2063,7 @@ function TrustChapter({ eyebrow, title, sub, children }) {
 function TrustSectionStory({ section, phase }) {
   if (phase === 'intro') {
     return (
-      <div className="tsx-overview tsx-story">
+      <div className="tsx-overview tsx-story tsx-story-light-band">
         <div className="tsx-section-inner">
           <TrustChapter
             eyebrow="Who this serves"
@@ -1796,50 +2095,61 @@ function TrustSectionStory({ section, phase }) {
   if (section.id === 'academy') return <AcademyDepthStory section={section} />;
 
   return (
-    <div className="tsx-overview tsx-story">
-      <div className="tsx-section-inner">
-        <TrustChapter
-          eyebrow="What we deliver"
-          title="What you get"
-          sub="The concrete artifacts you walk away with.">
-          <TrustDeliverableCards rows={section.stackDetails} />
-        </TrustChapter>
-
-        {section.proof?.length > 0 && (
+    <>
+      <div className="tsx-overview tsx-story tsx-story-light-band">
+        <div className="tsx-section-inner">
           <TrustChapter
-            eyebrow="Delivery proof"
-            title="Proof it holds"
-            sub="Evidence from work already shipped - not promises.">
-            <TrustProofCards items={section.proof} />
-            {TRUST_RUNLOG[section.id] && (
-              <div className="tsx-runlog-wrap">
-                <div className="tsx-dimline" data-label="Run log" aria-hidden="true" />
-                <TrustRunLog config={TRUST_RUNLOG[section.id]} />
-              </div>
-            )}
-            {section.id === 'marketing' && <TrustSignalLine />}
+            eyebrow="What we deliver"
+            title="What you get"
+            sub="The concrete artifacts you walk away with.">
+            <TrustDeliverableCards rows={section.stackDetails} />
           </TrustChapter>
-        )}
-
-        <TrustChapter
-          eyebrow="Engagement packages"
-          title="Ways to engage"
-          sub="Scoped entry points, matched to where you are.">
-          <TrustPackageCards packages={section.packages} />
-        </TrustChapter>
-
-        <TrustChapter
-          eyebrow="Common questions"
-          title="Before you commit"
-          sub="The questions teams ask most, answered up front.">
-          <TrustFaqAccordion faqs={section.faqs} />
-        </TrustChapter>
+        </div>
       </div>
-    </div>
+
+      {section.proof?.length > 0 && (
+        <section className="tsx-parent-dark-band tsx-parent-proof-band" data-story-step="03 / Proof">
+          <div className="tsx-section-inner">
+            <span className="tsx-story-step-pill">Delivery proof</span>
+            <TrustChapter
+              eyebrow="Delivery proof"
+              title="Proof it holds"
+              sub="Evidence from work already shipped - not promises.">
+              <TrustProofCards items={section.proof} />
+              {TRUST_RUNLOG[section.id] && (
+                <div className="tsx-runlog-wrap">
+                  <div className="tsx-dimline" data-label="Run log" aria-hidden="true" />
+                  <TrustRunLog config={TRUST_RUNLOG[section.id]} />
+                </div>
+              )}
+              {section.id === 'marketing' && <TrustSignalLine />}
+            </TrustChapter>
+          </div>
+        </section>
+      )}
+
+      <div className="tsx-overview tsx-story tsx-story-light-band">
+        <div className="tsx-section-inner">
+          <TrustChapter
+            eyebrow="Engagement packages"
+            title="Ways to engage"
+            sub="Scoped entry points, matched to where you are.">
+            <TrustPackageCards packages={section.packages} />
+          </TrustChapter>
+
+          <TrustChapter
+            eyebrow="Common questions"
+            title="Before you commit"
+            sub="The questions teams ask most, answered up front.">
+            <TrustFaqAccordion faqs={section.faqs} />
+          </TrustChapter>
+        </div>
+      </div>
+    </>
   );
 }
 
-/* ─── Academy depth story: light → dark rail → light ────────────── */
+/* ─── Academy depth story: light → dark proof → dark packages → light ────────────── */
 function AcademyPackageGrid({ packages }) {
   return (
     <div className="tsx-engage-grid">
@@ -1885,24 +2195,31 @@ function AcademyPackageGrid({ packages }) {
 
 function AcademyDepthStory({ section }) {
   return (
-    <div className="tsx-overview tsx-story">
-      <div className="tsx-section-inner">
-        <TrustChapter
-          eyebrow="What we deliver"
-          title="What you get"
-          sub="The concrete artifacts you walk away with.">
-          <TrustDeliverableCards rows={section.stackDetails} />
-        </TrustChapter>
-
-        {section.proof?.length > 0 && (
+    <>
+      <div className="tsx-overview tsx-story tsx-story-light-band">
+        <div className="tsx-section-inner">
           <TrustChapter
-            eyebrow="Delivery proof"
-            title="Proof it holds"
-            sub="Evidence from work already shipped - not promises.">
-            <TrustProofCards items={section.proof} />
+            eyebrow="What we deliver"
+            title="What you get"
+            sub="The concrete artifacts you walk away with.">
+            <TrustDeliverableCards rows={section.stackDetails} />
           </TrustChapter>
-        )}
+        </div>
       </div>
+
+      {section.proof?.length > 0 && (
+        <section className="tsx-parent-dark-band tsx-parent-proof-band" data-story-step="03 / Proof">
+          <div className="tsx-section-inner">
+            <span className="tsx-story-step-pill">Delivery proof</span>
+            <TrustChapter
+              eyebrow="Delivery proof"
+              title="Proof it holds"
+              sub="Evidence from work already shipped - not promises.">
+              <TrustProofCards items={section.proof} />
+            </TrustChapter>
+          </div>
+        </section>
+      )}
 
       <div className="tsx-darkrail">
         <div className="tsx-section-inner">
@@ -1923,7 +2240,7 @@ function AcademyDepthStory({ section }) {
           <TrustFaqAccordion faqs={section.faqs} />
         </TrustChapter>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -1980,16 +2297,24 @@ function TrustSubpageBand({ section, page }) {
         <div className="tsx-subpage-cards-head tsx-fade">
           <span className="tsx-section-eyebrow">{page.title}</span>
           <h2 className="tsx-section-heading">{page.callout.trust}</h2>
+          <button className="tsx-subpage-band-link" onClick={() => routeTo('trust', section.id, page.slug)}>
+            Open {page.title}
+          </button>
         </div>
         <div className="tsx-subpage-icon-grid">
           {page.cards.map((card, i) => (
-            <div className={`tsx-subpage-icon-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={card.title}>
+            <button
+              type="button"
+              className={`tsx-subpage-icon-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`}
+              key={card.title}
+              onClick={() => routeTo('trust', section.id, page.slug)}
+            >
               <div className="tsx-subpage-icon-wrap" aria-hidden="true">
                 {SUBPAGE_CARD_ICONS[card.title] || DEFAULT_CARD_ICON}
               </div>
               <h3 className="tsx-subpage-card-title">{card.title}</h3>
               <p className="tsx-subpage-card-body">{card.trust}</p>
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -1997,9 +2322,145 @@ function TrustSubpageBand({ section, page }) {
   );
 }
 
+function TrustSubpageHero({ section, page }) {
+  const siblingPages = section.subpages || [];
+  const titleRef = React.useRef(null);
+  return (
+    <section className="tsx-subpage-modern-hero">
+      <div className="tsx-hero-beams" aria-hidden="true">
+        <span className="tsx-hero-beam tsx-hero-beam--1" />
+        <span className="tsx-hero-beam tsx-hero-beam--2" />
+        <span className="tsx-hero-beam tsx-hero-beam--3" />
+        <span className="tsx-hero-arc tsx-hero-arc--1" />
+        <span className="tsx-hero-arc tsx-hero-arc--2" />
+      </div>
+      <TrustHeroParticles variant="subpage" />
+      <TrustHeroEnergyLoop sectionId={section.id} targetRef={titleRef} />
+      <div className="tsx-section-inner tsx-subpage-modern-hero-inner">
+        <div className="tsx-subpage-modern-copy">
+          <span className="tsx-subpage-modern-eyebrow">
+            {getTrustSectionLabel(section)}
+          </span>
+          <h1 ref={titleRef}>{page.title}</h1>
+          <p>{page.callout.trust}</p>
+          <div className="tsx-subpage-modern-actions">
+            <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact', section.id)}>
+              {TRUST_SECTION_CTA[section.id] || section.hero.trust.primary}
+            </button>
+            <button className="tsx-sec-btn-ghost" onClick={() => routeTo('trust', section.id)}>
+              Back to {getTrustSectionLabel(section)}
+            </button>
+          </div>
+        </div>
+        <aside className="tsx-subpage-modern-index" aria-label={`${getTrustSectionLabel(section)} pages`}>
+          <span>Explore</span>
+          {siblingPages.map((item, i) => (
+            <button
+              key={item.slug}
+              className={item.slug === page.slug ? 'active' : ''}
+              onClick={() => routeTo('trust', section.id, item.slug)}
+            >
+              {item.title}
+            </button>
+          ))}
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function TrustSubpageCards({ page }) {
+  return (
+    <div className="tsx-subpage-feature-grid">
+      {page.cards.map((card, i) => (
+        <article className={`tsx-subpage-feature-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={card.title}>
+          <span className="tsx-subpage-feature-icon" aria-hidden="true">
+            {SUBPAGE_CARD_ICONS[card.title] || DEFAULT_CARD_ICON}
+          </span>
+          <span className="tsx-subpage-feature-index">{String(i + 1).padStart(2, '0')}</span>
+          <h3>{card.title}</h3>
+          <p>{card.trust}</p>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function TrustSubpageDetailPage({ section, page, index }) {
+  const proofItems = section.proof || [];
+  return (
+    <main className="tsx-subpage-modern" style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' }}>
+      <TrustSubpageHero section={section} page={page} />
+
+      <section className="tsx-subpage-dark-section">
+        <div className="tsx-section-inner tsx-subpage-context-grid">
+          <div>
+            <span className="tsx-story-step-pill">Context</span>
+            <span className="tsx-subpage-modern-eyebrow">Context</span>
+            <h2>Where this fits in the engagement.</h2>
+          </div>
+          <p>{section.statement}</p>
+        </div>
+      </section>
+
+      <section className="tsx-subpage-light-section">
+        <div className="tsx-section-inner">
+          <span className="tsx-story-step-pill">Capability detail</span>
+          <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
+            <span className="tsx-chapter-eyebrow">Capability detail</span>
+            <h2 className="tsx-chapter-title">What {page.title} includes</h2>
+            <p className="tsx-chapter-sub">A focused view of the work inside this part of {getTrustSectionLabel(section)}.</p>
+          </header>
+          <TrustSubpageCards page={page} />
+        </div>
+      </section>
+
+      <section className="tsx-subpage-dark-section tsx-subpage-proof-section">
+        <div className="tsx-section-inner">
+          <span className="tsx-story-step-pill">Delivery and proof</span>
+          <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
+            <span className="tsx-chapter-eyebrow">Delivery path</span>
+            <h2 className="tsx-chapter-title">How the work moves</h2>
+            <p className="tsx-chapter-sub">The same delivery path holds across every {getTrustSectionLabel(section)} scope, from first frame to handover.</p>
+          </header>
+          <TrustProcessTrack steps={section.process} />
+          {proofItems.length > 0 && (
+            <div className="tsx-subpage-proof-wrap">
+              <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
+                <span className="tsx-chapter-eyebrow">Proof</span>
+                <h2 className="tsx-chapter-title">Evidence before claims</h2>
+              </header>
+              <TrustProofCards items={proofItems} />
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="tsx-subpage-light-section">
+        <div className="tsx-section-inner">
+          <span className="tsx-story-step-pill">Questions and intake</span>
+          <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
+            <span className="tsx-chapter-eyebrow">Before you commit</span>
+            <h2 className="tsx-chapter-title">Questions teams ask first</h2>
+          </header>
+          <TrustFaqAccordion faqs={section.faqs} />
+          <TrustIntakeBand
+            spaced
+            heading={section.intake.primary}
+            sub={section.intake.secondary}
+            cta={TRUST_SECTION_CTA[section.id] || 'Start a Project'}
+            onClick={() => routeTo('trust', 'contact', section.id)}
+          />
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function TrustSectionHeroUnravel({ theme, section }) {
   const wrapRef = React.useRef(null);
   const canvasRef = React.useRef(null);
+  const heroTitleRef = React.useRef(null);
   
   React.useEffect(() => {
     const canvas = canvasRef.current;
@@ -2057,31 +2518,22 @@ function TrustSectionHeroUnravel({ theme, section }) {
     }
     measure();
 
-    const state = { p: 0, target: 0 };
+    const state = { p: 0, target: 1 };
     const isDesktop = window.innerWidth > 760;
 
+    // Hero no longer waits on three screens of scroll. The formation plays
+    // autonomously as a living backdrop — it breathes between a loose and a
+    // fully-formed shape on a slow time loop, so the section reads in one view.
     let st;
-    if (!prefersReducedMotion) {
-      st = ScrollTrigger.create({
-        trigger: wrapRef.current,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: true,
-        onUpdate: (self) => {
-          state.target = self.progress;
-        }
-      });
-    } else {
-      state.target = 1;
-      wrapRef.current.style.height = "100svh";
-    }
+    const BREATHE = !prefersReducedMotion;
 
     let rafId = 0;
     let t0 = performance.now();
 
     function render(now) {
       const time = (now - t0) / 1000;
-      state.p += (state.target - state.p) * 0.09;
+      if (BREATHE) state.target = 0.9 + Math.sin(time * 0.22) * 0.1;
+      state.p += (state.target - state.p) * 0.05;
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
 
       const p = state.p;
@@ -2141,12 +2593,13 @@ function TrustSectionHeroUnravel({ theme, section }) {
         ctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
       });
 
-      rafId = requestAnimationFrame(render);
+      rafId = sectionVisible ? requestAnimationFrame(render) : 0;
     }
 
     let sectionVisible = true;
     const io = new IntersectionObserver(([e]) => {
       sectionVisible = e.isIntersecting;
+      if (sectionVisible && !rafId) rafId = requestAnimationFrame(render);
     }, { threshold: 0 });
     io.observe(wrapRef.current);
 
@@ -2168,12 +2621,21 @@ function TrustSectionHeroUnravel({ theme, section }) {
   const copy = section.hero[theme];
 
   return (
-    <div ref={wrapRef} className="tsx-hero-runway" style={{ height: '260vh' }}>
+    <div ref={wrapRef} className="tsx-hero-runway tsx-hero-runway--static" style={{ height: '100svh' }}>
       <div className="tsx-hero-stage">
+        <div className="tsx-hero-beams" aria-hidden="true">
+          <span className="tsx-hero-beam tsx-hero-beam--1" />
+          <span className="tsx-hero-beam tsx-hero-beam--2" />
+          <span className="tsx-hero-beam tsx-hero-beam--3" />
+          <span className="tsx-hero-arc tsx-hero-arc--1" />
+          <span className="tsx-hero-arc tsx-hero-arc--2" />
+        </div>
         <canvas ref={canvasRef} className="tsx-hero-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+        <TrustHeroParticles variant={section.id} />
+        <TrustHeroEnergyLoop sectionId={section.id} targetRef={heroTitleRef} />
         <div className="tsx-hero-chapter" style={{ opacity: 1, pointerEvents: 'auto' }}>
-          <p className="tsx-section-eyebrow">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {getTrustSectionLabel(section).toUpperCase()}</p>
-          <h1 className="tsx-section-heading" style={{ color: '#F4F8FF', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 700 }}>
+          <p className="tsx-section-eyebrow">{section.id === "academy" ? "01" : section.id === "marketing" ? "02" : "03"} / {getTrustSectionLabel(section).toUpperCase()}</p>
+          <h1 ref={heroTitleRef} className="tsx-section-heading" style={{ color: '#F4F8FF', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 700 }}>
             {copy.title}<br />
             <span className="serif" style={{ color: '#5B9DFF' }}>
               <CyclingWord words={SECTION_HERO_WORDS.trust[section.id] || [copy.accent]} />
@@ -2181,11 +2643,13 @@ function TrustSectionHeroUnravel({ theme, section }) {
           </h1>
           <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'rgba(220,232,248,.66)', marginInline: 'auto' }}>{copy.body}</p>
           <div className="tsx-sec-actions" style={{ marginTop: '24px', display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <button className="tsx-btn-cta" onClick={() => {
-              const band = document.querySelector(".tsx-subpage-band");
-              band?.scrollIntoView({ behavior: "smooth" });
-            }}>{copy.primary}</button>
-            <button className="tsx-sec-btn-ghost" onClick={() => routeTo('trust', 'customers', section.id)}>{copy.secondary}</button>
+            <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact', section.id)}>{copy.primary}</button>
+            <button className="tsx-sec-btn-ghost" onClick={() => {
+              const target = section.id === 'academy'
+                ? section.subpages.find((item) => item.slug === 'placements')
+                : section.subpages[0];
+              routeTo('trust', section.id, target?.slug);
+            }}>{copy.secondary}</button>
           </div>
         </div>
       </div>
@@ -2304,220 +2768,95 @@ function TrustFunnel({ section }) {
   );
 }
 
-/* ─── Academy Orbital Timeline (21st.dev Radial Orbital Timeline adapted for JSX) ─── */
-const ACADEMY_ORBITAL_NODES = [
-  { id: 1, title: "Map the learner", date: "Week 1", content: "Assess current skill level, target roles and portfolio gaps. Every learner enters with a written brief.", category: "Discovery", icon: MapPin, relatedIds: [2], status: "completed", energy: 100 },
-  { id: 2, title: "Run the cohort", date: "Weeks 2–8", content: "Live sessions, project sprints, mentor reviews and weekly delivery checkpoints — progress on the record.", category: "Delivery", icon: Users, relatedIds: [1, 3], status: "in-progress", energy: 80 },
-  { id: 3, title: "Build proof", date: "Weeks 7–10", content: "Turn projects into case studies, demos and interview-ready narratives. Portfolio speaks before the résumé.", category: "Output", icon: Package, relatedIds: [2, 4], status: "pending", energy: 55 },
-  { id: 4, title: "Place or partner", date: "Week 10+", content: "Match candidates to interviews or report cohort outcomes to institutions and hiring partners.", category: "Outcome", icon: Handshake, relatedIds: [3], status: "pending", energy: 30 },
+/* ─── Academy Process Timeline ─── */
+const ACADEMY_STEP_META = [
+  { timing: 'Week 1',      outcome: 'Written learner brief' },
+  { timing: 'Weeks 2–8',  outcome: 'Progress on the record' },
+  { timing: 'Weeks 7–10', outcome: 'Interview-ready portfolio' },
+  { timing: 'Week 10+',   outcome: 'Placement or outcome report' },
 ];
 
-function AcademyOrbitalTimeline() {
-  const [expandedItems, setExpandedItems] = React.useState({});
-  const [rotationAngle, setRotationAngle] = React.useState(0);
-  const [autoRotate, setAutoRotate] = React.useState(true);
-  const [pulseEffect, setPulseEffect] = React.useState({});
-  const [activeNodeId, setActiveNodeId] = React.useState(null);
-  const [centerOffset] = React.useState({ x: 0, y: 0 });
-  const containerRef = React.useRef(null);
-  const orbitRef = React.useRef(null);
-  const nodeRefs = React.useRef({});
-  const timelineData = ACADEMY_ORBITAL_NODES;
-
-  const handleContainerClick = (e) => {
-    if (e.target === containerRef.current || e.target === orbitRef.current) {
-      setExpandedItems({});
-      setActiveNodeId(null);
-      setPulseEffect({});
-      setAutoRotate(true);
-    }
-  };
-
-  const getRelatedItems = (itemId) => {
-    const current = timelineData.find(i => i.id === itemId);
-    return current ? current.relatedIds : [];
-  };
-
-  const centerViewOnNode = (nodeId) => {
-    const nodeIndex = timelineData.findIndex(i => i.id === nodeId);
-    const total = timelineData.length;
-    const targetAngle = (nodeIndex / total) * 360;
-    setRotationAngle(270 - targetAngle);
-  };
-
-  const toggleItem = (id) => {
-    setExpandedItems(prev => {
-      const newState = { ...prev };
-      Object.keys(newState).forEach(key => { if (parseInt(key) !== id) newState[parseInt(key)] = false; });
-      newState[id] = !prev[id];
-      if (!prev[id]) {
-        setActiveNodeId(id);
-        setAutoRotate(false);
-        const related = getRelatedItems(id);
-        const pulse = {};
-        related.forEach(rid => { pulse[rid] = true; });
-        setPulseEffect(pulse);
-        centerViewOnNode(id);
-      } else {
-        setActiveNodeId(null);
-        setAutoRotate(true);
-        setPulseEffect({});
-      }
-      return newState;
-    });
-  };
+function AcademyProcessTimeline({ section }) {
+  const steps = section.process || [];
+  const railRef = React.useRef(null);
 
   React.useEffect(() => {
-    if (!autoRotate) return;
-    const timer = setInterval(() => {
-      setRotationAngle(prev => Number(((prev + 0.3) % 360).toFixed(3)));
-    }, 50);
-    return () => clearInterval(timer);
-  }, [autoRotate]);
+    const el = railRef.current;
+    if (!el) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.style.setProperty('--draw', '1');
+      return;
+    }
+    let raf = 0;
+    const compute = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const start = vh * 0.85, end = vh * 0.28;
+      const p = (start - r.top) / (start - end + r.height);
+      el.style.setProperty('--draw', String(Math.max(0, Math.min(1, p))));
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(compute); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    compute();
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [steps.length]);
 
-  const calculateNodePosition = (index, total) => {
-    const angle = ((index / total) * 360 + rotationAngle) % 360;
-    const radius = 180;
-    const radian = (angle * Math.PI) / 180;
-    const x = radius * Math.cos(radian) + centerOffset.x;
-    const y = radius * Math.sin(radian) + centerOffset.y;
-    const zIndex = Math.round(100 + 50 * Math.cos(radian));
-    const opacity = Math.max(0.4, Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(radian)) / 2)));
-    return { x, y, zIndex, opacity };
-  };
-
-  const isRelatedToActive = (itemId) => {
-    if (!activeNodeId) return false;
-    return getRelatedItems(activeNodeId).includes(itemId);
-  };
-
-  const statusColor = (status) => {
-    if (status === 'completed') return 'bg-[#1A6DFF] text-white border-[#1A6DFF]';
-    if (status === 'in-progress') return 'bg-white text-[#0b1f33] border-[#0b1f33]';
-    return 'bg-slate-100 text-slate-500 border-slate-300';
-  };
+  if (!steps.length) return null;
 
   return (
-    <section className="tsx-signature" aria-label="The cohort path">
+    <section className="tsx-signature tsx-apt-section" aria-label="The cohort path">
       <div className="tsx-section-inner">
         <div className="tsx-signature-head tsx-fade">
           <span className="tsx-section-eyebrow">The cohort path</span>
           <h2 className="tsx-section-heading">From intake<br /><span className="serif">to hiring outcome.</span></h2>
-          <p className="tsx-signature-sub">Click any node to explore each phase of the programme journey.</p>
+          <p className="tsx-signature-sub">One path every cohort runs — assess, build, then prove.</p>
         </div>
-        <div
-          className="relative w-full flex items-center justify-center overflow-hidden"
-          style={{ height: '520px' }}
-          ref={containerRef}
-          onClick={handleContainerClick}
-        >
-          {/* orbit ring */}
-          <div className="absolute rounded-full border border-slate-200" style={{ width: 400, height: 400 }} />
-          {/* center pulse */}
-          <div className="absolute flex items-center justify-center" style={{ width: 56, height: 56 }}>
-            <div className="absolute rounded-full bg-[#1A6DFF] opacity-10 animate-ping" style={{ width: 64, height: 64 }} />
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1A6DFF] to-[#5B9DFF] flex items-center justify-center shadow-lg">
-              <svg viewBox="0 0 20 20" fill="none" stroke="white" strokeWidth="2" className="w-4 h-4"><path d="M10 2l2 5h5l-4 3 1.5 5L10 13l-4.5 2L7 10 3 7h5z"/></svg>
-            </div>
-          </div>
-          {/* orbit container */}
-          <div
-            ref={orbitRef}
-            className="absolute w-full h-full flex items-center justify-center"
-            style={{ perspective: '1000px', transform: `translate(${centerOffset.x}px, ${centerOffset.y}px)` }}
-          >
-            {timelineData.map((item, index) => {
-              const pos = calculateNodePosition(index, timelineData.length);
-              const isExpanded = expandedItems[item.id];
-              const isRelated = isRelatedToActive(item.id);
-              const isPulsing = pulseEffect[item.id];
-              const Icon = item.icon;
+
+        <div className="tsx-apt-layout">
+          <ol className="tsx-apt-rail" ref={railRef}>
+            {steps.map((s, i) => {
+              const meta = ACADEMY_STEP_META[i] || {};
               return (
-                <div
-                  key={item.id}
-                  ref={el => { nodeRefs.current[item.id] = el; }}
-                  className="absolute transition-all duration-700 cursor-pointer"
-                  style={{ transform: `translate(${pos.x}px, ${pos.y}px)`, zIndex: isExpanded ? 200 : pos.zIndex, opacity: isExpanded ? 1 : pos.opacity }}
-                  onClick={e => { e.stopPropagation(); toggleItem(item.id); }}
-                >
-                  {/* energy aura */}
-                  <div
-                    className={`absolute rounded-full ${isPulsing ? 'animate-pulse' : ''}`}
-                    style={{
-                      background: 'radial-gradient(circle, rgba(26,109,255,0.15) 0%, transparent 70%)',
-                      width: `${item.energy * 0.4 + 40}px`, height: `${item.energy * 0.4 + 40}px`,
-                      left: `-${(item.energy * 0.4 + 40 - 40) / 2}px`, top: `-${(item.energy * 0.4 + 40 - 40) / 2}px`,
-                    }}
-                  />
-                  {/* node icon */}
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                    isExpanded ? 'bg-[#1A6DFF] text-white border-[#1A6DFF] scale-150 shadow-lg shadow-blue-200' :
-                    isRelated ? 'bg-blue-50 text-[#1A6DFF] border-[#1A6DFF] animate-pulse' :
-                    'bg-white text-slate-500 border-slate-200 hover:border-[#1A6DFF] hover:text-[#1A6DFF]'
-                  }`}>
-                    <Icon size={16} />
+                <li className="tsx-apt-step tsx-fade" style={{ transitionDelay: (i * 100) + 'ms' }} key={s.step}>
+                  <div className="tsx-apt-spine-col">
+                    <span className="tsx-apt-node">{s.step}</span>
+                    {i < steps.length - 1 && <span className="tsx-apt-connector" aria-hidden="true" />}
                   </div>
-                  {/* label */}
-                  <div className={`absolute whitespace-nowrap text-xs font-semibold tracking-wide transition-all duration-300 text-center ${isExpanded ? 'text-[#1A6DFF] scale-110' : 'text-slate-500'}`} style={{ top: '48px', left: '50%', transform: `translateX(-50%) ${isExpanded ? 'scale(1.1)' : ''}` }}>
-                    {item.title}
+                  <div className="tsx-apt-body">
+                    <span className="tsx-apt-timing">{meta.timing}</span>
+                    <h3 className="tsx-apt-title">{s.title}</h3>
+                    <p className="tsx-apt-desc">{s.body}</p>
+                    <span className="tsx-apt-outcome">
+                      <span className="tsx-apt-outcome-mark" aria-hidden="true" />
+                      {meta.outcome}
+                    </span>
                   </div>
-                  {/* expanded card */}
-                  {isExpanded && (
-                    <div className="absolute bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-left" style={{ top: '72px', left: '50%', transform: 'translateX(-50%)', width: '220px', zIndex: 300 }}>
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-px h-2 bg-slate-300" />
-                      <div className="flex items-center justify-between mb-2">
-                        <span className={`text-xs px-2 py-0.5 rounded-full border font-semibold ${statusColor(item.status)}`}>
-                          {item.status === 'completed' ? 'COMPLETE' : item.status === 'in-progress' ? 'ACTIVE' : 'UPCOMING'}
-                        </span>
-                        <span className="text-xs text-slate-400 font-mono">{item.date}</span>
-                      </div>
-                      <p className="text-sm font-semibold text-slate-800 mb-1">{item.title}</p>
-                      <p className="text-xs text-slate-500 leading-relaxed">{item.content}</p>
-                      <div className="mt-3 pt-2 border-t border-slate-100">
-                        <div className="flex justify-between text-xs mb-1">
-                          <span className="flex items-center gap-1 text-slate-400"><Zap size={10} />Progress</span>
-                          <span className="font-mono text-slate-600">{item.energy}%</span>
-                        </div>
-                        <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-[#1A6DFF] to-[#5B9DFF] rounded-full" style={{ width: `${item.energy}%` }} />
-                        </div>
-                      </div>
-                      {item.relatedIds.length > 0 && (
-                        <div className="mt-3 pt-2 border-t border-slate-100">
-                          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1"><LinkIcon size={9} />Connected</p>
-                          <div className="flex flex-wrap gap-1">
-                            {item.relatedIds.map(rid => {
-                              const related = timelineData.find(i => i.id === rid);
-                              return (
-                                <button key={rid} className="text-xs px-2 py-0.5 border border-slate-200 rounded text-slate-600 hover:border-[#1A6DFF] hover:text-[#1A6DFF] transition-colors flex items-center gap-0.5"
-                                  onClick={e => { e.stopPropagation(); toggleItem(rid); }}>
-                                  {related?.title}<ArrowRight size={8} />
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                </li>
               );
             })}
-          </div>
+          </ol>
+
+          {TRUST_RUNLOG[section.id] && (
+            <div className="tsx-apt-runlog tsx-fade">
+              <div className="tsx-dimline" data-label="Run log" aria-hidden="true" />
+              <TrustRunLog config={TRUST_RUNLOG[section.id]} />
+            </div>
+          )}
         </div>
-        {/* static labels below for context */}
-        <div className="flex justify-center gap-6 flex-wrap mt-2 pb-8">
-          {timelineData.map(item => {
-            const Icon = item.icon;
-            return (
-              <div key={item.id} className="flex items-center gap-2 text-xs text-slate-400">
-                <Icon size={12} className="text-[#1A6DFF]" />
-                <span>{item.title}</span>
-                <span className="text-slate-300">·</span>
-                <span className="font-mono text-slate-300">{item.date}</span>
-              </div>
-            );
-          })}
+
+        <div className="tsx-apt-cta-row tsx-fade" style={{ transitionDelay: '420ms' }}>
+          <button className="tsx-btn-primary" onClick={() => routeTo('trust', 'academy', 'tracks')}>
+            See the tracks →
+          </button>
+          <button className="tsx-btn-ghost" onClick={() => routeTo('trust', 'contact')}>
+            Plan an Academy programme
+          </button>
         </div>
       </div>
     </section>
@@ -2525,7 +2864,7 @@ function AcademyOrbitalTimeline() {
 }
 
 function TrustSignatureModule({ section }) {
-  if (section.id === 'academy') return <AcademyOrbitalTimeline />;
+  if (section.id === 'academy') return <AcademyProcessTimeline section={section} />;
   if (section.id === 'labs') return (
     <TrustCohortLadder
       section={section}
@@ -2539,7 +2878,13 @@ function TrustSignatureModule({ section }) {
   return null;
 }
 
-function TrustSectionPage({ section }) {
+function TrustSectionPage({ section, detail }) {
+  const activeSubpageIndex = detail ? section.subpages.findIndex((page) => page.slug === detail) : -1;
+  if (detail && activeSubpageIndex === -1) return <NotFound theme="trust" page={`${section.id}/${detail}`} />;
+  if (activeSubpageIndex >= 0) {
+    return <TrustSubpageDetailPage section={section} page={section.subpages[activeSubpageIndex]} index={activeSubpageIndex} />;
+  }
+
   return (
     <main className="tsx-section-page" style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' }}>
       {/* Hook */}
@@ -2551,7 +2896,12 @@ function TrustSectionPage({ section }) {
       {/* Who this is for -> Why it matters -> What we do */}
       <TrustSectionStory section={section} phase="intro" />
       {/* How it works - the one mechanism, full-width centerpiece */}
-      <TrustSignatureModule section={section} />
+      <section className="tsx-parent-dark-band tsx-parent-mechanism-band" data-story-step="02 / Mechanism">
+        <div className="tsx-section-inner tsx-parent-band-marker">
+          <span className="tsx-story-step-pill">Mechanism</span>
+        </div>
+        <TrustSignatureModule section={section} />
+      </section>
       {/* What you get -> Proof -> Packages -> Questions */}
       <TrustSectionStory section={section} phase="depth" />
       {/* Go deeper */}
@@ -2560,39 +2910,75 @@ function TrustSectionPage({ section }) {
       ))}
       {/* Invitation - one clear close */}
       <section className="tsx-section-inner">
-        <TrustIntakeBand spaced heading={section.intake.primary} sub={section.intake.secondary} cta={TRUST_SECTION_CTA[section.id] || 'Start a Project'} />
+        <TrustIntakeBand
+          spaced
+          heading={section.intake.primary}
+          sub={section.intake.secondary}
+          cta={TRUST_SECTION_CTA[section.id] || 'Start a Project'}
+          onClick={() => routeTo('trust', 'contact', section.id)}
+        />
       </section>
     </main>
   );
 }
+function TrustPageHero({ eyebrow, title, accentWords, body, children, primaryLabel, onPrimary }) {
+  const titleRef = React.useRef(null);
+  return (
+    <div className="tsx-hero-runway tsx-hero-runway--static" style={{ height: '100svh' }}>
+      <div className="tsx-hero-stage">
+        <div className="tsx-hero-beams" aria-hidden="true">
+          <span className="tsx-hero-beam tsx-hero-beam--1" />
+          <span className="tsx-hero-beam tsx-hero-beam--2" />
+          <span className="tsx-hero-beam tsx-hero-beam--3" />
+          <span className="tsx-hero-arc tsx-hero-arc--1" />
+          <span className="tsx-hero-arc tsx-hero-arc--2" />
+        </div>
+        <TrustHeroParticles variant="page" />
+        <TrustHeroEnergyLoop sectionId="academy" targetRef={titleRef} />
+        <div className="tsx-hero-chapter" style={{ opacity: 1, pointerEvents: 'auto' }}>
+          {eyebrow && <p className="tsx-section-eyebrow">{eyebrow}</p>}
+          <h1 ref={titleRef} className="tsx-section-heading" style={{ color: '#F4F8FF', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 700 }}>
+            {title}<br />
+            <span className="serif" style={{ color: '#5B9DFF' }}>
+              <CyclingWord words={accentWords} />
+            </span>
+          </h1>
+          {body && <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'rgba(220,232,248,.66)', marginInline: 'auto' }}>{body}</p>}
+          {children}
+          {primaryLabel && (
+            <div className="tsx-sec-actions" style={{ marginTop: '24px', display: 'flex', gap: '16px', justifyContent: 'center' }}>
+              <button className="tsx-btn-cta" onClick={onPrimary}>{primaryLabel}</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function TrustCustomers({ detail }) {
   const activeSection = detail ? DATA.sections[detail] : null;
   if (detail && !activeSection) return <NotFound theme="trust" page={`customers/${detail}`} />;
   const proofItems = activeSection ? DATA.customers.filter(customer => customer.id === detail) : DATA.customers;
   return (
     <main className="tsx-customers-page">
-      <div className="tsx-sec-header">
-        <div className="tsx-sec-header-inner">
-          <div>
-            <span className="tsx-sec-eyebrow">{activeSection ? `${activeSection.name} — Proof` : "Operating Proof"}</span>
-            <h1 className="tsx-sec-h1">Delivery proof across every Nexara capability.</h1>
-            <p className="tsx-sec-body">Each engagement is framed as a delivery model — scope evidence, the work produced, and the operating readiness handed over. No invented logos, no vanity metrics.</p>
-          </div>
-          <div className="tsx-spec-panel">
-            <span className="tsx-spec-panel-label">Coverage</span>
-            {[
-              ["3", "solution lines"],
-              ["3", "proof records"],
-              ["100%", "scoped & owned"],
-            ].map(([value, label]) => (
-              <div className="tsx-spec-row" key={label}>
-                <span className="tsx-spec-label">{label}</span>
-                <span className="tsx-spec-value">{value}</span>
-              </div>
-            ))}
-          </div>
+      <TrustPageHero
+        eyebrow={activeSection ? `${activeSection.name} — Proof` : "Operating Proof"}
+        title="Delivery proof"
+        accentWords={SECTION_HERO_WORDS.trust.customers}
+        body="Each engagement is framed as a delivery model — scope evidence, the work produced, and the operating readiness handed over. No invented logos, no vanity metrics."
+        primaryLabel="Start an engagement"
+        onPrimary={() => routeTo('trust', 'contact')}
+      >
+        <div className="tsx-page-hero-stats">
+          {[["3","solution lines"],["3","proof records"],["100%","scoped & owned"]].map(([v, l]) => (
+            <div key={l} className="tsx-page-hero-stat">
+              <span className="tsx-page-hero-stat-value">{v}</span>
+              <span className="tsx-page-hero-stat-label">{l}</span>
+            </div>
+          ))}
         </div>
-      </div>
+      </TrustPageHero>
       <section className="tsx-section-inner tsx-proof-table-section">
         <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
           <span className="tsx-chapter-eyebrow">Operating proof</span>
@@ -2673,6 +3059,14 @@ function TrustCompany() {
   );
 }
 
+/* Icon map for channel selection cards */
+const CHANNEL_ICONS = {
+  academy:   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>,
+  marketing: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>,
+  labs:      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>,
+  home:      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg>,
+};
+
 function TrustContact({ detail }) {
   const copy = DATA.contact.trust;
   const {
@@ -2685,39 +3079,54 @@ function TrustContact({ detail }) {
 
   return (
     <main className="tsx-contact-page">
-      <section className="tsx-contact-hero">
-        <div className="tsx-section-inner">
-          <p className="tsx-cta-eyebrow">{copy.eyebrow}</p>
-          <h1 className="tsx-contact-h1">{copy.title}</h1>
-          <p className="tsx-contact-body">{copy.body}</p>
-          <a className="tsx-email-pill" href={`mailto:${copy.accent}`}>{copy.accent}</a>
-        </div>
-      </section>
+      <TrustPageHero
+        eyebrow={copy.eyebrow}
+        title="A structured engagement"
+        accentWords={SECTION_HERO_WORDS.trust.contact}
+        body={copy.body}
+      >
+        <a className="tsx-email-pill" href={`mailto:${copy.accent}`} style={{ marginTop: '20px', display: 'inline-block' }}>{copy.accent}</a>
+      </TrustPageHero>
 
       <section className="tsx-section-inner tsx-channel-section">
         <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
           <span className="tsx-chapter-eyebrow">Where to start</span>
           <h2 className="tsx-chapter-title">Select a section</h2>
-          <p className="tsx-chapter-sub">Pick the line closest to what you need — it routes your brief to the right team.</p>
+          <p className="tsx-chapter-sub">Pick the line closest to what you need — it routes your request to the right team.</p>
         </header>
         <div className="tsx-channel-grid">
-          {DATA.contact.channels.map(channel => (
-            <button
-              key={channel.title}
-              type="button"
-              className={formData.section === channel.section ? "tsx-channel-card active" : "tsx-channel-card"}
-              onClick={() => handleLaneSelect(channel.section)}
-            >
-              <h3>{channel.title}</h3>
-              <p>{channel.body}</p>
-            </button>
-          ))}
+          {DATA.contact.channels.map(channel => {
+            const isActive = formData.section === channel.section;
+            return (
+              <button
+                key={channel.title}
+                type="button"
+                className={isActive ? "tsx-channel-card active" : "tsx-channel-card"}
+                onClick={() => handleLaneSelect(channel.section)}
+                aria-pressed={isActive}
+              >
+                <div className="tsx-channel-card-header">
+                  <span className="tsx-channel-icon" aria-hidden="true">
+                    {CHANNEL_ICONS[channel.section] || CHANNEL_ICONS.home}
+                  </span>
+                  <h3>{channel.title}</h3>
+                  {isActive && (
+                    <span className="tsx-channel-check" aria-label="Selected">
+                      <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5l3.5 3.5 6.5-7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </span>
+                  )}
+                </div>
+                <p>{channel.body}</p>
+              </button>
+            );
+          })}
         </div>
       </section>
 
-      <section className="tsx-section-inner tsx-brief-section">
+      <section className="tsx-brief-band">
+      <div className="tsx-section-inner tsx-brief-section">
         <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
-          <span className="tsx-chapter-eyebrow">Your brief</span>
+          <span className="tsx-chapter-eyebrow">Your request</span>
           <h2 className="tsx-chapter-title">{DATA.contact.enquiry.title}</h2>
         </header>
         <p className="tsx-brief-intro">{DATA.contact.enquiry.body}</p>
@@ -2726,50 +3135,86 @@ function TrustContact({ detail }) {
         ) : (
           <div className="tsx-brief-grid">
             <form className="tsx-brief-form" onSubmit={handleSubmit}>
-              <div className="tsx-field">
-                <label className="tsx-field-label" htmlFor="trust-city">City</label>
-                <input id="trust-city" className="tsx-field-input" type="text" value={formData.city} onChange={(e) => handleChange("city", e.target.value)} />
-              </div>
-              <div className="tsx-field">
-                <label className="tsx-field-label" htmlFor="trust-audience">Audience / user group</label>
-                <input id="trust-audience" className="tsx-field-input" type="text" placeholder="e.g. engineering students, local shoppers" value={formData.audience} onChange={(e) => handleChange("audience", e.target.value)} />
-              </div>
-              <div className="tsx-field">
-                <label className="tsx-field-label" htmlFor="trust-timeline">Timeline</label>
-                <select id="trust-timeline" className="tsx-field-input" value={formData.timeline} onChange={(e) => handleChange("timeline", e.target.value)}>
-                  <option value="1-3 months">1-3 months</option>
-                  <option value="3-6 months">3-6 months</option>
-                  <option value="6-12 months">6-12 months</option>
-                  <option value="Ongoing">Ongoing</option>
-                </select>
-              </div>
-              <div className="tsx-field">
-                <label className="tsx-field-label" htmlFor="trust-context">Context / current state</label>
-                <textarea id="trust-context" className="tsx-field-input" placeholder="Existing website, tools, platforms, repositories, or current workflow" value={formData.context} onChange={(e) => handleChange("context", e.target.value)} />
-              </div>
-              <div className="tsx-field">
-                <label className="tsx-field-label" htmlFor="trust-success">Success metric</label>
-                <input id="trust-success" className="tsx-field-input" type="text" placeholder="e.g. improve enquiry conversion, launch a cohort dashboard" value={formData.successMetric} onChange={(e) => handleChange("successMetric", e.target.value)} />
-              </div>
-              <div className="tsx-field">
-                <label className="tsx-field-label" htmlFor="trust-name">Your name</label>
-                <input id="trust-name" className="tsx-field-input" type="text" placeholder="Decision-maker name" value={formData.name} onChange={(e) => handleChange("name", e.target.value)} />
-              </div>
-              <div className="tsx-field">
-                <label className="tsx-field-label" htmlFor="trust-email">Email</label>
-                <input id="trust-email" className="tsx-field-input" type="email" placeholder="name@company.com" value={formData.email} onChange={(e) => handleChange("email", e.target.value)} />
-              </div>
+
+              {/* Group 1: Contact info */}
+              <fieldset className="tsx-field-group">
+                <legend className="tsx-field-group-label">Contact info</legend>
+                <div className="tsx-field-row">
+                  <div className="tsx-field">
+                    <label className="tsx-field-label" htmlFor="trust-name">Your name</label>
+                    <input id="trust-name" className="tsx-field-input" type="text" placeholder="Decision-maker name" value={formData.name} onChange={(e) => handleChange("name", e.target.value)} />
+                  </div>
+                  <div className="tsx-field">
+                    <label className="tsx-field-label" htmlFor="trust-email">Email</label>
+                    <input id="trust-email" className="tsx-field-input" type="email" placeholder="name@company.com" value={formData.email} onChange={(e) => handleChange("email", e.target.value)} />
+                  </div>
+                </div>
+              </fieldset>
+
+              {/* Group 2: Project context */}
+              <fieldset className="tsx-field-group">
+                <legend className="tsx-field-group-label">Project context</legend>
+                <div className="tsx-field-row">
+                  <div className="tsx-field">
+                    <label className="tsx-field-label" htmlFor="trust-audience">Audience / user group</label>
+                    <input id="trust-audience" className="tsx-field-input" type="text" placeholder="e.g. engineering students, local shoppers" value={formData.audience} onChange={(e) => handleChange("audience", e.target.value)} />
+                  </div>
+                  <div className="tsx-field">
+                    <label className="tsx-field-label" htmlFor="trust-city">City</label>
+                    <input id="trust-city" className="tsx-field-input" type="text" value={formData.city} onChange={(e) => handleChange("city", e.target.value)} />
+                  </div>
+                </div>
+                <div className="tsx-field">
+                  <label className="tsx-field-label" htmlFor="trust-timeline">Timeline</label>
+                  <select id="trust-timeline" className="tsx-field-input tsx-field-select" value={formData.timeline} onChange={(e) => handleChange("timeline", e.target.value)}>
+                    <option value="1-3 months">1-3 months</option>
+                    <option value="3-6 months">3-6 months</option>
+                    <option value="6-12 months">6-12 months</option>
+                    <option value="Ongoing">Ongoing</option>
+                  </select>
+                </div>
+              </fieldset>
+
+              {/* Group 3: Brief */}
+              <fieldset className="tsx-field-group">
+                <legend className="tsx-field-group-label">Requirements</legend>
+                <div className="tsx-field">
+                  <label className="tsx-field-label" htmlFor="trust-context">Context / current state</label>
+                  <textarea id="trust-context" className="tsx-field-input" placeholder="Existing website, tools, platforms, repositories, or current workflow" value={formData.context} onChange={(e) => handleChange("context", e.target.value)} />
+                </div>
+                <div className="tsx-field">
+                  <label className="tsx-field-label" htmlFor="trust-success">Success metric</label>
+                  <input id="trust-success" className="tsx-field-input" type="text" placeholder="e.g. improve enquiry conversion, launch a cohort dashboard" value={formData.successMetric} onChange={(e) => handleChange("successMetric", e.target.value)} />
+                </div>
+              </fieldset>
+
               <button className="tsx-btn-cta tsx-brief-submit" type="submit">{DATA.contact.enquiry.label}</button>
             </form>
+
             <aside className="tsx-checklist-panel">
-              <span>Your enquiry should cover</span>
+              <span className="tsx-checklist-eyebrow">What makes a good request</span>
+              <p className="tsx-checklist-sub">Cover these points and we scope your engagement same day.</p>
               <ul>
-                {DATA.contact.checklist.map(item => <li key={item}>{item}</li>)}
+                {DATA.contact.checklist.map(item => (
+                  <li key={item}>
+                    <span className="tsx-checklist-check" aria-hidden="true">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                        <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2"/>
+                        <path d="M4.5 7l1.8 1.8 3.2-3.6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </span>
+                    {item}
+                  </li>
+                ))}
               </ul>
-              <a href={DATA.contact.enquiry.href}>{copy.accent}</a>
+              <a className="tsx-checklist-email" href={DATA.contact.enquiry.href}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+                {copy.accent}
+              </a>
             </aside>
           </div>
         )}
+      </div>
       </section>
     </main>
   );
@@ -2788,7 +3233,7 @@ function TrustConcierge({ page }) {
     <button
       className={`tsx-concierge${shown ? ' is-shown' : ''}`}
       onClick={() => routeTo('trust', 'contact')}
-      aria-label="Talk to Nexara — start a brief"
+      aria-label="Talk to Nexara — start a request"
     >
       <span className="tsx-concierge-dot" aria-hidden="true" />
       <span className="tsx-concierge-label">Talk to us</span>
@@ -2803,15 +3248,22 @@ function TrustSite({ page, detail }) {
   React.useEffect(() => setupTsxFade(), [page, detail]);
   React.useEffect(() => {
     const sel = '.tsx-sol-card,.tsx-gov-card,.tsx-proof-case-card,.tsx-pkg-card,.tsx-subpage-icon-card,.tsx-matrix-row,.tsx-channel-card,.tsx-deliver-card';
+    let lastMove = null, moveRaf = 0;
     const move = (e) => {
-      const c = e.target.closest && e.target.closest(sel);
-      if (!c) return;
-      const r = c.getBoundingClientRect();
-      c.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
-      c.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+      lastMove = e;
+      if (moveRaf) return;
+      moveRaf = requestAnimationFrame(() => {
+        moveRaf = 0;
+        const ev = lastMove;
+        const c = ev.target.closest && ev.target.closest(sel);
+        if (!c) return;
+        const r = c.getBoundingClientRect();
+        c.style.setProperty('--mx', ((ev.clientX - r.left) / r.width * 100) + '%');
+        c.style.setProperty('--my', ((ev.clientY - r.top) / r.height * 100) + '%');
+      });
     };
     window.addEventListener('mousemove', move, { passive: true });
-    return () => window.removeEventListener('mousemove', move);
+    return () => { window.removeEventListener('mousemove', move); cancelAnimationFrame(moveRaf); };
   }, []);
   const validPage = section || STATIC_PAGES.includes(page);
   return (
@@ -2820,7 +3272,7 @@ function TrustSite({ page, detail }) {
       <TrustNav page={page} detail={detail} />
       <div id="main" className={page !== 'home' ? 'tsx-main-offset' : ''}>
         {page === 'home'      && <TrustHome />}
-        {section              && <TrustSectionPage section={section} />}
+        {section              && <TrustSectionPage section={section} detail={detail} />}
         {page === 'customers' && <TrustCustomers detail={detail} />}
         {page === 'company'   && <TrustCompany />}
         {page === 'contact'   && <TrustContact detail={detail} />}

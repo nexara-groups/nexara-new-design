@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -163,18 +164,25 @@ function NeoAvatarSVG({ id = "neo-avatar", className = "" }) {
       {/* Left eye */}
       <g id={`${id}-eye-l`} className="neo-eye-l">
         <circle cx="38" cy="36" r="5.5" fill="#001616"/>
-        <circle cx="38" cy="36" r="4"   fill="#00f0ff"/>
-        <circle cx="38" cy="36" r="6.5" fill="#00f0ff" fillOpacity="0.1"/>
-        <circle cx="39.2" cy="34.8" r="1.4" fill="rgba(255,255,255,0.88)"/>
-        <circle cx="37"   cy="37.5" r="0.7" fill="rgba(255,255,255,0.4)"/>
+        <g id={`${id}-pupil-l`} className="neo-pupil">
+          <circle cx="38" cy="36" r="4"   fill="#00f0ff"/>
+          <circle cx="38" cy="36" r="6.5" fill="#00f0ff" fillOpacity="0.1"/>
+          <circle cx="39.2" cy="34.8" r="1.4" fill="rgba(255,255,255,0.88)"/>
+          <circle cx="37"   cy="37.5" r="0.7" fill="rgba(255,255,255,0.4)"/>
+        </g>
+        {/* Sass brow — hidden until expression engine raises it */}
+        <line id={`${id}-brow-l`} x1="33" y1="29" x2="43" y2="29" stroke="#ccff00" strokeWidth="1.2" strokeLinecap="round" opacity="0"/>
       </g>
       {/* Right eye */}
       <g id={`${id}-eye-r`} className="neo-eye-r">
         <circle cx="62" cy="36" r="5.5" fill="#001616"/>
-        <circle cx="62" cy="36" r="4"   fill="#00f0ff"/>
-        <circle cx="62" cy="36" r="6.5" fill="#00f0ff" fillOpacity="0.1"/>
-        <circle cx="63.2" cy="34.8" r="1.4" fill="rgba(255,255,255,0.88)"/>
-        <circle cx="61"   cy="37.5" r="0.7" fill="rgba(255,255,255,0.4)"/>
+        <g id={`${id}-pupil-r`} className="neo-pupil">
+          <circle cx="62" cy="36" r="4"   fill="#00f0ff"/>
+          <circle cx="62" cy="36" r="6.5" fill="#00f0ff" fillOpacity="0.1"/>
+          <circle cx="63.2" cy="34.8" r="1.4" fill="rgba(255,255,255,0.88)"/>
+          <circle cx="61"   cy="37.5" r="0.7" fill="rgba(255,255,255,0.4)"/>
+        </g>
+        <line id={`${id}-brow-r`} x1="57" y1="29" x2="67" y2="29" stroke="#ccff00" strokeWidth="1.2" strokeLinecap="round" opacity="0"/>
       </g>
       {/* Mouth */}
       <path id={`${id}-mouth`} d="M 37 54 Q 50 60 63 54" stroke="#ccff00" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
@@ -221,6 +229,7 @@ function NeoScrollyHero({ copy, theme }) {
   React.useEffect(() => {
     if (!HAS_SCROLL_ANIMATION) return;
 
+    let typeTimerRef = 0;
     const wrap = wrapRef.current;
     const heroEl = wrap.querySelector(".neo-scrolly-hero");
     const network = networkRef.current;
@@ -279,7 +288,7 @@ function NeoScrollyHero({ copy, theme }) {
           codeBody.removeChild(codeBody.firstChild);
         }
         currentLogIdx = (currentLogIdx + 1) % logs.length;
-        setTimeout(typeNext, 2400);
+        typeTimerRef = setTimeout(typeNext, 2400);
       };
       typeNext();
     }
@@ -334,6 +343,7 @@ function NeoScrollyHero({ copy, theme }) {
     }
 
     return () => {
+      clearTimeout(typeTimerRef);
       if (heroEl) {
         heroEl.removeEventListener("mousemove", onHeroMouseMove);
         heroEl.removeEventListener("mouseleave", onHeroMouseLeave);
@@ -519,6 +529,11 @@ function NeoGuide() {
 
     if (isDesktopFollower) {
       const clean = (text) => (text || "").replace(/\s+/g, " ").trim();
+      const shorten = (text, max = 46) => {
+        const t = clean(text);
+        return t.length > max ? `${t.slice(0, max).trim()}…` : t;
+      };
+      const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
       const textFrom = (node, selector) => clean(node?.querySelector(selector)?.textContent);
       const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
       let followerLive = false;
@@ -531,6 +546,81 @@ function NeoGuide() {
         lineCounts[bucket] = index + 1;
         return lines[index % lines.length];
       };
+      // generic brain — reads ANY meaningful element so Neo always has something
+      // real to say instead of falling back to "hover something".
+      const GENERIC_SEL = [
+        "a[href]", "button", "[role='button']", "summary", "[role='link']",
+        "h1", "h2", "h3", "h4", "h5",
+        ".eyebrow", ".pill", ".badge", ".tag", ".chip",
+        "label", "input", "textarea", "select",
+        "li", "figcaption", "blockquote", "th", "td",
+        "img", "svg", "video", "p", "strong", "em", "code"
+      ].join(",");
+      const keyOf = (s) => clean(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
+      const genericRead = (node) => {
+        const el = node?.closest?.(GENERIC_SEL);
+        if (!el) return null;
+        const tag = el.tagName.toLowerCase();
+        const raw = clean(el.getAttribute?.("aria-label") || el.textContent || el.getAttribute?.("alt") || el.getAttribute?.("placeholder"));
+        const txt = shorten(raw, 44);
+        const lc = raw.toLowerCase();
+
+        // interactive — links + buttons
+        const isCta = tag === "button" || el.matches("[role='button'],[role='link']") || (tag === "a" && el.getAttribute("href"));
+        if (isCta && raw) {
+          const looksLikeNav = /^(home|about|work|academy|marketing|labs|contact|pricing|services|blog|menu)\b/i.test(raw) || el.closest("nav");
+          const lines = looksLikeNav
+            ? [`“${txt}”? whole vibe lives back there. go touch it.`, `${lc} is one click away bestie, don't be delulu.`, `tap “${txt}”. i'll wait. impatiently. always.`, `this door leads to ${lc}. main character behavior is clicking it.`]
+            : [`“${txt}” — push the button bestie, make something happen fr.`, `this does ${lc}. lowkey the whole point. click it.`, `“${txt}” is THE move rn, no cap.`, `stop hovering, start clicking. “${txt}” said so.`, `not you sitting on “${txt}” like it bites. it doesn't. go.`];
+          return { key: `cta-${keyOf(raw)}`, label: looksLikeNav ? "nav route" : "action", line: pick(lines) };
+        }
+
+        // headings — quote the actual copy back
+        if (/^h[1-5]$/.test(tag) && raw) {
+          return { key: `head-${keyOf(raw)}`, label: "headline", line: pick([
+            `“${txt}” — ok they understood the assignment.`,
+            `they really opened with “${txt}”. respectfully, slay.`,
+            `“${txt}”. read it twice, it's giving thesis statement.`,
+            `“${txt}” living rent free now. that's the whole energy.`,
+            `not “${txt}” being the realest line on the page fr.`
+          ]) };
+        }
+
+        // labels / eyebrows / pills / badges
+        if (el.matches(".eyebrow,.pill,.badge,.tag,.chip") && raw) {
+          return { key: `tag-${keyOf(raw)}`, label: "label", line: pick([
+            `“${txt}” — tiny label, big aura.`, `the ${lc} flag just dropped. vibe check passed.`, `“${txt}”. iykyk. moving on.`, `lil ${lc} tag setting the whole mood. iconic.`
+          ]) };
+        }
+
+        // form fields
+        if (/^(input|textarea|select)$/.test(tag) || tag === "label") {
+          const name = shorten(el.getAttribute?.("name") || el.getAttribute?.("placeholder") || raw || "this field", 28).toLowerCase();
+          return { key: `field-${keyOf(name)}`, label: "field", line: pick([
+            `drop ${name} here. don't fumble the bag.`, `${name} goes in this one. easy W.`, `type ${name}, casually, like it's nothing. you got this.`, `${name}? say less. fill it and we move.`, `c'mon bestie, ${name} isn't gonna type itself.`
+          ]) };
+        }
+
+        // media
+        if (/^(img|svg|video)$/.test(tag)) {
+          return { key: `media-${keyOf(el.getAttribute?.("alt") || el.className || tag)}`, label: "visual", line: pick([
+            "this visual? it's giving art gallery fr.", "pixels ate and left no crumbs.", "lil graphic doing the MOST. respect.", "ok the visuals are not mid. we love to see it.", "this pic has aura ngl."
+          ]) };
+        }
+
+        // body copy / list items
+        if (raw && raw.length > 4) {
+          return { key: `read-${keyOf(raw)}`, label: "reading", line: pick([
+            `“${txt}” — yeah i'm reading over your shoulder, deal w it.`,
+            `this part says ${lc}. lowkey worth the read fr.`,
+            `“${txt}”. don't skim this one, it's not mid.`,
+            `caught “${txt}” — sneaky important, you're welcome.`,
+            `“${txt}”. the way this is actually kinda based.`
+          ]) };
+        }
+        return null;
+      };
+
       const classifyTarget = (node) => {
         const target = node?.closest?.([
           ".currency-btn",
@@ -564,14 +654,17 @@ function NeoGuide() {
         ].join(","));
 
         if (!target) {
+          const generic = genericRead(node);
+          if (generic) return generic;
           return {
             key: "idle",
             label: "nap mode",
             line: rotateLine("idle", [
-              "hover something.",
-              "bored ngl.",
-              "i see you lurking.",
-              "pick something. anything."
+              "hover something bestie, i'm not psychic.",
+              "bored ngl. entertain me.",
+              "i see you lurking. say hi to a button.",
+              "pick something. anything. touch grass later.",
+              "the silence is giving... nothing. move."
             ], "idle")
           };
         }
@@ -853,11 +946,14 @@ function NeoGuide() {
           ], "callout") };
         }
 
+        const generic = genericRead(node);
+        if (generic) return generic;
         return { key: "spot", label: "spotted", line: rotateLine("spot", [
-          "noted.",
-          "seen it.",
-          "tracking this.",
-          "logged."
+          "noted. unbothered. moving on.",
+          "seen it. it's giving... fine i guess.",
+          "tracking this, lowkey.",
+          "logged it bestie. you're welcome.",
+          "mid, but i respect the hover."
         ], "spot") };
       };
 
@@ -874,25 +970,130 @@ function NeoGuide() {
           { scale: 2.7, autoAlpha: 0, rotate: 24, duration: 0.42, ease: "power3.out" }
         );
       };
+      /* ── Expression engine — gives Neo his face energy ──────────── */
+      const A = "#neo-guide-avatar";
+      const faceSvg = guide.querySelector(A);
+      const pupL = guide.querySelector(`${A}-pupil-l`);
+      const pupR = guide.querySelector(`${A}-pupil-r`);
+      const eyeL = guide.querySelector(`${A}-eye-l`);
+      const eyeR = guide.querySelector(`${A}-eye-r`);
+      const browL= guide.querySelector(`${A}-brow-l`);
+      const browR= guide.querySelector(`${A}-brow-r`);
+      const mouth= guide.querySelector(`${A}-mouth`);
+      const led  = guide.querySelector('.neo-led-inner');
+      const hasFace = !!(pupL && pupR && eyeL && eyeR && mouth);
+      let blinkT, idleT;
+      if (hasFace) {
+        gsap.set(eyeL, { transformOrigin: "38px 36px" });
+        gsap.set(eyeR, { transformOrigin: "62px 36px" });
+      }
+      const MOUTH = {
+        smirk: "M 37 56 Q 50 57 64 50",   // lopsided "sure, whatever"
+        smile: "M 37 54 Q 50 60 63 54",
+        grin:  "M 36 53 Q 50 64 64 53",
+        flat:  "M 39 55 L 61 55",          // unimpressed
+        oh:    "M 44 53 Q 50 62 56 53",
+      };
+      const setMouth = (d, dur = 0.28) =>
+        hasFace && gsap.to(mouth, { attr: { d }, duration: dur, ease: "power2.out", overwrite: "auto" });
+      const look = (nx, ny) => {
+        if (!hasFace) return;
+        gsap.to([pupL, pupR], { x: nx * 2.6, y: ny * 2.4, duration: 0.32, ease: "power2.out", overwrite: "auto" });
+      };
+      const blink = (which = "both") => {
+        if (!hasFace) return;
+        const eyes = which === "r" ? [eyeR] : which === "l" ? [eyeL] : [eyeL, eyeR];
+        gsap.timeline()
+          .to(eyes, { scaleY: 0.08, duration: 0.06, ease: "power2.in" })
+          .to(eyes, { scaleY: 1,    duration: 0.13, ease: "power2.out" });
+      };
+      const ledFlash = () => led && gsap.fromTo(led,
+        { scale: 1 }, { scale: 2.1, duration: 0.16, yoyo: true, repeat: 1, transformOrigin: "50px 0px", ease: "power2.out" });
+      const brows = (up) => hasFace && gsap.to([browL, browR],
+        { opacity: up ? 0.9 : 0, y: up ? -1.5 : 0, duration: 0.2, overwrite: "auto" });
+      const eyeRoll = () => {
+        if (!hasFace) return;
+        gsap.timeline({ onComplete: () => look(0, 0) })
+          .to([pupL, pupR], { y: -2.6, x: 0, duration: 0.16, ease: "power1.in" })
+          .to([pupL, pupR], { x: 2.6,  duration: 0.15 })
+          .to([pupL, pupR], { y: 2,    x: 0, duration: 0.15 });
+      };
+      const moodFor = (key) => {
+        if (key === "idle") return "bored";
+        if (/^(currency|roi)/.test(key)) return "money";
+        if (/(intake|callout|sections|cta|btn|unbox|head|tag|media)/.test(key)) return "hype";
+        return "smirk";
+      };
+      const express = (mood) => {
+        if (!hasFace) return;
+        if (mood === "bored") { setMouth(MOUTH.flat); if (Math.random() < 0.45) eyeRoll(); brows(false); }
+        else if (mood === "money") { setMouth(MOUTH.grin); brows(true); ledFlash(); }
+        else if (mood === "hype")  { setMouth(MOUTH.grin); blink("r"); ledFlash(); brows(true); }
+        else { setMouth(MOUTH.smirk); brows(true); if (Math.random() < 0.3) blink("r"); }
+      };
+      // random idle blinks = "alive"
+      const scheduleBlink = () => {
+        blinkT = setTimeout(() => { if (followerLive) blink(); scheduleBlink(); }, 2400 + Math.random() * 3600);
+      };
+      // idle chatter — he keeps yapping even when you stop moving
+      const idleChatter = [
+        "bored ngl. do something.", "you good bestie? hover a thing.", "i see you lurking. it's giving shy.",
+        "we doing this or nah?", "tap something, i don't bite. promise.",
+        "pick a vibe. any vibe. i'm begging.", "still here. still iconic. unlike this silence.",
+        "scroll, click, something — anything fr.", "this silence is SO loud rn.",
+        "not you ghosting me on my own site.", "delulu to think i'll move first. your turn.",
+      ];
+      let idleIdx = 0;
+      const scheduleIdleSass = () => {
+        idleT = setTimeout(() => {
+          if (followerLive && lastKey === "idle") {
+            idleIdx++;
+            setInfo({ label: "nap mode", line: idleChatter[idleIdx % idleChatter.length] });
+            gsap.fromTo([bubble, tag], { autoAlpha: 0.5, y: 4 }, { autoAlpha: 1, y: 0, duration: 0.22, overwrite: "auto" });
+            if (Math.random() < 0.5) eyeRoll(); else blink();
+          }
+          scheduleIdleSass();
+        }, 3400 + Math.random() * 2600);
+      };
+      if (hasFace) { scheduleBlink(); scheduleIdleSass(); setMouth(MOUTH.smirk, 0); }
+      else { scheduleIdleSass(); }
+
       const onMove = (event) => {
         if (!followerLive) return;
         const offsetRight = event.clientX > window.innerWidth - 180;
         const x = clamp(event.clientX + (offsetRight ? -340 : 24), 12, window.innerWidth - 340);
         const y = clamp(event.clientY + 18, 84, window.innerHeight - 108);
-        gsap.to(charWrap, { x, y, duration: 0.3, ease: "power3.out", overwrite: "auto" });
-        gsap.to(spotlight, { autoAlpha: 1, top: y + 38, duration: 0.24, overwrite: "auto" });
+        gsap.to(charWrap, { x, y, duration: 0.2, ease: "power3.out", overwrite: "auto" });
+        gsap.to(spotlight, { autoAlpha: 1, top: y + 38, duration: 0.18, overwrite: "auto" });
+
+        // pupils watch the actual cursor → side-eye sass (never let face code break the voice)
+        try {
+          if (hasFace && faceSvg) {
+            const r = faceSvg.getBoundingClientRect();
+            look(clamp((event.clientX - (r.left + r.width / 2)) / 130, -1, 1),
+                 clamp((event.clientY - (r.top + r.height * 0.34)) / 130, -1, 1));
+          }
+        } catch (_) {}
 
         const info = classifyTarget(document.elementFromPoint(event.clientX, event.clientY));
         if (info.key !== lastKey) {
           lastKey = info.key;
           activeInfo = info;
           setInfo(info);
+          try { express(moodFor(info.key)); } catch (_) {}
           boomAt(event.clientX, event.clientY);
           gsap.fromTo([bubble, tag], { autoAlpha: 0.55, y: 4 }, { autoAlpha: 1, y: 0, duration: 0.18, overwrite: "auto" });
         }
       };
       const onLeave = () => {
-        setInfo({ label: "nap mode", line: "hover something." });
+        setInfo({ label: "nap mode", line: "left already? rude. i'll be here." });
+        setMouth(MOUTH.flat); brows(false); look(0, 0);
+      };
+      // click = smug little wink + antenna flash
+      const onClick = () => {
+        if (!followerLive || !hasFace) return;
+        blink("r"); ledFlash(); setMouth(MOUTH.grin);
+        gsap.delayedCall(0.5, () => setMouth(lastKey === "idle" ? MOUTH.flat : MOUTH.smirk));
       };
       const showFollower = () => {
         followerLive = true;
@@ -924,14 +1125,18 @@ function NeoGuide() {
       gsap.set([bubble, tag], { autoAlpha: 1, x: 0, y: 0 });
       gsap.set(beacon, { width: 0 });
       gsap.set(spotlight, { autoAlpha: 0, top: 188 });
-      setInfo({ label: "nap mode", line: "hover something. i'll yap usefully." });
+      setInfo({ label: "nap mode", line: "ayo. hover stuff, i'll actually be useful. promise." });
       window.addEventListener("mousemove", onMove, { passive: true });
       window.addEventListener("mouseleave", onLeave);
+      window.addEventListener("click", onClick);
 
       return () => {
         window.removeEventListener("mousemove", onMove);
         window.removeEventListener("mouseleave", onLeave);
-        gsap.killTweensOf([charWrap, bubble, tag, spotlight, burst]);
+        window.removeEventListener("click", onClick);
+        clearTimeout(blinkT);
+        clearTimeout(idleT);
+        gsap.killTweensOf([charWrap, bubble, tag, spotlight, burst, pupL, pupR, eyeL, eyeR, mouth]);
         triggers.forEach(t => t.kill());
         guide.classList.remove("is-cursor-guide", "is-scroll-guide");
       };
@@ -1468,12 +1673,13 @@ function NeoHeroUnravel({ copy, theme }) {
         });
       });
 
-      rafId = requestAnimationFrame(renderLoop);
+      rafId = heroVisible ? requestAnimationFrame(renderLoop) : 0;
     }
 
     let heroVisible = true;
     const io = new IntersectionObserver(([e]) => {
       heroVisible = e.isIntersecting;
+      if (heroVisible && !rafId) rafId = requestAnimationFrame(renderLoop);
     }, { threshold: 0 });
     io.observe(wrapRef.current);
 
@@ -2031,15 +2237,25 @@ function Site({ theme, page, detail }) {
 }
 
 function Nav({ theme, page, detail }) {
+  const [hoveredPage, setHoveredPage] = useState(null);
   return (
     <header className="nav">
       <button className="logo" onClick={() => { window.location.hash = ""; }}>Nexara</button>
-      <nav>
-        {DATA.nav.map((item) => (
-          <button key={item.page} className={page === item.page ? "active" : ""} onClick={() => routeTo(theme, item.page)}>
-            {item.label}
-          </button>
-        ))}
+      <nav onMouseLeave={() => setHoveredPage(null)}>
+        {DATA.nav.map((item) => {
+          const active = page === item.page;
+          const lit = hoveredPage ? hoveredPage === item.page : active;
+          return (
+            <button
+              key={item.page}
+              className={`${active ? 'active' : ''}${!active && hoveredPage === item.page ? ' hover-lit' : ''}`}
+              onClick={() => routeTo(theme, item.page)}
+              onMouseEnter={() => setHoveredPage(item.page)}
+            >
+              {item.label}
+            </button>
+          );
+        })}
       </nav>
       <div className="theme-pill">
         <button className={theme === "neo" ? "active" : ""} onClick={() => routeTo("neo", page, detail)}>Neo</button>
@@ -4000,7 +4216,7 @@ function MarketingSignalSection() {
           const y = baseY + v;
           if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = r === 1 ? 'rgba(255,61,245,0.5)' : 'rgba(233,238,242,0.12)';
+        ctx.strokeStyle = r === 1 ? 'rgba(0,229,160,0.5)' : 'rgba(233,238,242,0.12)';
         ctx.lineWidth = r === 1 ? 1.5 : 1;
         ctx.stroke();
       }
@@ -4074,7 +4290,7 @@ function MarketingFunnelSection() {
         ctx.moveTo(cx - w0, y0); ctx.lineTo(cx - w1, y1);
         ctx.moveTo(cx + w0, y0); ctx.lineTo(cx + w1, y1);
         ctx.stroke();
-        ctx.fillStyle = 'rgba(255,61,245,' + 0.85 * st + ')';
+        ctx.fillStyle = 'rgba(0,229,160,' + 0.85 * st + ')';
         ctx.font = "500 10px 'JetBrains Mono', monospace";
         ctx.textAlign = 'left';
         ctx.fillText(names[s], cx + w0 + 14, y0 + 14);
@@ -4092,7 +4308,7 @@ function MarketingFunnelSection() {
           if (p.keep > keepRates[s]) return;
           const wHere = fw * (widths[s] - (widths[s] - (widths[s + 1] ?? widths[s] * 0.8)) * ((prog * stages) % 1)) * 0.5;
           const px = cx + (p.x - 0.5) * 2 * wHere * 0.9;
-          ctx.fillStyle = p.keep < keepRates[stages - 1] ? '#ff3df5' : 'rgba(233,238,242,0.45)';
+          ctx.fillStyle = p.keep < keepRates[stages - 1] ? '#00e5a0' : 'rgba(233,238,242,0.45)';
           ctx.fillRect(px - 1.5, y - 1.5, 3, 3);
         });
       }
@@ -4397,6 +4613,7 @@ function BeforeAfterSlider({ theme }) {
 
 function InteractiveTimeline({ theme, section }) {
   const [activeStep, setActiveStep] = useState(0);
+  const sectionRef = useRef(null);
   const steps = section.process;
   const isNeo = theme === "neo";
 
@@ -4442,11 +4659,18 @@ function InteractiveTimeline({ theme, section }) {
   }, [section.id, isNeo]);
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setActiveStep((prev) => (prev + 1) % steps.length);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, [activeStep, steps.length]);
+    const el = sectionRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const progress = Math.max(0, Math.min(1, (vh - rect.top) / (rect.height + vh * 0.4)));
+      setActiveStep(Math.min(steps.length - 1, Math.floor(progress * steps.length)));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [steps.length]);
 
   const handleStepClick = (idx) => {
     setActiveStep(idx);
@@ -4455,7 +4679,7 @@ function InteractiveTimeline({ theme, section }) {
   const percentage = (activeStep / (steps.length - 1)) * 100;
 
   return (
-    <section className="interactive-timeline-band">
+    <section className="interactive-timeline-band" ref={sectionRef}>
       <div className="section-head" style={{ marginBottom: "32px" }}>
         <div>
           <p className="eyebrow">{isNeo ? "How it works" : "Delivery model"}</p>
@@ -4514,7 +4738,7 @@ function RoiEstimator({ theme }) {
   const [visitors, setVisitors] = useState(15000);
   const [val, setVal] = useState(150);
   const [conversion, setConversion] = useState(2.4);
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("INR");
 
   const rate = 83;
   const isINR = currency === "INR";

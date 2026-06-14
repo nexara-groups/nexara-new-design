@@ -1,187 +1,165 @@
-import React from 'react';
-import { DATA } from './data.js';
-import { routeTo } from './shared.js';
-const { useState } = React;
+import React from "react";
+import {
+  motion, AnimatePresence, useMotionValue, useSpring, useReducedMotion,
+} from "framer-motion";
+import { DATA } from "./data.js";
+import { routeTo } from "./shared.js";
+import "./gateway-cinematic.css";
 
-export function Gateway() {
-  const [hover, setHover] = useState(null);
-  const [leaving, setLeaving] = useState(null);
-  const [mobileIntent, setMobileIntent] = useState(null);
-  const rootRef = React.useRef(null);
-  const mobileSplitRef = React.useRef(50);
-  const tiltPermissionRef = React.useRef(false);
-  const dragMovedRef = React.useRef(false);
-  const neo = DATA.gateway.neo;
-  const trust = DATA.gateway.trust;
-  const sections = DATA.nav.filter(item => item.page !== "contact");
-  React.useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (window.matchMedia("(pointer: coarse)").matches) return;
-    let raf = 0;
-    const onMove = (e) => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(() => {
-        raf = 0;
-        const mx = (e.clientX / window.innerWidth) * 2 - 1;
-        const my = (e.clientY / window.innerHeight) * 2 - 1;
-        el.style.setProperty("--mx", mx.toFixed(3));
-        el.style.setProperty("--my", my.toFixed(3));
-      });
-    };
-    el.addEventListener("mousemove", onMove);
-    return () => {
-      el.removeEventListener("mousemove", onMove);
-      if (raf) window.cancelAnimationFrame(raf);
-    };
-  }, []);
-  React.useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-    const coarse = window.matchMedia("(pointer: coarse)");
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (!coarse.matches || reduce.matches) return;
+const { useState, useEffect, useRef } = React;
+const EASE = [0.16, 1, 0.3, 1];
+const NeoScene = React.lazy(() => import("./gateway-3d.jsx").then((m) => ({ default: m.NeoScene })));
+const TrustScene = React.lazy(() => import("./gateway-3d.jsx").then((m) => ({ default: m.TrustScene })));
 
-    let dragging = false;
-    let startY = 0;
-    let raf = 0;
-    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-    const setSplit = (split, source) => {
-      const next = clamp(split, 34, 66);
-      mobileSplitRef.current = next;
-      el.style.setProperty("--gate-split", next.toFixed(2) + "%");
-      const intent = next > 53 ? "neo" : next < 47 ? "trust" : null;
-      setMobileIntent(intent);
-      if (source) el.dataset.mobileInput = source;
-    };
-    const updateFromY = (clientY) => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(() => {
-        raf = 0;
-        const y = clamp(clientY / Math.max(window.innerHeight, 1), 0, 1);
-        setSplit(66 - y * 32, "touch");
-      });
-    };
-    const requestTilt = () => {
-      if (tiltPermissionRef.current) return;
-      tiltPermissionRef.current = true;
-      if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
-        DeviceOrientationEvent.requestPermission().catch(() => {});
-      }
-    };
-    const onPointerDown = (event) => {
-      dragging = true;
-      startY = event.clientY;
-      dragMovedRef.current = false;
-      requestTilt();
-      el.setPointerCapture?.(event.pointerId);
-      updateFromY(event.clientY);
-    };
-    const onPointerMove = (event) => {
-      if (!dragging) return;
-      if (Math.abs(event.clientY - startY) > 10) dragMovedRef.current = true;
-      updateFromY(event.clientY);
-    };
-    const onPointerUp = (event) => {
-      dragging = false;
-      el.releasePointerCapture?.(event.pointerId);
-    };
-    const onOrientation = (event) => {
-      if (dragging || event.gamma == null) return;
-      const tilt = clamp(event.gamma, -18, 18) / 18;
-      setSplit(50 + tilt * 10, "tilt");
-    };
-
-    setSplit(50);
-    el.addEventListener("pointerdown", onPointerDown);
-    el.addEventListener("pointermove", onPointerMove);
-    el.addEventListener("pointerup", onPointerUp);
-    el.addEventListener("pointercancel", onPointerUp);
-    window.addEventListener("deviceorientation", onOrientation, { passive: true });
-    return () => {
-      el.removeEventListener("pointerdown", onPointerDown);
-      el.removeEventListener("pointermove", onPointerMove);
-      el.removeEventListener("pointerup", onPointerUp);
-      el.removeEventListener("pointercancel", onPointerUp);
-      window.removeEventListener("deviceorientation", onOrientation);
-      if (raf) window.cancelAnimationFrame(raf);
-      delete el.dataset.mobileInput;
-    };
-  }, []);
-  const enter = (theme) => {
-    if (leaving) return;
-    if (dragMovedRef.current) { dragMovedRef.current = false; return; }
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) { routeTo(theme); return; }
-    setLeaving(theme);
-    window.setTimeout(() => routeTo(theme), 640);
-  };
-  const cls = "gateway" +
-    (hover && !leaving ? " is-" + hover : "") +
-    (mobileIntent && !leaving ? " mobile-" + mobileIntent : "") +
-    (leaving ? " is-leaving leave-" + leaving : "");
+function MagneticCTA({ children, onClick, className }) {
+  const ref = useRef(null);
+  const x = useMotionValue(0), y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 220, damping: 16 });
+  const sy = useSpring(y, { stiffness: 220, damping: 16 });
+  const reduce = useReducedMotion();
+  function move(e) {
+    if (reduce || !ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    x.set((e.clientX - (r.left + r.width / 2)) * 0.3);
+    y.set((e.clientY - (r.top + r.height / 2)) * 0.45);
+  }
+  function leave() { x.set(0); y.set(0); }
   return (
-    <main className={cls} ref={rootRef}>
-      <section
-        className="gate-panel gate-neo"
-        onMouseEnter={() => setHover("neo")}
-        onMouseLeave={() => setHover(null)}
-        onClick={() => enter("neo")}
-      >
-        <div className="gate-aurora" aria-hidden="true">
-          <span className="aurora-blob b1"></span>
-          <span className="aurora-blob b2"></span>
-          <span className="aurora-blob b3"></span>
-        </div>
-        <div className="gate-motion-grid"></div>
-        <div className="grain-layer" aria-hidden="true"></div>
-        <div className="gate-content">
-          <p className="gate-kicker">{neo.kicker}</p>
-          <h1>{neo.title}</h1>
-          <p>{neo.body}</p>
-          <ul className="gate-preview" aria-hidden="true">
-            {sections.map(item => <li key={item.page}>&gt; {item.label}</li>)}
-          </ul>
-          <div className="gate-mini-stats">
-            {neo.chips.map(chip => <span key={chip}>{chip}</span>)}
-          </div>
-          <button onClick={(e) => { e.stopPropagation(); enter("neo"); }}>
-            {neo.cta}
-          </button>
-        </div>
-      </section>
-      <section
-        className="gate-panel gate-trust"
-        onMouseEnter={() => setHover("trust")}
-        onMouseLeave={() => setHover(null)}
-        onClick={() => enter("trust")}
-      >
-        <div className="gate-aurora" aria-hidden="true">
-          <span className="aurora-blob b1"></span>
-          <span className="aurora-blob b2"></span>
-          <span className="aurora-blob b3"></span>
-        </div>
-        <div className="grain-layer" aria-hidden="true"></div>
-        <div className="gate-content">
-          <p className="gate-kicker">{trust.kicker}</p>
-          <h1>{trust.title}</h1>
-          <p>{trust.body}</p>
-          <ul className="gate-preview" aria-hidden="true">
-            {sections.map(item => <li key={item.page}>{item.trustLabel}</li>)}
-          </ul>
-          <div className="gate-mini-stats">
-            {trust.chips.map(chip => <span key={chip}>{chip}</span>)}
-          </div>
-          <button onClick={(e) => { e.stopPropagation(); enter("trust"); }}>
-            {trust.cta}
-          </button>
-        </div>
-      </section>
-      <div className="gate-brand">
-        <strong>NEXARA</strong>
-        <span>one company / two presentations</span>
-      </div>
-    </main>
+    <motion.button ref={ref} className={className} onClick={onClick}
+      onMouseMove={move} onMouseLeave={leave} style={{ x: sx, y: sy }}
+      whileTap={{ scale: 0.95 }}>
+      <span>{children}</span>
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+        strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </motion.button>
   );
 }
+
+function Side({ side, copy, phase, onEnter }) {
+  const left = side === "neo";
+  const container = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.08, delayChildren: 0.12 } },
+  };
+  const item = {
+    hidden: { y: 26, opacity: 0 },
+    show: { y: 0, opacity: 1, transition: { duration: 0.7, ease: EASE } },
+  };
+  return (
+    <AnimatePresence>
+      {phase === "live" && (
+        <motion.div
+          className={"gw2-content " + (left ? "gw2-content-left" : "gw2-content-right")}
+          variants={container} initial="hidden" animate="show">
+          <motion.p className={"gw2-kicker " + (left ? "gw2-kicker-neo" : "gw2-kicker-trust")} variants={item}>{copy.kicker}</motion.p>
+          <motion.h2 className={"gw2-title " + (left ? "gw2-title-neo" : "gw2-title-trust")} variants={item}>{copy.title}</motion.h2>
+          <motion.p className={"gw2-body " + (left ? "" : "gw2-body-trust")} variants={item}>{copy.body}</motion.p>
+          <motion.div className="gw2-chips" variants={item}>
+            {copy.chips.map((c) => (
+              <span key={c} className={"gw2-chip " + (left ? "gw2-chip-neo" : "gw2-chip-trust")}>{c}</span>
+            ))}
+          </motion.div>
+          <motion.div variants={item}>
+            <MagneticCTA className={"gw2-cta " + (left ? "gw2-cta-neo" : "gw2-cta-trust")} onClick={onEnter}>{copy.cta}</MagneticCTA>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function Gateway() {
+  const reduce = useReducedMotion();
+  const g = DATA.gateway;
+  const rootRef = useRef(null);
+  const [phase, setPhase] = useState(reduce ? "live" : "intro");
+  const [exitTo, setExitTo] = useState(null);
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(max-width: 820px)").matches
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 820px)");
+    const onChange = (e) => setIsMobile(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  // mobile gets a clean stacked layout — skip the mouse-seam + heavy 3D scenes
+  const showScenes = !reduce && !isMobile;
+
+  const mx = useMotionValue(0.5);
+  const seam = useSpring(mx, { stiffness: 90, damping: 22, mass: 0.5 });
+
+  useEffect(() => {
+    const apply = (v) => {
+      const el = rootRef.current; if (!el) return;
+      el.style.setProperty("--seam", (50 + (0.5 - v) * 16) + "%");
+    };
+    apply(0.5);
+    const unsub = seam.on("change", apply);
+    return unsub;
+  }, [seam]);
+
+  useEffect(() => {
+    if (reduce) return;
+    const t = setTimeout(() => setPhase("live"), 500);
+    return () => clearTimeout(t);
+  }, [reduce]);
+
+  function onMove(e) { if (!reduce) mx.set(e.clientX / window.innerWidth); }
+  function onLeave() { mx.set(0.5); }
+  function enter(world) { setExitTo(world); setTimeout(() => routeTo(world), 700); }
+
+  return (
+    <div className="gw2" ref={rootRef} onMouseMove={onMove} onMouseLeave={onLeave} style={{ "--seam": "50%" }}>
+      <div className="gw2-panel gw2-neo">
+        <div className="gw2-neo-fx" aria-hidden="true">
+          <div className="gw2-grid" />
+          {showScenes && (
+            <React.Suspense fallback={null}><div className="gw2-stage"><NeoScene /></div></React.Suspense>
+          )}
+        </div>
+      </div>
+      <div className="gw2-panel gw2-trust">
+        <div className="gw2-trust-fx" aria-hidden="true"><div className="gw2-lines" />
+          {showScenes && (<React.Suspense fallback={null}><div className="gw2-stage"><TrustScene /></div></React.Suspense>)}
+        </div>
+      </div>
+
+      <Side side="neo" copy={g.neo} phase={phase} onEnter={() => enter("neo")} />
+      <Side side="trust" copy={g.trust} phase={phase} onEnter={() => enter("trust")} />
+
+      <div className="gw2-brand">
+        <motion.h1 className="gw2-wordmark"
+          initial={{ opacity: 0, letterSpacing: "0.55em", filter: "blur(7px)" }}
+          animate={{ opacity: 1, letterSpacing: "0.16em", filter: "blur(0px)" }}
+          transition={{ duration: 1.15, ease: EASE }}>NEXARA</motion.h1>
+        <motion.p className="gw2-sub"
+          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55, duration: 0.8, ease: EASE }}>One company · Two worlds</motion.p>
+      </div>
+
+      {phase === "live" && (
+        <motion.p className="gw2-hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 0.8 }}>{isMobile ? "Tap a world to enter" : "Move across to feel both · click to enter"}</motion.p>
+      )}
+
+      <AnimatePresence>
+        {phase === "intro" && !reduce && (
+          <motion.div className="gw2-veil" exit={{ opacity: 0 }} transition={{ duration: 0.7, ease: EASE }} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {exitTo && (
+          <motion.div className={"gw2-wipe gw2-wipe-" + exitTo}
+            initial={{ clipPath: "circle(0% at 50% 55%)" }}
+            animate={{ clipPath: "circle(150% at 50% 55%)" }}
+            transition={{ duration: 0.7, ease: EASE }} />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export { Gateway };

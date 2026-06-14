@@ -112,6 +112,85 @@
 .neo .neo-hud-bl{bottom:14px;left:14px;border-width:0 0 1.5px 1.5px}
 .neo .neo-hud-brr{bottom:14px;right:14px;border-width:0 1.5px 1.5px 0}
 
+/* Neo nav sizing pass */
+.neo .nav {
+  height: 74px;
+  gap: clamp(20px, 3vw, 42px);
+  padding-inline: clamp(22px, 5vw, 70px);
+  background: rgba(0, 0, 0, .78);
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+
+.neo .logo {
+  font-size: 18px;
+  letter-spacing: .08em;
+  min-width: max-content;
+}
+
+.neo .logo::before {
+  width: 12px;
+  height: 12px;
+  margin-right: 12px;
+  box-shadow: 0 0 18px rgba(204, 255, 0, .42);
+}
+
+.neo .nav nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.55vw, 24px);
+  min-width: 0;
+}
+
+.neo .nav nav button {
+  padding: 11px 0 9px;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: .105em;
+  white-space: nowrap;
+}
+
+.neo .nav nav button.active {
+  border-bottom-width: 2px;
+  text-shadow: 0 0 18px rgba(204, 255, 0, .24);
+}
+
+.neo .nav nav button.hover-lit {
+  color: rgba(255, 255, 255, .72);
+  border-bottom: 1px solid rgba(204, 255, 0, .38);
+  text-shadow: 0 0 14px rgba(204, 255, 0, .14);
+  transition: color .14s ease, border-color .14s ease, text-shadow .14s ease;
+}
+
+.neo .theme-pill {
+  margin-left: auto;
+  border-radius: 999px;
+  border-color: rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .055);
+  padding: 3px;
+}
+
+.neo .theme-pill button {
+  border-radius: 999px;
+  padding: 7px 13px;
+  letter-spacing: .08em;
+}
+
+@media (max-width: 760px) {
+  .neo .nav {
+    height: auto;
+    min-height: 68px;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .neo .nav nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+}
+
 @keyframes neo-spin-clockwise {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -351,7 +430,7 @@
 
 .neo{
   --unbox-academy:#ccff00;
-  --unbox-marketing:#ff3df5;
+  --unbox-marketing:#00e5a0;
   --unbox-labs:#00f0ff;
   --unbox-briefs:#ffffff;
   --unbox-cities:#f97316;
@@ -1106,14 +1185,18 @@
   .neo-hero-rail { display: none; }
   .neo-hero-counter { left: 20px; bottom: 22px; font-size: 0.62rem; }
   .neo-hero-counter .neo-counter-bar { width: 72px; }
-  .neo-hero-chapter .ch-name { font-size: clamp(2.1rem, 11vw, 3rem); }
-  .neo-hero-chapter .h-display { font-size: clamp(1.9rem, 9.5vw, 2.7rem); }
+  .neo-hero-chapter .ch-name { font-size: clamp(1.7rem, 8vw, 2.5rem); overflow-wrap: break-word; }
+  .neo-hero-chapter .ch-name .serif { overflow-wrap: break-word; }
+  .neo-hero-chapter .h-display { font-size: clamp(1.7rem, 8vw, 2.5rem); overflow-wrap: break-word; }
   .neo-hero-chapter .ch-link, .neo-hero-chapter .btn { min-height: 44px; }
   .neo-rail-wrap { height: auto; }
   .neo-rail-stage { position: relative; height: auto; padding: 40px 0; }
   .neo-rail-track { flex-direction: column; width: 100%; padding: 20px; }
   .neo-rail-panel { width: 100%; min-height: auto; margin-bottom: 20px; }
   .neo-standards-grid { grid-template-columns: 1fr; }
+  .neo-final-cta { padding: clamp(60px, 12vh, 110px) 20px; }
+  .neo-final-cta .neo-final-cta { padding: 0; }
+  .neo-final-cta a { font-size: clamp(1.9rem, 11vw, 4rem); max-width: 100%; overflow-wrap: break-word; }
 }
 
 /* ── Academy ported sections ── */
@@ -1158,7 +1241,7 @@
 /* ── Ported scroll scenes: Labs blueprint build + Marketing signal/funnel ── */
 .nx-mono{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;display:inline-block}
 .nx-mono-labs{color:#00f0ff}
-.nx-mono-mkt{color:#ff3df5}
+.nx-mono-mkt{color:#00e5a0}
 
 .nx-labs-build{min-height:100vh;display:grid;place-items:center;padding:clamp(60px,8vw,100px) var(--pad);background:#050809;overflow:hidden}
 .nx-labs-split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,100px);align-items:center;width:min(1100px,100%)}
@@ -1171,11 +1254,11 @@
 .nx-labs-visual{border:1px solid rgba(0,240,255,.18);background:rgba(8,10,12,.82);aspect-ratio:4/3.4;position:relative;overflow:hidden}
 .nx-labs-visual svg{position:absolute;inset:0;width:100%;height:100%}
 
-.nx-mkt-signal{position:relative;min-height:62vh;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(80px,10vw,140px) var(--pad) clamp(48px,6vw,80px);background:#050809;border-block:1px solid rgba(255,61,245,.14);overflow:hidden}
+.nx-mkt-signal{position:relative;min-height:62vh;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(80px,10vw,140px) var(--pad) clamp(48px,6vw,80px);background:#050809;border-block:1px solid rgba(20,184,166,.18);overflow:hidden}
 .nx-mkt-wave{position:absolute;inset:0;width:100%;height:100%;opacity:.8}
 .nx-mkt-signal-copy{position:relative;z-index:2;max-width:1100px;margin:0 auto;width:100%}
 .nx-mkt-signal-copy h2{font-family:"Syne",sans-serif;font-weight:600;font-size:clamp(36px,6.5vw,92px);line-height:.98;letter-spacing:-.02em;margin:14px 0 0;color:#fff}
-.nx-mkt-signal-copy h2 em{font-style:normal;color:#ff3df5}
+.nx-mkt-signal-copy h2 em{font-style:normal;color:#14B8A6}
 .nx-mkt-sub{margin:24px 0 0;max-width:540px;color:rgba(233,238,242,.62);font-size:clamp(15px,1.6vw,18px);line-height:1.6}
 
 .nx-funnel-pin{position:relative;background:#050809}
