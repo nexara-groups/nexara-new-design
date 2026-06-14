@@ -1476,42 +1476,68 @@ const ACADEMY_PKG_ICONS = [
   <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M3 4h14v3H3zM3 10h14v3H3zM3 16h8v3H3z"/></svg>,
 ];
 
-function AcademyDisplayCard({ pkg, index, className }) {
+const CARD_POSITIONS = [
+  { left: 0,   top: 44 },
+  { left: 124, top: 0  },
+  { left: 248, top: 44 },
+];
+const CARD_Z_BASE = [10, 30, 20];
+
+function AcademyDisplayCard({ pkg, index, isActive, onEnter }) {
   const icon = ACADEMY_PKG_ICONS[index] || ACADEMY_PKG_ICONS[0];
   const featured = index === 1;
-  const iconColors = ['text-blue-400', 'text-indigo-400', 'text-slate-400'];
-  const titleColors = ['text-blue-400', 'text-indigo-400', 'text-slate-400'];
+  const pos = CARD_POSITIONS[index] || CARD_POSITIONS[0];
 
   return (
     <div
-      style={{ gridArea: 'stack' }}
+      onMouseEnter={onEnter}
+      style={{
+        position: 'absolute',
+        left: pos.left,
+        top: isActive ? pos.top - 14 : pos.top,
+        width: 260,
+        zIndex: isActive ? 40 : CARD_Z_BASE[index],
+        opacity: isActive ? 1 : 0.68,
+        filter: isActive ? 'none' : 'grayscale(35%) brightness(0.98)',
+        boxShadow: isActive
+          ? (featured
+              ? '0 16px 44px rgba(26,109,255,0.18), 0 2px 8px rgba(0,0,0,0.07)'
+              : '0 10px 32px rgba(0,0,0,0.13)')
+          : '0 1px 4px rgba(0,0,0,0.06)',
+        transition: 'top 0.32s cubic-bezier(.22,1,.36,1), opacity 0.22s ease, filter 0.22s ease, box-shadow 0.22s ease',
+        cursor: 'default',
+      }}
       className={[
-        'relative flex w-80 select-none flex-col justify-between rounded-2xl border-2 bg-white/80 backdrop-blur-sm px-5 py-4 transition-all duration-700',
-        'after:absolute after:-right-1 after:top-[-5%] after:h-[110%] after:w-72 after:bg-gradient-to-l after:from-slate-50 after:to-transparent',
-        featured ? 'border-[#1A6DFF]/40 hover:border-[#1A6DFF] shadow-lg shadow-blue-100' : 'border-slate-200 hover:border-slate-300',
-        '-skew-y-2',
-        className,
-      ].join(' ')}>
-      <div className="flex items-center gap-2 [&>*]:flex [&>*]:items-center [&>*]:gap-2">
-        <div>
-          <span className={`relative inline-flex rounded-full p-1.5 ${featured ? 'bg-blue-100' : 'bg-slate-100'}`}>
-            <span className={iconColors[index] || 'text-slate-400'}>{icon}</span>
-          </span>
-          <p className={`text-base font-semibold ${titleColors[index] || 'text-slate-600'}`}>{pkg.name}</p>
-        </div>
+        'flex select-none flex-col rounded-2xl border-2 bg-white px-5 py-4',
+        isActive
+          ? (featured ? 'border-[#1A6DFF]' : 'border-slate-300')
+          : (featured ? 'border-[#1A6DFF]/40' : 'border-slate-200'),
+      ].join(' ')}
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <span className={`inline-flex rounded-full p-1.5 ${featured ? 'bg-blue-100' : 'bg-slate-100'}`}>
+          <span className={featured ? 'text-blue-500' : 'text-slate-400'}>{icon}</span>
+        </span>
+        <p className={`text-sm font-semibold leading-tight ${featured ? 'text-blue-600' : 'text-slate-700'}`}>{pkg.name}</p>
       </div>
-      <p className="text-sm font-medium text-slate-700 mt-3 whitespace-nowrap">{pkg.fit}</p>
-      <div className="mt-2 text-xs text-slate-400">{pkg.duration}</div>
-      <ul className="mt-3 space-y-1">
+      <p className="text-xs font-medium text-slate-500 mb-1">{pkg.fit}</p>
+      <div className="text-xs text-slate-400 mb-3">{pkg.duration}</div>
+      <ul className="space-y-1.5 flex-1">
         {pkg.includes.map(item => (
-          <li key={item} className="text-xs text-slate-500 flex items-center gap-1.5">
-            <svg viewBox="0 0 16 16" className="w-3 h-3 text-[#1A6DFF] shrink-0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8.5l3 3 7-7"/></svg>
+          <li key={item} className="text-xs text-slate-500 flex items-start gap-1.5">
+            <svg viewBox="0 0 16 16" className="w-3 h-3 text-[#1A6DFF] shrink-0 mt-px" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 8.5l3 3 7-7"/>
+            </svg>
             {item}
           </li>
         ))}
       </ul>
       <button
-        className={`mt-4 w-full py-2 rounded-lg text-xs font-semibold transition-colors ${featured ? 'bg-[#1A6DFF] text-white hover:bg-[#1559d8]' : 'border border-slate-200 text-slate-600 hover:border-[#1A6DFF] hover:text-[#1A6DFF]'}`}
+        className={`mt-4 w-full py-2 rounded-lg text-xs font-semibold transition-colors ${
+          featured
+            ? 'bg-[#1A6DFF] text-white hover:bg-[#1559d8]'
+            : 'border border-slate-200 text-slate-600 hover:border-[#1A6DFF] hover:text-[#1A6DFF]'
+        }`}
         onClick={() => routeTo('trust', 'contact')}
       >
         {featured ? 'Start here →' : 'Get in touch'}
@@ -1521,20 +1547,28 @@ function AcademyDisplayCard({ pkg, index, className }) {
 }
 
 function AcademyDisplayCards({ packages }) {
-  const stackClasses = [
-    'hover:-translate-y-8 before:absolute before:inset-0 before:rounded-2xl before:bg-white/60 before:transition-opacity before:duration-500 hover:before:opacity-0 grayscale-[60%] hover:grayscale-0',
-    'translate-x-14 translate-y-8 hover:-translate-y-2 before:absolute before:inset-0 before:rounded-2xl before:bg-white/30 before:transition-opacity before:duration-500 hover:before:opacity-0 grayscale-[30%] hover:grayscale-0 z-10',
-    'translate-x-28 translate-y-16 hover:translate-y-6 z-20',
-  ];
+  const [active, setActive] = React.useState(1);
 
   return (
-    <div className="flex flex-col items-center gap-8">
-      <div className="grid place-items-center w-full" style={{ minHeight: '260px', gridTemplateAreas: "'stack'" }}>
-        {packages.slice(0, 3).map((pkg, i) => (
-          <AcademyDisplayCard key={pkg.name} pkg={pkg} index={i} className={stackClasses[i] || ''} />
-        ))}
+    <div className="flex flex-col gap-8">
+      <div style={{ overflowX: 'auto', overflowY: 'visible', paddingBottom: 20 }}>
+        <div
+          className="relative"
+          style={{ width: 508, height: 318, minWidth: 508 }}
+          onMouseLeave={() => setActive(1)}
+        >
+          {packages.slice(0, 3).map((pkg, i) => (
+            <AcademyDisplayCard
+              key={pkg.name}
+              pkg={pkg}
+              index={i}
+              isActive={active === i}
+              onEnter={() => setActive(i)}
+            />
+          ))}
+        </div>
       </div>
-      <p className="text-xs text-slate-400 text-center">Hover each card to explore. All programmes are scoped with a named owner.</p>
+      <p className="text-xs text-slate-400">Hover each card to preview. All programmes carry a named engagement owner.</p>
     </div>
   );
 }
@@ -1752,7 +1786,7 @@ function TrustSectionStory({ section, phase }) {
           <TrustDeliverableCards rows={section.stackDetails} />
         </TrustChapter>
 
-        {section.id !== 'academy' && (
+        {section.proof?.length > 0 && (
           <TrustChapter
             eyebrow="Delivery proof"
             title="Proof it holds"
