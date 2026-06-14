@@ -3,8 +3,25 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MapPin, Users, Package, Handshake, Zap, Link as LinkIcon, ArrowRight, GraduationCap, TrendingUp, Cpu, Shield, Mail } from 'lucide-react';
 import { DATA } from './data.js';
-import { voice, parseRoute, routeTo, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION } from './shared.js';
+import { voice, parseRoute, routeTo, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from './shared.js';
 import { NotFound } from './notfound.jsx';
+
+function CyclingWord({ words }) {
+  const [idx, setIdx] = React.useState(0);
+  const [animKey, setAnimKey] = React.useState(0);
+  React.useEffect(() => {
+    const id = setTimeout(() => {
+      setIdx(i => (i + 1) % words.length);
+      setAnimKey(k => k + 1);
+    }, 2200);
+    return () => clearTimeout(id);
+  }, [animKey, words.length]);
+  return (
+    <span className="ahero-wrap">
+      <span key={animKey} className="ahero-word">{words[idx]}</span>
+    </span>
+  );
+}
 
 const TRUST_NAV_ICONS = {
   academy:   <GraduationCap size={13} strokeWidth={2} />,
@@ -2158,7 +2175,9 @@ function TrustSectionHeroUnravel({ theme, section }) {
           <p className="tsx-section-eyebrow">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {getTrustSectionLabel(section).toUpperCase()}</p>
           <h1 className="tsx-section-heading" style={{ color: '#F4F8FF', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 700 }}>
             {copy.title}<br />
-            <span className="serif" style={{ color: '#5B9DFF' }}>{copy.accent}</span>
+            <span className="serif" style={{ color: '#5B9DFF' }}>
+              <CyclingWord words={SECTION_HERO_WORDS.trust[section.id] || [copy.accent]} />
+            </span>
           </h1>
           <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'rgba(220,232,248,.66)', marginInline: 'auto' }}>{copy.body}</p>
           <div className="tsx-sec-actions" style={{ marginTop: '24px', display: 'flex', gap: '16px', justifyContent: 'center' }}>

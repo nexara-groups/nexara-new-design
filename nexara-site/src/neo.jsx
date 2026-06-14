@@ -1,12 +1,40 @@
 import React from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
 import { NotFound } from './notfound.jsx';
 if (typeof window !== 'undefined') Object.assign(window, { THREE, gsap, ScrollTrigger });
 import { DATA } from './data.js';
-import { voice, parseRoute, routeTo, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION } from './shared.js';
+import { voice, parseRoute, routeTo, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from './shared.js';
 const { useState, useMemo, useEffect, useRef, useCallback, useLayoutEffect, useReducer } = React;
+
+function CyclingWord({ words }) {
+  const [idx, setIdx] = useState(0);
+  const [animKey, setAnimKey] = useState(0);
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setIdx(i => (i + 1) % words.length);
+      setAnimKey(k => k + 1);
+    }, 2200);
+    return () => clearTimeout(id);
+  }, [animKey, words.length]);
+  return (
+    <span className="ahero-wrap">
+      <span key={animKey} className="ahero-word">{words[idx]}</span>
+    </span>
+  );
+}
+
+const CARD_MOTION = {
+  hidden: { opacity: 0, y: 28, scale: 0.98 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] }
+  }
+};
 /* ==========================================================================
    ADVANCED HYBRID PARALLAX & COSMETIC MODULES - BACKPORT FROM DUO-THEME
    ========================================================================== */
@@ -2366,7 +2394,7 @@ function AcademyHero({ theme, section }) {
           <p className="eyebrow">{copy.eyebrow}</p>
           <h1>
             {copy.title}{" "}
-            <em>{copy.accent}</em>
+            <em><CyclingWord words={SECTION_HERO_WORDS.neo.academy} /></em>
           </h1>
           <p className="hero-body">{copy.body}</p>
           <div className="hero-actions">
@@ -2526,7 +2554,10 @@ function NeoSectionHero({ theme, section, variant, children }) {
       </div>
       <div className="hero-copy">
         <p className="eyebrow">{copy.eyebrow}</p>
-        <h1>{copy.title} <em>{copy.accent}</em></h1>
+        <h1>
+          {copy.title}{' '}
+          <em><CyclingWord words={(SECTION_HERO_WORDS.neo[section.id]) || [copy.accent]} /></em>
+        </h1>
         <p className="hero-body">{copy.body}</p>
         <div className="hero-actions">
           <button onClick={() => routeTo(theme, section.id, section.subpages[0].slug)}>{copy.primary}</button>
@@ -2853,6 +2884,7 @@ function NexaraUnbox({ theme }) {
 function SuperSkills({ theme }) {
   const calloutBody = DATA.home[theme].calloutBody;
   const [featured, ...supporting] = DATA.superSkills;
+  const reduceMotion = useReducedMotion();
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -2874,9 +2906,14 @@ function SuperSkills({ theme }) {
         </div>
 
         <div className="super-playbook">
-          <article 
+          <motion.article 
             className="super-play-feature spotlight-card" 
             onMouseMove={handleMouseMove}
+            variants={CARD_MOTION}
+            initial={reduceMotion ? false : "hidden"}
+            whileInView="show"
+            viewport={{ once: true, amount: 0.28 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.985 }}
           >
             <div className="spotlight-glow" />
             <div className="card-content-wrapper">
@@ -2902,7 +2939,7 @@ function SuperSkills({ theme }) {
                 </svg>
               </button>
             </div>
-          </article>
+          </motion.article>
 
           <aside className="play-sequence" aria-label="How Nexara combines sections">
             <span>{theme === "neo" ? "Combo logic" : "Delivery sequence"}</span>
@@ -2934,10 +2971,15 @@ function SuperSkills({ theme }) {
 
           <div className="super-play-list">
             {supporting.map((item) => (
-              <article 
+              <motion.article 
                 className="super-skill-card spotlight-card" 
                 key={item.title}
                 onMouseMove={handleMouseMove}
+                variants={CARD_MOTION}
+                initial={reduceMotion ? false : "hidden"}
+                whileInView="show"
+                viewport={{ once: true, amount: 0.32 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.985 }}
               >
                 <div className="spotlight-glow" />
                 <div className="card-content-wrapper">
@@ -2950,7 +2992,7 @@ function SuperSkills({ theme }) {
                     {item.stack.map((chip) => <span key={chip}>{chip}</span>)}
                   </div>
                 </div>
-              </article>
+              </motion.article>
             ))}
           </div>
         </div>
@@ -3178,6 +3220,7 @@ function CardVisual({ title, theme }) {
 }
 
 function ModuleCard({ theme, eyebrow, title, children, visualTitle = null, className = "module-card", onClick = null }) {
+  const reduceMotion = useReducedMotion();
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -3189,11 +3232,16 @@ function ModuleCard({ theme, eyebrow, title, children, visualTitle = null, class
   const isClickable = onClick !== null;
 
   return (
-    <article 
+    <motion.article 
       className={`${className} spotlight-card ${isClickable ? 'clickable-card' : ''}`} 
       onMouseMove={handleMouseMove}
       onClick={onClick}
       style={isClickable ? { cursor: "pointer" } : undefined}
+      variants={CARD_MOTION}
+      initial={reduceMotion ? false : "hidden"}
+      whileInView="show"
+      viewport={{ once: true, amount: 0.24 }}
+      whileTap={reduceMotion || !isClickable ? undefined : { scale: 0.985 }}
     >
       <div className="spotlight-glow" />
       <div className="card-content-wrapper">
@@ -3207,7 +3255,7 @@ function ModuleCard({ theme, eyebrow, title, children, visualTitle = null, class
           </div>
         )}
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -3396,6 +3444,8 @@ function ModuleModal({ theme, module, eyebrow, onClose }) {
 }
 
 function SectionCards({ theme, sections }) {
+  const reduceMotion = useReducedMotion();
+
   if (theme === "trust") {
     return (
       <section className="section-grid-wrap">
@@ -3458,13 +3508,23 @@ function SectionCards({ theme, sections }) {
       </div>
       <div className="section-cards">
         {sections.map((section) => (
-          <article className="section-card" key={section.id} id={`neo-guide-${section.id}`} onClick={() => routeTo(theme, section.id)}>
+          <motion.article
+            className="section-card"
+            key={section.id}
+            id={`neo-guide-${section.id}`}
+            onClick={() => routeTo(theme, section.id)}
+            variants={CARD_MOTION}
+            initial={reduceMotion ? false : "hidden"}
+            whileInView="show"
+            viewport={{ once: true, amount: 0.28 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.985 }}
+          >
             <span>{section.index}</span>
             <h3>{section.name}</h3>
             <p>{voice(theme, section.short)}</p>
             <div>{section.stack.slice(0, 4).map((x) => <small key={x}>{x}</small>)}</div>
             <button onClick={() => routeTo(theme, section.id)}>Enter {section.name}</button>
-          </article>
+          </motion.article>
         ))}
       </div>
     </section>
@@ -4745,6 +4805,8 @@ function AudienceFit({ theme, section }) {
 }
 
 function StackDetails({ theme, section }) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section className="content-band stack-detail">
       <div className="section-head">
@@ -4755,14 +4817,22 @@ function StackDetails({ theme, section }) {
       </div>
       <div className="stack-detail-grid">
         {section.stackDetails.map((item, i) => (
-          <article className="stack-detail-card" key={item.title}>
+          <motion.article
+            className="stack-detail-card"
+            key={item.title}
+            variants={CARD_MOTION}
+            initial={reduceMotion ? false : "hidden"}
+            whileInView="show"
+            viewport={{ once: true, amount: 0.28 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.985 }}
+          >
             <div className="stack-card-head">
               <span className="stack-outcome">{item.outcome}</span>
               <span className="stack-index">{String(i + 1).padStart(2, "0")}</span>
             </div>
             <h3>{item.title}</h3>
             <ul>{item.deliverables.map((d) => <li key={d}>{d}</li>)}</ul>
-          </article>
+          </motion.article>
         ))}
       </div>
     </section>

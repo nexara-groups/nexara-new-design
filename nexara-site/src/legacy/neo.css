@@ -692,6 +692,157 @@
   .neo .neo-pipe{margin-inline:auto}
 }
 
+/* ── Card scale/layout fix: larger plates, deliberate stacking ───── */
+.neo .section-grid-wrap,
+.neo .super-skills,
+.neo .modules-band,
+.neo .content-band,
+.neo .process-band {
+  padding-block: clamp(76px, 9vw, 128px);
+}
+
+.neo .section-head {
+  margin-bottom: clamp(28px, 4vw, 48px);
+}
+
+.neo .section-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 2.2vw, 32px);
+  align-items: stretch;
+}
+
+.neo .section-card {
+  min-height: clamp(340px, 32vw, 430px);
+  padding: clamp(30px, 3.3vw, 46px);
+  display: flex;
+  flex-direction: column;
+}
+
+.neo .section-card p {
+  margin-top: 18px;
+  flex: 1;
+}
+
+.neo .section-card button {
+  align-self: flex-start;
+  margin-top: 28px;
+}
+
+.neo .module-grid,
+.neo .module-grid.compact {
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
+  gap: clamp(22px, 2.4vw, 34px);
+}
+
+.neo .module-card {
+  min-height: clamp(360px, 34vw, 470px);
+  padding: clamp(30px, 3vw, 44px);
+}
+
+.neo .module-card h3 {
+  max-width: 12ch;
+}
+
+.neo .stack-detail-grid,
+.neo .package-grid,
+.neo .proof-cards {
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  gap: clamp(22px, 2.4vw, 34px);
+  align-items: stretch;
+}
+
+.neo .stack-detail-card,
+.neo .package-card,
+.neo .proof-cards article {
+  min-height: clamp(330px, 28vw, 430px);
+  padding: clamp(30px, 3vw, 44px);
+}
+
+.neo .stack-detail-card h3,
+.neo .package-card h3 {
+  max-width: 12ch;
+}
+
+.neo .super-skills-shell {
+  gap: clamp(34px, 5vw, 62px);
+}
+
+.neo .super-playbook {
+  grid-template-columns: minmax(420px, 1.05fr) minmax(360px, .95fr);
+  grid-template-areas:
+    "feature sequence"
+    "feature list";
+  gap: clamp(20px, 2.2vw, 30px);
+}
+
+.neo .super-play-feature {
+  grid-area: feature;
+  min-height: clamp(620px, 58vw, 760px);
+  padding: clamp(34px, 4vw, 58px);
+}
+
+.neo .play-sequence {
+  grid-area: sequence;
+  min-height: 260px;
+  padding: clamp(26px, 2.7vw, 36px);
+}
+
+.neo .super-play-list {
+  grid-area: list;
+  grid-template-columns: 1fr;
+  gap: clamp(18px, 1.8vw, 24px);
+}
+
+.neo .super-skill-card {
+  min-height: clamp(230px, 22vw, 300px);
+  padding: clamp(26px, 2.6vw, 36px);
+}
+
+.neo .card-content-wrapper {
+  min-height: 100%;
+}
+
+@media (max-width: 1180px) {
+  .neo .super-playbook {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "feature"
+      "sequence"
+      "list";
+  }
+
+  .neo .super-play-feature {
+    min-height: 540px;
+  }
+
+  .neo .super-play-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .neo .section-cards,
+  .neo .module-grid,
+  .neo .module-grid.compact,
+  .neo .stack-detail-grid,
+  .neo .package-grid,
+  .neo .proof-cards,
+  .neo .super-play-list {
+    grid-template-columns: 1fr;
+  }
+
+  .neo .section-card,
+  .neo .module-card,
+  .neo .stack-detail-card,
+  .neo .package-card,
+  .neo .proof-cards article,
+  .neo .super-play-feature,
+  .neo .super-skill-card {
+    min-height: auto;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    NEO STACK CARDS — spec-block redesign ("What you get")
    ═══════════════════════════════════════════════════════════════════ */

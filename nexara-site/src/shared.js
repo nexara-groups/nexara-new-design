@@ -1,8 +1,25 @@
 import React from 'react';
 import { DATA } from './data.js';
-const { useMemo, useState } = React;
+const { useMemo, useState, useEffect } = React;
 const STATIC_PAGES = ["home", "customers", "company", "contact"];
 const HAS_SCROLL_ANIMATION = true;
+
+/* ─── Animated hero cycling words (per section × theme) ─────────── */
+const SECTION_HERO_WORDS = {
+  trust: {
+    academy:   ['on record', 'by design', 'end-to-end', 'to plan'],
+    marketing: ['that converts', 'with proof', 'on-brand', 'to launch'],
+    labs:      ['to spec', 'in production', 'on time', 'with receipts'],
+    customers: ['on time', 'as scoped', 'with proof', 'as documented'],
+    contact:   ['with governance', 'named and scoped', 'cleanly', 'on the record'],
+  },
+  neo: {
+    academy:   ['different', 'proof-ready', 'placed', 'fast'],
+    marketing: ['loud', 'viral', 'live', 'sticky'],
+    labs:      ['shipped', 'smart', 'real', 'in prod'],
+    customers: ['proven', 'real', 'public', 'receipted'],
+  },
+};
 
 
 function voice(theme, value) {
@@ -131,4 +148,4 @@ function useBriefForm(detail, options = {}) {
 }
 
 
-export { DATA, voice, parseRoute, routeTo, useBriefForm, getBriefSections, buildBriefText, buildBriefMailto, STATIC_PAGES, HAS_SCROLL_ANIMATION };
+export { DATA, voice, parseRoute, routeTo, useBriefForm, getBriefSections, buildBriefText, buildBriefMailto, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS };
