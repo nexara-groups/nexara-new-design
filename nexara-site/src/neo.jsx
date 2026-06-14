@@ -2556,7 +2556,7 @@ function NeoSectionHero({ theme, section, variant, children }) {
         <p className="eyebrow">{copy.eyebrow}</p>
         <h1>
           {copy.title}{' '}
-          <em><CyclingWord words={(SECTION_HERO_WORDS.neo[section.id]) || [copy.accent]} /></em>
+          <em><CyclingWord words={(SECTION_HERO_WORDS[theme]?.[section.id]) || [copy.accent]} /></em>
         </h1>
         <p className="hero-body">{copy.body}</p>
         <div className="hero-actions">
@@ -3714,7 +3714,7 @@ function NeoSectionHeroUnravel({ theme, section }) {
             {section.id === "academy" ? (
               <>We don't hire engineers.<br />We <em style={{ fontStyle: 'normal', color: '#7c5cff' }}>compile</em> them.</>
             ) : (
-              <>{copy.title}<br /><span className="serif" style={{ color: section.id === "labs" ? '#ff5c8a' : '#00e5a0' }}>{copy.accent}</span></>
+              <>{copy.title}<br /><span className="serif" style={{ color: section.id === "labs" ? '#ff5c8a' : '#00e5a0' }}><CyclingWord words={SECTION_HERO_WORDS.neo[section.id] || [copy.accent]} /></span></>
             )}
           </h1>
           <p className="lede" style={{ marginTop: '14px', maxWidth: '34em', color: 'var(--muted)' }}>{copy.body}</p>
