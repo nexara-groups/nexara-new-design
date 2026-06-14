@@ -1776,6 +1776,8 @@ function TrustSectionStory({ section, phase }) {
     );
   }
 
+  if (section.id === 'academy') return <AcademyDepthStory section={section} />;
+
   return (
     <div className="tsx-overview tsx-story">
       <div className="tsx-section-inner">
@@ -1806,11 +1808,97 @@ function TrustSectionStory({ section, phase }) {
           eyebrow="Engagement packages"
           title="Ways to engage"
           sub="Scoped entry points, matched to where you are.">
-          {section.id === 'academy'
-            ? <AcademyDisplayCards packages={section.packages} />
-            : <TrustPackageCards packages={section.packages} />}
+          <TrustPackageCards packages={section.packages} />
         </TrustChapter>
 
+        <TrustChapter
+          eyebrow="Common questions"
+          title="Before you commit"
+          sub="The questions teams ask most, answered up front.">
+          <TrustFaqAccordion faqs={section.faqs} />
+        </TrustChapter>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Academy depth story: light → dark rail → light ────────────── */
+function AcademyPackageGrid({ packages }) {
+  return (
+    <div className="tsx-engage-grid">
+      {packages.map((pkg, i) => {
+        const featured = i === 1;
+        return (
+          <div key={pkg.name} className={`tsx-engage-card${featured ? ' featured' : ''}`}>
+            <div className="tsx-engage-card-header">
+              {featured && <span className="tsx-engage-badge">Most common</span>}
+              <div className="tsx-engage-card-title-row">
+                <p className="tsx-engage-name">{pkg.name}</p>
+                <span className="tsx-engage-fit">{pkg.fit}</span>
+              </div>
+            </div>
+            <div className="tsx-engage-meta">
+              <span className="tsx-engage-price">{pkg.price}</span>
+              <span className="tsx-engage-dur">{pkg.duration}</span>
+            </div>
+            <ul className="tsx-engage-list">
+              {pkg.includes.map(item => (
+                <li key={item}>
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 8.5l3 3 7-7"/>
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <div className="tsx-engage-foot">
+              <button
+                className={featured ? 'tsx-engage-cta-primary' : 'tsx-engage-cta-ghost'}
+                onClick={() => routeTo('trust', 'contact')}
+              >
+                {featured ? 'Start here →' : 'Get in touch'}
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function AcademyDepthStory({ section }) {
+  return (
+    <div className="tsx-overview tsx-story">
+      <div className="tsx-section-inner">
+        <TrustChapter
+          eyebrow="What we deliver"
+          title="What you get"
+          sub="The concrete artifacts you walk away with.">
+          <TrustDeliverableCards rows={section.stackDetails} />
+        </TrustChapter>
+
+        {section.proof?.length > 0 && (
+          <TrustChapter
+            eyebrow="Delivery proof"
+            title="Proof it holds"
+            sub="Evidence from work already shipped - not promises.">
+            <TrustProofCards items={section.proof} />
+          </TrustChapter>
+        )}
+      </div>
+
+      <div className="tsx-darkrail">
+        <div className="tsx-section-inner">
+          <header className="tsx-chapter-head">
+            <span className="tsx-chapter-eyebrow tsx-darkrail-eyebrow">Engagement packages</span>
+            <h2 className="tsx-chapter-title tsx-darkrail-title">Ways to engage</h2>
+            <p className="tsx-chapter-sub tsx-darkrail-sub">Scoped entry points, matched to where you are.</p>
+          </header>
+          <AcademyPackageGrid packages={section.packages} />
+        </div>
+      </div>
+
+      <div className="tsx-section-inner tsx-story-tail">
         <TrustChapter
           eyebrow="Common questions"
           title="Before you commit"

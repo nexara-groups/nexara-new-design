@@ -2932,6 +2932,123 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   }
 }
 
+/* ── Academy dark rail + engagement package grid ────────────────── */
+.trust .tsx-darkrail {
+  background: #0B1721;
+  padding-block: clamp(56px, 7vw, 88px);
+}
+.trust .tsx-story-tail {
+  padding-block: clamp(48px, 6vw, 72px);
+}
+.trust .tsx-darkrail .tsx-chapter-head { max-width: 58ch; margin-bottom: clamp(28px, 3.5vw, 44px); }
+.trust .tsx-darkrail-eyebrow {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(255,255,255,.38);
+  margin-bottom: 12px;
+}
+.trust .tsx-darkrail-title {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 500; letter-spacing: -0.02em;
+  color: #F1F5F9;
+  line-height: 1.1; margin: 0 0 12px;
+}
+.trust .tsx-darkrail-sub {
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
+  color: rgba(255,255,255,.45);
+  line-height: 1.55; margin: 0;
+}
+
+.trust .tsx-engage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+.trust .tsx-engage-card {
+  display: flex; flex-direction: column;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.trust .tsx-engage-card:hover { border-color: rgba(255,255,255,.2); }
+.trust .tsx-engage-card.featured {
+  background: rgba(26,109,255,.1);
+  border-color: rgba(26,109,255,.38);
+}
+.trust .tsx-engage-card.featured:hover { border-color: rgba(26,109,255,.65); }
+
+.trust .tsx-engage-card-header { padding: 24px 24px 0; }
+.trust .tsx-engage-badge {
+  display: inline-block;
+  font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: #1A6DFF;
+  background: rgba(26,109,255,.18);
+  border: 1px solid rgba(26,109,255,.32);
+  border-radius: 99px; padding: 3px 10px;
+  margin-bottom: 14px;
+}
+.trust .tsx-engage-card-title-row {
+  display: flex; flex-direction: column; gap: 5px;
+  margin-bottom: 20px;
+}
+.trust .tsx-engage-name {
+  font-size: 16px; font-weight: 600; color: #F1F5F9; margin: 0; line-height: 1.2;
+}
+.trust .tsx-engage-fit {
+  font-size: 12px; color: rgba(255,255,255,.42); font-weight: 400;
+}
+
+.trust .tsx-engage-meta {
+  padding: 14px 24px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex; flex-direction: column; gap: 5px;
+  margin: 0 24px 20px;
+  padding-inline: 0;
+}
+.trust .tsx-engage-price { font-size: 12px; color: rgba(255,255,255,.5); }
+.trust .tsx-engage-dur   { font-size: 11.5px; color: rgba(255,255,255,.32); }
+
+.trust .tsx-engage-list {
+  list-style: none; margin: 0; padding: 0 24px;
+  flex: 1; display: flex; flex-direction: column; gap: 10px;
+}
+.trust .tsx-engage-list li {
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: 13px; color: rgba(255,255,255,.6); line-height: 1.45;
+}
+.trust .tsx-engage-list li svg {
+  width: 13px; height: 13px; flex-shrink: 0; margin-top: 2px; color: #3b82f6;
+}
+
+.trust .tsx-engage-foot { padding: 24px; margin-top: 4px; }
+.trust .tsx-engage-cta-primary {
+  display: block; width: 100%;
+  padding: 10px 16px;
+  background: #1A6DFF; color: #fff;
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  border: none; border-radius: 8px; cursor: pointer;
+  transition: background .15s;
+}
+.trust .tsx-engage-cta-primary:hover { background: #1559d8; }
+.trust .tsx-engage-cta-ghost {
+  display: block; width: 100%;
+  padding: 10px 16px;
+  background: transparent; color: rgba(255,255,255,.65);
+  font-size: 13px; font-weight: 500; font-family: inherit;
+  border: 1px solid rgba(255,255,255,.18); border-radius: 8px; cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.trust .tsx-engage-cta-ghost:hover { border-color: rgba(255,255,255,.4); color: #fff; }
+
+@media (max-width: 860px) {
+  .trust .tsx-engage-grid { grid-template-columns: 1fr; }
+}
+
 /* ── Subpage Icon Cards — shadcn Card grid ──────────────────────── */
 .trust.tsx-site .tsx-subpage-callout {
   margin-bottom: 28px;
