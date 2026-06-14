@@ -2886,7 +2886,7 @@ function TrustSectionPage({ section, detail }) {
   }
 
   return (
-    <main className="tsx-section-page" style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' }}>
+    <main className={`tsx-section-page tsx-section-page--${section.id}`} style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' }}>
       {/* Hook */}
       {HAS_SCROLL_ANIMATION ? (
         <TrustSectionHeroUnravel theme="trust" section={section} />

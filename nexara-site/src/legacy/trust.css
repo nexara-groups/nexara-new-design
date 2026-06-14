@@ -6850,6 +6850,25 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   margin-top: -64px;
 }
 
+.trust.tsx-site .tsx-section-page--academy {
+  background: linear-gradient(180deg, #F4F6F8 0%, #EEF2F6 100%) !important;
+}
+
+.trust.tsx-site .tsx-section-page--marketing {
+  background: linear-gradient(180deg, #F4F6F8 0%, #EEF2F6 100%) !important;
+}
+
+.trust.tsx-site .tsx-section-page--labs {
+  background: linear-gradient(180deg, #F4F6F8 0%, #EEF2F6 100%) !important;
+}
+
+.trust.tsx-site .tsx-section-page--academy .tsx-story-tail,
+.trust.tsx-site .tsx-section-page--academy .tsx-subpage-band,
+.trust.tsx-site .tsx-section-page--marketing .tsx-subpage-band,
+.trust.tsx-site .tsx-section-page--labs .tsx-subpage-band {
+  background: linear-gradient(180deg, #F4F6F8 0%, #EEF2F6 100%) !important;
+}
+
 .trust.tsx-site .tsx-nav-inner {
   /* Frosted glass: white tint + brightness boost keeps the pill light enough
      for dark text over the dark hero, while staying translucent. Tint raised
