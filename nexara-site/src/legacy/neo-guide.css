@@ -1,0 +1,628 @@
+/* ═══════════════════════════════════════════════════════════════════
+   NEO SCROLLYTELLING GUIDE SYSTEM
+   Brutalist-digital: SVG character + CSS 3D + GSAP ScrollTrigger
+   Performance-first: will-change, compositor-safe transforms only
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Scroll narrative wrapper (300vh gives scroll room for the story) */
+.neo-scrolly-hero-wrap {
+  position: relative;
+  height: 300vh;
+}
+
+/* ── Hero scene ────────────────────────────────────────────────── */
+.neo-scrolly-hero {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+  padding: clamp(72px, 9vw, 128px) clamp(20px, 4vw, 56px);
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 72% 28%, rgba(0,240,255,0.1) 0%, transparent 52%),
+    radial-gradient(ellipse at 28% 76%, rgba(204,255,0,0.07) 0%, transparent 46%),
+    #000;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.neo-scrolly-copy {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── 3D Stage ──────────────────────────────────────────────────── */
+.neo-3d-stage {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Hero character ────────────────────────────────────────────── */
+.neo-char-hero {
+  position: relative;
+  z-index: 4;
+  width: clamp(140px, 15vw, 190px);
+  will-change: transform;
+  /* No CSS animation — GSAP scrub owns this element's transform */
+  filter:
+    drop-shadow(0 0 28px rgba(204,255,0,0.5))
+    drop-shadow(0 0 60px rgba(0,240,255,0.18));
+}
+
+.neo-hero-face-follow {
+  position: relative;
+  will-change: transform;
+}
+
+.neo-hero-guide-intro {
+  position: absolute;
+  left: 50%;
+  top: -66px;
+  width: min(238px, 38vw);
+  padding: 10px 12px;
+  background: rgba(0,0,0,0.9);
+  border: 1px solid rgba(204,255,0,0.42);
+  color: #ccff00;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  line-height: 1.45;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  box-shadow: 0 0 28px rgba(204,255,0,0.12), inset 0 0 18px rgba(0,240,255,0.07);
+  animation: neoIntroPulse 2.8s ease-in-out infinite alternate;
+}
+
+.neo-hero-guide-intro span {
+  display: block;
+  color: rgba(0,240,255,0.9);
+  margin-bottom: 3px;
+}
+
+.neo-hero-guide-intro strong {
+  display: block;
+  color: #ccff00;
+  font-weight: 700;
+}
+
+@keyframes neoIntroPulse {
+  from { transform: translateX(-50%) translateY(0); opacity: 0.82; }
+  to { transform: translateX(-50%) translateY(-5px); opacity: 1; }
+}
+
+@keyframes neoHeroFloat {
+  0%, 100% { transform: translateY(0)   rotate(-0.7deg); }
+  38%       { transform: translateY(-16px) rotate(0.6deg); }
+  72%       { transform: translateY(-9px)  rotate(0.9deg); }
+}
+
+/* ── SVG avatar animations ─────────────────────────────────────── */
+.neo-sig-ring-1 { animation: neoRingPulse 3.8s ease-in-out infinite; }
+.neo-sig-ring-2 { animation: neoRingPulse 4.6s ease-in-out infinite 1.2s; }
+.neo-sig-ring-3 { animation: neoRingPulse 5.4s ease-in-out infinite 2.4s; }
+
+@keyframes neoRingPulse {
+  0%, 100% { opacity: 0.1; }
+  50%       { opacity: 0.4; }
+}
+
+.neo-eye-l { animation: neoEyeBlink 5.2s ease-in-out infinite 0.05s; transform-origin: 38px 36px; }
+.neo-eye-r { animation: neoEyeBlink 5.2s ease-in-out infinite 0.18s; transform-origin: 62px 36px; }
+
+@keyframes neoEyeBlink {
+  0%, 86%, 100% { transform: scaleY(1); }
+  91%           { transform: scaleY(0.07); }
+}
+
+.neo-led-inner { animation: neoLedPulse 1.15s ease-in-out infinite alternate; }
+.neo-led-outer { animation: neoLedPulse 1.15s ease-in-out infinite alternate 0.4s; }
+
+@keyframes neoLedPulse {
+  from { opacity: 0.3; }
+  to   { opacity: 1;   }
+}
+
+.neo-core-glow { animation: neoCoreBreath 3.2s ease-in-out infinite alternate; }
+
+@keyframes neoCoreBreath {
+  from { opacity: 0.25; }
+  to   { opacity: 0.65; }
+}
+
+/* ── Server rack ───────────────────────────────────────────────── */
+.neo-server-rack-wrap {
+  position: absolute;
+  right: 2%;
+  top: 10%;
+  will-change: transform;
+  animation: neoServerDrift 7.8s ease-in-out infinite;
+  transform: perspective(420px) rotateY(-22deg) rotateX(8deg);
+}
+
+.neo-server-rack-hitbox {
+  position: relative;
+  will-change: transform;
+}
+
+@keyframes neoServerDrift {
+  0%, 100% { transform: perspective(420px) rotateY(-22deg) rotateX(8deg)  translateY(0);    }
+  50%       { transform: perspective(420px) rotateY(-17deg) rotateX(11deg) translateY(-10px); }
+}
+
+.neo-rack-glow {
+  position: absolute;
+  inset: -32px;
+  background: radial-gradient(ellipse, rgba(204,255,0,0.08), transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.neo-rack-front {
+  position: relative;
+  z-index: 2;
+  width: 124px;
+  height: 196px;
+  background: linear-gradient(180deg, #0d0d0d 0%, #080808 100%);
+  border: 1px solid rgba(204,255,0,0.32);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 7px;
+  box-shadow: inset 0 0 24px rgba(0,0,0,0.6);
+}
+
+.neo-rack-side {
+  position: absolute;
+  top: 6px;
+  left: 123px;
+  width: 20px;
+  height: 196px;
+  background: linear-gradient(90deg, #0a0a0a, #060606);
+  border: 1px solid rgba(204,255,0,0.14);
+  border-left: none;
+  transform: skewY(-30deg);
+  transform-origin: top left;
+  z-index: 1;
+}
+
+.neo-rack-top {
+  position: absolute;
+  top: -12px;
+  left: -1px;
+  width: 144px;
+  height: 12px;
+  background: linear-gradient(180deg, #161616, #0e0e0e);
+  border: 1px solid rgba(204,255,0,0.18);
+  border-bottom: none;
+  transform: skewX(-62deg);
+  transform-origin: bottom left;
+  z-index: 3;
+}
+
+.neo-server-unit {
+  flex: 1;
+  background: #111113;
+  border: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 7px;
+  position: relative;
+  overflow: hidden;
+}
+
+.neo-server-unit::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: #ccff00;
+  opacity: 0.55;
+}
+
+.neo-server-unit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(204,255,0,0.04), transparent 55%);
+}
+
+.neo-server-leds { display: flex; gap: 3px; position: relative; z-index: 1; }
+
+.neo-server-led {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+}
+
+.neo-led-g { background: #ccff00; box-shadow: 0 0 5px #ccff00; animation: neoLedBlink 2.2s ease-in-out infinite; }
+.neo-led-c { background: #00f0ff; box-shadow: 0 0 5px #00f0ff; animation: neoLedBlink 1.8s ease-in-out infinite 0.55s; }
+.neo-led-m { background: #ccff00; box-shadow: 0 0 5px #ccff00; animation: neoLedBlink 2.7s ease-in-out infinite 1.1s; }
+
+@keyframes neoLedBlink {
+  0%, 100% { opacity: 1; }
+  48%       { opacity: 0.15; box-shadow: none; }
+}
+
+.neo-server-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  color: rgba(204,255,0,0.55);
+  letter-spacing: 0.12em;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Wireframe octahedron ──────────────────────────────────────── */
+.neo-octahedron-wrap {
+  position: absolute;
+  left: 1%;
+  bottom: 11%;
+  width: clamp(78px, 9vw, 108px);
+  will-change: transform;
+  filter: drop-shadow(0 0 9px rgba(0,240,255,0.5));
+}
+
+/* Second code body — overlays first, fades in when Neo touches panel */
+.neo-code-body-2 {
+  position: absolute;
+  inset: 0;
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  line-height: 1.95;
+  color: rgba(255,255,255,0.62);
+  background: rgba(7,7,9,0.95);
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* Octahedron rotation owned by GSAP scrub — no CSS animation */
+
+/* ── Code panel ────────────────────────────────────────────────── */
+.neo-code-panel {
+  position: absolute;
+  left: 0%;
+  top: 8%;
+  width: clamp(168px, 18vw, 208px);
+  background: rgba(7,7,9,0.95);
+  border: 1px solid rgba(204,255,0,0.28);
+  clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 0 100%);
+  will-change: transform;
+  animation: neoCodeDrift 9s ease-in-out infinite;
+  transform: perspective(500px) rotateY(7deg) rotateX(-3deg);
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+}
+
+@keyframes neoCodeDrift {
+  0%, 100% { transform: perspective(500px) rotateY(7deg) rotateX(-3deg) translateY(0);   }
+  50%       { transform: perspective(500px) rotateY(4deg) rotateX(-1deg) translateY(-8px); }
+}
+
+.neo-code-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(204,255,0,0.1);
+}
+
+.neo-code-dot { width: 6px; height: 6px; border-radius: 50%; }
+.neo-code-dot:nth-child(1) { background: rgba(255,61,245,0.75); }
+.neo-code-dot:nth-child(2) { background: rgba(204,255,0,0.75); }
+.neo-code-dot:nth-child(3) { background: rgba(0,240,255,0.75); }
+
+.neo-code-filename {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  color: rgba(255,255,255,0.28);
+  letter-spacing: 0.1em;
+}
+
+.neo-code-body {
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  line-height: 1.95;
+  color: rgba(255,255,255,0.62);
+}
+
+.neo-code-body .c-kw  { color: #ff3df5; }
+.neo-code-body .c-fn  { color: #00f0ff; }
+.neo-code-body .c-str { color: #ccff00; }
+.neo-code-body .c-cm  { color: rgba(255,255,255,0.28); }
+.neo-code-body .c-num { color: #ff9900; }
+.neo-code-body .c-op  { color: rgba(255,255,255,0.45); }
+
+.neo-code-cursor {
+  display: inline-block;
+  width: 5px; height: 10px;
+  background: #ccff00;
+  animation: neoCursorBlink 1s step-end infinite;
+  vertical-align: -1px;
+  margin-left: 1px;
+}
+
+@keyframes neoCursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Data network SVG ──────────────────────────────────────────── */
+.neo-data-network {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+/* Packet dots — positioned over the network, animated via CSS */
+.neo-packet {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+}
+.neo-packet-1 { width:5px; height:5px; background:#ccff00; top:50%; left:50%; animation: npkt1 2.7s linear infinite; }
+.neo-packet-2 { width:4px; height:4px; background:#00f0ff; top:50%; left:50%; animation: npkt2 3.3s linear infinite 0.9s; }
+.neo-packet-3 { width:4px; height:4px; background:#ccff00; top:50%; left:50%; animation: npkt3 4s   linear infinite 0.4s; }
+.neo-packet-4 { width:3px; height:3px; background:#00f0ff; top:50%; left:50%; animation: npkt4 2.2s linear infinite 1.8s; }
+.neo-packet-5 { width:3px; height:3px; background:#ccff00; top:50%; left:50%; animation: npkt5 4.5s linear infinite 0.2s; }
+
+@keyframes npkt1 { from{transform:translate(-50%,-50%)} to{transform:translate(calc(-50% + 105px),calc(-50% - 105px))} }
+@keyframes npkt2 { from{transform:translate(-50%,-50%)} to{transform:translate(calc(-50% - 112px),calc(-50% - 82px))} }
+@keyframes npkt3 { from{transform:translate(-50%,-50%)} to{transform:translate(calc(-50% + 132px),calc(-50% + 102px))} }
+@keyframes npkt4 { from{transform:translate(-50%,-50%)} to{transform:translate(calc(-50% - 128px),calc(-50% + 88px))} }
+@keyframes npkt5 { from{transform:translate(-50%,-50%)} to{transform:translate(calc(-50%),calc(-50% - 168px))} }
+
+/* ── HUD corners (fixed naming from audit) ─────────────────────── */
+.neo .neo-hud-corner {
+  position: absolute;
+  width: 16px; height: 16px;
+  border-color: rgba(204,255,0,0.45);
+  border-style: solid;
+  z-index: 5;
+  pointer-events: none;
+}
+.neo .neo-hud-tl  { top: 14px; left: 14px;   border-width: 1.5px 0 0 1.5px; }
+.neo .neo-hud-tr  { top: 14px; right: 14px;  border-width: 1.5px 1.5px 0 0; }
+.neo .neo-hud-bl  { bottom: 14px; left: 14px;  border-width: 0 0 1.5px 1.5px; }
+.neo .neo-hud-brr { bottom: 14px; right: 14px; border-width: 0 1.5px 1.5px 0; }
+
+/* ── Guide overlay (fixed, phases 2 & 3) ───────────────────────── */
+.neo-guide-overlay {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 112px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.neo-guide-overlay.is-cursor-guide {
+  inset: 0;
+  width: auto;
+}
+
+.neo-guide-char-wrap {
+  position: absolute;
+  right: 12px;
+  top: 0;
+  width: 80px;
+  will-change: transform;
+}
+
+.neo-guide-overlay.is-cursor-guide .neo-guide-char-wrap {
+  left: 0;
+  right: auto;
+}
+
+.neo-guide-char-svg {
+  display: block;
+  width: 80px;
+  height: auto;
+  animation: neoHeroFloat 4.6s ease-in-out infinite;
+  filter:
+    drop-shadow(0 0 28px rgba(204,255,0,0.8))
+    drop-shadow(0 0 56px rgba(0,240,255,0.35));
+}
+
+/* Speech bubble — above character */
+.neo-guide-bubble {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  right: 0;
+  background: rgba(0,0,0,0.94);
+  border: 1px solid rgba(204,255,0,0.55);
+  padding: 5px 9px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ccff00;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 40px));
+  white-space: normal;
+  line-height: 1.45;
+  clip-path: polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px);
+}
+
+.neo-guide-overlay.is-cursor-guide .neo-guide-bubble {
+  bottom: calc(100% + 8px);
+  right: auto;
+  left: 0;
+  font-size: 9px;
+  padding: 8px 10px;
+  box-shadow: 0 0 26px rgba(204,255,0,0.16), inset 0 0 18px rgba(0,240,255,0.08);
+}
+
+/* Section tag — extends left from character */
+.neo-guide-tag {
+  position: absolute;
+  right: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(204,255,0,0.07);
+  border: 1px solid rgba(204,255,0,0.28);
+  border-right: none;
+  padding: 8px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(204,255,0,0.8);
+  white-space: nowrap;
+}
+
+.neo-guide-overlay.is-cursor-guide .neo-guide-tag {
+  right: auto;
+  left: 0;
+  top: calc(100% + 7px);
+  transform: none;
+  border-right: 1px solid rgba(204,255,0,0.28);
+  border-left: none;
+  background: rgba(0,0,0,0.88);
+  color: #ccff00;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Beacon line — grows leftward from guide toward content */
+.neo-guide-beacon {
+  position: absolute;
+  right: calc(100% + 6px);
+  top: 50%;
+  height: 1px;
+  width: 0;
+  background: linear-gradient(to left, rgba(204,255,0,0.55), transparent);
+  transform: translateY(-50%);
+  transform-origin: right center;
+}
+
+.neo-guide-overlay.is-cursor-guide .neo-guide-beacon {
+  display: none;
+}
+
+.neo-guide-burst {
+  position: fixed;
+  left: -18px;
+  top: -18px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(204,255,0,0.9);
+  border-radius: 999px;
+  box-shadow:
+    0 0 18px rgba(204,255,0,0.55),
+    inset 0 0 18px rgba(0,240,255,0.22);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.neo-guide-burst::before,
+.neo-guide-burst::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(0,240,255,0.65);
+  transform: rotate(45deg);
+}
+
+.neo-guide-burst::after {
+  inset: 14px;
+  border-color: rgba(204,255,0,0.78);
+  transform: rotate(0deg);
+}
+
+/* Spotlight — wide glow that moves with the character */
+.neo-guide-spotlight {
+  position: fixed;
+  right: 0;
+  width: 56vw;
+  height: 300px;
+  background: radial-gradient(ellipse at right center,
+    rgba(204,255,0,0.055) 0%,
+    rgba(0,240,255,0.028) 38%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 49;
+  transform: translateY(-50%);
+}
+
+.neo-guide-overlay.is-cursor-guide + .neo-guide-spotlight,
+.neo-guide-spotlight {
+  transition: opacity 0.2s ease;
+}
+
+/* ── Mobile ─────────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .neo-guide-overlay {
+    width: 78px;
+  }
+
+  .neo-guide-char-wrap {
+    right: 8px;
+    width: 58px;
+  }
+
+  .neo-guide-char-svg {
+    width: 58px;
+  }
+
+  .neo-guide-bubble {
+    max-width: 168px;
+    font-size: 7px;
+    padding: 5px 7px;
+  }
+
+  .neo-guide-tag {
+    display: none;
+  }
+
+  .neo-guide-spotlight {
+    width: 48vw;
+    height: 180px;
+  }
+
+  .neo-scrolly-hero {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100svh;
+    padding: 86px 20px 48px;
+    gap: 28px;
+  }
+
+  .neo-3d-stage {
+    height: 260px;
+    order: -1;
+  }
+
+  .neo-char-hero { width: 100px; }
+  .neo-hero-guide-intro {
+    left: 50%;
+    top: -58px;
+    width: min(210px, calc(100vw - 44px));
+    font-size: 7px;
+  }
+
+  .neo-server-rack-wrap { right: -4%; top: 4%; }
+  .neo-rack-front { width: 92px; height: 148px; }
+  .neo-rack-side { left: 91px; height: 148px; }
+  .neo-rack-top { width: 112px; }
+
+  .neo-code-panel { width: 148px; left: -4%; }
+  .neo-octahedron-wrap { width: 66px; bottom: 4%; }
+}
+
+@media (max-width: 980px) and (min-width: 761px) {
+  .neo-char-hero { width: 148px; }
+  .neo-server-rack-wrap { right: 0; }
+  .neo-code-panel { width: 176px; }
+}
