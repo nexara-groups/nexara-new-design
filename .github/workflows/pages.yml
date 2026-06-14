@@ -28,11 +28,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare static site
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: nexara-site/package-lock.json
+
+      - name: Build site
+        working-directory: nexara-site
         run: |
-          mkdir _site
-          cp index.html _site/
-          cp -R src styles _site/
+          npm ci
+          npm run build
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -42,7 +49,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: nexara-site/dist
 
       - name: Deploy to GitHub Pages
         id: deployment

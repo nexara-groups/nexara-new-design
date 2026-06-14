@@ -1,8 +1,24 @@
 # gstack browse/QA tooling state
 .gstack/
 
+# OS/editor noise
+.DS_Store
+
 # editor / tool backups
 *.bak
 
 # scratch design mockups (not part of the site)
 design-directions.html
+*options.html
+*preview.html
+*picker.html
+
+# duplicate migration worktrees
+nexara-web/
+
+# local Codex/QA state inside the app
+nexara-site/.superpowers/
+
+# packaged/raw font downloads; keep web font sources only
+nexara-site/public/fonts/*.zip
+nexara-site/public/fonts/*.otf

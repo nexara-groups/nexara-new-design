@@ -697,8 +697,9 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid cur
   .switch{display:none}
   .breadcrumb-bar{position:relative;top:auto;height:auto;padding:6px var(--pad)}
   .site{max-width:100vw;overflow-x:clip}
-  .hero-banner,.subnav,.footer,.breadcrumb-bar{max-width:100vw;overflow-x:hidden}
-  .subnav{position:relative;top:auto}
+  .hero-banner,.footer,.breadcrumb-bar{max-width:100vw;overflow-x:hidden}
+  .subnav{position:relative;top:auto;max-width:100vw;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .subnav::-webkit-scrollbar{display:none}
   .hero-banner{width:100vw;padding:42px 20px}
   .hero-banner.compact{padding:34px 20px 42px}
   .hero-copy,.hero-dashboard{width:100%;max-width:calc(100vw - 40px)}
