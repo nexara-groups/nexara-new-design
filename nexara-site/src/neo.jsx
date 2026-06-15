@@ -527,7 +527,7 @@ function NeoGuide() {
     gsap.set(spotlight, { autoAlpha: 0, top: "58vh" });
     if (burst) gsap.set(burst, { autoAlpha: 0, scale: 0.2 });
 
-    if (isDesktopFollower) {
+    // --- shared brain: defined once, driven by desktop (cursor) AND mobile (touch/scroll) ---
       const clean = (text) => (text || "").replace(/\s+/g, " ").trim();
       const shorten = (text, max = 46) => {
         const t = clean(text);
@@ -536,7 +536,7 @@ function NeoGuide() {
       const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
       const textFrom = (node, selector) => clean(node?.querySelector(selector)?.textContent);
       const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-      let followerLive = false;
+      let guideLive = false;
       let lastKey = "";
       let activeInfo = null;
       const lineCounts = {};
@@ -1033,7 +1033,7 @@ function NeoGuide() {
       };
       // random idle blinks = "alive"
       const scheduleBlink = () => {
-        blinkT = setTimeout(() => { if (followerLive) blink(); scheduleBlink(); }, 2400 + Math.random() * 3600);
+        blinkT = setTimeout(() => { if (guideLive) blink(); scheduleBlink(); }, 2400 + Math.random() * 3600);
       };
       // idle chatter — he keeps yapping even when you stop moving
       const idleChatter = [
@@ -1046,7 +1046,7 @@ function NeoGuide() {
       let idleIdx = 0;
       const scheduleIdleSass = () => {
         idleT = setTimeout(() => {
-          if (followerLive && lastKey === "idle") {
+          if (guideLive && lastKey === "idle") {
             idleIdx++;
             setInfo({ label: "nap mode", line: idleChatter[idleIdx % idleChatter.length] });
             gsap.fromTo([bubble, tag], { autoAlpha: 0.5, y: 4 }, { autoAlpha: 1, y: 0, duration: 0.22, overwrite: "auto" });
@@ -1055,11 +1055,13 @@ function NeoGuide() {
           scheduleIdleSass();
         }, 3400 + Math.random() * 2600);
       };
+      // --- desktop driver: cursor-follow + hover-classify (mobile drives the same brain via its own branch) ---
+      if (isDesktopFollower) {
       if (hasFace) { scheduleBlink(); scheduleIdleSass(); setMouth(MOUTH.smirk, 0); }
       else { scheduleIdleSass(); }
 
       const onMove = (event) => {
-        if (!followerLive) return;
+        if (!guideLive) return;
         const offsetRight = event.clientX > window.innerWidth - 180;
         const x = clamp(event.clientX + (offsetRight ? -340 : 24), 12, window.innerWidth - 340);
         const y = clamp(event.clientY + 18, 84, window.innerHeight - 108);
@@ -1091,18 +1093,18 @@ function NeoGuide() {
       };
       // click = smug little wink + antenna flash
       const onClick = () => {
-        if (!followerLive || !hasFace) return;
+        if (!guideLive || !hasFace) return;
         blink("r"); ledFlash(); setMouth(MOUTH.grin);
         gsap.delayedCall(0.5, () => setMouth(lastKey === "idle" ? MOUTH.flat : MOUTH.smirk));
       };
       const showFollower = () => {
-        followerLive = true;
+        guideLive = true;
         guide.classList.remove("is-offscreen");
         gsap.to(guide, { autoAlpha: 1, duration: 0.28, ease: "power2.out", overwrite: true });
         gsap.to(spotlight, { autoAlpha: 1, duration: 0.28, overwrite: true });
       };
       const hideFollower = () => {
-        followerLive = false;
+        guideLive = false;
         guide.classList.add("is-offscreen");
         gsap.to(guide, { autoAlpha: 0, duration: 0.22, ease: "power2.in", overwrite: true });
         gsap.to(spotlight, { autoAlpha: 0, duration: 0.22, overwrite: true });
@@ -1188,12 +1190,12 @@ function NeoGuide() {
         },
       },
       {
-        sel: ".module-grid.compact",
+        sel: ".module-grid:not(.compact)",
         yPos: "42vh",
         label: "Options",
         line: "pick one.",
         interact: (tl) => {
-          const cards = Array.from(document.querySelectorAll('.module-grid.compact .module-card'));
+          const cards = Array.from(document.querySelectorAll('.module-grid:not(.compact) .module-card'));
           if (!cards.length) return;
           tl.to(cards, { y: -8, borderColor: "rgba(204,255,0,0.65)", boxShadow: "0 0 30px rgba(204,255,0,0.16)", duration: 0.22, stagger: 0.06, ease: "power2.out" }, "+=0.1")
             .to(cards, { y: 0, borderColor: "", boxShadow: "", duration: 0.36, stagger: 0.05, ease: "power2.inOut" }, "+=0.18");
@@ -1728,7 +1730,7 @@ function NeoHeroUnravel({ copy, theme }) {
         <div className="neo-hero-chapter" data-from="0.125" data-to="0.225" aria-hidden="true">
           <p className="kicker">The premise</p>
           <h2 className="h-display">One core.<br /><span className="serif">Three forces.</span></h2>
-          <p className="lede">Every engagement runs through a single operating core — then unravels into three disciplined divisions.</p>
+          <p className="lede">Three directions. All pointing at your problem.</p>
         </div>
 
         <div className="neo-hero-chapter ch-left" style={{ '--accent': '#7c5cff' }} data-from="0.27" data-to="0.45" aria-hidden="true">
@@ -1823,7 +1825,7 @@ function NeoManifesto() {
       <div className="section-inner">
         <p className="kicker">Why Nexara</p>
         <p className="neo-manifesto-text">
-          We are one engineering company that grows people, builds intelligent systems, and makes brands move — one standard, three disciplines, zero shortcuts.
+          Three engines. One standard. No shortcuts, no gap years, no vibes without receipts. We build people, systems and brands — and we ship it all from one house.
         </p>
       </div>
     </section>
@@ -3467,7 +3469,7 @@ function ModuleCard({ theme, eyebrow, title, children, visualTitle = null, class
         <p>{children}</p>
         {isClickable && (
           <div className="card-click-prompt" style={{ marginTop: "16px", fontSize: "0.75rem", fontFamily: "var(--font-mono)", opacity: 0.7, textTransform: "uppercase" }}>
-            {theme === "neo" ? "[ CLICK TO SPEC // ]" : "View specifications →"}
+            {theme === "neo" ? "full drop →" : "View specifications →"}
           </div>
         )}
       </div>
@@ -4626,10 +4628,10 @@ function InteractiveTimeline({ theme, section }) {
         { title: "Launch", tag: "STAGE 03 // DEPLOY SYSTEM", desc: "Flipping the switch, pushing clean code to production, and setting active campaign layers live." },
         { title: "Optimize", tag: "STAGE 04 // compounding WINNERS", desc: "Auditing data logs, testing ad variant creatives, and compounding what works." }
       ] : [
-        { title: "Audience Alignment", tag: "Phase 01: Audit & Discovery", desc: "Establishing market category context, analyzing demographic constraints, and structuring primary brand pillars." },
-        { title: "Asset Development", tag: "Phase 02: Platform Architecture", desc: "Creating visual guidelines, high-conversion web presence layouts, and initial social campaigns." },
-        { title: "Deployment", tag: "Phase 03: System Integration", desc: "Publishing responsive web platforms, starting organic content schedules, and activating paid acquisition lines." },
-        { title: "Performance Tuning", tag: "Phase 04: Analytics & A/B testing", desc: "Conducting regular funnel audits, testing ad copy variations, and generating weekly performance reports." }
+        { title: "Audience & Category", tag: "Phase 01: Positioning & Discovery", desc: "Establishing market category context, analysing audience constraints, and structuring primary brand pillars." },
+        { title: "Brand & Asset Build", tag: "Phase 02: Creative & Web Build", desc: "Creating the visual system, high-conversion web presence and initial campaign assets." },
+        { title: "Launch & Activate", tag: "Phase 03: Live Activation", desc: "Publishing the site, starting the content calendar and activating paid acquisition channels." },
+        { title: "Measure & Optimise", tag: "Phase 04: Analytics & Optimisation", desc: "Conducting regular funnel reviews, testing ad variants and compounding what the data confirms." }
       ];
     } else if (section.id === "academy") {
       return isNeo ? [
@@ -4638,10 +4640,10 @@ function InteractiveTimeline({ theme, section }) {
         { title: "Build proof", tag: "STAGE 03 // DEPLOY SYSTEM", desc: "Case study refinement, interactive portfolio sites." },
         { title: "Place or partner", tag: "STAGE 04 // compounding WINNERS", desc: "Fast-tracked interview loops, direct hiring pipes." }
       ] : [
-        { title: "Audience Alignment", tag: "Phase 01: Audit & Discovery", desc: "Identifying career targets, benchmarking technical baselines, and mapping skills." },
-        { title: "Asset Development", tag: "Phase 02: Platform Architecture", desc: "Immersive technical instruction, sprint-based deliveries, and code-review structures." },
-        { title: "Deployment", tag: "Phase 03: System Integration", desc: "Documented project case studies, system deployments, and portfolio audits." },
-        { title: "Performance Tuning", tag: "Phase 04: Analytics & A/B testing", desc: "Partner matches, cohort reports, and coordinated hiring workflows." }
+        { title: "Skill Mapping", tag: "Phase 01: Learner Assessment", desc: "Identifying career targets, benchmarking technical baselines and mapping skills to hiring criteria." },
+        { title: "Cohort Delivery", tag: "Phase 02: Live Programme", desc: "Structured sessions, sprint-based project delivery and mentor-led code reviews." },
+        { title: "Portfolio Proof", tag: "Phase 03: Case Study Build", desc: "Projects converted into review-ready portfolios, scored against hiring standards." },
+        { title: "Placement", tag: "Phase 04: Hiring Coordination", desc: "Partner matching, cohort outcome reports and coordinated interview workflows." }
       ];
     } else { // labs
       return isNeo ? [
@@ -4650,10 +4652,10 @@ function InteractiveTimeline({ theme, section }) {
         { title: "Build and test", tag: "STAGE 03 // DEPLOY SYSTEM", desc: "Iterative evals, guardrail hardening, private sandboxing." },
         { title: "Deploy and observe", tag: "STAGE 04 // compounding WINNERS", desc: "Real-time telemetry, trace logs, compounding AI efficiency." }
       ] : [
-        { title: "Audience Alignment", tag: "Phase 01: Audit & Discovery", desc: "Identifying high-value, process-intensive operational bottlenecks." },
-        { title: "Asset Development", tag: "Phase 02: Platform Architecture", desc: "System architecture design, security reviews, and model selections." },
-        { title: "Deployment", tag: "Phase 03: System Integration", desc: "Prototype integration, evaluation benchmarking, and model safety runs." },
-        { title: "Performance Tuning", tag: "Phase 04: Analytics & A/B testing", desc: "Monitored deployment, production trace analysis, and latency optimization." }
+        { title: "Problem Frame", tag: "Phase 01: Discovery & Scoping", desc: "Defining the business problem, success criteria and the outcome the software must deliver." },
+        { title: "Architecture", tag: "Phase 02: System Design", desc: "System architecture, data model, integration map and technology selection — agreed before any build begins." },
+        { title: "Build & Evaluate", tag: "Phase 03: Incremental Delivery", desc: "Iterative build against the written scope, with evaluation checkpoints and QA at each stage." },
+        { title: "Launch & Support", tag: "Phase 04: Production & Handover", desc: "Monitored production deployment, clean handover documentation and agreed ongoing support scope." }
       ];
     }
   }, [section.id, isNeo]);
@@ -5269,8 +5271,8 @@ function Contact({ theme, detail }) {
                 onChange={(e) => handleChange("timeline", e.target.value)}
               >
                 <option value="Under 1 month">Under 1 month</option>
-                <option value="1-3 months">1-3 months</option>
-                <option value="3-6 months">3-6 months</option>
+                <option value="1-3 months">1–3 months</option>
+                <option value="3-6 months">3–6 months</option>
                 <option value="Ongoing">Ongoing support</option>
               </select>
             </div>
