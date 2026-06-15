@@ -1913,15 +1913,15 @@ function NeoDivisionsRail() {
         <div className="neo-rail-track" ref={trackRef}>
           {sections.map((sec, i) => (
             <button key={sec.id} className="neo-rail-panel" style={{ '--accent': i === 0 ? '#7c5cff' : i === 1 ? '#ff5c8a' : '#00e5a0' }} onClick={() => routeTo('neo', sec.id)}>
-              <span className="neo-panel-idx">0${i + 1} / ${sec.name.toUpperCase()}</span>
+              <span className="neo-panel-idx">0{i + 1} / {sec.name.toUpperCase()}</span>
               <span className="neo-panel-orb" />
               <span className="neo-panel-ring" />
-              <h3>${sec.name}<br /><span className="serif">${sec.headline || (i === 0 ? "we grow engineers" : i === 1 ? "we build intelligence" : "we make brands move")}</span></h3>
-              <p>${sec.short.neo || sec.desc}</p>
+              <h3>{sec.name}<br /><span className="serif">{sec.headline || (i === 0 ? "we grow engineers" : i === 1 ? "we build intelligence" : "we make brands move")}</span></h3>
+              <p>{sec.short.neo || sec.desc}</p>
               <span className="panel-tags">
-                ${sec.stack.slice(0, 4).map(tag => "<span key=\"" + tag + "\">" + tag + "</span>").join("")}
+                {sec.stack.slice(0, 4).map(tag => <span key={tag}>{tag}</span>)}
               </span>
-              <span className="btn">Enter ${sec.name} <span className="arr">→</span></span>
+              <span className="btn">Enter {sec.name} <span className="arr">→</span></span>
             </button>
           ))}
         </div>
