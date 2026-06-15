@@ -4332,12 +4332,24 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust .tsx-burger-icon.is-open i:nth-child(2) { top: 5px; transform: rotate(-45deg); }
 
 .trust .tsx-nav-sheet { display: none; }
+.trust .tsx-nav-backdrop { display: none; }
 
 @media (max-width: 768px) {
   .trust .tsx-nav-burger { display: inline-flex; }
   .trust .tsx-nav-cta { display: none; }
   .trust .tsx-theme-pill,
   .trust.tsx-site .tsx-theme-pill { display: flex !important; }
+
+  /* ── Backdrop: tap-outside-to-close ── */
+  .trust .tsx-nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 94;
+    background: rgba(11,31,51,.32);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
 
   /* ── Bottom sheet panel ── */
   .trust .tsx-nav-sheet {

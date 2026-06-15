@@ -591,6 +591,9 @@ function TrustNav({ page, detail }) {
   const navRef = React.useRef(null);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [hoveredPage, setHoveredPage] = React.useState(null);
+  const [dragY, setDragY] = React.useState(0);
+  const dragStart = React.useRef(null);
+
   React.useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
@@ -599,6 +602,25 @@ function TrustNav({ page, detail }) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   React.useEffect(() => { setMenuOpen(false); }, [page, detail]);
+  React.useEffect(() => { if (!menuOpen) setDragY(0); }, [menuOpen]);
+
+  const onSheetTouchStart = (e) => {
+    dragStart.current = e.touches[0].clientY;
+  };
+  const onSheetTouchMove = (e) => {
+    if (dragStart.current === null) return;
+    const delta = Math.max(0, e.touches[0].clientY - dragStart.current);
+    setDragY(delta);
+  };
+  const onSheetTouchEnd = () => {
+    if (dragStart.current === null) return;
+    dragStart.current = null;
+    if (dragY > 110) {
+      setMenuOpen(false);
+    } else {
+      setDragY(0);
+    }
+  };
   React.useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
@@ -648,7 +670,15 @@ function TrustNav({ page, detail }) {
           </button>
         </div>
       </div>
-      <div className={"tsx-nav-sheet" + (menuOpen ? ' is-open' : '')} role="dialog" aria-label="Menu" aria-hidden={!menuOpen}>
+      {menuOpen && <div className="tsx-nav-backdrop" aria-hidden="true" onClick={() => setMenuOpen(false)} />}
+      <div
+        className={"tsx-nav-sheet" + (menuOpen ? ' is-open' : '')}
+        role="dialog" aria-label="Menu" aria-hidden={!menuOpen}
+        onTouchStart={onSheetTouchStart}
+        onTouchMove={onSheetTouchMove}
+        onTouchEnd={onSheetTouchEnd}
+        style={dragY > 0 ? { transform: `translateY(${dragY}px)`, transition: 'transform 0ms' } : undefined}
+      >
         <div className="tsx-nav-sheet-handle" aria-hidden="true" />
         <nav className="tsx-nav-sheet-links" aria-label="Primary mobile">
           {DATA.nav.map((item) => (
