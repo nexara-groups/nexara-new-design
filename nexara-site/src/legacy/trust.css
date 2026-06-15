@@ -3472,6 +3472,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 
 .trust .tsx-rail-wrap { position: relative; height: 320vh; }
 .trust .tsx-rail-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+.trust .rail-head { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 clamp(20px, 6vw, 80px) clamp(16px, 2.4vh, 28px); }
 .trust .tsx-rail-track { display: flex; gap: clamp(18px, 3vw, 40px); padding: 5vh clamp(20px, 6vw, 80px); will-change: transform; width: max-content; }
 .trust .tsx-rail-panel { position: relative; width: min(70vw, 940px); min-height: 64vh; border: 1px solid var(--line); border-top: 3px solid var(--accent, var(--tsx-accent)); border-radius: 12px; padding: clamp(30px, 3.4vw, 52px); display: flex; flex-direction: column; gap: clamp(22px, 2.4vw, 34px); background: var(--paper); transition: border-color 0.4s, transform 0.5s, box-shadow 0.5s; color: var(--text); overflow: hidden; }
 .trust .tsx-rail-panel:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(22, 24, 29, 0.08); }
@@ -3570,7 +3571,8 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   .trust .tsx-hero-counter { left: 20px; bottom: 22px; font-size: 0.62rem; }
   .trust .tsx-hero-counter .tsx-counter-bar { width: 72px; }
   .trust .tsx-rail-wrap { height: auto; }
-  .trust .tsx-rail-stage { position: relative; height: auto; padding: 40px 0; }
+  .trust .tsx-rail-stage { position: relative; height: auto; padding: 0; }
+  .trust .rail-head { position: sticky; top: 68px; z-index: 10; background: var(--bg, var(--paper-0)); padding: 14px 20px; border-bottom: 1px solid var(--line); }
   .trust .tsx-rail-track { flex-direction: column; width: 100%; padding: 20px; }
   .trust .tsx-rail-panel { width: 100%; min-height: auto; margin-bottom: 20px; }
   .trust .tsx-panel-module { grid-template-columns: 28px 1fr; row-gap: 4px; }
@@ -4295,27 +4297,175 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust .tsx-final-cta-btn .arr { transition: transform .25s ease; display: inline-block; }
 .trust .tsx-final-cta-btn:hover .arr { transform: translateX(5px); }
 
-/* ── Audit fix: mobile hamburger + sheet menu (replaces horizontal scroll nav) ── */
-.trust .tsx-nav-burger { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); cursor: pointer; padding: 0; flex-shrink: 0; }
-.trust .tsx-burger-icon { position: relative; width: 18px; height: 12px; display: block; }
-.trust .tsx-burger-icon i { position: absolute; left: 0; right: 0; height: 2px; background: var(--ink); border-radius: 2px; transition: transform .28s var(--ease), top .28s var(--ease), opacity .2s; }
-.trust .tsx-burger-icon i:nth-child(1) { top: 1px; }
+/* ── Liquid glass hamburger + sheet ── */
+.trust .tsx-nav-burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(23,32,51,.10);
+  border-radius: 12px;
+  background: rgba(255,255,255,.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 10px rgba(23,32,51,.07), inset 0 1px 0 rgba(255,255,255,.9);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background .2s, box-shadow .2s, border-color .2s;
+}
+.trust .tsx-nav-burger:hover {
+  background: rgba(255,255,255,.95);
+  box-shadow: 0 4px 18px rgba(23,32,51,.10), inset 0 1px 0 rgba(255,255,255,1);
+  border-color: rgba(26,109,255,.18);
+}
+.trust .tsx-burger-icon { position: relative; width: 18px; height: 11px; display: block; }
+.trust .tsx-burger-icon i {
+  position: absolute; left: 0; right: 0; height: 1.5px;
+  background: var(--ink); border-radius: 2px;
+  transition: transform .32s cubic-bezier(0.16,1,.3,1), top .32s cubic-bezier(0.16,1,.3,1), opacity .22s;
+}
+.trust .tsx-burger-icon i:nth-child(1) { top: 0; }
 .trust .tsx-burger-icon i:nth-child(2) { top: 9px; }
 .trust .tsx-burger-icon.is-open i:nth-child(1) { top: 5px; transform: rotate(45deg); }
 .trust .tsx-burger-icon.is-open i:nth-child(2) { top: 5px; transform: rotate(-45deg); }
+
 .trust .tsx-nav-sheet { display: none; }
+
 @media (max-width: 768px) {
   .trust .tsx-nav-burger { display: inline-flex; }
   .trust .tsx-nav-cta { display: none; }
-  .trust .tsx-nav-sheet { display: flex; flex-direction: column; position: fixed; top: 64px; left: 0; right: 0; bottom: 0; height: calc(100dvh - 64px); z-index: 95; background: var(--paper-0); padding: clamp(24px,7vw,44px) clamp(20px,6vw,40px) calc(env(safe-area-inset-bottom) + 32px); opacity: 0; transform: translateY(-8px); pointer-events: none; transition: opacity .3s var(--ease), transform .3s var(--ease); overflow-y: auto; }
-  .trust .tsx-nav-sheet.is-open { opacity: 1; transform: none; pointer-events: auto; }
-  .trust .tsx-nav-sheet::before { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(47,74,107,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(47,74,107,.025) 1px, transparent 1px); background-size: 48px 48px; }
-  .trust .tsx-nav-sheet-links { display: flex; flex-direction: column; position: relative; z-index: 1; border-top: 1px solid var(--line); }
-  .trust .tsx-nav-sheet-links button { display: flex; align-items: baseline; gap: 14px; width: 100%; text-align: left; font-family: var(--font-display); font-size: clamp(1.6rem,7vw,2.4rem); font-weight: 500; color: var(--text); letter-spacing: -0.02em; background: none; border: none; border-bottom: 1px solid var(--line); padding: clamp(14px,3.4vw,22px) 0; cursor: pointer; opacity: 0; transform: translateX(-10px); transition: opacity .4s var(--ease), transform .4s var(--ease); }
-  .trust .tsx-nav-sheet.is-open .tsx-nav-sheet-links button { opacity: 1; transform: none; }
-  .trust .tsx-nav-sheet-links button.active { color: var(--vermilion); }
-  .trust .tsx-nav-sheet-num { font-family: "Inter", sans-serif; font-size: 0.7rem; font-weight: 700; color: var(--blueprint); letter-spacing: 0.06em; }
-  .trust .tsx-nav-sheet-cta { position: relative; z-index: 1; margin-top: auto; width: 100%; justify-content: center; padding-block: 18px; }
+  .trust .tsx-theme-pill,
+  .trust.tsx-site .tsx-theme-pill { display: flex !important; }
+
+  /* ── Bottom sheet panel ── */
+  .trust .tsx-nav-sheet {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    max-height: 88dvh;
+    z-index: 95;
+    background: rgba(220,235,255,0.76);
+    backdrop-filter: blur(52px) saturate(160%);
+    -webkit-backdrop-filter: blur(52px) saturate(160%);
+    border-radius: 20px 20px 0 0;
+    border-top: 1px solid rgba(26,109,255,.2);
+    box-shadow:
+      0 -4px 40px rgba(26,109,255,.12),
+      inset 0 1px 0 rgba(255,255,255,.6);
+    opacity: 0;
+    transform: translateY(100%);
+    pointer-events: none;
+    transition: opacity .32s cubic-bezier(0.32,0.72,0,1), transform .32s cubic-bezier(0.32,0.72,0,1);
+    overflow: hidden;
+  }
+  .trust .tsx-nav-sheet.is-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: opacity .24s ease-in, transform .24s ease-in;
+  }
+
+  /* Drag handle */
+  .trust .tsx-nav-sheet-handle {
+    flex-shrink: 0;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(26,109,255,.25);
+    align-self: center;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+
+  /* Scrollable link list */
+  .trust .tsx-nav-sheet-links {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex: 1 1 auto;
+  }
+
+  /* Two-line row per nav item */
+  .trust .tsx-nav-sheet-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid rgba(11,31,51,.07);
+    border-left: 3px solid transparent;
+    padding: 14px 20px 14px 17px;
+    cursor: pointer;
+    gap: 2px;
+    transition: background .15s, border-left-color .15s;
+  }
+  .trust .tsx-nav-sheet-row:hover { background: rgba(255,255,255,.55); border-left-color: rgba(26,109,255,.30); }
+  .trust .tsx-nav-sheet-row.active { background: rgba(26,109,255,.12); border-left-color: var(--blueprint); }
+
+  /* Label */
+  .trust .tsx-sheet-label {
+    display: block;
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+    transition: color .15s;
+  }
+  .trust .tsx-nav-sheet-row.active .tsx-sheet-label { color: var(--blueprint); font-weight: 700; }
+  .trust .tsx-nav-sheet-row:hover:not(.active) .tsx-sheet-label { color: var(--blueprint); }
+
+  /* Descriptor */
+  .trust .tsx-sheet-desc {
+    display: block;
+    font-family: "Inter", sans-serif;
+    font-size: 11.5px;
+    font-weight: 400;
+    color: #3B5C82;
+    letter-spacing: 0.01em;
+    line-height: 1.45;
+    transition: color .15s;
+  }
+  .trust .tsx-nav-sheet-row.active .tsx-sheet-desc { color: rgba(26,109,255,.65); }
+
+  /* Sticky footer with CTA */
+  .trust .tsx-nav-sheet-footer {
+    flex-shrink: 0;
+    padding: 12px 20px calc(env(safe-area-inset-bottom) + 16px);
+    background: linear-gradient(to bottom, rgba(220,235,255,0) 0%, rgba(220,235,255,.9) 28%);
+  }
+  .trust .tsx-nav-sheet-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+    background: #1A6DFF;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(26,109,255,.32), inset 0 1px 0 rgba(255,255,255,.15);
+    transition: background .18s, box-shadow .18s, transform .15s;
+  }
+  .trust .tsx-nav-sheet-cta:hover {
+    background: #0B3E9E;
+    box-shadow: 0 8px 28px rgba(26,109,255,.4), inset 0 1px 0 rgba(255,255,255,.15);
+    transform: translateY(-1px);
+  }
+  .trust .tsx-nav-sheet-cta .arr { display: inline-block; transition: transform .22s; }
+  .trust .tsx-nav-sheet-cta:hover .arr { transform: translateX(4px); }
 }
 
 /* ── Audit fix: vellum scrim behind hero text so particles never occlude/strike headlines ── */

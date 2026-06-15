@@ -1177,6 +1177,10 @@
 @media (max-width: 760px) {
   .neo .neo-hero-grid::after { background-size: 420px 420px; }
   .neo .hero-banner::before { display: none; }
+  /* Orbs too large on mobile (360px on 390px screen) — shrink and push to edge */
+  .neo .orb { opacity: 0.15; }
+  .neo .orb.one { width: 180px; height: 180px; right: -24px; top: 8%; }
+  .neo .orb.two { width: 130px; height: 130px; right: -10px; bottom: 12%; }
 }
 
 @media (max-width: 760px) {

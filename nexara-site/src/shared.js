@@ -55,6 +55,7 @@ function routeTo(theme, page = "home", detail = null) {
     localStorage.setItem("nexara_theme", theme);
   }
   const hash = [theme, page, detail].filter(Boolean).join("/");
+  window.scrollTo(0, 0);
   if (document.startViewTransition) {
     document.startViewTransition(() => { window.location.hash = hash; });
   } else {

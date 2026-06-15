@@ -579,6 +579,14 @@ function getTrustSubpageLabel(section, page) {
   return labels[section.id]?.[page.slug] || page.title;
 }
 
+const TRUST_SHEET_DESCS = {
+  academy:   "Talent built cohort by cohort, with reported placement readiness.",
+  marketing: "Market infrastructure — positioning, build, launch, optimise.",
+  labs:      "Software that solves the problem — SaaS, products and applied AI.",
+  customers: "Verified client outcomes, indexed by engagement type.",
+  contact:   "Start a scoped engagement with a named owner.",
+};
+
 function TrustNav({ page, detail }) {
   const navRef = React.useRef(null);
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -641,15 +649,20 @@ function TrustNav({ page, detail }) {
         </div>
       </div>
       <div className={"tsx-nav-sheet" + (menuOpen ? ' is-open' : '')} role="dialog" aria-label="Menu" aria-hidden={!menuOpen}>
+        <div className="tsx-nav-sheet-handle" aria-hidden="true" />
         <nav className="tsx-nav-sheet-links" aria-label="Primary mobile">
-          {DATA.nav.map((item, i) => (
-            <button key={item.page} className={page === item.page ? 'active' : ''} style={{ transitionDelay: (i * 35) + 'ms' }} onClick={() => routeTo('trust', item.page)}>
-              <span className="tsx-nav-sheet-num">/{String(i + 1).padStart(2, '0')}</span>
-              {getTrustNavLabel(item)}
+          {DATA.nav.map((item) => (
+            <button key={item.page} className={"tsx-nav-sheet-row" + (page === item.page ? ' active' : '')} onClick={() => routeTo('trust', item.page)}>
+              <span className="tsx-sheet-label">{getTrustNavLabel(item)}</span>
+              <span className="tsx-sheet-desc">{TRUST_SHEET_DESCS[item.page]}</span>
             </button>
           ))}
         </nav>
-        <button className="tsx-btn-cta tsx-nav-sheet-cta" onClick={() => routeTo('trust', 'contact')}>Start a Project <span className="arr">→</span></button>
+        <div className="tsx-nav-sheet-footer">
+          <button className="tsx-nav-sheet-cta" onClick={() => routeTo('trust', 'contact')}>
+            Start a Project <span className="arr" aria-hidden="true">→</span>
+          </button>
+        </div>
       </div>
     </header>
   );
@@ -721,10 +734,10 @@ function TrustCountUp({ value, className }) {
 
 function TrustProofStrip() {
   const stats = [
-    { num: '3', label: 'Solution Lines',       accent: false },
-    { num: '9', label: 'Capability Modules',   accent: false },
-    { num: '4', label: 'Delivery Standards',   accent: true  },
-    { num: '3', label: 'Engagement Packages', accent: false },
+    { num: '12', label: 'Months — standard Academy cohort',          accent: false },
+    { num: '1',  label: 'Named owner — every engagement, no exception', accent: true  },
+    { num: '8',  label: 'Cities in current operating scope',          accent: false },
+    { num: '0',  label: 'Open-ended scopes without a written brief',  accent: false },
   ];
   return (
     <div className="tsx-stat-band" aria-label="Key figures">
@@ -1588,8 +1601,8 @@ function TrustDivisionsRail() {
       <div className="tsx-rail-stage">
         <div className="rail-head">
           <div>
-            <p className="tsx-section-eyebrow">The divisions</p>
-            <h2 className="tsx-section-heading">Choose your force.</h2>
+            <p className="tsx-section-eyebrow">Service lines</p>
+            <h2 className="tsx-section-heading">Three practice areas.<br /><span className="serif">One operating standard.</span></h2>
           </div>
           <p className="rail-progress"><b ref={progressRef}>01</b> / 03</p>
         </div>
@@ -2061,6 +2074,10 @@ function TrustChapter({ eyebrow, title, sub, children }) {
 /* The section page told as one story. phase="intro" runs before the mechanism,
    phase="depth" after it — so the page reads who -> why -> what -> how -> proof -> ask. */
 function TrustSectionStory({ section, phase }) {
+  const whatWeDoTitle = section.id === 'academy' ? 'How we build a cohort'
+    : section.id === 'labs' ? 'How we scope a build'
+    : 'How we build a market system';
+
   if (phase === 'intro') {
     return (
       <div className="tsx-overview tsx-story tsx-story-light-band">
@@ -2068,7 +2085,7 @@ function TrustSectionStory({ section, phase }) {
           <TrustChapter
             eyebrow="Who this serves"
             title="Who this is for"
-            sub="The people and teams an engagement is built around - and the outcome each one is after.">
+            sub="The people and teams an engagement is built around — and the outcome each one is after.">
             <TrustLedgerRows framed items={section.audiences} titleKey="title" bodyKey="trust" />
           </TrustChapter>
 
@@ -2083,7 +2100,7 @@ function TrustSectionStory({ section, phase }) {
 
           <TrustChapter
             eyebrow="Capabilities"
-            title="What we do"
+            title={whatWeDoTitle}
             sub="The building blocks we combine into your engagement.">
             <TrustModuleCards rows={section.modules} />
           </TrustChapter>
@@ -2113,8 +2130,8 @@ function TrustSectionStory({ section, phase }) {
             <span className="tsx-story-step-pill">Delivery proof</span>
             <TrustChapter
               eyebrow="Delivery proof"
-              title="Proof it holds"
-              sub="Evidence from work already shipped - not promises.">
+              title={section.id === 'academy' ? 'Cohort outcomes' : section.id === 'labs' ? 'Systems shipped' : 'Campaigns delivered'}
+              sub="Evidence from work already shipped — not promises.">
               <TrustProofCards items={section.proof} />
               {TRUST_RUNLOG[section.id] && (
                 <div className="tsx-runlog-wrap">
@@ -2213,8 +2230,8 @@ function AcademyDepthStory({ section }) {
             <span className="tsx-story-step-pill">Delivery proof</span>
             <TrustChapter
               eyebrow="Delivery proof"
-              title="Proof it holds"
-              sub="Evidence from work already shipped - not promises.">
+              title="Cohort outcomes"
+              sub="Evidence from work already shipped — not promises.">
               <TrustProofCards items={section.proof} />
             </TrustChapter>
           </div>
@@ -2659,7 +2676,7 @@ function TrustSectionHeroUnravel({ theme, section }) {
 
 /* ─── Per-division signature modules (Trust-native, light, no canvas/pin) ─── */
 
-function TrustCohortLadder({ section, eyebrow = 'The cohort path', title, sub = 'One path every cohort runs - assess, build, then prove.', ariaLabel = 'The cohort path' }) {
+function TrustCohortLadder({ section, eyebrow = 'The cohort path', title, sub = 'One path every cohort runs — assess, build, then prove.', ariaLabel = 'The cohort path' }) {
   const steps = section.process || [];
   const railRef = React.useRef(null);
   React.useEffect(() => {
@@ -3167,9 +3184,9 @@ function TrustContact({ detail }) {
                 <div className="tsx-field">
                   <label className="tsx-field-label" htmlFor="trust-timeline">Timeline</label>
                   <select id="trust-timeline" className="tsx-field-input tsx-field-select" value={formData.timeline} onChange={(e) => handleChange("timeline", e.target.value)}>
-                    <option value="1-3 months">1-3 months</option>
-                    <option value="3-6 months">3-6 months</option>
-                    <option value="6-12 months">6-12 months</option>
+                    <option value="1-3 months">1–3 months</option>
+                    <option value="3-6 months">3–6 months</option>
+                    <option value="6-12 months">6–12 months</option>
                     <option value="Ongoing">Ongoing</option>
                   </select>
                 </div>

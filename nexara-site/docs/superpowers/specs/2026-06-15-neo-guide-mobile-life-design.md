@@ -31,9 +31,12 @@ He must read as **alive** on mobile, never a frozen sprite. Concretely:
    not a canned string).
 3. **Reacts to taps.** Tapping a nearby CTA/card/element makes him classify it
    and fire the matching contextual quip + a wink/expression, within ~150ms.
-4. **Variety.** Lines rotate (no immediate repeat); expressions vary by content
+4. **Tap him → he talks.** Tapping the guide himself (face/body) makes him cycle
+   a fresh self-aware quip + a wink/expression — a deliberate, rewarding gesture
+   distinct from tapping page elements.
+5. **Variety.** Lines rotate (no immediate repeat); expressions vary by content
    mood. He does not say the same thing twice in a row.
-5. **It feels intentional, not restless or broken.** Calm when idle, responsive
+6. **It feels intentional, not restless or broken.** Calm when idle, responsive
    when touched.
 
 If he merely moves position but the face is frozen, this is **not done**.
@@ -75,6 +78,12 @@ stays desktop-only — it needs a cursor.
   `classifyTarget(e.target)` → `express` + `setInfo` + `boomAt(x, y)` + wink.
   Throttled. Passive, never `preventDefault` — real taps/navigation untouched.
   Satisfies criterion 3.
+- **Tap-him-to-talk:** a `pointerdown`/click handler on the guide's own face/body
+  node → cycle a fresh self-aware quip (rotating bucket, no immediate repeat) +
+  wink/expression + `ledFlash`. Distinct bucket from contextual lines. The
+  face/body node must be `pointer-events: auto` (kept small, not a full-screen
+  hitbox) so it receives the tap without blocking page content. Satisfies
+  criterion 4.
 
 Mobile stays **docked** at section anchors (calmer, cheaper) — not continuous
 follow.
@@ -106,6 +115,7 @@ follow.
 
 - Desktop: after the lift, behavior unchanged (manual + visual).
 - Mobile (real device / emulation at ~390×844): walk every primary-criterion
-  item 1–5 above. Confirm blink/breathe with no input; confirm line+expression
-  change on scroll into each section; confirm tap-react < ~150ms; confirm line
-  variety; confirm no jank and battery guardrails active.
+  item 1–6 above. Confirm blink/breathe with no input; confirm line+expression
+  change on scroll into each section; confirm tap-nearby react < ~150ms; confirm
+  tapping him directly cycles a fresh quip + wink; confirm line variety; confirm
+  no jank and battery guardrails active.
