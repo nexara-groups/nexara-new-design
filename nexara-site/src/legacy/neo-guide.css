@@ -423,6 +423,13 @@
   right: auto;
 }
 
+/* Mobile/scroll mode only: make the avatar itself tappable (tap-him-to-talk).
+   Must NOT apply in cursor mode, or elementFromPoint would hit the avatar
+   instead of the hovered element and break desktop hover detection. */
+.neo-guide-overlay.is-scroll-guide .neo-guide-char-wrap {
+  pointer-events: auto;
+}
+
 .neo-guide-char-svg {
   display: block;
   width: 80px;

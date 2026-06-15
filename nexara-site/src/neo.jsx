@@ -1147,12 +1147,14 @@ function NeoGuide() {
     /* Phase 2: breakout — guide fades in as hero-wrap scrolls out */
     const homeHero = guideHomeHero;
     const showScrollGuide = () => {
+      guideLive = true;
       gsap.timeline()
         .to(guide,     { autoAlpha: 1, duration: 0.6, ease: "power2.out" }, 0)
         .to(charWrap,  { y: "44vh", duration: 1.2, ease: "power3.out" }, 0)
         .to(spotlight, { autoAlpha: 1, top: "44vh", duration: 1 }, 0.3);
     };
     const hideScrollGuide = () => {
+      guideLive = false;
       gsap.killTweensOf([charWrap, bubble, tag, beacon, spotlight]);
       gsap.to(guide, { autoAlpha: 0, duration: 0.35 });
       gsap.to(spotlight, { autoAlpha: 0, duration: 0.35 });
@@ -1174,78 +1176,65 @@ function NeoGuide() {
       showScrollGuide();
     }
 
+    // Mobile: always-on micro-life so the face never freezes (the hoisted
+    // brain's idle loops are gated on guideLive, set above on show/hide).
+    if (hasFace) { scheduleBlink(); scheduleIdleSass(); setMouth(MOUTH.smirk, 0); }
+    else { scheduleIdleSass(); }
+    // Seed idle state so scheduleIdleSass (guarded on lastKey === "idle") actually
+    // fires, and show an opening line instead of an empty bubble.
+    lastKey = "idle";
+    setInfo({ label: "nap mode", line: "ayo. scroll, tap stuff, tap me — i'll keep up." });
+    gsap.set([bubble, tag], { autoAlpha: 1 });
+
+    // Map a docked section to a facial mood (keeps expressions varied per section).
+    const moodForSection = (label) => {
+      const l = (label || "").toLowerCase();
+      if (/lab|ship|build|option/.test(l)) return "hype";
+      if (/academy|talent/.test(l)) return "money";
+      return "smirk";
+    };
+
     /* Section defs — each has a dock Y, announcement text, and a
        section-specific interact() that fires after Neo travels in    */
+    // Anchors target sections that actually render on current neo pages
+    // (manifesto → rail → final CTA). Old anchors (.detail-hero, .module-grid,
+    // .stack-detail, .market-context, .super-skills) were removed in a redesign,
+    // so the dock never fired — a big part of why he felt static on mobile.
     const sectionDefs = [
       {
-        sel: ".detail-hero",
-        yPos: "30vh",
-        label: "Inside page",
-        line: "we're inside now.",
+        sel: ".neo-manifesto",
+        yPos: "32vh",
+        label: "the premise",
+        line: "this part? actually read it.",
         interact: (tl) => {
-          const hero = document.querySelector('.detail-hero h2');
-          if (!hero) return;
-          tl.to(hero, { color: "#ccff00", textShadow: "0 0 24px rgba(204,255,0,0.35)", duration: 0.24, ease: "power2.out" }, "+=0.12")
-            .to(hero, { color: "", textShadow: "", duration: 0.5, ease: "power2.inOut" }, "+=0.35");
+          const h = document.querySelector('.neo-manifesto h2, .neo-manifesto h3, .neo-manifesto .h-display');
+          if (!h) return;
+          tl.to(h, { color: "#ccff00", textShadow: "0 0 24px rgba(204,255,0,0.35)", duration: 0.24, ease: "power2.out" }, "+=0.12")
+            .to(h, { color: "", textShadow: "", duration: 0.5, ease: "power2.inOut" }, "+=0.35");
         },
       },
       {
-        sel: ".module-grid:not(.compact)",
-        yPos: "42vh",
-        label: "Options",
-        line: "pick one.",
+        sel: ".neo-rail-wrap",
+        yPos: "46vh",
+        label: "the work",
+        line: "swipe through — it's the good stuff.",
         interact: (tl) => {
-          const cards = Array.from(document.querySelectorAll('.module-grid:not(.compact) .module-card'));
+          const cards = Array.from(document.querySelectorAll('.neo-rail-wrap [class*=card], .neo-rail-wrap article')).slice(0, 6);
           if (!cards.length) return;
-          tl.to(cards, { y: -8, borderColor: "rgba(204,255,0,0.65)", boxShadow: "0 0 30px rgba(204,255,0,0.16)", duration: 0.22, stagger: 0.06, ease: "power2.out" }, "+=0.1")
-            .to(cards, { y: 0, borderColor: "", boxShadow: "", duration: 0.36, stagger: 0.05, ease: "power2.inOut" }, "+=0.18");
+          tl.to(cards, { y: -8, duration: 0.22, stagger: 0.06, ease: "power2.out" }, "+=0.1")
+            .to(cards, { y: 0, duration: 0.36, stagger: 0.05, ease: "power2.inOut" }, "+=0.18");
         },
       },
       {
-        sel: ".stack-detail",
-        yPos: "54vh",
-        label: "Stack",
-        line: "details loading.",
+        sel: ".neo-final-cta",
+        yPos: "40vh",
+        label: "your move",
+        line: "alright. tap in. don't overthink it.",
         interact: (tl) => {
-          const cards = Array.from(document.querySelectorAll('.stack-detail-card'));
-          if (!cards.length) return;
-          tl.to(cards, { scale: 1.025, borderColor: "rgba(0,240,255,0.58)", duration: 0.2, stagger: 0.045, ease: "power2.out" }, "+=0.1")
-            .to(cards, { scale: 1, borderColor: "", duration: 0.32, stagger: 0.045, ease: "power2.inOut" }, "+=0.14");
-        },
-      },
-      {
-        sel: ".market-context",
-        yPos: "28vh",
-        label: "Academy",
-        line: "talent time.",
-        interact: (tl) => {
-          const cities = Array.from(document.querySelectorAll('.market-cities span'));
-          if (!cities.length) return;
-          const city = cities.find((item) => /visakhapatnam|vizag|vzag/i.test(item.textContent || "")) || cities[0];
-          tl.to(city, {
-            color: "#ccff00",
-            borderColor: "rgba(204,255,0,0.85)",
-            backgroundColor: "rgba(204,255,0,0.14)",
-            boxShadow: "0 0 26px rgba(204,255,0,0.36)",
-            textShadow: "0 0 20px rgba(204,255,0,0.9)",
-            scale: 1.24,
-            duration: 0.3,
-            ease: "power2.out"
-          }, "+=0.12")
-            .to(city, { scale: 1, duration: 0.55, ease: "elastic.out(1,0.5)" }, "+=0.5")
-            .set(city, { clearProps: "color,borderColor,backgroundColor,boxShadow,textShadow,scale" });
-        },
-      },
-      {
-        sel: ".super-skills",
-        yPos: "60vh",
-        label: "Labs",
-        line: "ship it.",
-        interact: (tl) => {
-          const cards = Array.from(document.querySelectorAll('.super-skill-card'));
-          if (!cards.length) return;
-          tl.to(cards, { scale: 1.04, borderColor: "rgba(204,255,0,0.75)", boxShadow: "0 0 32px rgba(204,255,0,0.22)", duration: 0.22, stagger: 0.09, ease: "power2.out", overwrite: "auto" }, "+=0.1")
-            .to(cards, { scale: 1, borderColor: "", boxShadow: "", duration: 0.4, stagger: 0.09, ease: "elastic.out(1,0.5)" }, "+=0.15");
+          const btn = document.querySelector('.neo-final-cta button, .neo-final-cta a');
+          if (!btn) return;
+          tl.to(btn, { scale: 1.06, duration: 0.24, ease: "power2.out" }, "+=0.12")
+            .to(btn, { scale: 1, duration: 0.4, ease: "elastic.out(1,0.5)" }, "+=0.2");
         },
       },
     ];
@@ -1265,10 +1254,14 @@ function NeoGuide() {
         .to(spotlight, { top: sec.yPos, duration: 0.65, ease: "power2.inOut" }, 0)
         .to(beacon,    { width: "8vw", duration: 0.4, ease: "power2.out" }, 0.2);
 
-      // 2. Announce section
+      // 2. Announce section + bring the face alive to match it
       tl.call(() => {
+        guideLive = true;
+        lastKey = "docked";                 // pause idle chatter while parked here
         if (bubble) bubble.textContent = sec.line;
         if (tag)    tag.textContent    = sec.label;
+        try { express(moodForSection(sec.label)); } catch (_) {}
+        if (hasFace) blink("r");
       })
       .to(bubble, { autoAlpha: 1, y: 0, duration: 0.35 }, "+=0.05")
       .to(tag,    { autoAlpha: 1, x: 0, duration: 0.35 }, "<0.1");
@@ -1288,9 +1281,8 @@ function NeoGuide() {
     };
 
     const undock = () => {
+      lastKey = "idle";                     // resume idle chatter between sections
       gsap.killTweensOf([charWrap, bubble, tag, beacon]);
-      gsap.killTweensOf(Array.from(document.querySelectorAll('.super-skill-card, .market-cities span')));
-      gsap.to(Array.from(document.querySelectorAll('.super-skill-card')), { scale: 1, borderColor: "", boxShadow: "", duration: 0.3, overwrite: true });
       gsap.to(charWrap,  { x: 0, y: "44vh", duration: 0.55, ease: "power2.inOut", overwrite: true });
       gsap.to(spotlight, { top: "44vh", duration: 0.55, overwrite: true });
       gsap.to(bubble,    { autoAlpha: 0, y: 10, duration: 0.25, overwrite: true });
@@ -1300,11 +1292,6 @@ function NeoGuide() {
       const armNode = guide.querySelector('#neo-guide-avatar-arm-l-node');
       if (armLine) gsap.to(armLine, { attr: { x1: 24, y1: 38, x2: 13, y2: 31 }, duration: 0.4, overwrite: true });
       if (armNode) gsap.to(armNode, { attr: { cx: 11, cy: 30 }, duration: 0.4, overwrite: true });
-
-      const cities = Array.from(document.querySelectorAll('.market-cities span'));
-      const cards = Array.from(document.querySelectorAll('.super-skill-card'));
-      gsap.set(cities, { clearProps: "color,borderColor,backgroundColor,boxShadow,textShadow,scale" });
-      gsap.set(cards, { clearProps: "scale,borderColor,boxShadow" });
     };
 
     sectionDefs.forEach((sec) => {
@@ -1321,9 +1308,60 @@ function NeoGuide() {
       }));
     });
 
+    // Mobile: tap a page element → classify + react (touch analog of desktop hover)
+    let lastTapT = 0;
+    const onTapClassify = (e) => {
+      if (guide.contains(e.target)) return;        // tapping HIM is handled below
+      const now = performance.now();
+      if (now - lastTapT < 250) return;            // throttle
+      lastTapT = now;
+      const info = classifyTarget(e.target);
+      if (info && info.key !== lastKey) { lastKey = info.key; activeInfo = info; setInfo(info); }
+      try { express(moodFor(info && info.key)); } catch (_) {}
+      boomAt(e.clientX || 0, e.clientY || 0);
+      if (hasFace) { blink("r"); ledFlash(); }
+      gsap.fromTo([bubble, tag], { autoAlpha: 0.55, y: 4 }, { autoAlpha: 1, y: 0, duration: 0.18, overwrite: "auto" });
+    };
+    window.addEventListener("pointerdown", onTapClassify, { passive: true });
+
+    // Mobile: tap HIM → self-aware quip (rotating, no immediate repeat)
+    const selfLines = [
+      "ayo you tapped me. bold. iconic.",
+      "yes hi it's me, your guide. obsessed already?",
+      "careful, tap me again and i get ideas.",
+      "main character energy. i respect it.",
+      "stop poking, start scrolling bestie.",
+      "you rang? scroll down, i'll keep up.",
+    ];
+    let selfIdx = 0;
+    const onTapSelf = (e) => {
+      e.stopPropagation();                          // don't also fire onTapClassify
+      selfIdx++;
+      setInfo({ label: "neo", line: selfLines[selfIdx % selfLines.length] });
+      if (hasFace) {
+        blink("r"); ledFlash(); setMouth(MOUTH.grin); express("hype");
+        gsap.delayedCall(0.5, () => setMouth(MOUTH.smirk));
+      }
+      gsap.fromTo([bubble, tag], { autoAlpha: 0.5, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.2, overwrite: "auto" });
+    };
+    charWrap.addEventListener("pointerdown", onTapSelf);
+
+    // Mobile: pause idle loops when the tab is hidden (battery)
+    const onVisibility = () => {
+      if (document.hidden) { clearTimeout(blinkT); clearTimeout(idleT); }
+      else if (guideLive && hasFace) { scheduleBlink(); scheduleIdleSass(); }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     return () => {
       undock();
       triggers.forEach(t => t.kill());
+      clearTimeout(blinkT);
+      clearTimeout(idleT);
+      window.removeEventListener("pointerdown", onTapClassify);
+      charWrap.removeEventListener("pointerdown", onTapSelf);
+      document.removeEventListener("visibilitychange", onVisibility);
+      gsap.killTweensOf([charWrap, bubble, tag, spotlight, burst]);
     };
   }, []);
 
