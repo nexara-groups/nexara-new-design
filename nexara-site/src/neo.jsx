@@ -658,13 +658,13 @@ function NeoGuide() {
           if (generic) return generic;
           return {
             key: "idle",
-            label: "nap mode",
+            label: "your guide",
             line: rotateLine("idle", [
-              "hover something bestie, i'm not psychic.",
-              "bored ngl. entertain me.",
-              "i see you lurking. say hi to a button.",
-              "pick something. anything. touch grass later.",
-              "the silence is giving... nothing. move."
+              "take your time — i'm your guide, just vibing up here.",
+              "hover anything and i'll break it down. no rush tho.",
+              "read it properly, i'll wait. that's literally my job.",
+              "chillin right here whenever you want the tour.",
+              "explore at your pace fr, i'm not going anywhere."
             ], "idle")
           };
         }
@@ -1019,7 +1019,7 @@ function NeoGuide() {
           .to([pupL, pupR], { y: 2,    x: 0, duration: 0.15 });
       };
       const moodFor = (key) => {
-        if (key === "idle") return "bored";
+        if (key === "idle") return "smirk";   // chill guide, not annoyed-at-you
         if (/^(currency|roi)/.test(key)) return "money";
         if (/(intake|callout|sections|cta|btn|unbox|head|tag|media)/.test(key)) return "hype";
         return "smirk";
@@ -1035,26 +1035,82 @@ function NeoGuide() {
       const scheduleBlink = () => {
         blinkT = setTimeout(() => { if (guideLive) blink(); scheduleBlink(); }, 2400 + Math.random() * 3600);
       };
-      // idle chatter — he keeps yapping even when you stop moving
+      // long-idle nudge — only after the user's been still a good while, and
+      // strictly no pressure (no "do something / move / your turn" energy).
       const idleChatter = [
-        "bored ngl. do something.", "you good bestie? hover a thing.", "i see you lurking. it's giving shy.",
-        "we doing this or nah?", "tap something, i don't bite. promise.",
-        "pick a vibe. any vibe. i'm begging.", "still here. still iconic. unlike this silence.",
-        "scroll, click, something — anything fr.", "this silence is SO loud rn.",
-        "not you ghosting me on my own site.", "delulu to think i'll move first. your turn.",
+        "whenever you're ready — there's good stuff below.",
+        "no pressure, scroll on when you wanna.",
+        "still here. take all the time you need.",
+        "ready when you are, bestie.",
+        "keep going whenever — i'll keep up.",
       ];
       let idleIdx = 0;
       const scheduleIdleSass = () => {
         idleT = setTimeout(() => {
           if (guideLive && lastKey === "idle") {
             idleIdx++;
-            setInfo({ label: "nap mode", line: idleChatter[idleIdx % idleChatter.length] });
+            setInfo({ label: "no rush", line: idleChatter[idleIdx % idleChatter.length] });
             gsap.fromTo([bubble, tag], { autoAlpha: 0.5, y: 4 }, { autoAlpha: 1, y: 0, duration: 0.22, overwrite: "auto" });
-            if (Math.random() < 0.5) eyeRoll(); else blink();
+            blink();                     // gentle blink, no eyeroll
           }
           scheduleIdleSass();
-        }, 3400 + Math.random() * 2600);
+        }, 22000 + Math.random() * 10000);   // 22–32s: only nudge after a long pause
       };
+      // --- shared scroll narration: Vibe explains each beat of the home scroll
+      //     (Nexara → premise → Academy / Labs / Marketing → close). Authored,
+      //     no-pressure lines. On desktop a later hover takes over; on mobile the
+      //     bubble auto-collapses so it never sits on the copy. ---
+      let narrateT;
+      const narrate = (key, label, line, mood) => {
+        if (key === lastKey) return;               // only on a real beat change
+        lastKey = key;
+        activeInfo = { label, line };
+        setInfo(activeInfo);
+        if (bubble) bubble.textContent = line;
+        if (tag)    tag.textContent    = label;
+        try { express(mood); } catch (_) {}
+        if (hasFace) blink("r");
+        clearTimeout(narrateT);
+        gsap.fromTo([bubble, tag], { autoAlpha: 0.5, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.25, overwrite: "auto" });
+        if (!isDesktopFollower) {
+          narrateT = setTimeout(() => gsap.to([bubble, tag], { autoAlpha: 0, y: 8, duration: 0.3, overwrite: "auto" }), 4600);
+        }
+      };
+
+      // Premise + closing beats (single-enter sections).
+      [
+        { sel: ".neo-manifesto", key: "narr-premise", label: "the premise", mood: "smirk",
+          line: "the premise: we build people, systems and brands — shipped from one house. this part's the thesis." },
+        { sel: ".neo-final-cta", key: "narr-close", label: "your move", mood: "hype",
+          line: "that's the tour. your move whenever — no rush." },
+      ].forEach((n) => {
+        const el = document.querySelector(n.sel);
+        if (!el) return;
+        triggers.push(ScrollTrigger.create({
+          trigger: el, start: "top 70%", end: "bottom 30%",
+          onEnter:     () => narrate(n.key, n.label, n.line, n.mood),
+          onEnterBack: () => narrate(n.key, n.label, n.line, n.mood),
+        }));
+      });
+
+      // Divisions: three panels inside one pinned rail — fire per active panel
+      // (same 0/1/2 index the rail itself uses).
+      const railNarrEl = document.querySelector(".neo-rail-wrap");
+      if (railNarrEl) {
+        const divisions = [
+          { key: "narr-academy",   label: "academy",   mood: "money", line: "Academy — we grow engineers who actually ship. talent, forged in public." },
+          { key: "narr-labs",      label: "labs",      mood: "hype",  line: "Labs — we build the intelligence. real AI systems, not slideware." },
+          { key: "narr-marketing", label: "marketing", mood: "hype",  line: "Marketing — we make brands move. every campaign wired to a metric." },
+        ];
+        triggers.push(ScrollTrigger.create({
+          trigger: railNarrEl, start: "top top", end: "bottom bottom", scrub: true,
+          onUpdate: (self) => {
+            const d = divisions[Math.min(2, Math.floor(self.progress * 2.99))];
+            if (d) narrate(d.key, d.label, d.line, d.mood);
+          },
+        }));
+      }
+
       // --- desktop driver: cursor-follow + hover-classify (mobile drives the same brain via its own branch) ---
       if (isDesktopFollower) {
       if (hasFace) { scheduleBlink(); scheduleIdleSass(); setMouth(MOUTH.smirk, 0); }
@@ -1088,7 +1144,7 @@ function NeoGuide() {
         }
       };
       const onLeave = () => {
-        setInfo({ label: "nap mode", line: "left already? rude. i'll be here." });
+        setInfo({ label: "your guide", line: "no worries — i'll be right here when you're back." });
         setMouth(MOUTH.flat); brows(false); look(0, 0);
       };
       // click = smug little wink + antenna flash
@@ -1127,7 +1183,7 @@ function NeoGuide() {
       gsap.set([bubble, tag], { autoAlpha: 1, x: 0, y: 0 });
       gsap.set(beacon, { width: 0 });
       gsap.set(spotlight, { autoAlpha: 0, top: 188 });
-      setInfo({ label: "nap mode", line: "ayo. hover stuff, i'll actually be useful. promise." });
+      setInfo({ label: "your guide", line: "ok so — Nexara. three engines, one roof. lemme walk you through." });
       window.addEventListener("mousemove", onMove, { passive: true });
       window.addEventListener("mouseleave", onLeave);
       window.addEventListener("click", onClick);
@@ -1138,20 +1194,33 @@ function NeoGuide() {
         window.removeEventListener("click", onClick);
         clearTimeout(blinkT);
         clearTimeout(idleT);
+        clearTimeout(narrateT);
         gsap.killTweensOf([charWrap, bubble, tag, spotlight, burst, pupL, pupR, eyeL, eyeR, mouth]);
         triggers.forEach(t => t.kill());
         guide.classList.remove("is-cursor-guide", "is-scroll-guide");
       };
     }
 
-    /* Phase 2: breakout — guide fades in as hero-wrap scrolls out */
+    /* ── Option A: collapse-to-launcher (mobile) ──
+       Bubble stays hidden; tapping the avatar (or a page element) expands it,
+       then it auto-collapses so the guide never sits over the copy. */
+    let collapseT;
+    const expandBubble = () => {
+      clearTimeout(collapseT);
+      gsap.fromTo([bubble, tag], { autoAlpha: 0.5, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.2, overwrite: "auto" });
+      collapseT = setTimeout(() => gsap.to([bubble, tag], { autoAlpha: 0, y: 8, duration: 0.3, overwrite: "auto" }), 3600);
+    };
+
+    /* Phase 2: breakout — guide fades in as hero-wrap scrolls out.
+       Parks low in the corner (82vh) instead of mid-screen, so it stays
+       out of the reading column. */
     const homeHero = guideHomeHero;
     const showScrollGuide = () => {
       guideLive = true;
       gsap.timeline()
         .to(guide,     { autoAlpha: 1, duration: 0.6, ease: "power2.out" }, 0)
-        .to(charWrap,  { y: "44vh", duration: 1.2, ease: "power3.out" }, 0)
-        .to(spotlight, { autoAlpha: 1, top: "44vh", duration: 1 }, 0.3);
+        .to(charWrap,  { y: "82vh", duration: 1.2, ease: "power3.out" }, 0)
+        .to(spotlight, { autoAlpha: 1, top: "82vh", duration: 1 }, 0.3);
     };
     const hideScrollGuide = () => {
       guideLive = false;
@@ -1176,137 +1245,19 @@ function NeoGuide() {
       showScrollGuide();
     }
 
-    // Mobile: always-on micro-life so the face never freezes (the hoisted
-    // brain's idle loops are gated on guideLive, set above on show/hide).
-    if (hasFace) { scheduleBlink(); scheduleIdleSass(); setMouth(MOUTH.smirk, 0); }
-    else { scheduleIdleSass(); }
-    // Seed idle state so scheduleIdleSass (guarded on lastKey === "idle") actually
-    // fires, and show an opening line instead of an empty bubble.
+    // Mobile: keep the face alive (blink) but DON'T auto-pop the bubble on idle —
+    // launcher mode means he only speaks when tapped, so reading stays clear.
+    if (hasFace) { scheduleBlink(); setMouth(MOUTH.smirk, 0); }
+    // Seed a launcher hint as the first-tap line, but keep the bubble collapsed.
     lastKey = "idle";
-    setInfo({ label: "nap mode", line: "ayo. scroll, tap stuff, tap me — i'll keep up." });
-    gsap.set([bubble, tag], { autoAlpha: 1 });
+    setInfo({ label: "your guide", line: "ok so — Nexara. three engines, one roof. scroll, i'll walk you through." });
+    if (bubble) bubble.textContent = "ok so — Nexara. three engines, one roof. scroll, i'll walk you through.";
+    gsap.set([bubble, tag], { autoAlpha: 0, y: 8 });
 
-    // Map a docked section to a facial mood (keeps expressions varied per section).
-    const moodForSection = (label) => {
-      const l = (label || "").toLowerCase();
-      if (/lab|ship|build|option/.test(l)) return "hype";
-      if (/academy|talent/.test(l)) return "money";
-      return "smirk";
-    };
-
-    /* Section defs — each has a dock Y, announcement text, and a
-       section-specific interact() that fires after Neo travels in    */
-    // Anchors target sections that actually render on current neo pages
-    // (manifesto → rail → final CTA). Old anchors (.detail-hero, .module-grid,
-    // .stack-detail, .market-context, .super-skills) were removed in a redesign,
-    // so the dock never fired — a big part of why he felt static on mobile.
-    const sectionDefs = [
-      {
-        sel: ".neo-manifesto",
-        yPos: "32vh",
-        label: "the premise",
-        line: "this part? actually read it.",
-        interact: (tl) => {
-          const h = document.querySelector('.neo-manifesto h2, .neo-manifesto h3, .neo-manifesto .h-display');
-          if (!h) return;
-          tl.to(h, { color: "#ccff00", textShadow: "0 0 24px rgba(204,255,0,0.35)", duration: 0.24, ease: "power2.out" }, "+=0.12")
-            .to(h, { color: "", textShadow: "", duration: 0.5, ease: "power2.inOut" }, "+=0.35");
-        },
-      },
-      {
-        sel: ".neo-rail-wrap",
-        yPos: "46vh",
-        label: "the work",
-        line: "swipe through — it's the good stuff.",
-        interact: (tl) => {
-          const cards = Array.from(document.querySelectorAll('.neo-rail-wrap [class*=card], .neo-rail-wrap article')).slice(0, 6);
-          if (!cards.length) return;
-          tl.to(cards, { y: -8, duration: 0.22, stagger: 0.06, ease: "power2.out" }, "+=0.1")
-            .to(cards, { y: 0, duration: 0.36, stagger: 0.05, ease: "power2.inOut" }, "+=0.18");
-        },
-      },
-      {
-        sel: ".neo-final-cta",
-        yPos: "40vh",
-        label: "your move",
-        line: "alright. tap in. don't overthink it.",
-        interact: (tl) => {
-          const btn = document.querySelector('.neo-final-cta button, .neo-final-cta a');
-          if (!btn) return;
-          tl.to(btn, { scale: 1.06, duration: 0.24, ease: "power2.out" }, "+=0.12")
-            .to(btn, { scale: 1, duration: 0.4, ease: "elastic.out(1,0.5)" }, "+=0.2");
-        },
-      },
-    ];
-
-    /* dock: vertical align → announce → arm extends + travel → interact → return */
-    const dock = (sec) => {
-      gsap.killTweensOf([charWrap, bubble, tag, beacon, spotlight]);
-
-      const travelX = -(window.innerWidth * 0.58);
-      const tl = gsap.timeline();
-
-      const armLine = guide.querySelector('#neo-guide-avatar-arm-l-line');
-      const armNode = guide.querySelector('#neo-guide-avatar-arm-l-node');
-
-      // 1. Snap vertically to section level
-      tl.to(charWrap,  { y: sec.yPos, duration: 0.65, ease: "power2.inOut" }, 0)
-        .to(spotlight, { top: sec.yPos, duration: 0.65, ease: "power2.inOut" }, 0)
-        .to(beacon,    { width: "8vw", duration: 0.4, ease: "power2.out" }, 0.2);
-
-      // 2. Announce section + bring the face alive to match it
-      tl.call(() => {
-        guideLive = true;
-        lastKey = "docked";                 // pause idle chatter while parked here
-        if (bubble) bubble.textContent = sec.line;
-        if (tag)    tag.textContent    = sec.label;
-        try { express(moodForSection(sec.label)); } catch (_) {}
-        if (hasFace) blink("r");
-      })
-      .to(bubble, { autoAlpha: 1, y: 0, duration: 0.35 }, "+=0.05")
-      .to(tag,    { autoAlpha: 1, x: 0, duration: 0.35 }, "<0.1");
-
-      // 3. Travel left — arm extends INTO content as Neo moves
-      tl.to(charWrap, { x: travelX, duration: 1.05, ease: "power3.out" }, "+=0.45");
-      if (armLine) tl.to(armLine, { attr: { x1: 12, y1: 40, x2: -9, y2: 21 }, duration: 0.42, ease: "power2.out" }, "-=0.72");
-      if (armNode) tl.to(armNode, { attr: { cx: -12, cy: 19 }, duration: 0.42, ease: "power2.out" }, "<");
-
-      // 4. Section-specific interaction
-      if (sec.interact) sec.interact(tl);
-
-      // 5. Return to right edge + retract arm
-      tl.to(charWrap, { x: 0, duration: 1.0, ease: "power3.in" }, "+=0.7");
-      if (armLine) tl.to(armLine, { attr: { x1: 24, y1: 38, x2: 13, y2: 31 }, duration: 0.48, ease: "power2.inOut" }, "<0.18");
-      if (armNode) tl.to(armNode, { attr: { cx: 11, cy: 30 }, duration: 0.48, ease: "power2.inOut" }, "<");
-    };
-
-    const undock = () => {
-      lastKey = "idle";                     // resume idle chatter between sections
-      gsap.killTweensOf([charWrap, bubble, tag, beacon]);
-      gsap.to(charWrap,  { x: 0, y: "44vh", duration: 0.55, ease: "power2.inOut", overwrite: true });
-      gsap.to(spotlight, { top: "44vh", duration: 0.55, overwrite: true });
-      gsap.to(bubble,    { autoAlpha: 0, y: 10, duration: 0.25, overwrite: true });
-      gsap.to(tag,       { autoAlpha: 0, x: 14, duration: 0.25, overwrite: true });
-      gsap.to(beacon,    { width: 0, duration: 0.2, overwrite: true });
-      const armLine = guide.querySelector('#neo-guide-avatar-arm-l-line');
-      const armNode = guide.querySelector('#neo-guide-avatar-arm-l-node');
-      if (armLine) gsap.to(armLine, { attr: { x1: 24, y1: 38, x2: 13, y2: 31 }, duration: 0.4, overwrite: true });
-      if (armNode) gsap.to(armNode, { attr: { cx: 11, cy: 30 }, duration: 0.4, overwrite: true });
-    };
-
-    sectionDefs.forEach((sec) => {
-      const el = document.querySelector(sec.sel);
-      if (!el) return;
-      triggers.push(ScrollTrigger.create({
-        trigger: el,
-        start: "top 60%",
-        end: "bottom 30%",
-        onEnter:     () => dock(sec),
-        onLeave:     undock,
-        onEnterBack: () => dock(sec),
-        onLeaveBack: undock,
-      }));
-    });
+    // Section narration (premise / divisions / close) is handled by the shared
+    // `narrate` system defined above — it drives both desktop and mobile, so the
+    // old mobile-only "dock + travel" system was removed. The avatar simply parks
+    // low (82vh) via showScrollGuide and speaks its authored line per beat.
 
     // Mobile: tap a page element → classify + react (touch analog of desktop hover)
     let lastTapT = 0;
@@ -1320,7 +1271,7 @@ function NeoGuide() {
       try { express(moodFor(info && info.key)); } catch (_) {}
       boomAt(e.clientX || 0, e.clientY || 0);
       if (hasFace) { blink("r"); ledFlash(); }
-      gsap.fromTo([bubble, tag], { autoAlpha: 0.55, y: 4 }, { autoAlpha: 1, y: 0, duration: 0.18, overwrite: "auto" });
+      expandBubble();
     };
     window.addEventListener("pointerdown", onTapClassify, { passive: true });
 
@@ -1342,22 +1293,24 @@ function NeoGuide() {
         blink("r"); ledFlash(); setMouth(MOUTH.grin); express("hype");
         gsap.delayedCall(0.5, () => setMouth(MOUTH.smirk));
       }
-      gsap.fromTo([bubble, tag], { autoAlpha: 0.5, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.2, overwrite: "auto" });
+      expandBubble();
     };
     charWrap.addEventListener("pointerdown", onTapSelf);
 
-    // Mobile: pause idle loops when the tab is hidden (battery)
+    // Mobile: pause the blink loop when the tab is hidden (battery). No idle
+    // nag loop on mobile — launcher mode only speaks on tap or section beats.
     const onVisibility = () => {
-      if (document.hidden) { clearTimeout(blinkT); clearTimeout(idleT); }
-      else if (guideLive && hasFace) { scheduleBlink(); scheduleIdleSass(); }
+      if (document.hidden) { clearTimeout(blinkT); }
+      else if (guideLive && hasFace) { scheduleBlink(); }
     };
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
-      undock();
       triggers.forEach(t => t.kill());
       clearTimeout(blinkT);
       clearTimeout(idleT);
+      clearTimeout(collapseT);
+      clearTimeout(narrateT);
       window.removeEventListener("pointerdown", onTapClassify);
       charWrap.removeEventListener("pointerdown", onTapSelf);
       document.removeEventListener("visibilitychange", onVisibility);
