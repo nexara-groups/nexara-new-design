@@ -1402,6 +1402,13 @@ function NeoHeroUnravel({ copy, theme }) {
 
     buildParticles();
 
+    // Constellation-line scratch: screen-space points of the featured strand.
+    // COUNT is fixed after mount (resize re-measures but never rebuilds).
+    const lineBuf = new Float32Array(COUNT * 2);
+    const LINE_STRIDE = window.innerWidth < 760 ? 2 : 3;
+    const LINE_CAP = 220;
+    const FOCUS_SEGS = { focus0: 0, focus1: 1, focus2: 2 };
+
     // Formations variables local to effect
     const v = [0, 0, 0];
     function fCloud(si, pt) {
@@ -1619,10 +1626,50 @@ function NeoHeroUnravel({ copy, theme }) {
       const p = state.p;
       updateChapters(p);
 
-      ctx.clearRect(0, 0, W, H);
+      const seg = segmentAt(p);
+
+      // Per-strand focus weight, eased by the same seg.e the morphs use.
+      const focusW = [0, 0, 0];
+      const fwFrom = FOCUS_SEGS[seg.from], fwTo = FOCUS_SEGS[seg.to];
+      if (fwFrom !== undefined) focusW[fwFrom] += 1 - seg.e;
+      if (fwTo !== undefined) focusW[fwTo] += seg.e;
+
+      // Motion trails: fade the previous frame instead of clearing it.
+      // Fast scroll -> weak fade (long streaks); idle -> strong fade (crisp).
+      const morphSpeed = Math.abs(state.target - state.p);
+      let fade = 1;
+      if (prefersReducedMotion) {
+        ctx.clearRect(0, 0, W, H);
+      } else {
+        fade = 0.5 - Math.min(0.28, morphSpeed * 34);
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "rgba(0,0,0," + fade.toFixed(3) + ")";
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // Chapter color takeover: nebula wash under the additive pass.
+      // Scaled by fade so the trail equilibrium lands at the base alpha.
+      const washW = focusW[0] + focusW[1] + focusW[2];
+      if (washW > 0.01) {
+        let wr = 0, wg = 0, wb = 0;
+        for (let siW = 0; siW < 3; siW++) {
+          wr += STRANDS[siW].rgb[0] * focusW[siW];
+          wg += STRANDS[siW].rgb[1] * focusW[siW];
+          wb += STRANDS[siW].rgb[2] * focusW[siW];
+        }
+        const washAlpha = 0.14 * washW * (prefersReducedMotion ? 1 : fade);
+        const g = ctx.createRadialGradient(CX, CY, 0, CX, CY, Math.max(W, H) * 0.62);
+        g.addColorStop(0, "rgba(" + ((wr / washW) | 0) + "," + ((wg / washW) | 0) + "," + ((wb / washW) | 0) + "," + washAlpha.toFixed(3) + ")");
+        g.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+      }
+
       ctx.globalCompositeOperation = "lighter";
 
-      const seg = segmentAt(p);
       const ry = p * 4.4 + time * 0.05 + mouse.x * 0.28;
       const rx = -0.16 + Math.sin(p * Math.PI) * 0.12 + mouse.y * 0.2;
       const cy_ = Math.cos(ry), sy_ = Math.sin(ry);
@@ -1637,7 +1684,10 @@ function NeoHeroUnravel({ copy, theme }) {
         const pA = [0, 0, 0];
         const pB = [0, 0, 0];
 
-        strandParts.forEach((pt) => {
+        const featured = focusW[si] > 0.35;
+        let bufN = 0;
+
+        strandParts.forEach((pt, pi) => {
           // Eval shapes and interpolate
           evalFormation(seg.from, si, pt, time);
           pA[0] = v[0]; pA[1] = v[1]; pA[2] = v[2];
@@ -1664,7 +1714,44 @@ function NeoHeroUnravel({ copy, theme }) {
 
           ctx.globalAlpha = alpha;
           ctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
+
+          // Depth bloom: particles near the camera get a soft halo.
+          if (persp > 1.14) {
+            const hd = d * 2.6;
+            ctx.globalAlpha = alpha * 0.35 * Math.min(1, (persp - 1.14) * 4);
+            ctx.drawImage(sprite, px - hd / 2, py - hd / 2, hd, hd);
+          }
+
+          if (featured && pi % LINE_STRIDE === 0) {
+            lineBuf[bufN * 2] = px;
+            lineBuf[bufN * 2 + 1] = py;
+            bufN++;
+          }
         });
+
+        // Constellation lines within the featured strand.
+        if (featured && bufN > 1) {
+          const maxD = Math.min(W, H) * 0.09;
+          const maxD2 = maxD * maxD;
+          const col = STRANDS[si].rgb;
+          ctx.strokeStyle = "rgb(" + col[0] + "," + col[1] + "," + col[2] + ")";
+          ctx.lineWidth = 1;
+          let drawn = 0;
+          for (let a = 0; a < bufN && drawn < LINE_CAP; a++) {
+            const ax = lineBuf[a * 2], ay = lineBuf[a * 2 + 1];
+            for (let b = a + 1; b < bufN && drawn < LINE_CAP; b++) {
+              const dx = lineBuf[b * 2] - ax, dy = lineBuf[b * 2 + 1] - ay;
+              const d2 = dx * dx + dy * dy;
+              if (d2 > maxD2) continue;
+              ctx.globalAlpha = (1 - d2 / maxD2) * focusW[si] * 0.3;
+              ctx.beginPath();
+              ctx.moveTo(ax, ay);
+              ctx.lineTo(lineBuf[b * 2], lineBuf[b * 2 + 1]);
+              ctx.stroke();
+              drawn++;
+            }
+          }
+        }
       });
 
       rafId = heroVisible ? requestAnimationFrame(renderLoop) : 0;
