@@ -2322,8 +2322,9 @@ function Nav({ theme, page, detail }) {
   return (
     <header className="nav">
       <button className="logo" onClick={() => { window.location.hash = ""; }} aria-label="Nexara home"
-        style={{ background: 'rgba(255,255,255,.94)', padding: '5px 10px', borderRadius: 8 }}>
-        <img src="/brand/nexara-logo.svg" alt="Nexara" style={{ height: 26, display: 'block' }} />
+        style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <img src="/brand/nexara-mark.svg" alt="" style={{ height: 28, display: 'block', filter: 'drop-shadow(0 0 7px rgba(160,200,255,.5))' }} />
+        Nexara
       </button>
       <nav onMouseLeave={() => setHoveredPage(null)}>
         {DATA.nav.map((item) => {
