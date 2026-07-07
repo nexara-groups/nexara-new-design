@@ -1458,7 +1458,7 @@ function TrustHeroUnravel() {
       } else {
         tctx.globalCompositeOperation = 'destination-out';
         tctx.globalAlpha = 1;
-        tctx.fillStyle = scrolling ? 'rgba(0,0,0,0.30)' : 'rgba(0,0,0,0.44)';
+        tctx.fillStyle = scrolling ? 'rgba(0,0,0,0.62)' : 'rgba(0,0,0,0.80)';
         tctx.fillRect(0, 0, W, H);
       }
 
@@ -1480,8 +1480,8 @@ function TrustHeroUnravel() {
           const bow = pt.arc * Math.min(dlen * .16, W * .05) * Math.sin(pt.t * Math.PI);
           const px = st.ptSrc.x + ddx * e + pt.jx * W * .03 * (1 - e) + nX * bow + mx;
           const py = st.ptSrc.y + ddy * e + pt.jy * H * .03 * (1 - e) + nY * bow + my;
-          const a  = Math.sin(pt.t * Math.PI) * st.ptAlpha;
-          const d  = pt.sz * (5.5 + (1 - e) * 2.5) * (W < 760 ? 1.8 : 2.8);
+          const a  = Math.sin(pt.t * Math.PI) * st.ptAlpha * 0.6;
+          const d  = pt.sz * (4.2 + (1 - e) * 1.8) * (W < 760 ? 1.4 : 2.1);
           if (a < 0.005 || px < -d || px > W + d || py < -d || py > H + d) return;
           tctx.globalAlpha = a;
           tctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
