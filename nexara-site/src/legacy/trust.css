@@ -1053,6 +1053,9 @@
 .trust .tsx-footer-links button:hover{color:var(--text)}
 .trust .tsx-footer-bottom{padding-top:28px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;max-width:1200px;margin-inline:auto;padding-inline:clamp(20px,5vw,80px)}
 .trust .tsx-footer-copyright{font-size:13px;color:#94A3B8}
+.trust .tsx-footer-legal{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.trust .tsx-footer-legal a,.trust .tsx-footer-legal button{font:inherit;font-size:13px;color:#94A3B8;background:none;border:0;padding:0;cursor:pointer;text-decoration:none;transition:color .2s}
+.trust .tsx-footer-legal a:hover,.trust .tsx-footer-legal button:hover{color:var(--ink,#0f172a)}
 
 .trust .tsx-fade{opacity:0;transform:translateY(24px);transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)}
 .trust .tsx-fade.visible{opacity:1;transform:translateY(0)}
@@ -7324,19 +7327,41 @@ html.js-reveal-ready .trust .tsx-fade.visible {
    FINAL PASS 2 — unify nav blues, section hero power beams
    ════════════════════════════════════════════════════════════════════ */
 
-/* (1) Nav buttons shared ONE blue. The theme toggle and the CTA were two
-   different blues (#1A6DFF vs #0B3E9E) sitting side by side — odd. Both now
-   use the brand blue; the CTA simply darkens on hover for state. */
+/* (1) Nav CTA — blue solid (scrolled) / glass ghost (non-scrolled) */
 .trust.tsx-site .tsx-nav-cta {
+  position: relative;
+  overflow: visible;
   background: #1A6DFF !important;
-  border-color: #1A6DFF !important;
+  border: 1px solid #1A6DFF !important;
+  color: #fff !important;
   box-shadow:
     0 2px 10px rgba(26, 109, 255, .26),
     inset 0 1px 0 rgba(255,255,255,.18) !important;
+  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease, color .2s ease, transform .2s ease !important;
 }
 .trust.tsx-site .tsx-nav-cta:hover {
   background: #1551C9 !important;
   border-color: #1551C9 !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+/* Ghost glass on transparent nav (dark-hero top) */
+.trust.tsx-site .tsx-nav:not(.scrolled) .tsx-nav-cta {
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,.28) !important;
+  color: #fff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22),
+    0 2px 10px rgba(0,0,0,.08) !important;
+}
+.trust.tsx-site .tsx-nav:not(.scrolled) .tsx-nav-cta:hover {
+  background: rgba(255,255,255,.06) !important;
+  border-color: rgba(255,255,255,.5) !important;
+  color: #fff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.4),
+    0 4px 18px rgba(0,0,0,.14) !important;
+  transform: translateY(-1px) !important;
 }
 /* ── Theme pill: active = white card, not blue block ── */
 .trust.tsx-site .tsx-theme-pill button.active {
@@ -7359,28 +7384,6 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust.tsx-site .tsx-nav:not(.scrolled) .tsx-theme-pill button.active {
   color: #0B1F33 !important;
   background: #fff !important;
-}
-
-/* ── "Talk to us" CTA: transparent glass + star sparkles ── */
-.trust.tsx-site .tsx-nav-cta {
-  position: relative;
-  overflow: visible;
-  background: transparent !important;
-  border: 1px solid rgba(255,255,255,.28) !important;
-  color: #0B1F33 !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.22),
-    0 2px 10px rgba(0,0,0,.08) !important;
-  transition: border-color .2s ease, box-shadow .2s ease, color .2s ease, transform .2s ease !important;
-}
-.trust.tsx-site .tsx-nav-cta:hover {
-  border-color: rgba(255,255,255,.5) !important;
-  color: #0B1F33 !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.4),
-    0 4px 18px rgba(0,0,0,.14) !important;
-  transform: translateY(-1px) !important;
-  background: rgba(255,255,255,.06) !important;
 }
 
 /* Star sparkle layer A — 5 dots, slow twinkle */

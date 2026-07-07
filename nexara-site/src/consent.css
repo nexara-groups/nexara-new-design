@@ -1,0 +1,116 @@
+/* ============================================================
+   Cookie consent — banner, preferences modal, toggle.
+   Self-contained. Theme by overriding the --cc-* variables below.
+   ============================================================ */
+
+:root {
+  --cc-bg: #07090d;            /* banner background — Nexara ink   */
+  --cc-fg: #ffffff;            /* banner text                     */
+  --cc-accent: #c8ff00;        /* primary button / active toggle — Nexara lime */
+  --cc-accent-dark: #b0e000;   /* primary button hover            */
+  --cc-card-bg: #ffffff;       /* modal card background           */
+  --cc-card-fg: #07090d;       /* modal headings                  */
+  --cc-muted: #6b6b6b;         /* secondary text                  */
+  --cc-rule: #e2e0d9;          /* hairlines / borders             */
+  --cc-radius: 8px;
+  --cc-font: 'Inter', system-ui, sans-serif;
+}
+
+/* Lime accent needs dark ink text on solid buttons / links for contrast. */
+.cc-btn-solid { color: #07090d; }
+.cc-banner-text a { color: var(--cc-accent); }
+
+/* -- Banner -- */
+.cc-banner {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  z-index: 1800;
+  background: var(--cc-bg);
+  border-top: 2px solid var(--cc-accent);
+  transform: translateY(110%);
+  transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.28);
+  font-family: var(--cc-font);
+}
+.cc-banner.show { transform: translateY(0); }
+.cc-banner-inner {
+  max-width: 1280px; margin: 0 auto;
+  padding: 1.35rem clamp(1.5rem, 4vw, 3rem);
+  display: flex; align-items: center; gap: 2rem;
+}
+.cc-banner-text strong { display: block; color: var(--cc-fg); font-size: 0.95rem; margin-bottom: 0.25rem; }
+.cc-banner-text p { color: rgba(255,255,255,0.6); font-size: 0.82rem; line-height: 1.6; margin: 0; max-width: 70ch; }
+.cc-banner-text a { color: var(--cc-accent); text-decoration: underline; text-underline-offset: 2px; }
+.cc-banner-text a:hover { color: var(--cc-accent-dark); }
+.cc-banner-actions { display: flex; gap: 0.6rem; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+
+/* -- Shared buttons -- */
+.cc-btn {
+  font-family: var(--cc-font);
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.7rem 1.3rem; border: 1.5px solid transparent; cursor: pointer;
+  transition: all 0.2s ease; white-space: nowrap;
+}
+.cc-btn-solid { background: var(--cc-accent); color: var(--cc-fg); border-color: var(--cc-accent); }
+.cc-btn-solid:hover { background: var(--cc-accent-dark); border-color: var(--cc-accent-dark); }
+.cc-btn-ghost { background: transparent; color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.28); }
+.cc-btn-ghost:hover { border-color: var(--cc-fg); color: var(--cc-fg); }
+
+/* -- Preferences modal -- */
+.cc-modal {
+  position: fixed; inset: 0; z-index: 3200;
+  background: rgba(10,10,10,0.72);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+  font-family: var(--cc-font);
+}
+.cc-modal.open { opacity: 1; pointer-events: auto; }
+.cc-modal-card {
+  position: relative; background: var(--cc-card-bg);
+  max-width: 560px; width: 100%; max-height: 88vh; overflow-y: auto;
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  border-radius: var(--cc-radius);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  transform: translateY(12px); transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.cc-modal.open .cc-modal-card { transform: translateY(0); }
+.cc-modal-card h3 { font-size: 1.5rem; margin: 0 0 0.5rem; color: var(--cc-card-fg); }
+.cc-modal-lead { font-size: 0.86rem; color: var(--cc-muted); margin-bottom: 1.75rem; line-height: 1.65; }
+.cc-modal-close {
+  position: absolute; top: 1rem; right: 1rem; width: 38px; height: 38px;
+  background: transparent; border: 1px solid var(--cc-rule); color: var(--cc-muted);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;
+}
+.cc-modal-close:hover { border-color: var(--cc-card-fg); color: var(--cc-card-fg); }
+.cc-row { display: flex; align-items: center; gap: 1.5rem; padding: 1.15rem 0; border-top: 1px solid var(--cc-rule); }
+.cc-row-text { flex: 1; }
+.cc-row-text strong { display: block; font-size: 0.92rem; color: var(--cc-card-fg); margin-bottom: 0.2rem; }
+.cc-row-text span { font-size: 0.8rem; color: var(--cc-muted); line-height: 1.55; }
+.cc-row-text code { font-family: monospace; font-size: 0.78rem; background: rgba(0,0,0,0.06); padding: 0.05em 0.35em; border-radius: 2px; }
+.cc-locked { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cc-muted); flex-shrink: 0; }
+.cc-modal-actions {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+  margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--cc-rule);
+}
+.cc-modal-actions .cc-btn-ghost { color: var(--cc-muted); border-color: var(--cc-rule); }
+.cc-modal-actions .cc-btn-ghost:hover { border-color: var(--cc-card-fg); color: var(--cc-card-fg); }
+
+/* -- Toggle switch -- */
+.cc-switch { position: relative; display: inline-block; width: 46px; height: 26px; flex-shrink: 0; }
+.cc-switch input { opacity: 0; width: 0; height: 0; }
+.cc-slider { position: absolute; inset: 0; background: #cfcdc5; border-radius: 26px; transition: background 0.2s ease; cursor: pointer; }
+.cc-slider::before { content: ''; position: absolute; height: 20px; width: 20px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s ease; }
+.cc-switch input:checked + .cc-slider { background: var(--cc-accent); }
+.cc-switch input:checked + .cc-slider::before { transform: translateX(20px); }
+.cc-switch input:focus-visible + .cc-slider { outline: 2px solid var(--cc-card-fg); outline-offset: 2px; }
+
+/* -- Mobile -- */
+@media (max-width: 768px) {
+  .cc-banner-inner { flex-direction: column; align-items: stretch; gap: 1rem; }
+  .cc-banner-actions { justify-content: stretch; }
+  .cc-banner-actions .cc-btn { flex: 1; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-banner, .cc-modal, .cc-modal-card, .cc-slider, .cc-slider::before { transition-duration: 0.01ms; }
+}

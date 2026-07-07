@@ -1,6 +1,7 @@
 import React from 'react';
 import { parseRoute } from './shared.js';
 import { TrustSite } from './trust.jsx';
+import CookieConsent from './CookieConsent.jsx';
 
 const { useState } = React;
 const Gateway = React.lazy(() => import('./gateway.jsx').then((m) => ({ default: m.Gateway })));
@@ -42,7 +43,12 @@ function App() {
   else if (route.theme === "trust") el = <TrustSite page={route.page} detail={route.detail} />;
   else el = <NeoSite theme={route.theme} page={route.page} detail={route.detail} />;
 
-  return <React.Suspense fallback={null}>{el}</React.Suspense>;
+  return (
+    <>
+      <React.Suspense fallback={null}>{el}</React.Suspense>
+      <CookieConsent />
+    </>
+  );
 }
 
 export default App;

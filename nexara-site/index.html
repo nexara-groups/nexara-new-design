@@ -94,12 +94,35 @@
     }
     </script>
 
-    <!-- ── Google Analytics ────────────────────────────────────────── -->
+    <!-- ── Google Analytics + Consent Mode v2 ──────────────────────── -->
+    <!-- Everything DENIED until the visitor opts in. The consent 'default'
+         MUST run before gtag('config') so no _ga cookies fire pre-consent. -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BPYYD3KQ99"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
+
+      // 1) Default everything to DENIED (no analytics cookies until opt-in).
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': 'denied',
+        'functionality_storage': 'granted',
+        'security_storage': 'granted',
+        'wait_for_update': 500
+      });
+
+      // 2) Re-apply a previously saved choice so consent persists across visits.
+      try {
+        var _cc = JSON.parse(localStorage.getItem('cc-consent') || 'null');
+        if (_cc && _cc.analytics === true) {
+          gtag('consent', 'update', { 'analytics_storage': 'granted' });
+        }
+      } catch (e) {}
+
+      // 3) Init GA (still cookieless until consent granted above).
       gtag('config', 'G-BPYYD3KQ99');
     </script>
 

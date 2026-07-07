@@ -8,6 +8,7 @@ import { NotFound } from './notfound.jsx';
 if (typeof window !== 'undefined') Object.assign(window, { THREE, gsap, ScrollTrigger });
 import { DATA } from './data.js';
 import { voice, parseRoute, routeTo, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from './shared.js';
+import { openCookiePreferences } from './CookieConsent.jsx';
 const { useState, useMemo, useEffect, useRef, useCallback, useLayoutEffect, useReducer } = React;
 
 function CyclingWord({ words }) {
@@ -5391,6 +5392,11 @@ function Footer({ theme }) {
         {Object.values(DATA.sections).map((s) => <button key={s.id} onClick={() => routeTo(theme, s.id)}>{s.name}</button>)}
         <button onClick={() => routeTo(theme, "company")}>Company</button>
         <button onClick={() => routeTo(theme, "contact")}>Contact</button>
+        <a href="/privacy-policy.html">Privacy</a>
+        <a href="/terms-of-service.html">Terms</a>
+        <a href="/cookie-policy.html">Cookies</a>
+        <a href="/data-deletion.html">Data Deletion</a>
+        <button onClick={openCookiePreferences}>Cookie Preferences</button>
       </div>
     </footer>
   );

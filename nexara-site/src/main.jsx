@@ -11,6 +11,7 @@ import "./legacy/gateway.css";
 import "./legacy/neo.css";
 import "./legacy/trust.css";
 import "./legacy/neo-guide.css";
+import "./consent.css";
 
 gsap.registerPlugin(ScrollTrigger);
 Object.assign(window, { React, gsap, ScrollTrigger, NEXARA: DATA });

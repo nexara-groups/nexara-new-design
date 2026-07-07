@@ -6,6 +6,7 @@ import { GraduationCap, TrendingUp, Cpu, Shield, Mail } from 'lucide-react';
 import { DATA } from './data.js';
 import { voice, parseRoute, routeTo, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from './shared.js';
 import { NotFound } from './notfound.jsx';
+import { openCookiePreferences } from './CookieConsent.jsx';
 
 function CyclingWord({ words }) {
   const [idx, setIdx] = React.useState(0);
@@ -995,6 +996,13 @@ function TrustFooter() {
       </div>
       <div className="tsx-footer-bottom">
         <p className="tsx-footer-copyright">© 2026 Nexara. All rights reserved.</p>
+        <nav className="tsx-footer-legal" aria-label="Legal">
+          <a href="/privacy-policy.html">Privacy Policy</a>
+          <a href="/terms-of-service.html">Terms of Service</a>
+          <a href="/cookie-policy.html">Cookie Policy</a>
+          <a href="/data-deletion.html">Data Deletion</a>
+          <button type="button" onClick={openCookiePreferences}>Cookie Preferences</button>
+        </nav>
       </div>
     </footer>
   );
