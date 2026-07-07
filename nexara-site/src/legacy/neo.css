@@ -1,6 +1,6 @@
 .neo{--bg:#000;--panel:#0b0b0d;--panel2:#101014;--line:rgba(255,255,255,.12);--text:#fff;--muted:#8a8a92;--accent:#ccff00;--cyan:#00f0ff;background:var(--bg);color:var(--text);font-family:"Space Grotesk",sans-serif}
 .neo .nav{background:rgba(0,0,0,.82);border-bottom:1px solid var(--line)}
-.neo .logo{font-family:"Syne",sans-serif;color:#fff;text-transform:uppercase}.neo .logo::before{content:"";display:inline-block;width:11px;height:11px;background:var(--accent);margin-right:10px}
+.neo .logo{font-family:"Syne",sans-serif;color:#fff;text-transform:uppercase}
 .neo .nav nav button{font-family:"JetBrains Mono",monospace;color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
 .neo .nav nav button.active{color:#fff;border-bottom:1px solid var(--accent)}
 .neo .switch{background:#fff;color:#000;padding:10px 14px;font-family:"JetBrains Mono",monospace;font-size:11px;text-transform:uppercase}
@@ -130,12 +130,6 @@
   min-width: max-content;
 }
 
-.neo .logo::before {
-  width: 12px;
-  height: 12px;
-  margin-right: 12px;
-  box-shadow: 0 0 18px rgba(204, 255, 0, .42);
-}
 
 .neo .nav nav {
   display: flex;

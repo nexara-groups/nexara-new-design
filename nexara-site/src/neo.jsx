@@ -2321,7 +2321,10 @@ function Nav({ theme, page, detail }) {
   const [hoveredPage, setHoveredPage] = useState(null);
   return (
     <header className="nav">
-      <button className="logo" onClick={() => { window.location.hash = ""; }}>Nexara</button>
+      <button className="logo" onClick={() => { window.location.hash = ""; }} aria-label="Nexara home"
+        style={{ background: 'rgba(255,255,255,.94)', padding: '5px 10px', borderRadius: 8 }}>
+        <img src="/brand/nexara-logo.svg" alt="Nexara" style={{ height: 26, display: 'block' }} />
+      </button>
       <nav onMouseLeave={() => setHoveredPage(null)}>
         {DATA.nav.map((item) => {
           const active = page === item.page;

@@ -630,7 +630,7 @@ function TrustNav({ page, detail }) {
     <header className="tsx-nav" ref={navRef} role="banner">
       <div className="tsx-nav-inner">
         <button className="tsx-logo" onClick={() => routeTo('trust', 'home')} aria-label="Nexara home">
-          Nexara
+          <img src="/brand/nexara-logo.svg" alt="Nexara" style={{ height: 34, display: 'block' }} />
         </button>
         <nav aria-label="Primary">
           <ul className="tsx-nav-links tsx-tubelight" onMouseLeave={() => setHoveredPage(null)}>
@@ -966,7 +966,7 @@ function TrustFooter() {
       <div className="tsx-footer-top">
         <div>
           <button className="tsx-logo" onClick={() => routeTo('trust', 'home')} aria-label="Nexara home">
-            Nexara
+            <img src="/brand/nexara-logo.svg" alt="Nexara" style={{ height: 40, display: 'block' }} />
           </button>
           <p className="tsx-footer-brand-desc">Enterprise IT capability programmes for talent, digital growth and applied automation.</p>
         </div>
