@@ -3861,6 +3861,11 @@ function NeoSectionHeroUnravel({ theme, section }) {
     let COUNT = window.innerWidth < 760 ? 260 : 560;
     let parts = [];
 
+    // Constellation-line scratch (same treatment as the home hero).
+    const lineBuf = new Float32Array((window.innerWidth < 760 ? 260 : 560) * 2);
+    const LINE_STRIDE = window.innerWidth < 760 ? 2 : 3;
+    const LINE_CAP = 160;
+
     function build() {
       COUNT = window.innerWidth < 760 ? 260 : 560;
       parts = new Array(COUNT);
@@ -3915,7 +3920,33 @@ function NeoSectionHeroUnravel({ theme, section }) {
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
 
       const p = state.p;
-      ctx.clearRect(0, 0, W, H);
+
+      // Motion trails: fade the previous frame instead of clearing it.
+      const morphSpeed = Math.abs(state.target - state.p);
+      let fade = 1;
+      if (prefersReducedMotion) {
+        ctx.clearRect(0, 0, W, H);
+      } else {
+        fade = 0.5 - Math.min(0.28, morphSpeed * 34);
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "rgba(0,0,0," + fade.toFixed(3) + ")";
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // Accent takeover: nebula wash strengthens as the shape forms.
+      const formW = p * p * (3 - 2 * p);
+      if (formW > 0.02) {
+        const washAlpha = 0.12 * formW * (prefersReducedMotion ? 1 : fade);
+        const g = ctx.createRadialGradient(CX, CY, 0, CX, CY, Math.max(W, H) * 0.62);
+        g.addColorStop(0, "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + "," + washAlpha.toFixed(3) + ")");
+        g.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+      }
+
       ctx.globalCompositeOperation = "lighter";
 
       const ry = p * 1.8 + time * 0.08;
@@ -3923,7 +3954,10 @@ function NeoSectionHeroUnravel({ theme, section }) {
       const cy_ = Math.cos(ry), sy_ = Math.sin(ry);
       const cx_ = Math.cos(rx), sx_ = Math.sin(rx);
 
-      parts.forEach((pt) => {
+      let bufN = 0;
+      const linesOn = formW > 0.55 && !prefersReducedMotion;
+
+      parts.forEach((pt, pi) => {
         // Line formation
         const lx = (pt.t - 0.5) * 3.3;
         const ly = 0;
@@ -3973,14 +4007,52 @@ function NeoSectionHeroUnravel({ theme, section }) {
 
         ctx.globalAlpha = 0.95;
         ctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
+
+        // Depth bloom: near-camera particles get a soft halo.
+        if (persp > 1.14) {
+          const hd = d * 2.6;
+          ctx.globalAlpha = 0.33 * Math.min(1, (persp - 1.14) * 4);
+          ctx.drawImage(sprite, px - hd / 2, py - hd / 2, hd, hd);
+        }
+
+        if (linesOn && pi % LINE_STRIDE === 0) {
+          lineBuf[bufN * 2] = px;
+          lineBuf[bufN * 2 + 1] = py;
+          bufN++;
+        }
       });
 
-      rafId = requestAnimationFrame(render);
+      // Constellation lines once the shape has formed.
+      if (linesOn && bufN > 1) {
+        const maxD = Math.min(W, H) * 0.09;
+        const maxD2 = maxD * maxD;
+        ctx.strokeStyle = "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")";
+        ctx.lineWidth = 1;
+        const lineW = (formW - 0.55) / 0.45;
+        let drawn = 0;
+        for (let a = 0; a < bufN && drawn < LINE_CAP; a++) {
+          const ax = lineBuf[a * 2], ay = lineBuf[a * 2 + 1];
+          for (let b = a + 1; b < bufN && drawn < LINE_CAP; b++) {
+            const dx = lineBuf[b * 2] - ax, dy = lineBuf[b * 2 + 1] - ay;
+            const d2 = dx * dx + dy * dy;
+            if (d2 > maxD2) continue;
+            ctx.globalAlpha = (1 - d2 / maxD2) * lineW * 0.3;
+            ctx.beginPath();
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(lineBuf[b * 2], lineBuf[b * 2 + 1]);
+            ctx.stroke();
+            drawn++;
+          }
+        }
+      }
+
+      rafId = sectionVisible ? requestAnimationFrame(render) : 0;
     }
 
     let sectionVisible = true;
     const io = new IntersectionObserver(([e]) => {
       sectionVisible = e.isIntersecting;
+      if (sectionVisible && !rafId) rafId = requestAnimationFrame(render);
     }, { threshold: 0 });
     io.observe(wrapRef.current);
 
