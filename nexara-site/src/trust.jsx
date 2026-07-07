@@ -1585,7 +1585,7 @@ function TrustHeroUnravel() {
         </div>
 
         <div className="tsx-hero-chapter ch-right" style={{ '--accent': '#1E40AF' }} data-from="0.45" data-to="0.63" aria-hidden="true">
-          <p className="tsx-panel-idx" style={{ right: 'clamp(24px, 9vw, 140px)', left: 'auto' }}>02 / DIVISION</p>
+          <p className="tsx-panel-idx" style={{ right: 'max(9vw, 150px)', left: 'auto' }}>02 / DIVISION</p>
           <h2 className="tsx-section-heading" style={{ textAlign: 'right' }}>Labs<br /><span className="serif" style={{ color: '#1E40AF' }}>the systems forge.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'right' }}>Applied AI and automation systems, engineered from prototype to production with written specs and weekly demos.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'labs')} style={{ marginTop: '20px' }}>Enter Labs →</button>
