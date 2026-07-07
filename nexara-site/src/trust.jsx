@@ -1064,6 +1064,7 @@ function TrustHeroUnravel() {
         t:  i / COUNT,
         jx: Math.random() - .5,
         jy: Math.random() - .5,
+        arc: (Math.random() - .5) * 2,
         sz: 1.0 + Math.random() * 1.4,
       }))
     );
@@ -1216,6 +1217,15 @@ function TrustHeroUnravel() {
         ctx.beginPath();
         ctx.arc(bx, by, ringR, arcA, arcA + Math.PI * .3);
         ctx.stroke();
+
+        // Precision dial: dashed outer ring, slow rotation via dash offset.
+        ctx.globalAlpha = alpha * 0.4;
+        ctx.setLineDash([2, 6]);
+        ctx.lineDashOffset = -time * 14;
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = `rgb(${d.r},${d.g},${d.b})`;
+        ctx.beginPath(); ctx.arc(bx, by, ringR * 1.45, 0, TAU); ctx.stroke();
+        ctx.setLineDash([]);
       }
 
       // Center dot
@@ -1261,10 +1271,37 @@ function TrustHeroUnravel() {
       ctx.globalAlpha = intensity;
       ctx.fillStyle = '#fff';
       ctx.beginPath(); ctx.arc(CX, CY, W * .014, 0, TAU); ctx.fill();
+
+      // Instrument ring: slowly rotating ticks, every 4th one long.
+      const tickR = pulse * 1.6;
+      const rot = time * 0.15;
+      ctx.strokeStyle = 'rgba(140,180,255,1)';
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.30 * intensity;
+      for (let i = 0; i < 48; i++) {
+        const a = rot + (i / 48) * TAU;
+        const c = Math.cos(a), s = Math.sin(a);
+        const len = i % 4 === 0 ? W * .008 : W * .004;
+        ctx.beginPath();
+        ctx.moveTo(CX + c * tickR, CY + s * tickR);
+        ctx.lineTo(CX + c * (tickR + len), CY + s * (tickR + len));
+        ctx.stroke();
+      }
+
+      // Breathing orbit ellipse.
+      ctx.globalAlpha = 0.22 * intensity;
+      ctx.beginPath();
+      ctx.ellipse(CX, CY, tickR * 1.35, tickR * (0.42 + 0.16 * Math.sin(time * 0.5)), -0.35, 0, TAU);
+      ctx.stroke();
       ctx.globalAlpha = 1;
     }
 
     let W = 0, H = 0, CX = 0, CY = 0, SCALE = 1;
+
+    // Offscreen trail layer: particles + silk trails accumulate here so the
+    // labels, rings, and core on the main canvas stay crisp every frame.
+    const trailCanvas = document.createElement('canvas');
+    const tctx = trailCanvas.getContext('2d');
 
     function measure() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1272,6 +1309,9 @@ function TrustHeroUnravel() {
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      trailCanvas.width = canvas.width;
+      trailCanvas.height = canvas.height;
+      tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       CX = W / 2;
       CY = H * 0.48;
       SCALE = Math.min(W, H) * 0.305;
@@ -1411,29 +1451,67 @@ function TrustHeroUnravel() {
       const states = DIVS.map((_, si) => getState(pc, si, time));
       const ci = coreIntensity(pc);
 
-      // Particles (drawn first — beneath blobs and core)
-      ctx.globalCompositeOperation = 'lighter';
+      // Silk trails: fade the offscreen layer instead of clearing it.
+      const scrolling = Math.abs(state.target - state.p) > 0.0008;
+      if (prefersReducedMotion) {
+        tctx.clearRect(0, 0, W, H);
+      } else {
+        tctx.globalCompositeOperation = 'destination-out';
+        tctx.globalAlpha = 1;
+        tctx.fillStyle = scrolling ? 'rgba(0,0,0,0.30)' : 'rgba(0,0,0,0.44)';
+        tctx.fillRect(0, 0, W, H);
+      }
+
+      // Particles (drawn into the trail layer, beneath blobs and core).
+      // Paths bow perpendicular to the travel line — braided silk streams.
+      tctx.globalCompositeOperation = 'lighter';
       DIVS.forEach((_, si) => {
         const st = states[si];
         if (st.ptAlpha < 0.01) return;
         const sprite = sprites[si];
+        const ddx = st.ptDst.x - st.ptSrc.x, ddy = st.ptDst.y - st.ptSrc.y;
+        const dlen = Math.hypot(ddx, ddy) || 1;
+        const nX = -ddy / dlen, nY = ddx / dlen;
         particles[si].forEach(pt => {
           pt.t = (pt.t + .0058) % 1;
           const e  = ss(pt.t);
           const mx = mouse.x * W * .032 * (1 - e);
           const my = mouse.y * H * .032 * (1 - e);
-          const px = st.ptSrc.x + (st.ptDst.x - st.ptSrc.x) * e + pt.jx * W * .03 * (1 - e) + mx;
-          const py = st.ptSrc.y + (st.ptDst.y - st.ptSrc.y) * e + pt.jy * H * .03 * (1 - e) + my;
+          const bow = pt.arc * Math.min(dlen * .16, W * .05) * Math.sin(pt.t * Math.PI);
+          const px = st.ptSrc.x + ddx * e + pt.jx * W * .03 * (1 - e) + nX * bow + mx;
+          const py = st.ptSrc.y + ddy * e + pt.jy * H * .03 * (1 - e) + nY * bow + my;
           const a  = Math.sin(pt.t * Math.PI) * st.ptAlpha;
           const d  = pt.sz * (5.5 + (1 - e) * 2.5) * (W < 760 ? 1.8 : 2.8);
           if (a < 0.005 || px < -d || px > W + d || py < -d || py > H + d) return;
-          ctx.globalAlpha = a;
-          ctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
+          tctx.globalAlpha = a;
+          tctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
         });
       });
-      ctx.globalCompositeOperation = 'source-over';
+      tctx.globalCompositeOperation = 'source-over';
 
+      // Composite the trail layer, then draw crisp geometry on top.
       ctx.globalAlpha = 1;
+      ctx.drawImage(trailCanvas, 0, 0, W, H);
+
+      // Filaments: lit fibers connecting travelling blobs to the core.
+      states.forEach((st, si) => {
+        const fdx = st.bPos.x - CX, fdy = st.bPos.y - CY;
+        const fdist = Math.hypot(fdx, fdy);
+        const fa = Math.min(st.ptAlpha * 1.4, st.bAlpha) * cl(fdist / (W * .12)) * 0.22;
+        if (fa < 0.02) return;
+        const d = DIVS[si];
+        const grad = ctx.createLinearGradient(CX, CY, st.bPos.x, st.bPos.y);
+        grad.addColorStop(0,  `rgba(${d.r},${d.g},${d.b},0)`);
+        grad.addColorStop(.5, `rgba(${d.r},${d.g},${d.b},${fa.toFixed(3)})`);
+        grad.addColorStop(1,  `rgba(${d.r},${d.g},${d.b},0)`);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.moveTo(CX, CY);
+        ctx.lineTo(st.bPos.x, st.bPos.y);
+        ctx.stroke();
+      });
 
       // Blobs (drawn over particles)
       states.forEach((st, si) => {
