@@ -2140,6 +2140,12 @@
     min-width: 0;
   }
 
+  /* 42px lockup is ~181px wide — it shoves the burger off a 375px screen.
+     26px keeps NEXARA legible and frees ~70px. */
+  .trust.tsx-site .tsx-logo img {
+    height: 26px !important;
+  }
+
   .trust.tsx-site .tsx-nav-cta {
     display: none;
   }

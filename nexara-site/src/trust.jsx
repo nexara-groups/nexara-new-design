@@ -1081,7 +1081,7 @@ function TrustHeroUnravel() {
       const spread = [
         { x: W * .16, y: H * .15 },
         { x: W * .84, y: H * .15 },
-        { x: CX,      y: H * .86 },
+        { x: CX,      y: H * (W < 760 ? .76 : .86) }, // higher on mobile: label must clear the scroll cue
       ];
       const core  = { x: CX, y: CY };
       const spots = [
