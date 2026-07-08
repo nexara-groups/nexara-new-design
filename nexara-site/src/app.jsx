@@ -16,10 +16,15 @@ const PAGE_TITLES = {
   contact:   'Contact — Start a Project',
 };
 
+const BRAND_TITLE = 'Nexara Groups — Academy, Digital Marketing & Product Studio';
+
 function useDynamicTitle(route) {
   React.useEffect(() => {
-    if (!route.theme || route.page === 'gateway') {
-      document.title = 'Nexara — Academy, Marketing & Labs | Three Forces, One Standard';
+    // Gateway and the themed home pages carry the full keyword-rich brand title
+    // (a bare "Home | Nexara Trust" wastes the highest-value SERP line, which
+    // crawlers read from the JS-rendered <title>, not the static HTML).
+    if (!route.theme || route.page === 'gateway' || route.page === 'home') {
+      document.title = BRAND_TITLE;
       return;
     }
     const section = PAGE_TITLES[route.page] || route.page;

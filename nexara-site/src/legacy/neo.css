@@ -1016,6 +1016,27 @@
 .neo-rail-panel .panel-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
 .neo-rail-panel .panel-tags span { font-family: "JetBrains Mono", monospace; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 100px; padding: 6px 12px; }
 
+/* Align rail head + standards band to the rail track's horizontal inset.
+   Without this, .rail-head and the unstyled .section-inner hug the raw
+   viewport edge (left:0) while the rail cards sit at clamp(20px,6vw,80px). */
+.neo #divisions .rail-head { padding-inline: clamp(20px, 6vw, 80px); }
+.neo .section.standards { padding-block: clamp(54px, 7vw, 96px); }
+.neo .section.standards .section-inner { padding-inline: clamp(20px, 6vw, 80px); }
+
+/* Rail head "Choose your force." carries no .section-head ancestor, so its
+   .h-section was unstyled (16px). Promote it to a real display title that
+   matches the standards head. */
+.neo #divisions .rail-head h2,
+.neo .section.standards .section-head h2 {
+  font-family: "Syne", sans-serif;
+  font-size: clamp(2rem, 4vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.neo #divisions .rail-head h2 { margin-top: 8px; }
+
 .neo-standards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .neo-standard-card { background: #0b0b0d; border: 1px solid var(--line); padding: 28px; min-height: 250px; display: flex; flex-direction: column; transition: border-color 0.3s; }
 .neo-standard-card:hover { border-color: var(--accent); }
@@ -1142,6 +1163,7 @@
 
 /* Gradient-ink display headings */
 .neo .section-head h2,
+.neo #divisions .rail-head h2,
 .neo .callout h2,
 .neo .stack-matrix h2,
 .neo .intake-cta h2 {
@@ -1205,6 +1227,9 @@
   .neo-rail-stage { position: relative; height: auto; padding: 40px 0; }
   .neo-rail-track { flex-direction: column; width: 100%; padding: 20px; }
   .neo-rail-panel { width: 100%; min-height: auto; margin-bottom: 20px; }
+  /* Match the flat 20px mobile track inset so heads align to the card edge. */
+  .neo #divisions .rail-head,
+  .neo .section.standards .section-inner { padding-inline: 20px; }
   /* Card collapses to content height on mobile — the absolute idx would sit
      on the heading, so put it back in flow above it. */
   .neo-panel-idx { position: static; display: block; margin-bottom: 14px; }

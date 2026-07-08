@@ -932,7 +932,7 @@
 .trust .tsx-nav-links.tsx-tubelight button::after{display:none}
 .trust .tsx-nav-links.tsx-tubelight{overflow:visible}
 .trust .tsx-nav-links.tsx-tubelight li{position:relative}
-.trust .tsx-tubelight-btn{position:relative;display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:600;color:#33475F;white-space:nowrap;padding:6px 13px;background:none;border:none;cursor:pointer;font-family:inherit;transition:color .15s,background .15s;border-radius:6px}
+.trust .tsx-tubelight-btn{position:relative;display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:600;color:#33475F;white-space:nowrap;padding:6px 11px;background:none;border:none;cursor:pointer;font-family:inherit;transition:color .15s,background .15s;border-radius:6px}
 .trust .tsx-tubelight-btn:hover:not(.active){color:var(--text)}
 .trust .tsx-tubelight-btn.active{color:var(--text);background:color-mix(in srgb,var(--tsx-accent,#1A6DFF) 7%,transparent)}
 .trust .tsx-tubelight-icon{display:flex;align-items:center;opacity:.7}
@@ -6441,10 +6441,14 @@ html.js-reveal-ready .trust .tsx-fade.visible {
    No animation on the pill itself — confidence doesn't shimmer.
 */
 .trust.tsx-site .tsx-nav-inner {
-  max-width: 1220px;
+  /* Pill hugs its content (logo + links + toggle + CTA) and is capped only by
+     the viewport — a fixed 1220px bar let the content (~1316px) overflow the
+     rounded right edge, spilling the toggle + CTA outside the glass. */
+  width: max-content;
+  max-width: min(1340px, calc(100vw - 24px));
   height: 58px;
-  padding-inline: clamp(16px, 2.8vw, 32px);
-  gap: clamp(18px, 2.2vw, 32px);
+  padding-inline: clamp(14px, 2.2vw, 26px);
+  gap: clamp(14px, 1.6vw, 22px);
   border-radius: 999px;
   position: relative;
   isolation: isolate;
@@ -6795,6 +6799,23 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust.tsx-site .tsx-logo {
   font-family: 'Deltha', sans-serif !important;
   letter-spacing: 0.01em !important;
+}
+
+/* Elevate the logo off the glass pill: bigger mark (48px, set inline), nudged
+   up, with a soft navy depth shadow so it reads as raised rather than printed
+   flat. */
+.trust.tsx-site .tsx-logo img {
+  transform: translateY(-2px);
+  filter:
+    drop-shadow(0 1px 1px rgba(11, 31, 51, .24))
+    drop-shadow(0 4px 10px rgba(11, 31, 51, .28));
+  transition: filter .25s ease, transform .25s ease;
+}
+.trust.tsx-site .tsx-logo:hover img {
+  transform: translateY(-3px);
+  filter:
+    drop-shadow(0 2px 2px rgba(11, 31, 51, .28))
+    drop-shadow(0 6px 16px rgba(11, 31, 51, .34));
 }
 
 /* Footer wordmark */

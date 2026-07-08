@@ -1,5 +1,11 @@
 *{box-sizing:border-box}
 html,body,#root{min-height:100%;margin:0}
+/* Reserve space above every scroll target (scrollIntoView, #anchors) so
+   headings never land hidden under the sticky/fixed nav. Sized to the
+   taller of Neo's 2-row mobile nav (~129px) / Trust's fixed nav (~64-68px)
+   plus breathing room; harmless slack on the shorter one. */
+html{scroll-padding-top:110px}
+@media(max-width:720px){html{scroll-padding-top:150px}}
 body{font-family:"Plus Jakarta Sans",system-ui,sans-serif;background:#000;color:#fff;-webkit-font-smoothing:antialiased;overflow-x:clip}
 button{font:inherit;cursor:pointer;min-height:44px;transition:transform 180ms cubic-bezier(0.16,1,0.3,1)}
 button:active{transform:scale(0.96)}
