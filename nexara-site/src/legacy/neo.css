@@ -951,7 +951,16 @@
 .neo-hero-runway { position: relative; height: 640vh; }
 .neo-hero-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: radial-gradient(ellipse 80% 60% at 50% 45%, rgba(124, 92, 255, 0.08), transparent 60%), #06060a; }
 .neo-hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.neo-hero-chapter { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 clamp(20px, 6vw, 80px); opacity: 0; pointer-events: none; will-change: opacity, transform; transition: opacity 0.4s var(--ease), transform 0.4s var(--ease); }
+.neo-hero-chapter { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 clamp(20px, 6vw, 80px); opacity: 0; pointer-events: none; will-change: opacity, transform; transition: opacity 0.4s var(--ease), transform 0.4s var(--ease); isolation: isolate; }
+/* Readability scrim: dark vignette behind chapter copy so it holds against
+   the particle field. Lives inside the chapter, so it fades with it. */
+.neo-hero-chapter::before { content: ""; position: absolute; inset: -6%; z-index: -1; pointer-events: none; background: radial-gradient(ellipse 62% 52% at 50% 50%, rgba(4,6,10,.72), rgba(4,6,10,.28) 55%, transparent 76%); }
+.neo-hero-chapter.ch-left::before { background: radial-gradient(ellipse 55% 62% at 26% 50%, rgba(4,6,10,.72), rgba(4,6,10,.28) 55%, transparent 78%); }
+.neo-hero-chapter.ch-right::before { background: radial-gradient(ellipse 55% 62% at 74% 50%, rgba(4,6,10,.72), rgba(4,6,10,.28) 55%, transparent 78%); }
+.neo-hero-chapter .ch-name, .neo-hero-chapter .h-display { text-shadow: 0 2px 30px rgba(0,0,0,.9), 0 0 12px rgba(0,0,0,.55); }
+.neo-hero-chapter .kicker, .neo-hero-chapter .ch-num, .neo-hero-chapter .hero-sub { text-shadow: 0 1px 10px rgba(0,0,0,.9); }
+.neo-hero-chapter .serif { text-shadow: 0 2px 24px rgba(0,0,0,.85); }
+.neo-hero-chapter .lede { text-shadow: 0 1px 12px rgba(0,0,0,.85); }
 .neo-hero-chapter.ch-left { align-items: flex-start; text-align: left; padding-left: clamp(24px, 9vw, 140px); padding-right: 46%; }
 .neo-hero-chapter.ch-right { align-items: flex-end; text-align: right; padding-right: clamp(24px, 9vw, 140px); padding-left: 46%; }
 .neo-hero-title { font-family: var(--font-display, "Syne", sans-serif); font-size: clamp(3.4rem, 13vw, 11.5rem); font-weight: 800; line-height: 0.92; letter-spacing: -0.02em; display: flex; text-transform: uppercase; }
@@ -963,7 +972,7 @@
 .neo-hero-chapter .ch-num { font-family: "JetBrains Mono", monospace; font-size: 0.66rem; letter-spacing: 0.3em; color: var(--accent, #7c5cff); margin-bottom: 16px; }
 .neo-hero-chapter .ch-name { font-family: "Syne", sans-serif; font-size: clamp(2.4rem, 6.5vw, 5.2rem); font-weight: 800; line-height: 0.98; letter-spacing: -0.02em; text-transform: uppercase; }
 .neo-hero-chapter .serif { font-family: "Libre Baskerville", Georgia, serif; font-style: italic; font-weight: 400; text-transform: none; letter-spacing: -0.01em; color: var(--accent, #7c5cff); }
-.neo-hero-chapter .lede { margin-top: 18px; max-width: 38ch; font-size: clamp(0.95rem, 1.2vw, 1.1rem); line-height: 1.7; color: var(--muted); }
+.neo-hero-chapter .lede { margin-top: 18px; max-width: 38ch; font-size: clamp(0.95rem, 1.2vw, 1.1rem); line-height: 1.7; color: #C2CAD6; }
 .neo-hero-chapter .ch-link { margin-top: 26px; font-family: "JetBrains Mono", monospace; font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent, #7c5cff); background: none; border: 1px solid color-mix(in srgb, var(--accent, #7c5cff) 45%, transparent); border-radius: 999px; padding: 12px 22px; cursor: pointer; transition: background .2s, color .2s; }
 .neo-hero-chapter .ch-link:hover { background: var(--accent, #7c5cff); color: #06060a; }
 .neo-hero-chapter .hero-actions { margin-top: 30px; display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
@@ -1183,6 +1192,8 @@
 @media (max-width: 760px) {
   .neo-hero-runway { height: 480vh; }
   .neo-hero-chapter.ch-left, .neo-hero-chapter.ch-right { align-items: center; text-align: center; padding: 0 24px 18vh; }
+  /* Chapters are centered on mobile — recenter their readability scrims too */
+  .neo-hero-chapter.ch-left::before, .neo-hero-chapter.ch-right::before { background: radial-gradient(ellipse 70% 55% at 50% 46%, rgba(4,6,10,.72), rgba(4,6,10,.28) 55%, transparent 78%); }
   .neo-hero-rail { display: none; }
   .neo-hero-counter { left: 20px; bottom: 22px; font-size: 0.62rem; }
   .neo-hero-counter .neo-counter-bar { width: 72px; }
