@@ -27,14 +27,34 @@
     ol li { margin:6px 0; }
     .box { background:#fff; border:1px solid var(--rule); border-left:3px solid var(--lime); border-radius:8px; padding:16px 18px; margin:18px 0; }
     .box strong { display:block; margin-bottom:4px; }
-    footer { margin-top:56px; padding-top:20px; border-top:1px solid var(--rule); font-size:13px; color:var(--muted); display:flex; gap:18px; flex-wrap:wrap; }
-    footer a { color:var(--muted); }
+    /* ── Enriched header nav + site footer ── */
+    header { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    .nav-links { display:flex; gap:clamp(14px,2.4vw,22px); flex-wrap:wrap; }
+    .nav-links a { color:var(--muted); text-decoration:none; font-size:14px; font-weight:500; }
+    .nav-links a:hover { color:var(--ink); }
+    footer { display:block; margin-top:64px; padding-top:32px; border-top:1px solid var(--rule); color:var(--muted); font-size:14px; }
+    .foot-top { display:flex; justify-content:space-between; gap:36px; flex-wrap:wrap; }
+    .foot-brand { max-width:280px; }
+    .foot-brand .tagline { margin:14px 0 0; font-size:13px; line-height:1.65; color:var(--muted); }
+    .foot-cols { display:flex; gap:clamp(28px,5vw,56px); flex-wrap:wrap; }
+    .foot-col h4 { font-family:'Fraunces',serif; font-size:12px; font-weight:600; color:var(--ink); text-transform:uppercase; letter-spacing:.06em; margin:0 0 12px; }
+    .foot-col a { display:block; color:var(--muted); text-decoration:none; font-size:14px; margin:8px 0; }
+    .foot-col a:hover { color:var(--ink); }
+    .foot-bottom { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-top:36px; padding-top:18px; border-top:1px solid var(--rule); font-size:13px; }
+    .foot-bottom a { color:var(--muted); text-decoration:none; }
+    .foot-bottom a:hover { color:var(--ink); }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <a class="brand" href="/"><img src="/brand/nexara-logo.svg" alt="Nexara" style="height:34px;display:block"></a>
+      <nav class="nav-links" aria-label="Sections">
+        <a href="/#trust/academy">Academy</a>
+        <a href="/#trust/marketing">Marketing</a>
+        <a href="/#trust/labs">Labs</a>
+        <a href="/#trust/contact">Contact</a>
+      </nav>
     </header>
 
     <h1>Data Deletion Instructions</h1>
@@ -71,9 +91,36 @@
     <p>See our <a href="/privacy-policy.html">Privacy Policy</a> for your full rights under the DPDP Act 2023 and GDPR, and how we handle Meta Platform Data.</p>
 
     <footer>
-      <a href="/">&larr; Back to Nexara</a>
-      <a href="/privacy-policy.html">Privacy Policy</a>
-      <a href="/terms-of-service.html">Terms of Service</a>
+      <div class="foot-top">
+        <div class="foot-brand">
+          <a class="brand" href="/"><img src="/brand/nexara-logo.svg" alt="Nexara" style="height:30px;display:block"></a>
+          <p class="tagline">Three forces, one operating standard — talent, growth, and AI software, built by Nexara Private Limited.</p>
+        </div>
+        <div class="foot-cols">
+          <div class="foot-col">
+            <h4>Divisions</h4>
+            <a href="/#trust/academy">Academy</a>
+            <a href="/#trust/marketing">Digital Marketing</a>
+            <a href="/#trust/labs">Product Studio</a>
+          </div>
+          <div class="foot-col">
+            <h4>Company</h4>
+            <a href="/#trust/customers">Delivery Proof</a>
+            <a href="/#trust/contact">Contact</a>
+          </div>
+          <div class="foot-col">
+            <h4>Legal</h4>
+            <a href="/privacy-policy.html">Privacy Policy</a>
+            <a href="/terms-of-service.html">Terms of Service</a>
+            <a href="/cookie-policy.html">Cookie Policy</a>
+            <a href="/data-deletion.html">Data Deletion</a>
+          </div>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 Nexara Private Limited · Visakhapatnam, India</span>
+        <a href="/">↑ Back to nexaragroups.com</a>
+      </div>
     </footer>
   </div>
 </body>
