@@ -114,3 +114,34 @@
 @media (prefers-reduced-motion: reduce) {
   .cc-banner, .cc-modal, .cc-modal-card, .cc-slider, .cc-slider::before { transition-duration: 0.01ms; }
 }
+
+/* ── Trust theme: warm paper, enterprise blue (tokens from trust.css) ── */
+.cc-banner.cc-theme-trust {
+  --cc-accent: #1A6DFF;
+  --cc-accent-dark: #1257D6;
+  background: rgba(248, 250, 252, 0.96);
+  border-top: 1px solid rgba(23, 32, 51, 0.12);
+  box-shadow: 0 -12px 34px rgba(11, 31, 51, 0.10);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.cc-banner.cc-theme-trust .cc-banner-text strong { color: #0B1F33; font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.02rem; }
+.cc-banner.cc-theme-trust .cc-banner-text p { color: #5B7290; }
+.cc-banner.cc-theme-trust .cc-btn { border-radius: 9px; }
+.cc-banner.cc-theme-trust .cc-btn-solid { color: #fff; }
+.cc-banner.cc-theme-trust .cc-btn-ghost { color: #0B1F33; border-color: rgba(23, 32, 51, 0.22); }
+.cc-banner.cc-theme-trust .cc-btn-ghost:hover { border-color: #0B1F33; color: #0B1F33; }
+
+.cc-modal.cc-theme-trust {
+  --cc-accent: #1A6DFF;
+  --cc-accent-dark: #1257D6;
+  --cc-card-fg: #0B1F33;
+  --cc-muted: #5B7290;
+  background: rgba(11, 31, 51, 0.45);
+}
+.cc-modal.cc-theme-trust .cc-modal-card { border-radius: 14px; }
+.cc-modal.cc-theme-trust h3 { font-family: 'Fraunces', serif; font-weight: 600; }
+.cc-modal.cc-theme-trust .cc-btn { border-radius: 9px; }
+.cc-modal.cc-theme-trust .cc-btn-solid { color: #fff; }
+.cc-modal.cc-theme-trust .cc-btn-ghost { color: #0B1F33; border-color: rgba(23, 32, 51, 0.22); }
+.cc-modal.cc-theme-trust .cc-btn-ghost:hover { border-color: #0B1F33; color: #0B1F33; }

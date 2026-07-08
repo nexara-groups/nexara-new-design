@@ -9,6 +9,7 @@
  */
 
 import React from 'react';
+import { parseRoute } from './shared.js';
 
 const { useCallback, useEffect, useState } = React;
 
@@ -49,11 +50,15 @@ export default function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [analytics, setAnalytics] = useState(false);
+  const [theme, setTheme] = useState(() => parseRoute().theme);
 
   useEffect(() => {
     const cur = readConsent();
     if (!cur) setShowBanner(true);
     setAnalytics(cur ? cur.analytics : false);
+
+    const onHash = () => setTheme(parseRoute().theme);
+    window.addEventListener('hashchange', onHash);
 
     const openPrefs = () => {
       const c = readConsent();
@@ -71,6 +76,7 @@ export default function CookieConsent() {
     return () => {
       window.removeEventListener('cc:open-preferences', openPrefs);
       window.removeEventListener('keydown', onKey);
+      window.removeEventListener('hashchange', onHash);
     };
   }, []);
 
@@ -98,7 +104,7 @@ export default function CookieConsent() {
 
   return (
     <>
-      <div className={`cc-banner${showBanner ? ' show' : ''}`} role="dialog" aria-label="Cookie consent">
+      <div className={`cc-banner${showBanner ? ' show' : ''}${theme === 'trust' ? ' cc-theme-trust' : ''}`} role="dialog" aria-label="Cookie consent">
         <div className="cc-banner-inner">
           <div className="cc-banner-text">
             <strong>We value your privacy</strong>
@@ -123,7 +129,7 @@ export default function CookieConsent() {
       </div>
 
       <div
-        className={`cc-modal${modalOpen ? ' open' : ''}`}
+        className={`cc-modal${modalOpen ? ' open' : ''}${theme === 'trust' ? ' cc-theme-trust' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-label="Cookie preferences"
