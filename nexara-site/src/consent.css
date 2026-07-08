@@ -16,8 +16,6 @@
   --cc-font: 'Inter', system-ui, sans-serif;
 }
 
-/* Lime accent needs dark ink text on solid buttons / links for contrast. */
-.cc-btn-solid { color: #07090d; }
 .cc-banner-text a { color: var(--cc-accent); }
 
 /* -- Banner -- */
@@ -50,7 +48,7 @@
   padding: 0.7rem 1.3rem; border: 1.5px solid transparent; cursor: pointer;
   transition: all 0.2s ease; white-space: nowrap;
 }
-.cc-btn-solid { background: var(--cc-accent); color: var(--cc-fg); border-color: var(--cc-accent); }
+.cc-btn-solid { background: var(--cc-accent); color: #07090d; border-color: var(--cc-accent); }
 .cc-btn-solid:hover { background: var(--cc-accent-dark); border-color: var(--cc-accent-dark); }
 .cc-btn-ghost { background: transparent; color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.28); }
 .cc-btn-ghost:hover { border-color: var(--cc-fg); color: var(--cc-fg); }
