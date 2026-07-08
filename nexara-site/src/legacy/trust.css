@@ -932,7 +932,7 @@
 .trust .tsx-nav-links.tsx-tubelight button::after{display:none}
 .trust .tsx-nav-links.tsx-tubelight{overflow:visible}
 .trust .tsx-nav-links.tsx-tubelight li{position:relative}
-.trust .tsx-tubelight-btn{position:relative;display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:500;color:var(--muted);padding:6px 13px;background:none;border:none;cursor:pointer;font-family:inherit;transition:color .15s,background .15s;border-radius:6px}
+.trust .tsx-tubelight-btn{position:relative;display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:600;color:#33475F;white-space:nowrap;padding:6px 13px;background:none;border:none;cursor:pointer;font-family:inherit;transition:color .15s,background .15s;border-radius:6px}
 .trust .tsx-tubelight-btn:hover:not(.active){color:var(--text)}
 .trust .tsx-tubelight-btn.active{color:var(--text);background:color-mix(in srgb,var(--tsx-accent,#1A6DFF) 7%,transparent)}
 .trust .tsx-tubelight-icon{display:flex;align-items:center;opacity:.7}
@@ -6550,10 +6550,10 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   min-height: 36px;
   padding: 8px 14px;
   border-radius: 999px;
-  font-size: 12.5px;
-  font-weight: 500;
-  letter-spacing: .025em;
-  color: rgba(11, 31, 51, .68);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: rgba(11, 31, 51, .88);
 }
 
 /* Active pill: confident white surface with a real crisp border and
@@ -6958,7 +6958,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   color: #0B1F33 !important;
 }
 .trust.tsx-site .tsx-nav .tsx-tubelight-btn {
-  color: rgba(11, 31, 51, 0.62) !important;
+  color: rgba(11, 31, 51, 0.85) !important;
 }
 .trust.tsx-site .tsx-nav .tsx-tubelight-btn.active,
 .trust.tsx-site .tsx-nav .tsx-tubelight-btn:hover {

@@ -630,7 +630,7 @@ function TrustNav({ page, detail }) {
     <header className="tsx-nav" ref={navRef} role="banner">
       <div className="tsx-nav-inner">
         <button className="tsx-logo" onClick={() => routeTo('trust', 'home')} aria-label="Nexara home">
-          <img src="/brand/nexara-logo.svg" alt="Nexara" style={{ height: 34, display: 'block' }} />
+          <img src="/brand/nexara-logo.svg" alt="Nexara" style={{ height: 42, display: 'block' }} />
         </button>
         <nav aria-label="Primary">
           <ul className="tsx-nav-links tsx-tubelight" onMouseLeave={() => setHoveredPage(null)}>
