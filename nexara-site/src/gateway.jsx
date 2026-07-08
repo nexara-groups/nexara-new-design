@@ -11,7 +11,7 @@ const EASE = [0.16, 1, 0.3, 1];
 const NeoScene = React.lazy(() => import("./gateway-3d.jsx").then((m) => ({ default: m.NeoScene })));
 const TrustScene = React.lazy(() => import("./gateway-3d.jsx").then((m) => ({ default: m.TrustScene })));
 
-function MagneticCTA({ children, onClick, className }) {
+function MagneticCTA({ children, onClick, className, href }) {
   const ref = useRef(null);
   const x = useMotionValue(0), y = useMotionValue(0);
   const sx = useSpring(x, { stiffness: 220, damping: 16 });
@@ -25,13 +25,13 @@ function MagneticCTA({ children, onClick, className }) {
   }
   function leave() { x.set(0); y.set(0); }
   return (
-    <motion.button ref={ref} className={className} onClick={onClick}
-      onMouseMove={move} onMouseLeave={leave} style={{ x: sx, y: sy }}
+    <motion.a ref={ref} className={className} href={href} onClick={onClick}
+      onMouseMove={move} onMouseLeave={leave} style={{ x: sx, y: sy, display: 'inline-flex', alignItems: 'center' }}
       whileTap={{ scale: 0.95 }}>
       <span>{children}</span>
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
         strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-    </motion.button>
+    </motion.a>
   );
 }
 
@@ -60,7 +60,7 @@ function Side({ side, copy, phase, onEnter }) {
             ))}
           </motion.div>
           <motion.div variants={item}>
-            <MagneticCTA className={"gw2-cta " + (left ? "gw2-cta-neo" : "gw2-cta-trust")} onClick={onEnter}>{copy.cta}</MagneticCTA>
+            <MagneticCTA className={"gw2-cta " + (left ? "gw2-cta-neo" : "gw2-cta-trust")} href={left ? "/neo" : "/trust"} onClick={(e) => { e.preventDefault(); onEnter(); }}>{copy.cta}</MagneticCTA>
           </motion.div>
         </motion.div>
       )}

@@ -30,7 +30,7 @@ function voice(theme, value) {
 }
 
 function parseRoute() {
-  const raw = window.location.hash.replace(/^#/, "");
+  const raw = window.location.pathname.replace(/^\//, "").replace(/\/$/, "");
   if (!raw) {
     return { theme: null, page: "gateway", detail: null };
   }
@@ -54,12 +54,23 @@ function routeTo(theme, page = "home", detail = null) {
   if (theme === "neo" || theme === "trust") {
     localStorage.setItem("nexara_theme", theme);
   }
-  const hash = [theme, page, detail].filter(Boolean).join("/");
+  let path = "/";
+  if (theme) {
+    if (page === "gateway") {
+      path = "/";
+    } else {
+      path = "/" + [theme, page, detail].filter(Boolean).join("/");
+    }
+  }
   window.scrollTo(0, 0);
+  const navigate = () => {
+    window.history.pushState(null, "", path);
+    window.dispatchEvent(new Event("popstate"));
+  };
   if (document.startViewTransition) {
-    document.startViewTransition(() => { window.location.hash = hash; });
+    document.startViewTransition(navigate);
   } else {
-    window.location.hash = hash;
+    navigate();
   }
 }
 

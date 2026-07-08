@@ -629,9 +629,9 @@ function TrustNav({ page, detail }) {
   return (
     <header className="tsx-nav" ref={navRef} role="banner">
       <div className="tsx-nav-inner">
-        <button className="tsx-logo" onClick={() => routeTo('trust', 'home')} aria-label="Nexara home">
+        <a className="tsx-logo" href="/trust" onClick={(e) => { e.preventDefault(); routeTo('trust', 'home'); }} aria-label="Nexara home">
           <img src="/brand/nexara-logo.svg" alt="Nexara" style={{ height: 48, display: 'block' }} />
-        </button>
+        </a>
         <nav aria-label="Primary">
           <ul className="tsx-nav-links tsx-tubelight" onMouseLeave={() => setHoveredPage(null)}>
             {DATA.nav.map(item => {
@@ -639,9 +639,10 @@ function TrustNav({ page, detail }) {
               const glowing = hoveredPage ? hoveredPage === item.page : active;
               return (
                 <li key={item.page}>
-                  <button
+                  <a
                     className={`tsx-tubelight-btn${active ? ' active' : ''}${!active && hoveredPage === item.page ? ' hovered' : ''}`}
-                    onClick={() => routeTo('trust', item.page)}
+                    href={`/trust/${item.page}`}
+                    onClick={(e) => { e.preventDefault(); routeTo('trust', item.page); }}
                     onMouseEnter={() => setHoveredPage(item.page)}
                   >
                     {glowing && (
@@ -654,7 +655,7 @@ function TrustNav({ page, detail }) {
                     )}
                     <span className="tsx-tubelight-icon">{TRUST_NAV_ICONS[item.page]}</span>
                     {getTrustNavLabel(item)}
-                  </button>
+                  </a>
                 </li>
               );
             })}
@@ -662,10 +663,10 @@ function TrustNav({ page, detail }) {
         </nav>
         <div className="tsx-nav-right">
           <div className="theme-pill tsx-theme-pill" role="group" aria-label="Theme mode">
-            <button type="button" onClick={() => routeTo('neo', page, detail)}>Neo</button>
-            <button type="button" className="active" onClick={() => routeTo('trust', page, detail)}>Trust</button>
+            <a type="button" href={detail ? `/neo/${page}/${detail}` : `/neo/${page}`} onClick={(e) => { e.preventDefault(); routeTo('neo', page, detail); }}>Neo</a>
+            <a type="button" className="active" href={detail ? `/trust/${page}/${detail}` : `/trust/${page}`} onClick={(e) => { e.preventDefault(); routeTo('trust', page, detail); }}>Trust</a>
           </div>
-          <button className="tsx-nav-cta" onClick={() => routeTo('trust', 'contact')}>Talk to us <span aria-hidden="true">→</span></button>
+          <a className="tsx-nav-cta" href="/trust/contact" onClick={(e) => { e.preventDefault(); routeTo('trust', 'contact'); }}>Talk to us <span aria-hidden="true">→</span></a>
           <button className="tsx-nav-burger" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(o => !o)}>
             <span className={"tsx-burger-icon" + (menuOpen ? ' is-open' : '')}><i /><i /></span>
           </button>
@@ -683,16 +684,16 @@ function TrustNav({ page, detail }) {
         <div className="tsx-nav-sheet-handle" aria-hidden="true" />
         <nav className="tsx-nav-sheet-links" aria-label="Primary mobile">
           {DATA.nav.map((item) => (
-            <button key={item.page} className={"tsx-nav-sheet-row" + (page === item.page ? ' active' : '')} onClick={() => routeTo('trust', item.page)}>
+            <a key={item.page} className={"tsx-nav-sheet-row" + (page === item.page ? ' active' : '')} href={`/trust/${item.page}`} onClick={(e) => { e.preventDefault(); setMenuOpen(false); routeTo('trust', item.page); }}>
               <span className="tsx-sheet-label">{getTrustNavLabel(item)}</span>
               <span className="tsx-sheet-desc">{TRUST_SHEET_DESCS[item.page]}</span>
-            </button>
+            </a>
           ))}
         </nav>
         <div className="tsx-nav-sheet-footer">
-          <button className="tsx-nav-sheet-cta" onClick={() => routeTo('trust', 'contact')}>
+          <a className="tsx-nav-sheet-cta" href="/trust/contact" onClick={(e) => { e.preventDefault(); setMenuOpen(false); routeTo('trust', 'contact'); }}>
             Start a Project <span className="arr" aria-hidden="true">→</span>
-          </button>
+          </a>
         </div>
       </div>
     </header>

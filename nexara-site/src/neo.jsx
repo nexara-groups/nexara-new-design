@@ -2321,30 +2321,31 @@ function Nav({ theme, page, detail }) {
   const [hoveredPage, setHoveredPage] = useState(null);
   return (
     <header className="nav">
-      <button className="logo" onClick={() => { window.location.hash = ""; }} aria-label="Nexara home"
+      <a className="logo" href="/" onClick={(e) => { e.preventDefault(); routeTo(null, 'gateway'); }} aria-label="Nexara home"
         style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <img src="/brand/nexara-mark.svg" alt="" style={{ height: 28, display: 'block', filter: 'drop-shadow(0 0 7px rgba(160,200,255,.5))' }} />
         Nexara
-      </button>
+      </a>
       <nav onMouseLeave={() => setHoveredPage(null)}>
         {DATA.nav.map((item) => {
           const active = page === item.page;
           const lit = hoveredPage ? hoveredPage === item.page : active;
           return (
-            <button
+            <a
               key={item.page}
               className={`${active ? 'active' : ''}${!active && hoveredPage === item.page ? ' hover-lit' : ''}`}
-              onClick={() => routeTo(theme, item.page)}
+              href={theme ? `/${theme}/${item.page}` : `/trust/${item.page}`}
+              onClick={(e) => { e.preventDefault(); routeTo(theme, item.page); }}
               onMouseEnter={() => setHoveredPage(item.page)}
             >
               {item.label}
-            </button>
+            </a>
           );
         })}
       </nav>
       <div className="theme-pill">
-        <button className={theme === "neo" ? "active" : ""} onClick={() => routeTo("neo", page, detail)}>Neo</button>
-        <button className={theme === "trust" ? "active" : ""} onClick={() => routeTo("trust", page, detail)}>Trust</button>
+        <a className={theme === "neo" ? "active" : ""} href={detail ? `/neo/${page}/${detail}` : `/neo/${page}`} onClick={(e) => { e.preventDefault(); routeTo("neo", page, detail); }}>Neo</a>
+        <a className={theme === "trust" ? "active" : ""} href={detail ? `/trust/${page}/${detail}` : `/trust/${page}`} onClick={(e) => { e.preventDefault(); routeTo("trust", page, detail); }}>Trust</a>
       </div>
     </header>
   );

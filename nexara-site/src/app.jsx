@@ -36,9 +36,9 @@ function useDynamicTitle(route) {
 function App() {
   const [route, setRoute] = useState(parseRoute());
   React.useEffect(() => {
-    const onHash = () => setRoute(parseRoute());
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    const onPopState = () => setRoute(parseRoute());
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
   useDynamicTitle(route);
