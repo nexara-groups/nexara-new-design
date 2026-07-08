@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nexara-new-design.pages.dev/sitemap.xml
+Sitemap: https://nexaragroups.com/sitemap.xml

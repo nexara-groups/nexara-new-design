@@ -1205,6 +1205,9 @@
   .neo-rail-stage { position: relative; height: auto; padding: 40px 0; }
   .neo-rail-track { flex-direction: column; width: 100%; padding: 20px; }
   .neo-rail-panel { width: 100%; min-height: auto; margin-bottom: 20px; }
+  /* Card collapses to content height on mobile — the absolute idx would sit
+     on the heading, so put it back in flow above it. */
+  .neo-panel-idx { position: static; display: block; margin-bottom: 14px; }
   .neo-standards-grid { grid-template-columns: 1fr; }
   .neo-final-cta { padding: clamp(60px, 12vh, 110px) 20px; }
   .neo-final-cta .neo-final-cta { padding: 0; }

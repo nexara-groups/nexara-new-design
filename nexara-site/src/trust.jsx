@@ -995,7 +995,7 @@ function TrustFooter() {
         ))}
       </div>
       <div className="tsx-footer-bottom">
-        <p className="tsx-footer-copyright">© 2026 Nexara. All rights reserved.</p>
+        <p className="tsx-footer-copyright">© 2026 Nexara Private Limited (Nexara Groups). All rights reserved.</p>
         <nav className="tsx-footer-legal" aria-label="Legal">
           <a href="/privacy-policy.html">Privacy Policy</a>
           <a href="/terms-of-service.html">Terms of Service</a>

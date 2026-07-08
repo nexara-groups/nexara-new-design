@@ -1957,7 +1957,7 @@ function NeoDivisionsRail() {
               <span className="neo-panel-idx">0{i + 1} / {sec.name.toUpperCase()}</span>
               <span className="neo-panel-orb" />
               <span className="neo-panel-ring" />
-              <h3>{sec.name}<br /><span className="serif">{sec.headline || (i === 0 ? "we grow engineers" : i === 1 ? "we build intelligence" : "we make brands move")}</span></h3>
+              <h3>{sec.name}<br /><span className="serif">{sec.headline || (i === 0 ? "we grow engineers" : i === 1 ? "we make brands move" : "we build intelligence")}</span></h3>
               <p>{sec.short.neo || sec.desc}</p>
               <span className="panel-tags">
                 {sec.stack.slice(0, 4).map(tag => <span key={tag}>{tag}</span>)}
@@ -5550,6 +5550,7 @@ function Footer({ theme }) {
       <div>
         <strong>Nexara</strong>
         <p>Academy, Digital Marketing and Labs. One company, two presentations.</p>
+        <p>© 2026 Nexara Private Limited (Nexara Groups) · Visakhapatnam, India</p>
       </div>
       <div>
         {Object.values(DATA.sections).map((s) => <button key={s.id} onClick={() => routeTo(theme, s.id)}>{s.name}</button>)}
