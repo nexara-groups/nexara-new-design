@@ -28,6 +28,7 @@ const routes = [
   { path: 'trust/marketing', theme: 'trust', page: 'marketing', detail: null },
   { path: 'trust/labs', theme: 'trust', page: 'labs', detail: null },
   { path: 'trust/customers', theme: 'trust', page: 'customers', detail: null },
+  { path: 'trust/company', theme: 'trust', page: 'company', detail: null },
   { path: 'trust/contact', theme: 'trust', page: 'contact', detail: null },
   // Trust Details
   { path: 'trust/academy/tracks', theme: 'trust', page: 'academy', detail: 'tracks' },
@@ -43,6 +44,7 @@ const routes = [
   { path: 'neo/marketing', theme: 'neo', page: 'marketing', detail: null },
   { path: 'neo/labs', theme: 'neo', page: 'labs', detail: null },
   { path: 'neo/customers', theme: 'neo', page: 'customers', detail: null },
+  { path: 'neo/company', theme: 'neo', page: 'company', detail: null },
   { path: 'neo/contact', theme: 'neo', page: 'contact', detail: null },
   // Neo Details
   { path: 'neo/academy/tracks', theme: 'neo', page: 'academy', detail: 'tracks' },
@@ -82,6 +84,11 @@ function getDescription(theme, page, detail) {
   }
   if (page === 'contact') {
     return 'Plan an engagement with Nexara. Submit a brief, request an AI automation consult, or coordinate student hiring in Visakhapatnam, India.';
+  }
+  if (page === 'company') {
+    return theme === 'neo'
+      ? "Nexara Gen Z: the IT company that doesn't act like one. Academy turns learning into portfolio proof, Digital Marketing turns offers into market signal, Labs turns AI ideas into working systems."
+      : 'Nexara is an incorporated capability firm with three specialist forces — Academy, Digital, Labs — answering to one governance standard: named ownership, written scope, reported cadence.';
   }
   return BASE_DESC;
 }
@@ -181,6 +188,18 @@ function generateNoscriptHTML(theme, page, detail) {
         <li><strong>AI & Product Studio:</strong> Scoped custom SaaS platforms shipped to production.</li>
       </ul>
     `;
+  } else if (page === 'company') {
+    const co = DATA.company[activeTheme];
+    html += `
+      <h2>${activeTheme === 'neo' ? 'Nexara Gen Z' : 'The Operating Standard'}</h2>
+      <p>${co.manifesto}</p>
+      <h3>Standards</h3>
+      <ul>
+    `;
+    DATA.company.standards.forEach(s => {
+      html += `<li><strong>${s.title}</strong>: ${s.body}</li>`;
+    });
+    html += `</ul>`;
   } else if (page === 'contact') {
     html += `
       <h2>Start a Project Enquiry</h2>

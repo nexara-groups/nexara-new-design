@@ -41,6 +41,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://nexaragroups.com/trust/company</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://nexaragroups.com/trust/contact</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
@@ -118,6 +124,12 @@
   </url>
   <url>
     <loc>https://nexaragroups.com/neo/customers</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://nexaragroups.com/neo/company</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
