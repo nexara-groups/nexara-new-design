@@ -3,6 +3,10 @@
 import React from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+// Was registered once, globally, in the old app's main.jsx entry point — Next.js's
+// App Router has no equivalent single entry point, and no file here re-registered
+// it, so ScrollTrigger.create() threw "_context is not a function" at runtime.
+if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 import { motion, useReducedMotion } from 'framer-motion';
 import { GraduationCap, TrendingUp, Cpu, Shield, Mail } from 'lucide-react';
 import { DATA } from '@/lib/data';

@@ -7,6 +7,10 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
 import { NotFound } from './NotFound';
+// Was registered once, globally, in the old app's main.jsx entry point — Next.js's
+// App Router has no equivalent single entry point, and no file here re-registered
+// it, so ScrollTrigger.create() threw "_context is not a function" at runtime.
+if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 if (typeof window !== 'undefined') Object.assign(window, { THREE, gsap, ScrollTrigger });
 import { DATA } from '@/lib/data';
 import { voice, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from '@/lib/shared';
