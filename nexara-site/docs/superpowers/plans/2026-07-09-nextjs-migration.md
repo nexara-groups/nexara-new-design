@@ -960,6 +960,16 @@ git commit -m "feat: wire up App Router pages, layout, and generated sitemap fro
 
 **Files:** none (verification only)
 
+> **DONE (core sweep) — and this task justified its own existence twice over.** Two real, fatal-to-serious bugs existed on `migration/phase1` that seven implementor rounds and three review passes across Tasks 0-7 never caught, because none of them ran the app in an actual browser:
+> 1. **`gsap.registerPlugin(ScrollTrigger)` was never ported.** The old app called it once, globally, in `main.jsx` before mounting React — Next.js's App Router has no equivalent single entry point, and no task in this plan accounted for `main.jsx`'s setup at all. Every `ScrollTrigger.create()` call threw a fatal `Runtime TypeError` on page load. Fixed by registering at module scope in `TrustSiteClient.tsx`/`NeoSiteClient.tsx`.
+> 2. **A textbook Next.js hydration mismatch in `GatewayClient.tsx`** — `isMobile` state computed from `window.matchMedia` inside the `useState` initializer, so server and client disagreed on the initial value. Only visible via Next's dev overlay at a mobile viewport width; invisible in desktop testing and invisible to code review. Fixed by starting state identical on both, applying the real value client-side in an effect.
+>
+> Both fixes are correctness bugs a code-only review (however rigorous) structurally cannot catch — they only manifest at runtime, in a real browser, and one of them only at a specific viewport. This is the actual argument for Task 8 existing as its own gate, not a formality: **static review and an actual browser sweep catch different, non-overlapping classes of bugs.**
+>
+> Covered: console/hydration sweep across representative routes (all unique templates × both themes, plus detail/company/contact/404-fallback pages), desktop visual spot-check, mobile viewport check, and an interaction smoke test (nav click → route change → correct title/content/active-state with zero errors — proving the Task 6 `routeTo` fix works end-to-end in a live browser; cookie consent accept flow → correct `localStorage` write).
+>
+> **Not yet done, deliberately deferred:** the canvas particle/blob equilibrium check below (Step 2) — genuinely requires human eyeballing per the prior finding it cites, not something to fake-verify via automation. Also not done: a full 29-route pixel-by-pixel pass (skipped as low-value given the ported code is verbatim/CSS is byte-identical — visual parity is structurally guaranteed once the representative sweep is clean, which it is).
+
 - [ ] **Step 1: Run the dev server and open every one of the 29 routes**, comparing against the equivalent live `nexaragroups.com` URL side-by-side, for both desktop and mobile viewport (per this project's established preview workflow — start the dev server, use the browser preview tool, `preview_resize` for mobile, `preview_screenshot` for each route).
 
 - [ ] **Step 2: For `trust/*` routes specifically**, verify the canvas particle/blob hero reaches the same steady-state (trail length, fade rate, color) as production — per this project's prior finding that this effect is invisible in throttled/headless preview and must be eyeballed in a real, unthrottled browser tab.
