@@ -7,8 +7,8 @@ import { GraduationCap, TrendingUp, Cpu, Shield, Mail } from 'lucide-react';
 import { DATA } from '@/lib/data';
 import { voice, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from '@/lib/shared';
 import { useRouter } from 'next/navigation';
-import { NotFound } from './notfound.jsx';
-import { openCookiePreferences } from './CookieConsent.jsx';
+import { NotFound } from './NotFound';
+import { openCookiePreferences } from './CookieConsent';
 
 // `routeTo` was previously imported from shared.js (parseRoute/routeTo were the
 // hash-router). App Router replaces navigation with next/navigation's router, but

@@ -5,12 +5,12 @@ import { motion, useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
-import { NotFound } from './notfound.jsx';
+import { NotFound } from './NotFound';
 if (typeof window !== 'undefined') Object.assign(window, { THREE, gsap, ScrollTrigger });
 import { DATA } from '@/lib/data';
 import { voice, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from '@/lib/shared';
 import { useRouter } from 'next/navigation';
-import { openCookiePreferences } from './CookieConsent.jsx';
+import { openCookiePreferences } from './CookieConsent';
 const { useState, useMemo, useEffect, useRef, useCallback, useLayoutEffect, useReducer } = React;
 
 // `routeTo` was previously imported from shared.js (parseRoute/routeTo were the
