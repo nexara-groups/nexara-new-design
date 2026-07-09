@@ -97,12 +97,14 @@ function Gateway() {
   const rootRef = useRef(null);
   const [phase, setPhase] = useState(reduce ? "live" : "intro");
   const [exitTo, setExitTo] = useState(null);
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(max-width: 820px)").matches
-  );
+  // Must start identical on server and client (server has no `window`) to avoid a
+  // hydration mismatch — the real value is applied client-side in the effect below,
+  // not computed here.
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 820px)");
+    setIsMobile(mq.matches);
     const onChange = (e) => setIsMobile(e.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
