@@ -14,25 +14,7 @@ import { voice, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_W
 import { useRouter } from 'next/navigation';
 import { NotFound } from './NotFound';
 import { openCookiePreferences } from './CookieConsent';
-
-// `routeTo` was previously imported from shared.js (parseRoute/routeTo were the
-// hash-router). App Router replaces navigation with next/navigation's router, but
-// `routeTo(...)` is called from ~60 call sites spread across many sibling
-// top-level components in this file (TrustNav, TrustHome, TrustIntakeBand, etc.),
-// not just from the main TrustSite component — so the router instance is captured
-// once via a registration effect in TrustSite and this module-scope function reads
-// it, preserving every existing call site's signature and behavior unchanged.
-let _trustRouter: ReturnType<typeof useRouter> | null = null;
-function routeTo(theme: string, page = 'home', detail: string | null = null) {
-  const path = theme === 'gateway' || !theme ? '/' : '/' + [theme, page, detail].filter(Boolean).join('/');
-  window.scrollTo(0, 0);
-  const navigate = () => { if (_trustRouter) _trustRouter.push(path); };
-  if (document.startViewTransition) {
-    document.startViewTransition(navigate);
-  } else {
-    navigate();
-  }
-}
+import { routeTo, setTrustRouter } from '@/lib/trust-router';
 
 function CyclingWord({ words }) {
   const [idx, setIdx] = React.useState(0);
@@ -3404,7 +3386,7 @@ function TrustConcierge({ page }) {
 
 function TrustSite({ page, detail }) {
   const router = useRouter();
-  React.useEffect(() => { _trustRouter = router; }, [router]);
+  React.useEffect(() => { setTrustRouter(router); }, [router]);
   const section = DATA.sections[page];
   React.useEffect(() => { window.scrollTo(0, 0); }, [page]);
   React.useEffect(() => setupTsxFade(), [page, detail]);

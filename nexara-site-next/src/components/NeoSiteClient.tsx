@@ -16,26 +16,8 @@ import { DATA } from '@/lib/data';
 import { voice, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from '@/lib/shared';
 import { useRouter } from 'next/navigation';
 import { openCookiePreferences } from './CookieConsent';
+import { routeTo, setNeoRouter } from '@/lib/neo-router';
 const { useState, useMemo, useEffect, useRef, useCallback, useLayoutEffect, useReducer } = React;
-
-// `routeTo` was previously imported from shared.js (parseRoute/routeTo were the
-// hash-router). App Router replaces navigation with next/navigation's router, but
-// `routeTo(...)` is called from dozens of call sites spread across many sibling
-// top-level components in this file, not just from the main Site component — so
-// the router instance is captured once via a registration effect in Site and this
-// module-scope function reads it, preserving every existing call site's signature
-// and behavior unchanged.
-let _neoRouter: ReturnType<typeof useRouter> | null = null;
-function routeTo(theme: string, page = 'home', detail: string | null = null) {
-  const path = theme === 'gateway' || !theme ? '/' : '/' + [theme, page, detail].filter(Boolean).join('/');
-  window.scrollTo(0, 0);
-  const navigate = () => { if (_neoRouter) _neoRouter.push(path); };
-  if (document.startViewTransition) {
-    document.startViewTransition(navigate);
-  } else {
-    navigate();
-  }
-}
 
 function CyclingWord({ words }) {
   const [idx, setIdx] = useState(0);
@@ -2320,7 +2302,7 @@ function TrustHero({ copy, theme }) {
 
 function Site({ theme, page, detail }) {
   const router = useRouter();
-  React.useEffect(() => { _neoRouter = router; }, [router]);
+  React.useEffect(() => { setNeoRouter(router); }, [router]);
   const isNeo = theme === "neo";
   const section = DATA.sections[page];
   React.useEffect(() => { window.scrollTo(0, 0); }, [theme, page]);
