@@ -1,4 +1,3 @@
-// @ts-nocheck -- verbatim-ported from JS; typed properly in Phase 2 decomposition
 'use client';
 import React from "react";
 import {
@@ -13,13 +12,18 @@ const EASE = [0.16, 1, 0.3, 1];
 const NeoScene = React.lazy(() => import("./Gateway3D").then((m) => ({ default: m.NeoScene })));
 const TrustScene = React.lazy(() => import("./Gateway3D").then((m) => ({ default: m.TrustScene })));
 
-function MagneticCTA({ children, onClick, className, href }) {
-  const ref = useRef(null);
+function MagneticCTA({ children, onClick, className, href }: {
+  children: React.ReactNode;
+  onClick: (e: React.MouseEvent) => void;
+  className: string;
+  href: string;
+}) {
+  const ref = useRef<HTMLAnchorElement>(null);
   const x = useMotionValue(0), y = useMotionValue(0);
   const sx = useSpring(x, { stiffness: 220, damping: 16 });
   const sy = useSpring(y, { stiffness: 220, damping: 16 });
   const reduce = useReducedMotion();
-  function move(e) {
+  function move(e: React.MouseEvent) {
     if (reduce || !ref.current) return;
     const r = ref.current.getBoundingClientRect();
     x.set((e.clientX - (r.left + r.width / 2)) * 0.3);
@@ -37,7 +41,12 @@ function MagneticCTA({ children, onClick, className, href }) {
   );
 }
 
-function Side({ side, copy, phase, onEnter }) {
+function Side({ side, copy, phase, onEnter }: {
+  side: 'neo' | 'trust';
+  copy: { kicker: string; title: string; body: string; chips: string[]; cta: string };
+  phase: string;
+  onEnter: () => void;
+}) {
   const left = side === "neo";
   const container = {
     hidden: {},
@@ -94,9 +103,9 @@ function Gateway() {
   };
   const reduce = useReducedMotion();
   const g = DATA.gateway;
-  const rootRef = useRef(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState(reduce ? "live" : "intro");
-  const [exitTo, setExitTo] = useState(null);
+  const [exitTo, setExitTo] = useState<'neo' | 'trust' | null>(null);
   // Must start identical on server and client (server has no `window`) to avoid a
   // hydration mismatch — the real value is applied client-side in the effect below,
   // not computed here.
@@ -105,7 +114,7 @@ function Gateway() {
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 820px)");
     setIsMobile(mq.matches);
-    const onChange = (e) => setIsMobile(e.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
@@ -116,7 +125,7 @@ function Gateway() {
   const seam = useSpring(mx, { stiffness: 90, damping: 22, mass: 0.5 });
 
   useEffect(() => {
-    const apply = (v) => {
+    const apply = (v: number) => {
       const el = rootRef.current; if (!el) return;
       el.style.setProperty("--seam", (50 + (0.5 - v) * 16) + "%");
     };
@@ -131,12 +140,12 @@ function Gateway() {
     return () => clearTimeout(t);
   }, [reduce]);
 
-  function onMove(e) { if (!reduce) mx.set(e.clientX / window.innerWidth); }
+  function onMove(e: React.MouseEvent) { if (!reduce) mx.set(e.clientX / window.innerWidth); }
   function onLeave() { mx.set(0.5); }
-  function enter(world) { setExitTo(world); setTimeout(() => routeTo(world), 700); }
+  function enter(world: 'neo' | 'trust') { setExitTo(world); setTimeout(() => routeTo(world), 700); }
 
   return (
-    <div className="gw2" ref={rootRef} onMouseMove={onMove} onMouseLeave={onLeave} style={{ "--seam": "50%" }}>
+    <div className="gw2" ref={rootRef} onMouseMove={onMove} onMouseLeave={onLeave} style={{ "--seam": "50%" } as React.CSSProperties}>
       <div className="gw2-panel gw2-neo">
         <div className="gw2-neo-fx" aria-hidden="true">
           <div className="gw2-grid" />

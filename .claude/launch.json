@@ -12,6 +12,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "nexara-site", "run", "preview"],
       "port": 4173
+    },
+    {
+      "name": "nexara-site-next-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "nexara-site-next", "run", "dev"],
+      "port": 3000
     }
   ]
 }

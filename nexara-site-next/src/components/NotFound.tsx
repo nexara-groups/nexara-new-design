@@ -1,4 +1,3 @@
-// @ts-nocheck -- verbatim-ported from JS; typed properly in Phase 2 decomposition
 'use client';
 
 import React from 'react';
@@ -6,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { DATA } from '@/lib/data';
 import { voice } from '@/lib/shared';
 
-export function NotFound({ theme, page }) {
+export function NotFound({ theme, page }: { theme: 'trust' | 'neo' | null; page?: string }) {
   const router = useRouter();
   const routeTo = (theme: string | null, page = "home", detail: string | null = null) => {
     if (theme === "neo" || theme === "trust") {

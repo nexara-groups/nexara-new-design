@@ -1,13 +1,13 @@
-// @ts-nocheck -- verbatim-ported from JS; typed properly in Phase 2 decomposition
 'use client';
 import React from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { MeshDistortMaterial } from "@react-three/drei";
+import type * as THREE from "three";
 
 const { useRef } = React;
 
 function NeoObject() {
-  const g = useRef();
+  const g = useRef<THREE.Group>(null);
   useFrame((state, dt) => {
     const o = g.current; if (!o) return;
     o.rotation.x += dt * 0.06;
@@ -40,7 +40,7 @@ export function NeoScene() {
 }
 
 function TrustObject() {
-  const g = useRef();
+  const g = useRef<THREE.Group>(null);
   useFrame((state, dt) => {
     const o = g.current; if (!o) return;
     o.rotation.y += dt * 0.13;
