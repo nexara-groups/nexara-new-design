@@ -34,6 +34,36 @@ export function routeTitle(route: Route): string {
   return `${capPage} — ${themeName(route.theme as Theme)}`;
 }
 
+const BASE_DESC = 'Three forces. One operating standard. Nexara Private Limited builds careers, grows brands, and ships production software — all from one house.';
+
+// Ported verbatim from the old Vite app's scripts/prerender.js getDescription() —
+// same copy, same per-page granularity (detail slug doesn't change the
+// description there either; this matches that baseline, not a regression).
+export function routeDescription(route: Route): string {
+  if (route.page === 'gateway' || route.page === 'home') return BASE_DESC;
+  if (route.page === 'academy') {
+    return "Nexara Academy: cohort-based talent development and managed internships with verified placement outcomes. Built for India's growth cities like Visakhapatnam.";
+  }
+  if (route.page === 'marketing') {
+    return 'Nexara Digital Marketing: positioning, visual identity, landing pages, corporate websites, campaigns, and growth measurement infrastructure.';
+  }
+  if (route.page === 'labs') {
+    return 'Nexara Product Studio: production AI software, custom SaaS platforms, B2B portals, and system integrations built to solve real business problems.';
+  }
+  if (route.page === 'customers') {
+    return 'Nexara Delivery Proof: evidence before claims. Documented customer stories and delivery standards across academy, marketing, and labs.';
+  }
+  if (route.page === 'contact') {
+    return 'Plan an engagement with Nexara. Submit a brief, request an AI automation consult, or coordinate student hiring in Visakhapatnam, India.';
+  }
+  if (route.page === 'company') {
+    return route.theme === 'neo'
+      ? "Nexara Gen Z: the IT company that doesn't act like one. Academy turns learning into portfolio proof, Digital Marketing turns offers into market signal, Labs turns AI ideas into working systems."
+      : 'Nexara is an incorporated capability firm with three specialist forces — Academy, Digital, Labs — answering to one governance standard: named ownership, written scope, reported cadence.';
+  }
+  return BASE_DESC;
+}
+
 export const ROUTES: Route[] = [
   { path: '', theme: null, page: 'gateway', detail: null },
 

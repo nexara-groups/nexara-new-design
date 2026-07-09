@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ROUTES, routeTitle } from '@/lib/routes';
+import { ROUTES, routeTitle, routeDescription } from '@/lib/routes';
 import { Site } from '@/components/NeoSiteClient';
 
 export function generateStaticParams() {
@@ -12,9 +12,15 @@ export async function generateMetadata({ params }: { params: Promise<{ page: str
   const { page } = await params;
   const route = ROUTES.find((r) => r.theme === 'neo' && r.page === page && !r.detail);
   if (!route) return {};
+  const title = routeTitle(route);
+  const description = routeDescription(route);
+  const url = `https://nexaragroups.com/${route.path}`;
   return {
-    title: routeTitle(route),
-    alternates: { canonical: `https://nexaragroups.com/${route.path}` },
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: { title, description, url },
+    twitter: { title, description },
   };
 }
 
