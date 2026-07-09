@@ -308,6 +308,14 @@ git commit -m "feat: add authoritative route table for Next.js migration"
 **Files:**
 - Create: `nexara-site-next/package.json`, `next.config.mjs`, `tsconfig.json`, `postcss.config.mjs`, `open-next.config.ts`, `wrangler.toml`, `.env.example`
 
+> **DONE — but the tournament-round version of this task was scoped without running `npm install`, and a real install (done later, after Task 7) surfaced real errors this section's original text didn't anticipate:**
+> - `next@15.3.0` doesn't satisfy `@opennextjs/cloudflare`'s peer range (`>=15.5.18 <16`) — bumped to `next@15.5.18`, still Next 15, still under 16. Bump `wrangler` to `^4.86.0` to match the same peer requirement.
+> - `@types/react`, `@types/react-dom`, `@types/node`, `tailwindcss`, `@tailwindcss/postcss` were never added by any round (all correctly out of scope for a config-only round) — needed for real. `postcss.config.mjs` needs the `@tailwindcss/postcss` plugin, not `@tailwindcss/vite` (the original app's Vite-only plugin).
+> - `next.config.mjs` was missing from every round's file list — an omission in the task brief I gave implementors, not something any of them got wrong.
+> - **Verbatim-ported files need `// @ts-nocheck`, not `.jsx` renaming.** `allowJs: true` only exempts `.js`/`.jsx` files from type-checking when `checkJs` is also unset (which it is) — `.tsx`/`.ts` files are always fully checked under `strict: true`, regardless of `allowJs`. Renaming Task 6's output to `.jsx` was tried and reverted: it breaks the legitimate TypeScript annotations the `routeTo` fix itself uses (`ReturnType<typeof useRouter>`, etc.), since `.jsx` can't parse type syntax at all. The five Task 6 files plus `shared.ts` now carry a top-of-file `// @ts-nocheck` instead, with a comment explaining it's interim (typed properly during Phase 2 decomposition).
+>
+> With these fixes, `npm install && npm run build` succeeds end-to-end — all 29 routes + `sitemap.xml` generate as static/SSG pages, confirmed by inspecting `.next/server/app/trust/contact.html` directly: real navigation, real page content, real markup in the server-rendered HTML. No more empty `<div id="root">`.
+
 - [ ] **Step 1: Scaffold via create-next-app**
 
 ```bash
