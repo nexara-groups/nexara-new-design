@@ -1,3 +1,4 @@
+// @ts-nocheck -- verbatim-ported from JS; typed properly in Phase 2 decomposition
 'use client';
 import React from "react";
 import { Canvas, useFrame } from "@react-three/fiber";

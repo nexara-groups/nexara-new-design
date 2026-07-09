@@ -1,3 +1,4 @@
+// @ts-nocheck -- verbatim-ported from JS; typed properly in Phase 2 decomposition
 import React from 'react';
 import { DATA } from './data';
 const { useMemo, useState, useEffect } = React;

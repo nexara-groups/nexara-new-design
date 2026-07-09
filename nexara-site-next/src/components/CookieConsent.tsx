@@ -12,6 +12,13 @@
 
 import React from 'react';
 
+declare global {
+  interface Window {
+    openCookiePreferences?: () => void;
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
 const { useCallback, useEffect, useState } = React;
 
 const STORE_KEY = 'cc-consent';
@@ -33,7 +40,7 @@ function clearGaCookies() {
   const parts = host.split('.');
   if (parts.length > 2) domains.push(`.${parts.slice(-2).join('.')}`);
   document.cookie.split(';').forEach((c) => {
-    const name = c.split('=')[0].trim();
+    const name = (c.split('=')[0] ?? '').trim();
     if (name.startsWith('_ga') || name === '_gid') {
       domains.forEach((d) => {
         document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/${d ? `;domain=${d}` : ''}`;
@@ -65,7 +72,7 @@ export default function CookieConsent({ theme }: { theme: 'trust' | 'neo' | null
     window.addEventListener('cc:open-preferences', openPrefs);
     window.openCookiePreferences = openPrefs;
 
-    const onKey = (e) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setModalOpen(false);
     };
     window.addEventListener('keydown', onKey);
@@ -76,7 +83,7 @@ export default function CookieConsent({ theme }: { theme: 'trust' | 'neo' | null
     };
   }, []);
 
-  const save = useCallback((allowAnalytics) => {
+  const save = useCallback((allowAnalytics: boolean) => {
     const rec = {
       necessary: true,
       analytics: allowAnalytics,
