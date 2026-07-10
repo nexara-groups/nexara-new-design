@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DATA } from '@/lib/data';
 import { HAS_SCROLL_ANIMATION } from '@/lib/shared';
@@ -8,6 +9,9 @@ import { getTrustSectionLabel, TRUST_ACCENT, TRUST_OPERATING_STANDARD } from './
 import { TrustHeroFlat, TrustHeroUnravel } from './Hero';
 import { TrustSolutionsGrid, TrustEnterpriseStacks, TrustProofStrip, TrustMarketContext } from './Misc';
 import { TrustLedgerRows } from './Cards';
+
+// See trust/Hero.tsx for why this is repeated per-file rather than centralized.
+if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
 export function TrustManifesto() {
   const wrapRef = React.useRef<HTMLElement | null>(null);

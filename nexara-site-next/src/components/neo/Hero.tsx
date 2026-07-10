@@ -10,6 +10,9 @@ import { HAS_SCROLL_ANIMATION } from '@/lib/shared';
 import { routeTo } from '@/lib/neo-router';
 import { Sparkles } from './Guide';
 
+// See trust/Hero.tsx for why this is repeated per-file rather than centralized.
+if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
+
 // Minimal shape actually read by NeoScrollyHero/TrustHero below — DATA.home
 // entries carry a couple more optional fields (calloutTitle/calloutBody)
 // that aren't read here. NeoHeroUnravel also accepts `copy`/`theme` but

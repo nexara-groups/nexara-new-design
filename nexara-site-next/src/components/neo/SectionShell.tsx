@@ -2,6 +2,7 @@
 import React from 'react';
 import type { Variants } from 'framer-motion';
 import { motion, useReducedMotion } from 'framer-motion';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DATA } from '@/lib/data';
 import { voice, SECTION_HERO_WORDS } from '@/lib/shared';
@@ -13,6 +14,9 @@ import { AcademyHero, AcademyTerminalSection, AcademyBootSequence } from './Acad
 import { MarketingHero, LabsHero, LabsBlueprintSection, MarketingSignalSection, MarketingFunnelSection } from './MarketingLabs';
 import { ModuleCard, ModuleModal, BeforeAfterSlider, RoiEstimator, InteractiveTimeline, CARD_MOTION } from './Cards';
 const { useState, useMemo } = React;
+
+// See trust/Hero.tsx for why this is repeated per-file rather than centralized.
+if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
 // Minimal shapes actually read by this group — DATA.sections entries carry
 // more fields (process, packages, stack, short, statement, etc.) that aren't

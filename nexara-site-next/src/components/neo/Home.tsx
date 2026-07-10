@@ -1,11 +1,15 @@
 'use client';
 import React from 'react';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DATA } from '@/lib/data';
 import { HAS_SCROLL_ANIMATION } from '@/lib/shared';
 import { routeTo } from '@/lib/neo-router';
 import { HeroBanner } from './SectionShell';
 import { NeoHeroUnravel, TrustHero } from './Hero';
+
+// See trust/Hero.tsx for why this is repeated per-file rather than centralized.
+if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
 // Minimal shapes actually read by this group — DATA.sections/DATA.customers
 // entries carry many more fields (hero, modules, stackDetails, etc.) that

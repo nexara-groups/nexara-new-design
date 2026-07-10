@@ -8,6 +8,9 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HAS_SCROLL_ANIMATION } from '@/lib/shared';
 
+// See trust/Hero.tsx for why this is repeated per-file rather than centralized.
+if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
+
 interface NeoAvatarSVGProps {
   id?: string;
   className?: string;

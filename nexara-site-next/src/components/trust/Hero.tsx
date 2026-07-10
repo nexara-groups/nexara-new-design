@@ -4,12 +4,20 @@
 // as a rushed tail-end of this decomposition.
 'use client';
 import React from 'react';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, useReducedMotion } from 'framer-motion';
 import { DATA } from '@/lib/data';
 import { routeTo } from '@/lib/trust-router';
 import { TrustParticleCanvas } from './Canvas';
 import { getTrustSectionLabel } from './shared';
+
+// Registered per-file, not relying on another module's registration reaching
+// this one — production code-splitting can put gsap/ScrollTrigger in a
+// different chunk per file, so a single central registerPlugin() call doesn't
+// reliably propagate. registerPlugin() is idempotent, so this is safe to
+// repeat in every file that calls ScrollTrigger.create/.batch/.refresh.
+if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
 const TRUST_HERO_PARTICLES = [
   { x: 8, y: 20, s: 8, d: 0.0, dur: 9.5 },
