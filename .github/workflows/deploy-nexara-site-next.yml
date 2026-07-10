@@ -1,0 +1,44 @@
+name: Deploy nexara-site-next to Cloudflare Workers
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "nexara-site-next/**"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-nexara-site-next
+  cancel-in-progress: false
+
+env:
+  CLOUDFLARE_ACCOUNT_ID: ca93de7853e49bb397e5a95ca6c01a03
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nexara-site-next
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: nexara-site-next/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build and deploy
+        run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
