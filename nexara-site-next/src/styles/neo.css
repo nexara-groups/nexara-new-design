@@ -166,7 +166,7 @@
   padding: 3px;
 }
 
-.neo .theme-pill button {
+.neo .theme-pill a {
   border-radius: 999px;
   padding: 7px 13px;
   letter-spacing: .08em;

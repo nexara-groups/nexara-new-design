@@ -753,11 +753,11 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid cur
 }
 /* Theme pill toggle */
 .theme-pill{display:flex;border-radius:6px;overflow:hidden;border:1px solid rgba(128,128,128,.3);flex-shrink:0}
-.theme-pill button{border:0;padding:5px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;min-height:auto;background:transparent;cursor:pointer;transition:background .15s,color .15s;text-transform:uppercase}
-.neo .theme-pill button.active{background:#fff;color:#000}
-.neo .theme-pill button:not(.active){color:rgba(255,255,255,.45)}
-.trust .theme-pill button.active{background:var(--accent);color:#fff}
-.trust .theme-pill button:not(.active){color:var(--muted)}
+.theme-pill a{border:0;padding:5px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;min-height:auto;background:transparent;cursor:pointer;transition:background .15s,color .15s;text-transform:uppercase}
+.neo .theme-pill a.active{background:#fff;color:#000}
+.neo .theme-pill a:not(.active){color:rgba(255,255,255,.45)}
+.trust .theme-pill a.active{background:var(--accent);color:#fff}
+.trust .theme-pill a:not(.active){color:var(--muted)}
 /* Breadcrumb bar theme colors */
 .neo .breadcrumb-bar{color:rgba(255,255,255,.4)}
 .trust .breadcrumb-bar{color:var(--muted)}

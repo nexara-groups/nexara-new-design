@@ -6635,7 +6635,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8);
 }
 
-.trust.tsx-site .tsx-theme-pill button {
+.trust.tsx-site .tsx-theme-pill a {
   min-height: 30px;
   padding: 7px 12px;
   border: 0;
@@ -6650,7 +6650,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   cursor: pointer;
 }
 
-.trust.tsx-site .tsx-theme-pill button.active {
+.trust.tsx-site .tsx-theme-pill a.active {
   color: #fff;
   background: #1A6DFF;
   box-shadow: 0 8px 20px rgba(26, 109, 255, .24);
@@ -7020,7 +7020,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   border: 1px solid rgba(255, 255, 255, 0.48) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65) !important;
 }
-.trust.tsx-site .tsx-theme-pill button {
+.trust.tsx-site .tsx-theme-pill a {
   color: rgba(11, 31, 51, 0.52) !important;
 }
 
@@ -7398,7 +7398,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   transform: translateY(-1px) !important;
 }
 /* ── Theme pill: active = white card, not blue block ── */
-.trust.tsx-site .tsx-theme-pill button.active {
+.trust.tsx-site .tsx-theme-pill a.active {
   color: #0B1F33 !important;
   background: #fff !important;
   box-shadow:
@@ -7412,10 +7412,10 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   background: rgba(255,255,255,.08);
   border-color: rgba(255,255,255,.12);
 }
-.trust.tsx-site .tsx-nav:not(.scrolled) .tsx-theme-pill button {
+.trust.tsx-site .tsx-nav:not(.scrolled) .tsx-theme-pill a {
   color: rgba(255,255,255,.5);
 }
-.trust.tsx-site .tsx-nav:not(.scrolled) .tsx-theme-pill button.active {
+.trust.tsx-site .tsx-nav:not(.scrolled) .tsx-theme-pill a.active {
   color: #0B1F33 !important;
   background: #fff !important;
 }
