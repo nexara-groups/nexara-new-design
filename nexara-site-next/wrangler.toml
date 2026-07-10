@@ -3,6 +3,10 @@ main = ".open-next/worker.js"
 compatibility_date = "2026-07-09"
 compatibility_flags = ["nodejs_compat"]
 
+routes = [
+  { pattern = "nexaragroups.com/*", zone_name = "nexaragroups.com" }
+]
+
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
