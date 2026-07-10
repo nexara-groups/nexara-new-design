@@ -1079,11 +1079,12 @@
   .trust .tsx-footer-top{grid-template-columns:1fr 1fr}
   .trust .tsx-footer-top>div:first-child{grid-column:1/-1}
 }
-/* Full desktop nav-links (5 nowrap labels) + logo + theme-pill + CTA stop
-   fitting in .tsx-nav-inner below ~1400px, which clips/hides the CTA and
-   squeezes the theme-pill. Below that width, fold links into the existing
-   burger sheet (already built for <=768px) instead of letting it overflow. */
-@media(max-width:1400px) and (min-width:769px){
+/* Full desktop nav-links (5 nowrap labels) + logo + theme-pill + CTA don't
+   fit .tsx-nav-inner at full size below ~1400px. Below 880px (true mobile/
+   tablet) fold links into the existing burger sheet; from 881-1400px, keep
+   the full desktop nav but shrink the logo/gaps/link padding enough to fit
+   -- see the "compact desktop nav" block further down for those rules. */
+@media(max-width:880px) and (min-width:769px){
   .trust .tsx-nav-links{display:none}
 }
 @media(max-width:768px){
@@ -4350,7 +4351,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust .tsx-nav-sheet { display: none; }
 .trust .tsx-nav-backdrop { display: none; }
 
-@media (max-width: 1400px) {
+@media (max-width: 880px) {
   .trust .tsx-nav-burger { display: inline-flex; }
   .trust .tsx-nav-cta { display: none; }
   .trust .tsx-theme-pill,
@@ -6695,14 +6696,42 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   z-index: 5;
 }
 
-@media (max-width: 1040px) {
+/* Compact desktop nav (881-1400px): the full nav-links + logo + theme-pill +
+   CTA don't fit at full size in this range, but burger-folding it would show
+   a mobile-style nav on ordinary laptop widths (1280/1366) -- so shrink
+   everything just enough to keep it all visible instead. Below 880px this is
+   superseded by the burger nav above. */
+@media (max-width: 1400px) and (min-width: 881px) {
   .trust.tsx-site .tsx-tubelight-btn {
-    padding-inline: 9px;
-    font-size: 12px;
+    padding-inline: 6px;
+    font-size: 11.5px;
+    gap: 0;
   }
 
-  .trust.tsx-site .tsx-theme-pill {
+  .trust.tsx-site .tsx-tubelight-icon {
     display: none;
+  }
+
+  .trust.tsx-site .tsx-logo img {
+    height: 28px !important;
+  }
+
+  .trust.tsx-site .tsx-nav-inner {
+    gap: 10px;
+  }
+
+  .trust.tsx-site .tsx-nav-links {
+    gap: 0;
+  }
+
+  .trust.tsx-site .tsx-theme-pill a {
+    padding: 5px 7px;
+  }
+
+  .trust.tsx-site .tsx-nav-cta {
+    padding: 0 10px !important;
+    font-size: 10px;
+    gap: 4px;
   }
 }
 
