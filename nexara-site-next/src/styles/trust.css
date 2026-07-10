@@ -1079,6 +1079,13 @@
   .trust .tsx-footer-top{grid-template-columns:1fr 1fr}
   .trust .tsx-footer-top>div:first-child{grid-column:1/-1}
 }
+/* Full desktop nav-links (5 nowrap labels) + logo + theme-pill + CTA stop
+   fitting in .tsx-nav-inner below ~1400px, which clips/hides the CTA and
+   squeezes the theme-pill. Below that width, fold links into the existing
+   burger sheet (already built for <=768px) instead of letting it overflow. */
+@media(max-width:1400px) and (min-width:769px){
+  .trust .tsx-nav-links{display:none}
+}
 @media(max-width:768px){
   .trust .tsx-nav-links{display:none}
   .trust .tsx-mobile-nav-scroll{position:fixed;top:64px;left:0;right:0;height:46px;display:flex;align-items:center;gap:8px;overflow-x:auto;padding:7px 20px;background:rgba(255,255,255,.94);border-top:1px solid rgba(226,232,240,.65);border-bottom:1px solid var(--line);backdrop-filter:blur(14px);-webkit-overflow-scrolling:touch;z-index:99}
@@ -4343,7 +4350,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust .tsx-nav-sheet { display: none; }
 .trust .tsx-nav-backdrop { display: none; }
 
-@media (max-width: 768px) {
+@media (max-width: 1400px) {
   .trust .tsx-nav-burger { display: inline-flex; }
   .trust .tsx-nav-cta { display: none; }
   .trust .tsx-theme-pill,
