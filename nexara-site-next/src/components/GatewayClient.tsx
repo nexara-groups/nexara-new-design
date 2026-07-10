@@ -94,12 +94,12 @@ function Gateway() {
       }
     }
     window.scrollTo(0, 0);
-    const navigate = () => router.push(path);
-    if (document.startViewTransition) {
-      document.startViewTransition(navigate);
-    } else {
-      navigate();
-    }
+    // base.css declares `@view-transition { navigation: auto; }`, which already
+    // wraps every router.push in its own view transition. Also calling
+    // document.startViewTransition() here raced that automatic one and threw
+    // "InvalidStateError: Transition was aborted because of invalid state",
+    // leaving a stuck transition snapshot covering the page.
+    router.push(path);
   };
   const reduce = useReducedMotion();
   const g = DATA.gateway;
