@@ -2891,3 +2891,27 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid cur
 @media (prefers-reduced-motion: reduce) {
   .aurora-blob { animation: none; }
 }
+
+/* ── Film grain: fine SVG noise over both themes + gateway. Kills gradient
+   banding on the dark navy/black surfaces (visible stepping in the radial
+   gradients) and adds subtle material texture. 2.8% opacity is imperceptible
+   as "noise" on light sections but enough to dither dark gradients. ── */
+.site::after,
+.gw2::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+  opacity: .028;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* ── Display typography finishing: balance ragged headline wraps (kills
+   single-word widow lines) and tighten tracking at display sizes, where
+   default spacing reads loose. Body text is untouched. ── */
+h1, h2 { text-wrap: balance; }
+.trust.tsx-site .tsx-section-heading,
+.trust.tsx-site .tsx-hero-title--strike,
+.neo .ch-name { letter-spacing: -0.02em; }

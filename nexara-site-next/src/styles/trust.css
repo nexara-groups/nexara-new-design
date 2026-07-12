@@ -2108,17 +2108,19 @@
   font-size: 0.95rem;
 }
 
+/* One radius language across the site: nav, theme pill, and chips are all
+   full pills — squared CTAs next to them read as a different design system. */
 .trust.tsx-site .tsx-btn-cta,
 .trust.tsx-site .tsx-sec-btn-primary,
 .trust.tsx-site .tsx-nav-cta {
-  border-radius: 0;
+  border-radius: 999px;
   background: var(--accent);
   box-shadow: none;
 }
 
 .trust.tsx-site .tsx-btn-ghost,
 .trust.tsx-site .tsx-sec-btn-ghost {
-  border-radius: 0;
+  border-radius: 999px;
 }
 
 @media (max-width: 1024px) {
@@ -4681,17 +4683,19 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   color: var(--text) !important;
 }
 
-/* 6 · Buttons: square enterprise blue, flat */
+/* 6 · Buttons: flat enterprise blue. Pill radius to match the nav, theme
+   pill and chips — the earlier 2px "square" pass clashed with every other
+   rounded element on the page. */
 .trust.tsx-site .tsx-btn-cta,
 .trust.tsx-site .tsx-nav-cta,
 .trust .tsx-btn-cta {
-  border-radius: 2px !important;
+  border-radius: 999px !important;
   background: var(--accent) !important;
   color: #fff !important;
   box-shadow: none !important;
 }
 .trust.tsx-site .tsx-sec-btn-ghost {
-  border-radius: 2px !important;
+  border-radius: 999px !important;
   border: 1px solid var(--line) !important;
   box-shadow: none !important;
 }
@@ -7628,24 +7632,36 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   color: rgba(120, 152, 198, .24);
 }
 
-/* The blade of light (position + opacity scrubbed by JS) */
+/* The blade of light (position + opacity scrubbed by JS).
+   A narrow skewed bar with tight blur reads as a light blade; the old
+   50%-radius ellipse at 13px blur read as a fuzzy white smear over the
+   letters. The soft ambient halo now lives in a wider ::before pass at
+   low opacity, so the core stays crisp. */
 .trust.tsx-site .tsx-wordmark-beam {
   position: absolute;
   top: -14%;
   left: -14%;
   height: 128%;
-  width: clamp(54px, 7vw, 108px);
+  width: clamp(20px, 2.6vw, 40px);
   pointer-events: none;
-  border-radius: 50%;
+  transform: skewX(-14deg);
   mix-blend-mode: screen;
-  filter: blur(13px);
+  filter: blur(3px);
   opacity: 0;
   background: linear-gradient(90deg,
     transparent,
-    rgba(150, 196, 255, .65) 38%,
+    rgba(150, 196, 255, .55) 30%,
     #eaf3ff 50%,
-    rgba(150, 196, 255, .65) 62%,
+    rgba(150, 196, 255, .55) 70%,
     transparent);
+}
+.trust.tsx-site .tsx-wordmark-beam::before {
+  content: "";
+  position: absolute;
+  inset: -12% -220%;
+  background: radial-gradient(ellipse 60% 50% at 50% 50%,
+    rgba(150, 196, 255, .28), transparent 70%);
+  filter: blur(18px);
 }
 
 @media (prefers-reduced-motion: reduce) {

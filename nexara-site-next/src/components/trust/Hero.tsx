@@ -160,7 +160,9 @@ export function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }: {
       comet.style.opacity = hasHit ? '1' : '0.82';
       comet.style.transform = `translate(${cometX}px,${cometY}px) translate(-50%,-50%) scale(${hasHit ? 1.34 : 1.02 + Math.sin(phase * Math.PI) * 0.16})`;
 
-      digit.style.opacity = hasHit ? '1' : '0.78';
+      // Visible only while striking the target: at rest the chip parked
+      // half-clipped at the viewport edge and read as a stray UI artifact.
+      digit.style.opacity = hasHit ? '1' : '0';
       digit.style.transform = `translate(${hitX}px,${hitY}px) translate(-50%,-50%) scale(${hasHit ? 1.16 : 1})`;
       digit.style.boxShadow = hasHit ? '0 0 42px rgba(26,109,255,.92)' : '0 0 0 rgba(26,109,255,0)';
 
