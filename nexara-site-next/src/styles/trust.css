@@ -2356,10 +2356,19 @@
   box-shadow: 0 1px 2px rgba(22, 24, 29, .2), inset 0 -2px 0 var(--accent);
 }
 
+/* Gradient-mesh backdrop: four offset color fields over a deeper base ramp,
+   plus a faint blueprint grid. Layered radials read as depth/material where
+   the old single radial read as flat navy; the grain overlay dithers them. */
 .trust.tsx-site .tsx-hero {
   background:
-    radial-gradient(ellipse at 14% 32%, rgba(47,74,107, .26), transparent 42%),
-    linear-gradient(135deg, #08111f 0%, #0f172a 48%, #111827 100%);
+    linear-gradient(rgba(120, 160, 220, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 160, 220, .035) 1px, transparent 1px),
+    radial-gradient(ellipse 52% 44% at 78% 16%, rgba(26, 109, 255, .13), transparent 62%),
+    radial-gradient(ellipse 62% 54% at 10% 78%, rgba(47, 74, 107, .34), transparent 64%),
+    radial-gradient(ellipse 38% 34% at 90% 84%, rgba(91, 157, 255, .09), transparent 60%),
+    radial-gradient(ellipse 46% 40% at 14% 32%, rgba(47, 74, 107, .26), transparent 46%),
+    linear-gradient(160deg, #060d18 0%, #0b1526 42%, #0f172a 70%, #111827 100%);
+  background-size: 56px 56px, 56px 56px, auto, auto, auto, auto, auto;
 }
 
 .trust.tsx-site .tsx-hero-card {
@@ -5842,11 +5851,19 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   background: var(--accent-2) !important;
 }
 
+/* Gradient-mesh backdrop: four offset color fields + a faint blueprint grid
+   over a deeper base ramp. Layered radials read as depth/material where two
+   flat radials read as plain navy; the film-grain overlay dithers them. */
 .trust.tsx-site .tsx-hero-stage {
   background:
-    radial-gradient(ellipse at 78% 14%, rgba(26, 109, 255, .24), transparent 55%),
-    radial-gradient(ellipse at 12% 92%, rgba(91, 157, 255, .13), transparent 50%),
-    linear-gradient(180deg, #101827 0%, #08111c 100%) !important;
+    linear-gradient(rgba(120, 160, 220, .04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 160, 220, .03) 1px, transparent 1px),
+    radial-gradient(ellipse 52% 44% at 78% 14%, rgba(26, 109, 255, .24), transparent 58%),
+    radial-gradient(ellipse 60% 52% at 8% 88%, rgba(26, 60, 120, .30), transparent 62%),
+    radial-gradient(ellipse 36% 32% at 92% 78%, rgba(91, 157, 255, .10), transparent 58%),
+    radial-gradient(ellipse 44% 40% at 12% 22%, rgba(47, 74, 107, .22), transparent 52%),
+    linear-gradient(170deg, #101827 0%, #0a1420 55%, #08111c 100%) !important;
+  background-size: 56px 56px, 56px 56px, auto, auto, auto, auto, auto !important;
 }
 
 .trust.tsx-site .tsx-hero-chapter .tsx-section-eyebrow,

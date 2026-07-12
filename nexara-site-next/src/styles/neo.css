@@ -18,7 +18,14 @@
 .neo .hero-body{color:var(--muted)}
 .neo .hero-actions button{font-family:"JetBrains Mono",monospace;text-transform:uppercase;background:var(--accent);color:#000}.neo .hero-actions .secondary{background:transparent;color:#fff;border:1px solid var(--line)}
 .neo .hero-dashboard{background:var(--line);border:1px solid var(--line)}.neo .hero-dashboard div{background:rgba(11,11,13,.86)}.neo .hero-dashboard strong{font-family:"Syne",sans-serif;color:#fff}.neo .hero-dashboard span{font-family:"JetBrains Mono",monospace;color:var(--muted)}
-.neo .section-grid-wrap,.neo .module-grid,.neo .stack-matrix,.neo .proof-cards{background:#000}
+/* Flat #000 panels get a faint lime wash + corner falloff — material depth
+   without breaking the void-black aesthetic; the grain overlay dithers it. */
+.neo .section-grid-wrap,.neo .module-grid,.neo .stack-matrix,.neo .proof-cards{
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(204,255,0,.045), transparent 68%),
+    radial-gradient(ellipse 55% 45% at 88% 96%, rgba(60,80,40,.10), transparent 62%),
+    #000;
+}
 /* Module normalization — count-aware columns, one gutter token, equal-height cards */
 .neo{--module-gap:clamp(20px,2.5vw,32px)}
 .neo .module-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--module-gap);align-items:stretch}
