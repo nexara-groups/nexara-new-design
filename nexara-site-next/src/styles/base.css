@@ -1323,10 +1323,25 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid cur
   transform: translateY(-2px);
 }
 
-/* ── View Transitions (theme toggle + page nav crossfade) ── */
+/* ── View Transitions (theme toggle + page nav) ──
+   Directional instead of a flat crossfade: the incoming page rises 10px and
+   sharpens from a slight blur (materialize); the outgoing page just fades,
+   subtler than the enter — attention is on what's arriving, not leaving. */
 @view-transition { navigation: auto; }
-::view-transition-old(root),
-::view-transition-new(root) { animation-duration: 220ms; animation-timing-function: ease-in-out; }
+@keyframes vt-page-enter {
+  from { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0);   }
+}
+@keyframes vt-page-exit {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+::view-transition-old(root) {
+  animation: vt-page-exit 180ms cubic-bezier(.3, 0, .8, .4) both;
+}
+::view-transition-new(root) {
+  animation: vt-page-enter 320ms cubic-bezier(.16, 1, .3, 1) both;
+}
 @media(prefers-reduced-motion:reduce) {
   ::view-transition-old(root),::view-transition-new(root) { animation-duration: 0.001ms; }
 }
@@ -2915,3 +2930,20 @@ h1, h2 { text-wrap: balance; }
 .trust.tsx-site .tsx-section-heading,
 .trust.tsx-site .tsx-hero-title--strike,
 .neo .ch-name { letter-spacing: -0.02em; }
+
+/* ── Tactile press feedback: buttons and pill CTAs compress slightly on
+   press. Immediate (80ms in), springs back on release via the element's
+   own transition. Purpose: confirm the press registered. ── */
+@media (prefers-reduced-motion: no-preference) {
+  button:active,
+  .trust .tsx-btn-cta:active,
+  .trust .tsx-nav-cta:active,
+  .trust .tsx-sec-btn-primary:active,
+  .trust .tsx-btn-ghost:active,
+  .trust .tsx-sec-btn-ghost:active,
+  .trust .tsx-theme-pill a:active,
+  .neo .theme-pill a:active {
+    transform: scale(.97) !important;
+    transition-duration: 80ms !important;
+  }
+}
