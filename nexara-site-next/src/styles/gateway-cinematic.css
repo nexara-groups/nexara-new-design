@@ -16,7 +16,7 @@
 .gw2-particle { position: absolute; width: 4px; height: 4px; border-radius: 50%;
   background: #c8ff00; box-shadow: 0 0 8px 1px rgba(200,255,0,.7); pointer-events: none; }
 .gw2-lines { position: absolute; inset: 0;
-  background-image: linear-gradient(90deg, rgba(26,109,255,.10) 1px, transparent 1px);
+  background-image: linear-gradient(90deg, rgba(102, 160, 204,.10) 1px, transparent 1px);
   background-size: 80px 100%; animation: gw2-lines-drift 22s linear infinite;
   mask-image: radial-gradient(80% 80% at 78% 50%, #000 40%, transparent 80%); }
 @keyframes gw2-lines-drift { to { background-position: 80px 0; } }
@@ -29,7 +29,7 @@
 .gw2-kicker { font-family: "Geist Mono", "JetBrains Mono", monospace; font-size: 12px;
   font-weight: 600; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 18px; }
 .gw2-kicker-neo { color: #c8ff00; }
-.gw2-kicker-trust { color: #1a6dff; }
+.gw2-kicker-trust { color: #66a0cc; }
 .gw2-title { font-family: "Geist", Inter, sans-serif; font-weight: 600; line-height: 1.04;
   letter-spacing: -.02em; font-size: clamp(2rem, 3.2vw, 3.5rem); margin: 0 0 20px; }
 .gw2-title-neo { color: #f3f7e8; }
@@ -43,15 +43,15 @@
 .gw2-chip { font-family: "Geist Mono", monospace; font-size: 10px; font-weight: 600;
   letter-spacing: .08em; text-transform: uppercase; padding: 5px 11px; border-radius: 2px; }
 .gw2-chip-neo { color: #c8ff00; border: 1px solid rgba(200,255,0,.32); }
-.gw2-chip-trust { color: #1a6dff; border: 1px solid rgba(26,109,255,.3); }
+.gw2-chip-trust { color: #66a0cc; border: 1px solid rgba(102, 160, 204,.3); }
 
 .gw2-cta { display: inline-flex; align-items: center; gap: 10px; border: none; cursor: pointer;
   font-family: "Geist Mono", monospace; font-size: 12px; font-weight: 700; letter-spacing: .1em;
   text-transform: uppercase; padding: 15px 26px; border-radius: 2px; will-change: transform; }
 .gw2-cta-neo { background: #c8ff00; color: #0a0d05; box-shadow: 0 0 0 0 rgba(200,255,0,.5); }
 .gw2-cta-neo:hover { box-shadow: 0 0 28px 2px rgba(200,255,0,.45); }
-.gw2-cta-trust { background: #1a6dff; color: #fff; }
-.gw2-cta-trust:hover { box-shadow: 0 0 28px 2px rgba(26,109,255,.4); }
+.gw2-cta-trust { background: #66a0cc; color: #fff; }
+.gw2-cta-trust:hover { box-shadow: 0 0 28px 2px rgba(102, 160, 204,.4); }
 
 .gw2-brand { position: absolute; top: 6vh; left: 0; right: 0; z-index: 6; text-align: center;
   pointer-events: none; mix-blend-mode: difference; }
@@ -63,7 +63,7 @@
 .gw2-veil { position: absolute; inset: 0; z-index: 7; background: #07090d; }
 .gw2-wipe { position: absolute; inset: 0; z-index: 9; pointer-events: none; }
 .gw2-wipe-neo { background: #c8ff00; }
-.gw2-wipe-trust { background: #1a6dff; }
+.gw2-wipe-trust { background: #66a0cc; }
 .gw2-hint { position: absolute; bottom: 4vh; left: 0; right: 0; z-index: 6; text-align: center;
   font-family: "Geist Mono", monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
   color: rgba(140,150,160,.7); pointer-events: none; }

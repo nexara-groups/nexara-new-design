@@ -115,7 +115,7 @@
 
 /* ── Trust theme: warm paper, enterprise blue (tokens from trust.css) ── */
 .cc-banner.cc-theme-trust {
-  --cc-accent: #1A6DFF;
+  --cc-accent: #66A0CC;
   --cc-accent-dark: #1257D6;
   background: rgba(248, 250, 252, 0.96);
   border-top: 1px solid rgba(23, 32, 51, 0.12);
@@ -131,7 +131,7 @@
 .cc-banner.cc-theme-trust .cc-btn-ghost:hover { border-color: #0B1F33; color: #0B1F33; }
 
 .cc-modal.cc-theme-trust {
-  --cc-accent: #1A6DFF;
+  --cc-accent: #66A0CC;
   --cc-accent-dark: #1257D6;
   --cc-card-fg: #0B1F33;
   --cc-muted: #5B7290;

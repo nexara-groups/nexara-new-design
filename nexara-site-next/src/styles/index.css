@@ -11,18 +11,18 @@
   --card-foreground: #0b1f33;
   --popover: #ffffff;
   --popover-foreground: #0b1f33;
-  --primary: #1a6dff;            /* Nexara accent */
+  --primary: #66a0cc;            /* Nexara accent */
   --primary-foreground: #ffffff;
   --secondary: #f1f5f9;
   --secondary-foreground: #0b1f33;
   --muted: #f1f5f9;
   --muted-foreground: #5b7290;
   --accent: #eaf1ff;
-  --accent-foreground: #1a6dff;
+  --accent-foreground: #66a0cc;
   --destructive: #e7000b;
   --border: #dce3eb;
   --input: #dce3eb;
-  --ring: #1a6dff;
+  --ring: #66a0cc;
 }
 
 .dark {

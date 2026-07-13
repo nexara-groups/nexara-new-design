@@ -51,7 +51,7 @@ function TrustObject() {
     <group ref={g} position={[0, 0.1, 0]} scale={1.5}>
       <mesh>
         <icosahedronGeometry args={[1, 1]} />
-        <meshBasicMaterial color="#1a6dff" wireframe transparent opacity={0.55} />
+        <meshBasicMaterial color="#66a0cc" wireframe transparent opacity={0.55} />
       </mesh>
       <mesh scale={0.62}>
         <icosahedronGeometry args={[1, 0]} />
