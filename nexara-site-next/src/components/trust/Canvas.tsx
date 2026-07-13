@@ -10,7 +10,7 @@ export function TrustParticleCanvas() {
     const ctx2d = canvas.getContext('2d');
     if (!ctx2d) return;
     const ctx: CanvasRenderingContext2D = ctx2d;
-    const BG = '#081726', LINE = 'rgba(91,157,255,', DOT = 'rgba(91,157,255,1)';
+    const BG = '#081726', LINE = 'rgba(143, 187, 221,', DOT = 'rgba(143, 187, 221,1)';
     const MAX_DIST = 160, N = 320;
     let W: number, H: number, particles: any[], raf: number;
 
@@ -53,7 +53,7 @@ export function TrustParticleCanvas() {
 
       // Interactive cursor constellation lines
       if (mouse.x !== null && mouse.y !== null) {
-        ctx.fillStyle = 'rgba(147, 197, 253, 0.04)';
+        ctx.fillStyle = 'rgba(158, 196, 224, 0.04)';
         ctx.beginPath();
         ctx.arc(mouse.x, mouse.y, 100, 0, Math.PI * 2);
         ctx.fill();
@@ -63,7 +63,7 @@ export function TrustParticleCanvas() {
           const dx = p.x - mouse.x, dy = p.y - mouse.y, d2 = dx*dx + dy*dy;
           if (d2 < 120 * 120) {
             const alpha = (1 - Math.sqrt(d2) / 120) * 0.38;
-            ctx.strokeStyle = `rgba(147, 197, 253, ${alpha})`;
+            ctx.strokeStyle = `rgba(158, 196, 224, ${alpha})`;
             ctx.lineWidth = 0.8;
             ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
           }

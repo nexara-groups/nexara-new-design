@@ -18,7 +18,7 @@ export const TRUST_NAV_ICONS = {
 
 /* Blueprint Ledger — divisions share one structural blueprint accent; they
    differ by plate numeral + serif tagline, not hue. */
-export const TRUST_ACCENT: Record<string, string> = { academy: '#1A6DFF', marketing: '#1A6DFF', labs: '#1A6DFF' };
+export const TRUST_ACCENT: Record<string, string> = { academy: '#66A0CC', marketing: '#66A0CC', labs: '#66A0CC' };
 
 export const TRUST_OPERATING_STANDARD = [
   { title: 'Written before built', body: "Every engagement starts with a written brief and scope. If it isn't written down, it isn't agreed." },

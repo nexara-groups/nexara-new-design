@@ -209,7 +209,7 @@ export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof Trust
 
     const shape = section.id === "academy" ? "spiral" : section.id === "labs" ? "sphere" : "signal";
     // Ink-on-paper strands matching the section
-    const rgb = section.id === "labs" ? [11, 31, 51] : [26, 109, 255];
+    const rgb = section.id === "labs" ? [11, 31, 51] : [102, 160, 204];
 
     const makeSprite = (cRgb: number[]) => {
       const s = document.createElement("canvas");
@@ -374,7 +374,7 @@ export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof Trust
           <p className="tsx-section-eyebrow">{section.id === "academy" ? "01" : section.id === "marketing" ? "02" : "03"} / {getTrustSectionLabel(section).toUpperCase()}</p>
           <h1 ref={heroTitleRef} className="tsx-section-heading" style={{ color: '#F4F8FF', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 700 }}>
             {copy.title}<br />
-            <span className="serif" style={{ color: '#5B9DFF' }}>
+            <span className="serif" style={{ color: '#8FBBDD' }}>
               <CyclingWord words={(SECTION_HERO_WORDS.trust as Record<string, string[]>)[section.id] || [copy.accent]} />
             </span>
           </h1>
@@ -464,7 +464,7 @@ export function TrustPageHero({ eyebrow, title, accentWords, body, children, pri
           {eyebrow && <p className="tsx-section-eyebrow">{eyebrow}</p>}
           <h1 ref={titleRef} className="tsx-section-heading" style={{ color: '#F4F8FF', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 700 }}>
             {title}<br />
-            <span className="serif" style={{ color: '#5B9DFF' }}>
+            <span className="serif" style={{ color: '#8FBBDD' }}>
               <CyclingWord words={accentWords} />
             </span>
           </h1>

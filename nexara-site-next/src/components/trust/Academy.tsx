@@ -60,7 +60,7 @@ export function AcademyDisplayCard({ pkg, index, isActive, onEnter }: {
         transform: isActive ? 'translateY(-14px)' : 'translateY(0)',
         boxShadow: isActive
           ? (featured
-              ? '0 16px 44px rgba(26,109,255,0.18), 0 2px 8px rgba(0,0,0,0.07)'
+              ? '0 16px 44px rgba(102, 160, 204,0.18), 0 2px 8px rgba(0,0,0,0.07)'
               : '0 10px 32px rgba(0,0,0,0.13)')
           : '0 1px 4px rgba(0,0,0,0.06)',
         transition: 'transform 0.32s cubic-bezier(.22,1,.36,1), opacity 0.22s ease, filter 0.22s ease, box-shadow 0.22s ease',
@@ -69,8 +69,8 @@ export function AcademyDisplayCard({ pkg, index, isActive, onEnter }: {
       className={[
         'flex select-none flex-col rounded-2xl border-2 bg-white px-5 py-4',
         isActive
-          ? (featured ? 'border-[#1A6DFF]' : 'border-slate-300')
-          : (featured ? 'border-[#1A6DFF]/40' : 'border-slate-200'),
+          ? (featured ? 'border-[#66A0CC]' : 'border-slate-300')
+          : (featured ? 'border-[#66A0CC]/40' : 'border-slate-200'),
       ].join(' ')}
     >
       <div className="flex items-center gap-2 mb-3">
@@ -84,7 +84,7 @@ export function AcademyDisplayCard({ pkg, index, isActive, onEnter }: {
       <ul className="space-y-1.5 flex-1">
         {pkg.includes.map(item => (
           <li key={item} className="text-xs text-slate-500 flex items-start gap-1.5">
-            <svg viewBox="0 0 16 16" className="w-3 h-3 text-[#1A6DFF] shrink-0 mt-px" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 16 16" className="w-3 h-3 text-[#66A0CC] shrink-0 mt-px" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 8.5l3 3 7-7"/>
             </svg>
             {item}
@@ -94,8 +94,8 @@ export function AcademyDisplayCard({ pkg, index, isActive, onEnter }: {
       <button
         className={`mt-4 w-full py-2 rounded-lg text-xs font-semibold transition-colors ${
           featured
-            ? 'bg-[#1A6DFF] text-white hover:bg-[#1551C9]'
-            : 'border border-slate-200 text-slate-600 hover:border-[#1A6DFF] hover:text-[#1A6DFF]'
+            ? 'bg-[#66A0CC] text-white hover:bg-[#44719C]'
+            : 'border border-slate-200 text-slate-600 hover:border-[#66A0CC] hover:text-[#66A0CC]'
         }`}
         onClick={() => routeTo('trust', 'contact')}
       >
