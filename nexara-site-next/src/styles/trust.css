@@ -4395,8 +4395,8 @@ html.js-reveal-ready .trust .tsx-fade.visible {
     max-height: 88dvh;
     z-index: 95;
     background: rgba(220,235,255,0.76);
-    backdrop-filter: blur(52px) saturate(160%);
-    -webkit-backdrop-filter: blur(52px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
     border-radius: 20px 20px 0 0;
     border-top: 1px solid rgba(102, 160, 204,.2);
     box-shadow:
@@ -6498,8 +6498,8 @@ html.js-reveal-ready .trust .tsx-fade.visible {
       rgba(255,255,255,.70) 100%
     ) border-box;
   border: 1.5px solid transparent;
-  backdrop-filter: blur(28px) saturate(180%) brightness(1.02);
-  -webkit-backdrop-filter: blur(28px) saturate(180%) brightness(1.02);
+  backdrop-filter: blur(24px) saturate(180%) brightness(1.02);
+  -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.02);
   /* Deeper, neutral outer shadow anchors the pill.
      Inset top highlight is the only glass edge signal — kept sharp and high contrast. */
   box-shadow:
@@ -6547,8 +6547,8 @@ html.js-reveal-ready .trust .tsx-fade.visible {
     0 0 0 0.5px rgba(11, 31, 51, .07),
     inset 0 1.5px 0 rgba(255, 255, 255, 1),
     inset 0 -1px 0 rgba(11, 31, 51, .08);
-  backdrop-filter: blur(40px) saturate(200%) brightness(1.02);
-  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.02);
+  backdrop-filter: blur(24px) saturate(200%) brightness(1.02);
+  -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.02);
 }
 
 /* Logo wordmark: heavier weight + tighter tracking gives it the
@@ -7024,8 +7024,8 @@ html.js-reveal-ready .trust .tsx-fade.visible {
     rgba(255, 255, 255, 0.42) 0%,
     rgba(225, 240, 255, 0.30) 100%
   ) !important;
-  backdrop-filter: blur(32px) saturate(200%) brightness(1.08) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(1.08) !important;
+  backdrop-filter: blur(24px) saturate(200%) brightness(1.08) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.08) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.44) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.60),
@@ -7132,8 +7132,8 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   background:
     linear-gradient(150deg, rgba(255,255,255,.64) 0%, rgba(228,240,255,.52) 100%) !important;
   border: 1px solid rgba(255,255,255,.66) !important;
-  backdrop-filter: blur(30px) saturate(190%) brightness(1.1) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(190%) brightness(1.1) !important;
+  backdrop-filter: blur(24px) saturate(190%) brightness(1.1) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) brightness(1.1) !important;
   /* Ring + deeper shadow give the pill a defined silhouette on every bg. */
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.8),
@@ -7694,4 +7694,107 @@ html.js-reveal-ready .trust .tsx-fade.visible {
     text-shadow: 0 0 20px rgba(143, 187, 221, .3);
   }
   .trust.tsx-site .tsx-wordmark-beam { display: none; }
+}
+
+/* Performance budget: on touch-sized viewports avoid full-screen blur and
+   continuously composited decoration. The visual hierarchy stays intact while
+   scrolling and taps remain on the browser's fast path. */
+@media (max-width: 760px) {
+  .trust.tsx-site .tsx-nav,
+  .trust.tsx-site .tsx-mobile-nav-scroll {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .trust.tsx-site .tsx-hero-particles::before {
+    filter: none !important;
+    opacity: .22;
+  }
+
+  .trust.tsx-site .tsx-hero-beams,
+  .trust.tsx-site .tsx-hero-arc {
+    display: none !important;
+  }
+
+  .trust.tsx-site .tsx-hero-energy-thread,
+  .trust.tsx-site .tsx-hero-energy-comet,
+  .trust.tsx-site .tsx-hero-energy-reflection {
+    box-shadow: none !important;
+  }
+}
+
+/* Premium clarity pass — preserves the existing Trust layout and editorial
+   language while lifting contrast, depth and selective blue energy. */
+.trust {
+  --text: #0B1F33;
+  --ink: #0B1F33;
+  --ink-2: #52677F;
+  --ink-3: #718096;
+  --muted: #52677F;
+  --blueprint: #5A9FD3;
+  --vermilion: #5A9FD3;
+  --accent: #5A9FD3;
+  --accent-2: #2F6FA6;
+  --line: rgba(11,31,51,.15);
+  --line-2: rgba(11,31,51,.20);
+}
+
+.trust.tsx-site .tsx-hero-stage {
+  background:
+    linear-gradient(rgba(140,185,225,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140,185,225,.045) 1px, transparent 1px),
+    radial-gradient(ellipse 54% 48% at 78% 12%, rgba(94,177,238,.34), transparent 58%),
+    radial-gradient(ellipse 58% 48% at 8% 88%, rgba(58,105,190,.34), transparent 62%),
+    radial-gradient(ellipse 38% 34% at 90% 78%, rgba(153,205,244,.18), transparent 58%),
+    linear-gradient(165deg, #101e32 0%, #091728 54%, #050d19 100%) !important;
+}
+
+.trust.tsx-site .tsx-hero-stage .tsx-hero-canvas { opacity: .72; }
+.trust.tsx-site .tsx-hero-particles::before { opacity: .62; }
+.trust.tsx-site .tsx-hero-title--strike span {
+  color: rgba(164,195,230,.68);
+  text-shadow: 0 0 30px rgba(90,159,211,.22);
+}
+.trust.tsx-site .tsx-hero-chapter .tsx-section-eyebrow,
+.trust.tsx-site .tsx-hero-chapter .tsx-panel-idx,
+.trust.tsx-site .tsx-hero-rail button.is-active::after { color: #9BCFF4 !important; }
+.trust.tsx-site .tsx-hero-chapter .tsx-sec-body,
+.trust.tsx-site .tsx-hero-sub,
+.trust.tsx-site .tsx-scroll-cue,
+.trust.tsx-site .tsx-hero-counter { color: rgba(231,241,252,.80); }
+.trust.tsx-site .tsx-hero-rail button::after { color: rgba(239,247,255,.58); }
+.trust.tsx-site .tsx-hero-chapter .tsx-section-heading,
+.trust.tsx-site .tsx-hero-counter strong { color: #FCFEFF !important; }
+
+.trust.tsx-site .tsx-sol-card,
+.trust.tsx-site .tsx-gov-card,
+.trust.tsx-site .tsx-proof-case-card,
+.trust.tsx-site .tsx-pkg-card,
+.trust.tsx-site .tsx-subpage-icon-card,
+.trust.tsx-site .tsx-matrix-row {
+  box-shadow: 0 2px 5px rgba(11,31,51,.045), 0 18px 42px -24px rgba(30,70,110,.24);
+}
+
+.trust.tsx-site .tsx-parent-dark-band {
+  background:
+    radial-gradient(circle at 16% 18%, color-mix(in srgb, var(--sec-accent, var(--accent)) 30%, transparent), transparent 32%),
+    radial-gradient(circle at 86% 80%, rgba(91,145,195,.12), transparent 34%),
+    linear-gradient(180deg, #091524 0%, #0d2034 54%, #07111d 100%);
+}
+.trust.tsx-site .tsx-parent-dark-band .tsx-signature-sub,
+.trust.tsx-site .tsx-parent-dark-band .tsx-chapter-sub,
+.trust.tsx-site .tsx-parent-dark-band .tsx-ladder-body p,
+.trust.tsx-site .tsx-parent-dark-band .tsx-proof-case-body,
+.trust.tsx-site .tsx-parent-dark-band .tsx-proof-result-text,
+.trust.tsx-site .tsx-parent-dark-band .tsx-funnel-desc { color: rgba(235,244,253,.82) !important; }
+
+@media (max-width: 760px) {
+  .trust.tsx-site .tsx-hero-particles::before { opacity: .40; }
+  .trust.tsx-site .tsx-hero-energy-comet {
+    box-shadow: 0 0 18px rgba(143,187,221,.76) !important;
+  }
+  .trust.tsx-site .tsx-hero-energy-thread,
+  .trust.tsx-site .tsx-hero-energy-reflection {
+    filter: drop-shadow(0 0 5px rgba(143,187,221,.62));
+  }
 }

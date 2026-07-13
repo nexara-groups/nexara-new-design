@@ -101,6 +101,11 @@ export function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }: {
 
     let rafId = 0;
     let t0 = performance.now();
+    let lastFrame = 0;
+    let visible = true;
+    let resizeTimer: number | undefined;
+    const frameInterval = 1000 / 30;
+    const shouldAnimate = !reduceMotion && !window.matchMedia('(max-width: 760px)').matches;
 
     const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
     const ease = (t) => t * t * (3 - 2 * t);
@@ -113,7 +118,15 @@ export function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }: {
       el.style.transform = `translate(${x1}px,${y1}px) rotate(${angle}rad) scaleX(${len})`;
     };
 
-    function frame(now) {
+    let geometry: {
+      w: number;
+      h: number;
+      sourceX: number;
+      beamY: number;
+      targetBox: { left: number; right: number; top: number; bottom: number } | null;
+    };
+
+    function measure() {
       const box = loop.getBoundingClientRect();
       const target = targetRef?.current?.getBoundingClientRect();
       const w = box.width || window.innerWidth;
@@ -131,8 +144,20 @@ export function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }: {
       const beamY = targetBox
         ? clamp(targetBox.top + (targetBox.bottom - targetBox.top) * 0.58, 96, h - 72)
         : fallbackY;
-      const duration = reduceMotion ? 100000 : 3200;
-      const phase = reduceMotion ? 0.38 : ((now - t0) % duration) / duration;
+      geometry = { w, h, sourceX, beamY, targetBox };
+    }
+
+    function frame(now) {
+      rafId = 0;
+      if (!visible || document.hidden) return;
+      if (now - lastFrame < frameInterval) {
+        rafId = requestAnimationFrame(frame);
+        return;
+      }
+      lastFrame = now;
+      const { w, sourceX, beamY, targetBox } = geometry;
+      const duration = shouldAnimate ? 3200 : 100000;
+      const phase = shouldAnimate ? ((now - t0) % duration) / duration : 0.38;
       const outbound = phase < 0.72;
       const pass = outbound ? ease(phase / 0.72) : 1 - ease((phase - 0.72) / 0.28);
       const rawX = sourceX + pass * (w * 0.68);
@@ -166,11 +191,34 @@ export function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }: {
       digit.style.transform = `translate(${hitX}px,${hitY}px) translate(-50%,-50%) scale(${hasHit ? 1.16 : 1})`;
       digit.style.boxShadow = hasHit ? '0 0 42px rgba(102, 160, 204,.92)' : '0 0 0 rgba(102, 160, 204,0)';
 
-      rafId = requestAnimationFrame(frame);
+      if (shouldAnimate) rafId = requestAnimationFrame(frame);
     }
 
+    measure();
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible && !rafId) rafId = requestAnimationFrame(frame);
+      else if (!visible && rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+    }, { threshold: 0 });
+    observer.observe(loop);
+    const onResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(measure, 120);
+    };
+    const onVisibility = () => {
+      if (document.hidden && rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      else if (!document.hidden && visible && !rafId) rafId = requestAnimationFrame(frame);
+    };
+    window.addEventListener('resize', onResize, { passive: true });
+    document.addEventListener('visibilitychange', onVisibility);
     rafId = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(rafId);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.clearTimeout(resizeTimer);
+      observer.disconnect();
+      window.removeEventListener('resize', onResize);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, [reduceMotion, targetRef]);
 
   return (
@@ -248,6 +296,9 @@ export function TrustHeroUnravel() {
     const ctx = canvas.getContext("2d");
     const TAU = Math.PI * 2;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = window.matchMedia("(max-width: 760px)").matches;
+    const saveData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+    const lowPower = isMobile || saveData || (navigator.hardwareConcurrency || 8) <= 4;
 
     // ── Three divisions: blob + particle stream system ────────────────────────
     //
@@ -283,7 +334,10 @@ export function TrustHeroUnravel() {
     };
     const sprites = DIVS.map(d => makeSprite(d.r, d.g, d.b));
 
-    const COUNT = window.innerWidth < 760 ? 90 : 140;
+    // The previous 270–420 moving sprites plus a DPR-2 trail buffer kept the
+    // main thread/GPU busy even while idle. This is visually equivalent at
+    // normal viewing distance, but leaves enough frame budget for scrolling.
+    const COUNT = lowPower ? 18 : 64;
     const particles = DIVS.map(() =>
       Array.from({ length: COUNT }, (_, i) => ({
         t:  i / COUNT,
@@ -503,8 +557,8 @@ export function TrustHeroUnravel() {
       ctx.strokeStyle = 'rgba(152, 188, 216,1)';
       ctx.lineWidth = 1;
       ctx.globalAlpha = 0.30 * intensity;
-      for (let i = 0; i < 48; i++) {
-        const a = rot + (i / 48) * TAU;
+      for (let i = 0; i < 24; i++) {
+        const a = rot + (i / 24) * TAU;
         const c = Math.cos(a), s = Math.sin(a);
         const len = i % 4 === 0 ? W * .008 : W * .004;
         ctx.beginPath();
@@ -529,7 +583,7 @@ export function TrustHeroUnravel() {
     const tctx = trailCanvas.getContext('2d');
 
     function measure() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = lowPower ? 1 : Math.min(window.devicePixelRatio || 1, 1.35);
       W = canvas.clientWidth; H = canvas.clientHeight;
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
@@ -563,8 +617,10 @@ export function TrustHeroUnravel() {
     const beamEl = titleRef.current ? titleRef.current.querySelector('.tsx-wordmark-beam') : null;
     const litArr = titleSpans.map(() => 0);
     function applyLit(el, lit, prox) {
-      const r = Math.round(120 + 124 * lit), g = Math.round(152 + 96 * lit), b = Math.round(198 + 57 * lit);
-      el.style.color = `rgba(${r},${g},${b},${(0.24 + 0.76 * lit).toFixed(2)})`;
+      // Keep the unlit wordmark legible and premium. The strike still creates a
+      // clear lift to white, but the resting state no longer reads as disabled.
+      const r = Math.round(164 + 80 * lit), g = Math.round(195 + 53 * lit), b = Math.round(230 + 25 * lit);
+      el.style.color = `rgba(${r},${g},${b},${(0.68 + 0.32 * lit).toFixed(2)})`;
       const glow = lit * 0.32 + prox * 0.9;
       el.style.textShadow = `0 0 ${(20 + prox * 22).toFixed(0)}px rgba(168, 200, 224,${glow.toFixed(2)})`
         + (prox > 0.02 ? `,0 0 ${(74 * prox).toFixed(0)}px rgba(102, 160, 204,${(prox * 0.6).toFixed(2)})` : '');
@@ -628,6 +684,13 @@ export function TrustHeroUnravel() {
     }
 
     const isDesktop = window.innerWidth > 760;
+    let heroVisible = true;
+    let rafId = 0;
+    let t0 = performance.now();
+    let lastFrame = 0;
+    let idleFrames = 0;
+    let strikeComplete = false;
+    const frameInterval = 1000 / (lowPower ? 24 : 30);
     let st;
 
     if (!prefersReducedMotion) {
@@ -638,6 +701,7 @@ export function TrustHeroUnravel() {
         scrub: true,
         onUpdate: (self) => {
           state.target = self.progress;
+          ensureRender();
         }
       });
     } else {
@@ -648,26 +712,41 @@ export function TrustHeroUnravel() {
     const onMouseMove = (e) => {
       mouse.tx = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
       mouse.ty = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+      ensureRender();
     };
-    if (isDesktop) {
+    if (isDesktop && !lowPower) {
       window.addEventListener("mousemove", onMouseMove, { passive: true });
     }
 
-    let rafId = 0;
-    let t0 = performance.now();
+    function ensureRender() {
+      if (heroVisible && !rafId && !document.hidden) rafId = requestAnimationFrame(renderLoop);
+    }
 
     function renderLoop(now) {
+      rafId = 0;
+      if (!heroVisible || document.hidden) return;
+      if (now - lastFrame < frameInterval) {
+        rafId = requestAnimationFrame(renderLoop);
+        return;
+      }
+      lastFrame = now;
       const time = (now - t0) / 1000;
-      state.p += (state.target - state.p) * 0.09;
+      state.p += (state.target - state.p) * (lowPower ? 0.32 : 0.22);
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
-      mouse.x += (mouse.tx - mouse.x) * 0.05;
-      mouse.y += (mouse.ty - mouse.y) * 0.05;
+      mouse.x += (mouse.tx - mouse.x) * 0.15;
+      mouse.y += (mouse.ty - mouse.y) * 0.15;
 
       const p = state.p;
       // Beam strike owns p ∈ [0, STRIKE]; the convergence is remapped to run
       // over the remaining scroll so nothing fires until the wordmark is lit.
       const pc = p <= STRIKE ? 0 : (p - STRIKE) / (1 - STRIKE);
-      strikeUpdate(p >= STRIKE ? 1 : p / STRIKE);
+      if (p < STRIKE) {
+        strikeComplete = false;
+        strikeUpdate(p / STRIKE);
+      } else if (!strikeComplete) {
+        strikeUpdate(1);
+        strikeComplete = true;
+      }
       updateChapters(pc);
       ctx.clearRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'source-over';
@@ -676,67 +755,62 @@ export function TrustHeroUnravel() {
       const states = DIVS.map((_, si) => getState(pc, si, time));
       const ci = coreIntensity(pc);
 
-      // Silk trails: fade the offscreen layer instead of clearing it.
+      // Silk trails are the expensive layer. Keep them on capable desktops;
+      // mobile and constrained devices retain the blobs/core without it.
       const scrolling = Math.abs(state.target - state.p) > 0.0008;
-      if (prefersReducedMotion) {
-        tctx.clearRect(0, 0, W, H);
-      } else {
-        tctx.globalCompositeOperation = 'destination-out';
-        tctx.globalAlpha = 1;
-        tctx.fillStyle = scrolling ? 'rgba(0,0,0,0.62)' : 'rgba(0,0,0,0.80)';
-        tctx.fillRect(0, 0, W, H);
-      }
+      if (!lowPower) {
+        if (prefersReducedMotion) {
+          tctx.clearRect(0, 0, W, H);
+        } else {
+          tctx.globalCompositeOperation = 'destination-out';
+          tctx.globalAlpha = 1;
+          tctx.fillStyle = scrolling ? 'rgba(0,0,0,0.62)' : 'rgba(0,0,0,0.80)';
+          tctx.fillRect(0, 0, W, H);
+        }
 
-      // Particles (drawn into the trail layer, beneath blobs and core).
-      // Paths bow perpendicular to the travel line — braided silk streams.
-      tctx.globalCompositeOperation = 'lighter';
-      DIVS.forEach((_, si) => {
-        const st = states[si];
-        if (st.ptAlpha < 0.01) return;
-        const sprite = sprites[si];
-        const ddx = st.ptDst.x - st.ptSrc.x, ddy = st.ptDst.y - st.ptSrc.y;
-        const dlen = Math.hypot(ddx, ddy) || 1;
-        const nX = -ddy / dlen, nY = ddx / dlen;
-        particles[si].forEach(pt => {
-          pt.t = (pt.t + .0058) % 1;
-          const e  = ss(pt.t);
-          const mx = mouse.x * W * .032 * (1 - e);
-          const my = mouse.y * H * .032 * (1 - e);
-          const bow = pt.arc * Math.min(dlen * .16, W * .05) * Math.sin(pt.t * Math.PI);
-          const px = st.ptSrc.x + ddx * e + pt.jx * W * .03 * (1 - e) + nX * bow + mx;
-          const py = st.ptSrc.y + ddy * e + pt.jy * H * .03 * (1 - e) + nY * bow + my;
-          const a  = Math.sin(pt.t * Math.PI) * st.ptAlpha * 0.6;
-          const d  = pt.sz * (4.2 + (1 - e) * 1.8) * (W < 760 ? 1.4 : 2.1);
-          if (a < 0.005 || px < -d || px > W + d || py < -d || py > H + d) return;
-          tctx.globalAlpha = a;
-          tctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
+        tctx.globalCompositeOperation = 'lighter';
+        DIVS.forEach((_, si) => {
+          const st = states[si];
+          if (st.ptAlpha < 0.01) return;
+          const sprite = sprites[si];
+          const ddx = st.ptDst.x - st.ptSrc.x, ddy = st.ptDst.y - st.ptSrc.y;
+          const dlen = Math.hypot(ddx, ddy) || 1;
+          const nX = -ddy / dlen, nY = ddx / dlen;
+          particles[si].forEach(pt => {
+            pt.t = (pt.t + .0058) % 1;
+            const e  = ss(pt.t);
+            const mx = mouse.x * W * .032 * (1 - e);
+            const my = mouse.y * H * .032 * (1 - e);
+            const bow = pt.arc * Math.min(dlen * .16, W * .05) * Math.sin(pt.t * Math.PI);
+            const px = st.ptSrc.x + ddx * e + pt.jx * W * .03 * (1 - e) + nX * bow + mx;
+            const py = st.ptSrc.y + ddy * e + pt.jy * H * .03 * (1 - e) + nY * bow + my;
+            const a  = Math.sin(pt.t * Math.PI) * st.ptAlpha * 0.6;
+            const d  = pt.sz * (4.2 + (1 - e) * 1.8) * 2.1;
+            if (a < 0.005 || px < -d || px > W + d || py < -d || py > H + d) return;
+            tctx.globalAlpha = a;
+            tctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
+          });
         });
-      });
-      tctx.globalCompositeOperation = 'source-over';
-
-      // Composite the trail layer, then draw crisp geometry on top.
-      ctx.globalAlpha = 1;
-      ctx.drawImage(trailCanvas, 0, 0, W, H);
-
-      // Filaments: lit fibers connecting travelling blobs to the core.
-      states.forEach((st, si) => {
-        const fdx = st.bPos.x - CX, fdy = st.bPos.y - CY;
-        const fdist = Math.hypot(fdx, fdy);
-        const fa = Math.min(st.ptAlpha * 1.4, st.bAlpha) * cl(fdist / (W * .12)) * 0.22;
-        if (fa < 0.02) return;
-        const d = DIVS[si];
-        const grad = ctx.createLinearGradient(CX, CY, st.bPos.x, st.bPos.y);
-        grad.addColorStop(0,  `rgba(${d.r},${d.g},${d.b},0)`);
-        grad.addColorStop(.5, `rgba(${d.r},${d.g},${d.b},${fa.toFixed(3)})`);
-        grad.addColorStop(1,  `rgba(${d.r},${d.g},${d.b},0)`);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 1;
+        tctx.globalCompositeOperation = 'source-over';
         ctx.globalAlpha = 1;
-        ctx.beginPath();
-        ctx.moveTo(CX, CY);
-        ctx.lineTo(st.bPos.x, st.bPos.y);
-        ctx.stroke();
-      });
+        ctx.drawImage(trailCanvas, 0, 0, W, H);
+
+        states.forEach((st, si) => {
+          const fdx = st.bPos.x - CX, fdy = st.bPos.y - CY;
+          const fdist = Math.hypot(fdx, fdy);
+          const fa = Math.min(st.ptAlpha * 1.4, st.bAlpha) * cl(fdist / (W * .12)) * 0.22;
+          if (fa < 0.02) return;
+          const d = DIVS[si];
+          const grad = ctx.createLinearGradient(CX, CY, st.bPos.x, st.bPos.y);
+          grad.addColorStop(0, `rgba(${d.r},${d.g},${d.b},0)`);
+          grad.addColorStop(.5, `rgba(${d.r},${d.g},${d.b},${fa.toFixed(3)})`);
+          grad.addColorStop(1, `rgba(${d.r},${d.g},${d.b},0)`);
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 1;
+          ctx.globalAlpha = 1;
+          ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(st.bPos.x, st.bPos.y); ctx.stroke();
+        });
+      }
 
       // Blobs (drawn over particles)
       states.forEach((st, si) => {
@@ -746,20 +820,31 @@ export function TrustHeroUnravel() {
       // Core (always topmost)
       drawCore(ci, time);
 
-      rafId = heroVisible ? requestAnimationFrame(renderLoop) : 0;
+      const stillMoving = Math.abs(state.target - state.p) > 0.0008
+        || (!lowPower && Math.abs(mouse.tx - mouse.x) > 0.002)
+        || (!lowPower && Math.abs(mouse.ty - mouse.y) > 0.002);
+      if (stillMoving) {
+        idleFrames = 0;
+        ensureRender();
+      } else if (idleFrames < 1) {
+        idleFrames += 1;
+        ensureRender();
+      }
     }
 
-    let heroVisible = true;
     const io = new IntersectionObserver(([e]) => {
       heroVisible = e.isIntersecting;
-      if (heroVisible && !rafId) rafId = requestAnimationFrame(renderLoop);
+      if (heroVisible) ensureRender();
+      else if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
     }, { threshold: 0 });
     io.observe(wrapRef.current);
 
-    rafId = requestAnimationFrame(renderLoop);
+    ensureRender();
 
+    let resizeTimer;
     const onResize = () => {
-      measure();
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => { measure(); ensureRender(); }, 120);
     };
     window.addEventListener("resize", onResize, { passive: true });
 
@@ -776,6 +861,7 @@ export function TrustHeroUnravel() {
 
     return () => {
       cancelAnimationFrame(rafId);
+      window.clearTimeout(resizeTimer);
       io.disconnect();
       window.removeEventListener("resize", onResize);
       window.removeEventListener("mousemove", onMouseMove);
