@@ -2,6 +2,7 @@ name = "nexara-site"
 main = ".open-next/worker.js"
 compatibility_date = "2026-07-09"
 compatibility_flags = ["nodejs_compat"]
+account_id = "ca93de7853e49bb397e5a95ca6c01a03"
 
 routes = [
   { pattern = "nexaragroups.com/*", zone_name = "nexaragroups.com" }
