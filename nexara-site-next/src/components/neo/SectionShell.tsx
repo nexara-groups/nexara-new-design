@@ -176,6 +176,9 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
     const ctx: CanvasRenderingContext2D = ctxMaybe;
     const TAU = Math.PI * 2;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const lowPower = window.matchMedia("(max-width: 760px)").matches
+      || Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData)
+      || (navigator.hardwareConcurrency || 8) <= 4;
 
     const shape = section.id === "academy" ? "spiral" : section.id === "labs" ? "sphere" : "signal";
     const rgb = section.id === "academy" ? [124, 92, 255] : section.id === "labs" ? [255, 92, 138] : [0, 229, 160];
@@ -196,16 +199,16 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
     };
 
     const sprite = makeSprite(rgb);
-    let COUNT = window.innerWidth < 760 ? 260 : 560;
+    let COUNT = lowPower ? 64 : 180;
     let parts: { t: number; j: number; sz: number }[] = [];
 
     // Constellation-line scratch (same treatment as the home hero).
-    const lineBuf = new Float32Array((window.innerWidth < 760 ? 260 : 560) * 2);
-    const LINE_STRIDE = window.innerWidth < 760 ? 2 : 3;
-    const LINE_CAP = 160;
+    const lineBuf = new Float32Array(COUNT * 2);
+    const LINE_STRIDE = lowPower ? 4 : 3;
+    const LINE_CAP = lowPower ? 36 : 80;
 
     function build() {
-      COUNT = window.innerWidth < 760 ? 260 : 560;
+      COUNT = lowPower ? 64 : 180;
       parts = new Array(COUNT);
       for (let i = 0; i < COUNT; i++) {
         parts[i] = {
@@ -219,7 +222,7 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
 
     let W = 0, H = 0, CX = 0, CY = 0, SCALE = 1;
     function measure() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = lowPower ? 1 : Math.min(window.devicePixelRatio || 1, 1.35);
       W = canvas.clientWidth; H = canvas.clientHeight;
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
@@ -231,6 +234,12 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
     measure();
 
     const state = { p: 0, target: 0 };
+    let sectionVisible = true;
+    let rafId = 0;
+    let lastFrame = 0;
+    let idleFrames = 0;
+    let resizeTimer: number | undefined;
+    const frameInterval = 1000 / (lowPower ? 24 : 30);
 
     let st: ScrollTrigger | undefined;
     if (!prefersReducedMotion) {
@@ -241,6 +250,7 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
         scrub: true,
         onUpdate: (self) => {
           state.target = self.progress;
+          ensureRender();
         }
       });
     } else {
@@ -248,12 +258,22 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
       wrap.style.height = "100svh";
     }
 
-    let rafId = 0;
     const t0 = performance.now();
 
+    function ensureRender() {
+      if (sectionVisible && !rafId && !document.hidden) rafId = requestAnimationFrame(render);
+    }
+
     function render(now: number) {
+      rafId = 0;
+      if (!sectionVisible || document.hidden) return;
+      if (now - lastFrame < frameInterval) {
+        rafId = requestAnimationFrame(render);
+        return;
+      }
+      lastFrame = now;
       const time = (now - t0) / 1000;
-      state.p += (state.target - state.p) * 0.09;
+      state.p += (state.target - state.p) * (lowPower ? 0.32 : 0.22);
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
 
       const p = state.p;
@@ -346,7 +366,7 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
         ctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
 
         // Depth bloom: near-camera particles get a soft halo.
-        if (persp > 1.14) {
+        if (!lowPower && persp > 1.14) {
           const hd = d * 2.6;
           ctx.globalAlpha = 0.33 * Math.min(1, (persp - 1.14) * 4);
           ctx.drawImage(sprite, px - hd / 2, py - hd / 2, hd, hd);
@@ -383,25 +403,33 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
         }
       }
 
-      rafId = sectionVisible ? requestAnimationFrame(render) : 0;
+      if (Math.abs(state.target - state.p) > 0.0008) {
+        idleFrames = 0;
+        ensureRender();
+      } else if (idleFrames < 1) {
+        idleFrames += 1;
+        ensureRender();
+      }
     }
 
-    let sectionVisible = true;
     const io = new IntersectionObserver(([e]) => {
       sectionVisible = e ? e.isIntersecting : false;
-      if (sectionVisible && !rafId) rafId = requestAnimationFrame(render);
+      if (sectionVisible) ensureRender();
+      else if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
     }, { threshold: 0 });
     io.observe(wrap);
 
-    rafId = requestAnimationFrame(render);
+    ensureRender();
 
     const onResize = () => {
-      measure();
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => { measure(); ensureRender(); }, 120);
     };
     window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
       cancelAnimationFrame(rafId);
+      window.clearTimeout(resizeTimer);
       io.disconnect();
       window.removeEventListener("resize", onResize);
       if (st) st.kill();

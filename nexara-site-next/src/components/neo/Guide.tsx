@@ -30,15 +30,21 @@ function Sparkles() {
   React.useEffect(() => {
     let raf = 0;
     let visible = true;
-    const tick = () => {
-      if (visible && layerRef.current)
+    const update = () => {
+      raf = 0;
+      if (visible && layerRef.current) {
         layerRef.current.style.transform = `translateY(${window.scrollY * 0.45}px)`;
-      raf = requestAnimationFrame(tick);
+      }
     };
-    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0 });
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible) onScroll();
+    }, { threshold: 0 });
     if (layerRef.current) io.observe(layerRef.current.closest(".neo-hero-sticky") || layerRef.current);
-    raf = requestAnimationFrame(tick);
-    return () => { cancelAnimationFrame(raf); io.disconnect(); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => { cancelAnimationFrame(raf); io.disconnect(); window.removeEventListener('scroll', onScroll); };
   }, []);
   return (
     <div className="sparkles-layer" ref={layerRef}>

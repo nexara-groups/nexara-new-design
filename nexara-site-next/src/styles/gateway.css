@@ -492,6 +492,22 @@
   opacity: 1;
 }
 
+@media (max-width: 760px) {
+  .gate-aurora {
+    filter: none;
+    opacity: .6;
+  }
+
+  .gate-content::before {
+    display: none;
+  }
+
+  .gate-neo::after,
+  .gate-trust::after {
+    animation: none;
+  }
+}
+
 /* Brand shimmer sweep */
 .gate-brand strong {
   background: linear-gradient(110deg, #fff 35%, rgba(160,235,255,.85) 50%, #fff 65%);

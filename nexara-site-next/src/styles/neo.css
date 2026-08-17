@@ -955,10 +955,47 @@
 .neo .clickable-card:hover .card-click-prompt{border-color:rgba(204,255,0,.5);background:rgba(204,255,0,.06);box-shadow:0 0 18px rgba(204,255,0,.12);opacity:1!important}
 
 /* ── Prototype Scrolly Integration ── */
-.neo-hero-runway { position: relative; height: 640vh; }
-.neo-hero-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: radial-gradient(ellipse 80% 60% at 50% 45%, rgba(124, 92, 255, 0.08), transparent 60%), #06060a; }
-.neo-hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.neo-hero-chapter { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 clamp(20px, 6vw, 80px); opacity: 0; pointer-events: none; will-change: opacity, transform; transition: opacity 0.4s var(--ease), transform 0.4s var(--ease); isolation: isolate; }
+.neo-hero-runway { position: relative; height: 640vh; touch-action: pan-y; overscroll-behavior-x: none; }
+.neo-hero-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; isolation: isolate; background: radial-gradient(ellipse 80% 60% at 50% 45%, rgba(124, 92, 255, 0.08), transparent 60%), #06060a; }
+.neo-hero-canvas { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; contain: strict; transform: translateZ(0); }
+.neo-webgl-fallback .neo-hero-canvas { display: none; }
+.neo-hero-stage::before,
+.neo-hero-stage::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+/* Resolution-independent optical depth: static gradients and a tiny tiled
+   texture stay razor sharp at 4K without adding work to the animation loop. */
+.neo-hero-stage::before {
+  opacity: .42;
+  background:
+    linear-gradient(90deg, transparent 0 7.95%, rgba(152,210,255,.055) 8%, transparent 8.05% 91.95%, rgba(204,255,0,.05) 92%, transparent 92.05%),
+    linear-gradient(180deg, transparent 0 11.95%, rgba(255,255,255,.045) 12%, transparent 12.05% 87.95%, rgba(0,240,255,.045) 88%, transparent 88.05%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0 1px, transparent 1px 5px);
+  mix-blend-mode: screen;
+}
+.neo-hero-stage::after {
+  background:
+    radial-gradient(ellipse 56% 45% at 50% 48%, transparent 28%, rgba(2,4,8,.1) 66%, rgba(0,0,0,.72) 100%),
+    radial-gradient(ellipse 42% 14% at 50% 0%, rgba(170,215,255,.1), transparent 72%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E");
+  background-size: auto, auto, 160px 160px;
+  opacity: .34;
+  mix-blend-mode: soft-light;
+}
+.neo-hero-chapter { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 clamp(20px, 6vw, 80px); opacity: 0; pointer-events: none; will-change: opacity, transform; isolation: isolate; }
+
+/* Preserve the same composition on 2K/4K canvases instead of leaving the
+   display typography stuck at the ordinary desktop cap. Pure type scaling is
+   resolution independent and has no per-frame canvas cost. */
+@media (min-width: 1920px) and (min-height: 1000px) {
+  .neo .neo-hero-title { font-size: clamp(11.5rem, 9vw, 23rem); }
+  .neo .neo-hero-chapter .h-display { font-size: clamp(4.6rem, 4vw, 9rem); }
+  .neo .neo-hero-chapter .ch-name { font-size: clamp(5.2rem, 4vw, 9rem); }
+  .neo .neo-hero-chapter .kicker,
+  .neo .neo-hero-chapter .ch-num { font-size: clamp(.68rem, .42vw, .95rem); }
+  .neo .neo-hero-chapter .hero-sub { font-size: clamp(.66rem, .36vw, .86rem); }
+  .neo .neo-hero-chapter .lede { max-width: 42ch; font-size: clamp(1.1rem, .68vw, 1.4rem); }
+  .neo .neo-hero-rail button::after,
+  .neo .neo-hero-counter { font-size: clamp(.72rem, .36vw, .9rem); }
+}
 /* Readability scrim: dark vignette behind chapter copy so it holds against
    the particle field. Lives inside the chapter, so it fades with it. */
 .neo-hero-chapter::before { content: ""; position: absolute; inset: -6%; z-index: -1; pointer-events: none; background: radial-gradient(ellipse 62% 52% at 50% 50%, rgba(4,6,10,.72), rgba(4,6,10,.28) 55%, transparent 76%); }
@@ -1323,4 +1360,99 @@
   .nx-funnel-stage{grid-template-columns:1fr;align-content:center}
   .nx-funnel-canvas{height:44vh}
   .nx-mkt-signal{min-height:48vh}
+}
+
+/* Mobile performance budget: preserve the neon composition without forcing
+   full-screen blur layers through the compositor during every scroll frame. */
+@media (max-width: 760px) {
+  .neo .subnav,
+  .neo .neo-bcast-chip {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .neo .neo-panel-orb {
+    filter: none !important;
+    opacity: .45;
+  }
+
+  .neo .neo-hero-core,
+  .neo .acad-boot-progress {
+    box-shadow: none !important;
+  }
+}
+
+/* Premium clarity pass — more vivid material and readable supporting copy,
+   without changing Neo's layout or increasing particle density. */
+.neo {
+  --panel: #0D0F13;
+  --panel2: #15181E;
+  --line: rgba(255,255,255,.17);
+  --muted: #A9AFBA;
+}
+.neo .nav {
+  background: rgba(2,3,5,.88);
+  border-bottom-color: rgba(255,255,255,.16);
+}
+.neo .neo-hero-stage {
+  background:
+    radial-gradient(ellipse 78% 60% at 50% 42%, rgba(124,92,255,.13), transparent 62%),
+    radial-gradient(ellipse 44% 34% at 16% 18%, rgba(0,240,255,.08), transparent 66%),
+    radial-gradient(ellipse 42% 32% at 88% 76%, rgba(204,255,0,.07), transparent 68%),
+    #030407;
+}
+.neo .neo-hero-chapter .hero-sub,
+.neo .neo-scroll-cue,
+.neo .neo-hero-counter { color: #AEB6C2; }
+.neo .neo-hero-rail button::after { color: rgba(255,255,255,.40); }
+.neo .neo-hero-rail button::before { background: rgba(255,255,255,.28); }
+.neo .neo-hero-chapter .lede { color: #D4DAE3; }
+.neo .section-card p,
+.neo .module-card p,
+.neo .proof-cards p,
+.neo .callout p,
+.neo .process-grid p,
+.neo .faq-band p,
+.neo .contact-layout p,
+.neo .neo-rail-panel p,
+.neo .neo-standard-card p,
+.neo .acad-sub,
+.neo .acad-boot-desc { color: #A9AFBA; }
+.neo .section-card,
+.neo .module-card,
+.neo .stack-detail-card,
+.neo .package-card,
+.neo .proof-receipt,
+.neo .contact-card {
+  box-shadow: 0 20px 52px -34px rgba(0,240,255,.28), inset 0 1px 0 rgba(255,255,255,.025);
+}
+.neo .section-head h2,
+.neo #divisions .rail-head h2,
+.neo .callout h2,
+.neo .stack-matrix h2 {
+  background: linear-gradient(105deg, #fff 42%, #eaffab 72%, #7ff8ff 112%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 760px) {
+  .neo .neo-panel-orb { opacity: .62; }
+  .neo .neo-hero-core {
+    box-shadow: 0 0 18px rgba(204,255,0,.42), inset 0 0 14px rgba(0,240,255,.24) !important;
+  }
+  .neo .acad-boot-progress {
+    box-shadow: 0 0 7px rgba(200,255,0,.45) !important;
+  }
+}
+
+/* Wide-gamut displays get more chroma separation without animated filters. */
+@media (color-gamut: p3) {
+  .neo .neo-hero-stage {
+    background:
+      radial-gradient(ellipse 78% 60% at 50% 42%, color(display-p3 .45 .32 1 / .15), transparent 62%),
+      radial-gradient(ellipse 44% 34% at 16% 18%, color(display-p3 0 .88 1 / .09), transparent 66%),
+      radial-gradient(ellipse 42% 32% at 88% 76%, color(display-p3 .72 1 0 / .08), transparent 68%),
+      #030407;
+  }
 }

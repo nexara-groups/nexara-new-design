@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     images: ['https://nexaragroups.com/brand/og-image.png'],
   },
   icons: { icon: '/brand/nexara-mark.svg' },
+  verification: { google: 'fLwXJBPqsWL-8uTW8q2DDuRbOJnOY0WPe3xABNY4ftc' },
 };
 
 const ORG_JSONLD = {

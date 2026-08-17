@@ -11,8 +11,10 @@ export function TrustParticleCanvas() {
     if (!ctx2d) return;
     const ctx: CanvasRenderingContext2D = ctx2d;
     const BG = '#081726', LINE = 'rgba(143, 187, 221,', DOT = 'rgba(143, 187, 221,1)';
-    const MAX_DIST = 160, N = 320;
+    const MAX_DIST = 150;
     let W: number, H: number, particles: any[], raf: number;
+    let lastFrame = 0;
+    const frameInterval = 1000 / 30;
 
     // Mouse proximity tracking state
     const mouse: { x: number | null; y: number | null } = { x: null, y: null };
@@ -32,13 +34,22 @@ export function TrustParticleCanvas() {
       if (this.y < -4) this.y = H + 4; if (this.y > H + 4) this.y = -4;
     };
     function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       W = canvas.offsetWidth; H = canvas.offsetHeight;
       canvas.width = W * dpr; canvas.height = H * dpr;
       ctx.scale(dpr, dpr);
     }
-    function init() { resize(); particles = Array.from({ length: N }, () => new (Particle as any)()); }
-    function draw() {
+    function init() {
+      resize();
+      const count = window.innerWidth < 760 ? 48 : 96;
+      particles = Array.from({ length: count }, () => new (Particle as any)());
+    }
+    function draw(now = performance.now()) {
+      if (now - lastFrame < frameInterval) {
+        raf = canvasVisible ? requestAnimationFrame(draw) : 0;
+        return;
+      }
+      lastFrame = now;
       ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
       for (let i = 0; i < particles.length; i++) {
         const a = particles[i];

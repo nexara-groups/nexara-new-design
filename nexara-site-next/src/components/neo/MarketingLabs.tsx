@@ -86,18 +86,30 @@ export function MarketingSignalSection() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lowPower = window.matchMedia('(max-width: 760px)').matches
+      || Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData)
+      || (navigator.hardwareConcurrency || 8) <= 4;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     let ww = 0, wh = 0, dpr = 1, rafId = 0;
+    let visible = true, lastFrame = 0;
+    let resizeTimer: number | undefined;
+    const frameInterval = 1000 / 30;
     const fit = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = lowPower ? 1 : Math.min(window.devicePixelRatio || 1, 1.35);
       ww = canvas.clientWidth; wh = canvas.clientHeight;
       canvas.width = ww * dpr; canvas.height = wh * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     fit();
-    window.addEventListener('resize', fit);
     const draw = (ts: number) => {
+      rafId = 0;
+      if (!visible || document.hidden) return;
+      if (ts - lastFrame < frameInterval) {
+        rafId = window.requestAnimationFrame(draw);
+        return;
+      }
+      lastFrame = ts;
       const t0 = ts / 1000;
       ctx.clearRect(0, 0, ww, wh);
       for (let r = 0; r < 3; r++) {
@@ -113,11 +125,24 @@ export function MarketingSignalSection() {
         ctx.lineWidth = r === 1 ? 1.5 : 1;
         ctx.stroke();
       }
-      if (!reduced) rafId = window.requestAnimationFrame(draw);
+      if (!reduced && !lowPower) rafId = window.requestAnimationFrame(draw);
     };
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry?.isIntersecting ?? false;
+      if (visible && !rafId) rafId = window.requestAnimationFrame(draw);
+      else if (!visible && rafId) { window.cancelAnimationFrame(rafId); rafId = 0; }
+    }, { threshold: 0 });
+    observer.observe(canvas);
+    const onResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => { fit(); if (!rafId) rafId = window.requestAnimationFrame(draw); }, 120);
+    };
+    window.addEventListener('resize', onResize, { passive: true });
     rafId = window.requestAnimationFrame(draw);
     return () => {
-      window.removeEventListener('resize', fit);
+      observer.disconnect();
+      window.clearTimeout(resizeTimer);
+      window.removeEventListener('resize', onResize);
       if (rafId) window.cancelAnimationFrame(rafId);
     };
   }, []);
@@ -144,17 +169,25 @@ export function MarketingFunnelSection() {
     const canvas = canvasRef.current;
     if (!wrap || !canvas || !window.gsap) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lowPower = window.matchMedia('(max-width: 760px)').matches
+      || Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData)
+      || (navigator.hardwareConcurrency || 8) <= 4;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     let fw = 0, fh = 0, dpr = 1, rafId = 0;
+    let resizeTimer: number | undefined;
     const fit = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = lowPower ? 1 : Math.min(window.devicePixelRatio || 1, 1.35);
       fw = canvas.clientWidth; fh = canvas.clientHeight;
       canvas.width = fw * dpr; canvas.height = fh * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     fit();
-    window.addEventListener('resize', fit);
+    const onResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => { fit(); drawFunnel(fstate.t); }, 120);
+    };
+    window.addEventListener('resize', onResize, { passive: true });
 
     const sub = (t: number, a: number, b: number) => Math.max(0, Math.min(1, (t - a) / (b - a)));
     const eo = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -222,6 +255,7 @@ export function MarketingFunnelSection() {
         gsap.to(fstate, {
           t: 1,
           ease: 'none',
+          onUpdate: () => drawFunnel(fstate.t),
           scrollTrigger: { trigger: wrap, start: 'top top', end: '+=260%', scrub: 0.5, pin: true },
         });
         if (blocks.length) {
@@ -236,11 +270,11 @@ export function MarketingFunnelSection() {
           });
         }
       }, wrap);
-      const tick = () => { drawFunnel(fstate.t); rafId = window.requestAnimationFrame(tick); };
-      rafId = window.requestAnimationFrame(tick);
+      drawFunnel(0);
     }
     return () => {
-      window.removeEventListener('resize', fit);
+      window.clearTimeout(resizeTimer);
+      window.removeEventListener('resize', onResize);
       if (rafId) window.cancelAnimationFrame(rafId);
       if (gctx) gctx.revert();
     };
