@@ -9,6 +9,17 @@ if (typeof window !== 'undefined') Object.assign(window, { THREE, gsap, ScrollTr
 import { DATA } from './data.js';
 import { voice, parseRoute, routeTo, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from './shared.js';
 import { openCookiePreferences } from './CookieConsent.jsx';
+import ContactDetails from './ContactDetails.jsx';
+import LocalContext from './LocalContext.jsx';
+import { routePath } from './seo.js';
+import { HeroLighting, Tilt } from './components/ui/motion-primitives.jsx';
+import HeroIntro from './components/HeroIntro.jsx';
+import InternshipOverview from './components/InternshipOverview.jsx';
+import { runVisibleAnimation } from './animation.js';
+import './legacy/neo.css';
+import './legacy/neo-guide.css';
+import './neo-refinements.css';
+gsap.registerPlugin(ScrollTrigger);
 const { useState, useMemo, useEffect, useRef, useCallback, useLayoutEffect, useReducer } = React;
 
 function CyclingWord({ words }) {
@@ -1613,12 +1624,11 @@ function NeoHeroUnravel({ copy, theme }) {
       window.addEventListener("mousemove", onMouseMove, { passive: true });
     }
 
-    let rafId = 0;
     let t0 = performance.now();
 
     function renderLoop(now) {
       const time = (now - t0) / 1000;
-      state.p += (state.target - state.p) * 0.09;
+      state.p = prefersReducedMotion ? state.target : state.p + (state.target - state.p) * 0.09;
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
       mouse.x += (mouse.tx - mouse.x) * 0.05;
       mouse.y += (mouse.ty - mouse.y) * 0.05;
@@ -1754,17 +1764,9 @@ function NeoHeroUnravel({ copy, theme }) {
         }
       });
 
-      rafId = heroVisible ? requestAnimationFrame(renderLoop) : 0;
     }
 
-    let heroVisible = true;
-    const io = new IntersectionObserver(([e]) => {
-      heroVisible = e.isIntersecting;
-      if (heroVisible && !rafId) rafId = requestAnimationFrame(renderLoop);
-    }, { threshold: 0 });
-    io.observe(wrapRef.current);
-
-    rafId = requestAnimationFrame(renderLoop);
+    const stopAnimation = runVisibleAnimation(wrapRef.current, renderLoop, { reducedMotion: prefersReducedMotion });
 
     const onResize = () => {
       measure();
@@ -1784,8 +1786,7 @@ function NeoHeroUnravel({ copy, theme }) {
     });
 
     return () => {
-      cancelAnimationFrame(rafId);
-      io.disconnect();
+      stopAnimation();
       window.removeEventListener("resize", onResize);
       window.removeEventListener("mousemove", onMouseMove);
       if (st) st.kill();
@@ -1794,7 +1795,8 @@ function NeoHeroUnravel({ copy, theme }) {
 
   return (
     <div ref={wrapRef} className="neo-hero-runway">
-      <div className="neo-hero-stage">
+      <div className="neo-hero-stage" data-hero-surface>
+        <HeroLighting />
         <canvas ref={canvasRef} className="neo-hero-canvas" aria-hidden="true" />
         
         {/* Chapters Overlays */}
@@ -1803,37 +1805,38 @@ function NeoHeroUnravel({ copy, theme }) {
           <h1 ref={titleRef} className="neo-hero-title" aria-label="Nexara">
             <span>N</span><span>E</span><span>X</span><span>A</span><span>R</span><span>A</span>
           </h1>
+          <HeroIntro theme="neo" />
           <p className="hero-sub">Scroll to unravel</p>
         </div>
 
-        <div className="neo-hero-chapter" data-from="0.125" data-to="0.225" aria-hidden="true">
+        <div className="neo-hero-chapter" data-from="0.125" data-to="0.225">
           <p className="kicker">The premise</p>
           <h2 className="h-display">One core.<br /><span className="serif">Three forces.</span></h2>
           <p className="lede">Three directions. All pointing at your problem.</p>
         </div>
 
-        <div className="neo-hero-chapter ch-left" style={{ '--accent': '#7c5cff' }} data-from="0.27" data-to="0.45" aria-hidden="true">
+        <div className="neo-hero-chapter ch-left" style={{ '--accent': '#7c5cff' }} data-from="0.27" data-to="0.45">
           <p className="ch-num">01 / DIVISION</p>
           <h2 className="ch-name">Academy<br /><span className="serif">we grow engineers.</span></h2>
           <p className="lede">Cohort-based programmes that turn ambitious learners into working engineers — sprint by sprint, review by review.</p>
           <button className="ch-link" onClick={() => routeTo('neo', 'academy')}>Enter Academy →</button>
         </div>
 
-        <div className="neo-hero-chapter ch-right" style={{ '--accent': '#ff5c8a' }} data-from="0.45" data-to="0.63" aria-hidden="true">
+        <div className="neo-hero-chapter ch-right" style={{ '--accent': '#ff5c8a' }} data-from="0.45" data-to="0.63">
           <p className="ch-num">02 / DIVISION</p>
           <h2 className="ch-name">Labs<br /><span className="serif">we build intelligence.</span></h2>
           <p className="lede">Applied AI and automation systems, engineered from prototype to production with written specs and weekly demos.</p>
           <button className="ch-link" onClick={() => routeTo('neo', 'labs')}>Enter Labs →</button>
         </div>
 
-        <div className="neo-hero-chapter ch-left" style={{ '--accent': '#00e5a0' }} data-from="0.63" data-to="0.81" aria-hidden="true">
+        <div className="neo-hero-chapter ch-left" style={{ '--accent': '#00e5a0' }} data-from="0.63" data-to="0.81">
           <p className="ch-num">03 / DIVISION</p>
           <h2 className="ch-name">Marketing<br /><span className="serif">we make brands move.</span></h2>
           <p className="lede">Brand systems, web experiences and performance creative — built like software, measured like engineering.</p>
           <button className="ch-link" onClick={() => routeTo('neo', 'marketing')}>Enter Marketing →</button>
         </div>
 
-        <div className="neo-hero-chapter" data-from="0.86" data-to="1" aria-hidden="true">
+        <div className="neo-hero-chapter" data-from="0.86" data-to="1">
           <p className="kicker">The weave</p>
           <h2 className="h-display">Three disciplines.<br /><span className="serif">One standard.</span></h2>
           <div className="hero-actions">
@@ -1953,7 +1956,7 @@ function NeoDivisionsRail() {
         </div>
         <div className="neo-rail-track" ref={trackRef}>
           {sections.map((sec, i) => (
-            <button key={sec.id} className="neo-rail-panel" style={{ '--accent': i === 0 ? '#7c5cff' : i === 1 ? '#ff5c8a' : '#00e5a0' }} onClick={() => routeTo('neo', sec.id)}>
+            <Tilt as="button" type="button" rotationFactor={3} key={sec.id} className="neo-rail-panel" style={{ '--accent': i === 0 ? '#7c5cff' : i === 1 ? '#ff5c8a' : '#00e5a0' }} onClick={() => routeTo('neo', sec.id)}>
               <span className="neo-panel-idx">0{i + 1} / {sec.name.toUpperCase()}</span>
               <span className="neo-panel-orb" />
               <span className="neo-panel-ring" />
@@ -1963,7 +1966,7 @@ function NeoDivisionsRail() {
                 {sec.stack.slice(0, 4).map(tag => <span key={tag}>{tag}</span>)}
               </span>
               <span className="btn">Enter {sec.name} <span className="arr">→</span></span>
-            </button>
+            </Tilt>
           ))}
         </div>
       </div>
@@ -2311,6 +2314,7 @@ function Site({ theme, page, detail }) {
         {page === "contact" && <Contact theme={theme} detail={detail} />}
         {!validPage && <NotFound theme={theme} page={page} />}
       </div>
+      {validPage && <LocalContext theme={theme} page={page} detail={detail} />}
       {isNeo && HAS_SCROLL_ANIMATION && <NeoGuide key={`${page}-${detail || "root"}`} />}
       <Footer theme={theme} />
     </div>
@@ -2334,7 +2338,7 @@ function Nav({ theme, page, detail }) {
             <a
               key={item.page}
               className={`${active ? 'active' : ''}${!active && hoveredPage === item.page ? ' hover-lit' : ''}`}
-              href={theme ? `/${theme}/${item.page}` : `/trust/${item.page}`}
+              href={routePath(theme || 'trust', item.page)}
               onClick={(e) => { e.preventDefault(); routeTo(theme, item.page); }}
               onMouseEnter={() => setHoveredPage(item.page)}
             >
@@ -2344,8 +2348,8 @@ function Nav({ theme, page, detail }) {
         })}
       </nav>
       <div className="theme-pill">
-        <a className={theme === "neo" ? "active" : ""} href={detail ? `/neo/${page}/${detail}` : `/neo/${page}`} onClick={(e) => { e.preventDefault(); routeTo("neo", page, detail); }}>Neo</a>
-        <a className={theme === "trust" ? "active" : ""} href={detail ? `/trust/${page}/${detail}` : `/trust/${page}`} onClick={(e) => { e.preventDefault(); routeTo("trust", page, detail); }}>Trust</a>
+        <a className={theme === "neo" ? "active" : ""} href={routePath('neo', page, detail)} onClick={(e) => { e.preventDefault(); routeTo("neo", page, detail); }}>Neo</a>
+        <a className={theme === "trust" ? "active" : ""} href={routePath('trust', page, detail)} onClick={(e) => { e.preventDefault(); routeTo("trust", page, detail); }}>Trust</a>
       </div>
     </header>
   );
@@ -2390,26 +2394,26 @@ function Home({ theme }) {
                   </div>
                 </div>
                 <div className="neo-standards-grid">
-                  <div className="neo-standard-card">
+                  <Tilt className="neo-standard-card">
                     <span className="neo-std-idx">/01</span>
                     <h3>Written before built</h3>
                     <p>Every engagement starts with a written brief and scope. If it isn't written down, it isn't agreed.</p>
-                  </div>
-                  <div className="neo-standard-card">
+                  </Tilt>
+                  <Tilt className="neo-standard-card">
                     <span className="neo-std-idx">/02</span>
                     <h3>Demo every week</h3>
                     <p>Working software, live cohorts, running campaigns — shown weekly, not described in decks.</p>
-                  </div>
-                  <div className="neo-standard-card">
+                  </Tilt>
+                  <Tilt className="neo-standard-card">
                     <span className="neo-std-idx">/03</span>
                     <h3>One accountable lead</h3>
                     <p>Every cohort, system and campaign has a single named owner from kickoff to handover.</p>
-                  </div>
-                  <div className="neo-standard-card">
+                  </Tilt>
+                  <Tilt className="neo-standard-card">
                     <span className="neo-std-idx">/04</span>
                     <h3>Handover by design</h3>
                     <p>Documentation, access and training are part of the deliverable — never an afterthought.</p>
-                  </div>
+                  </Tilt>
                 </div>
               </div>
             </section>
@@ -3534,7 +3538,7 @@ function ModuleCard({ theme, eyebrow, title, children, visualTitle = null, class
   const isClickable = onClick !== null;
 
   return (
-    <motion.article 
+    <Tilt as="article"
       className={`${className} spotlight-card ${isClickable ? 'clickable-card' : ''}`} 
       onMouseMove={handleMouseMove}
       onClick={onClick}
@@ -3557,7 +3561,7 @@ function ModuleCard({ theme, eyebrow, title, children, visualTitle = null, class
           </div>
         )}
       </div>
-    </motion.article>
+    </Tilt>
   );
 }
 
@@ -3833,7 +3837,7 @@ function SectionCards({ theme, sections }) {
   );
 }
 
-function NeoSectionHeroUnravel({ theme, section }) {
+function NeoSectionHeroUnravel({ theme, section, subpage }) {
   const wrapRef = React.useRef(null);
   const canvasRef = React.useRef(null);
   
@@ -3916,12 +3920,11 @@ function NeoSectionHeroUnravel({ theme, section }) {
       wrapRef.current.style.height = "100svh";
     }
 
-    let rafId = 0;
     let t0 = performance.now();
 
     function render(now) {
       const time = (now - t0) / 1000;
-      state.p += (state.target - state.p) * 0.09;
+      state.p = prefersReducedMotion ? state.target : state.p + (state.target - state.p) * 0.09;
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
 
       const p = state.p;
@@ -4051,17 +4054,9 @@ function NeoSectionHeroUnravel({ theme, section }) {
         }
       }
 
-      rafId = sectionVisible ? requestAnimationFrame(render) : 0;
     }
 
-    let sectionVisible = true;
-    const io = new IntersectionObserver(([e]) => {
-      sectionVisible = e.isIntersecting;
-      if (sectionVisible && !rafId) rafId = requestAnimationFrame(render);
-    }, { threshold: 0 });
-    io.observe(wrapRef.current);
-
-    rafId = requestAnimationFrame(render);
+    const stopAnimation = runVisibleAnimation(wrapRef.current, render, { reducedMotion: prefersReducedMotion });
 
     const onResize = () => {
       measure();
@@ -4069,8 +4064,7 @@ function NeoSectionHeroUnravel({ theme, section }) {
     window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
-      cancelAnimationFrame(rafId);
-      io.disconnect();
+      stopAnimation();
       window.removeEventListener("resize", onResize);
       if (st) st.kill();
     };
@@ -4079,25 +4073,27 @@ function NeoSectionHeroUnravel({ theme, section }) {
   const copy = section.hero[theme];
 
   return (
-    <div ref={wrapRef} className="neo-hero-runway" style={{ height: '260vh' }}>
-      <div className="neo-hero-stage">
+    <div ref={wrapRef} className={"neo-hero-runway" + (subpage ? " neo-hero-runway--detail" : "")} style={{ height: subpage ? 'auto' : '260vh' }}>
+      <div className="neo-hero-stage" data-hero-surface>
+        <HeroLighting />
         <canvas ref={canvasRef} className="neo-hero-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
         <div className="neo-hero-chapter" style={{ opacity: 1, pointerEvents: 'auto' }}>
           <p className="kicker">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {section.name.toUpperCase()}</p>
           <h1 className="ch-name" style={{ color: '#fff', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 800, textTransform: section.id === "academy" ? 'none' : 'uppercase' }}>
-            {section.id === "academy" ? (
+            {subpage?.heading ? subpage.heading : section.id === "academy" ? (
               <>We don't hire engineers.<br />We <em style={{ fontStyle: 'normal', color: '#7c5cff' }}>compile</em> them.</>
             ) : (
               <>{copy.title}<br /><span className="serif" style={{ color: section.id === "labs" ? '#ff5c8a' : '#00e5a0' }}><CyclingWord words={SECTION_HERO_WORDS.neo[section.id] || [copy.accent]} /></span></>
             )}
           </h1>
-          <p className="lede" style={{ marginTop: '14px', maxWidth: '34em', color: 'var(--muted)' }}>{copy.body}</p>
+          <p className="lede" style={{ marginTop: '14px', maxWidth: '34em', color: 'var(--muted)' }}>{subpage ? subpage.callout[theme] : copy.body}</p>
           <div className="hero-actions" style={{ marginTop: '24px' }}>
             <button className="btn btn-solid" onClick={() => {
+              if (subpage?.slug === 'internships') { routeTo('neo', 'contact', 'academy'); return; }
               const subnav = document.querySelector(".subnav");
               subnav?.scrollIntoView({ behavior: "smooth" });
-            }}>{copy.primary}</button>
-            <button className="btn" onClick={() => routeTo('neo', 'customers', section.id)}>{copy.secondary}</button>
+            }}>{subpage?.slug === 'internships' ? 'Discuss an internship' : copy.primary}</button>
+            <button className="btn" onClick={() => subpage?.slug === 'internships' ? routeTo('neo', 'academy') : routeTo('neo', 'customers', section.id)}>{subpage?.slug === 'internships' ? 'Explore Academy' : copy.secondary}</button>
           </div>
         </div>
       </div>
@@ -4353,7 +4349,7 @@ function MarketingSignalSection() {
     if (!canvas) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = canvas.getContext('2d');
-    let ww, wh, dpr, rafId = 0;
+    let ww, wh, dpr;
     const fit = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       ww = canvas.clientWidth; wh = canvas.clientHeight;
@@ -4378,12 +4374,11 @@ function MarketingSignalSection() {
         ctx.lineWidth = r === 1 ? 1.5 : 1;
         ctx.stroke();
       }
-      if (!reduced) rafId = window.requestAnimationFrame(draw);
     };
-    rafId = window.requestAnimationFrame(draw);
+    const stopAnimation = runVisibleAnimation(canvas, draw, { reducedMotion: reduced });
     return () => {
       window.removeEventListener('resize', fit);
-      if (rafId) window.cancelAnimationFrame(rafId);
+      stopAnimation();
     };
   }, []);
 
@@ -4410,7 +4405,8 @@ function MarketingFunnelSection() {
     if (!wrap || !canvas || !window.gsap) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = canvas.getContext('2d');
-    let fw, fh, dpr, rafId = 0;
+    let fw, fh, dpr;
+    let stopAnimation = () => {};
     const fit = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       fw = canvas.clientWidth; fh = canvas.clientHeight;
@@ -4497,12 +4493,11 @@ function MarketingFunnelSection() {
           });
         }
       }, wrap);
-      const tick = () => { drawFunnel(fstate.t); rafId = window.requestAnimationFrame(tick); };
-      rafId = window.requestAnimationFrame(tick);
+      stopAnimation = runVisibleAnimation(canvas, () => drawFunnel(fstate.t));
     }
     return () => {
       window.removeEventListener('resize', fit);
-      if (rafId) window.cancelAnimationFrame(rafId);
+      stopAnimation();
       if (gctx) gctx.revert();
     };
   }, []);
@@ -4539,7 +4534,7 @@ function SectionPage({ theme, section, detail }) {
   return (
     <main>
       {isNeo ? (
-        <NeoSectionHeroUnravel theme={theme} section={section} />
+        <NeoSectionHeroUnravel theme={theme} section={section} subpage={active} />
       ) : section.id === "academy" ? (
         <AcademyHero theme={theme} section={section} />
       ) : section.id === "marketing" ? (
@@ -4563,6 +4558,7 @@ function SectionPage({ theme, section, detail }) {
         </>
       )}
       <SubNav theme={theme} section={section} active={active} />
+      {section.id === 'academy' && active?.slug === 'internships' && <InternshipOverview theme={theme} />}
       <div key={active?.slug || "overview"} className="section-content-enter">
         {active ? <SubpageDetail theme={theme} section={section} page={active} /> : <SectionOverview theme={theme} section={section} />}
       </div>
@@ -5348,6 +5344,7 @@ function ContactHero({ theme, onStartBrief }) {
         <h1 className="contact-hero__heading">{copy.title}</h1>
         <p className="contact-hero__subtext">{copy.body}</p>
         <a className="contact-hero__email-pill" href={`mailto:${copy.accent}`}>{copy.accent}</a>
+        <ContactDetails />
         <button className="contact-hero__cta" onClick={onStartBrief}>{copy.primary}</button>
       </div>
     </section>
@@ -5552,15 +5549,17 @@ function Footer({ theme }) {
         <strong>Nexara</strong>
         <p>Academy, Digital Marketing and Labs. One company, two presentations.</p>
         <p>© 2026 Nexara Private Limited (Nexara Groups) · Visakhapatnam, India</p>
+        <div className="footer-contact"><a href={DATA.contact.phone.href}>{DATA.contact.phone.display}</a><a href={DATA.contact.address.mapsHref} target="_blank" rel="noopener noreferrer">Visakhapatnam office ↗</a></div>
+        <address className="footer-address">{DATA.contact.address.street}<br />{DATA.contact.address.city}</address>
       </div>
       <div>
         {Object.values(DATA.sections).map((s) => <button key={s.id} onClick={() => routeTo(theme, s.id)}>{s.name}</button>)}
         <button onClick={() => routeTo(theme, "company")}>Company</button>
         <button onClick={() => routeTo(theme, "contact")}>Contact</button>
-        <a href="/privacy-policy.html">Privacy</a>
-        <a href="/terms-of-service.html">Terms</a>
-        <a href="/cookie-policy.html">Cookies</a>
-        <a href="/data-deletion.html">Data Deletion</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms-of-service">Terms</a>
+        <a href="/cookie-policy">Cookies</a>
+        <a href="/data-deletion">Data Deletion</a>
         <button onClick={openCookiePreferences}>Cookie Preferences</button>
       </div>
     </footer>

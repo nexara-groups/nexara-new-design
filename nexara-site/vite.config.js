@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
   build: {
+    manifest: true,
     chunkSizeWarningLimit: 900,
     rollupOptions: {
       output: {

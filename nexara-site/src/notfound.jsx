@@ -8,7 +8,8 @@ export function NotFound({ theme, page }) {
     <main>
       <section className="detail-hero">
         <p className="eyebrow">Route check</p>
-        <h2>{page ? `No page is configured for "${page}".` : "No page is configured for this route."}</h2>
+        <h1>Page not found</h1>
+        <p>{page ? `No page is configured for "${page}".` : "No page is configured for this route."}</p>
       </section>
       <section className="module-grid compact">
         <article className="module-card">

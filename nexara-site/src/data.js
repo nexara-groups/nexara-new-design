@@ -200,6 +200,7 @@ export const DATA = {
         {
           slug: "internships",
           title: "Internships",
+          heading: "Software internships in Vizag & Visakhapatnam",
           callout: { neo: "Internships that feel like a real tech squad — not a certificate farm.", trust: "A managed bridge from learning to workplace delivery, with a checkpoint every week." },
           cards: [
             { title: "Mentor pods", neo: "Small groups, direct feedback, no hiding. This is peak learning.", trust: "Each pod has an assigned mentor owning weekly progress and quality review." },
@@ -473,6 +474,12 @@ export const DATA = {
     },
   },
   contact: {
+    phone: { display: '9257535757', href: 'tel:+919257535757' },
+    address: {
+      street: 'First Floor, 1-83-14, MVP Sector 3, Sector 4, Sector 3, MVP Colony',
+      city: 'Visakhapatnam, Andhra Pradesh 530017',
+      mapsHref: 'https://www.google.com/maps/search/?api=1&query=First%20Floor%2C%201-83-14%2C%20MVP%20Sector%203%2C%20Sector%204%2C%20Sector%203%2C%20MVP%20Colony%2C%20Visakhapatnam%2C%20Andhra%20Pradesh%20530017',
+    },
     neo: {
       eyebrow: "LET'S BUILD",
       title: "We work with builders. Start here.",

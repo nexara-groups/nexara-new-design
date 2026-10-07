@@ -1,36 +1,22 @@
 import React from 'react';
 import { parseRoute } from './shared.js';
-import { TrustSite } from './trust.jsx';
+import { updatePageSeo } from './seo.js';
 import CookieConsent from './CookieConsent.jsx';
 
 const { useState } = React;
-const Gateway = React.lazy(() => import('./gateway.jsx').then((m) => ({ default: m.Gateway })));
-const NeoSite = React.lazy(() => import('./neo.jsx').then((m) => ({ default: m.Site })));
-
-const PAGE_TITLES = {
-  home:      'Home',
-  academy:   'Academy — Talent Development',
-  marketing: 'Marketing — Growth Infrastructure',
-  labs:      'Labs — AI Software',
-  customers: 'Customers — Delivery Proof',
-  contact:   'Contact — Start a Project',
+const loaders = {
+  trust: () => import('./trust.jsx').then(module => module.TrustSite),
+  neo: () => import('./neo.jsx').then(module => module.Site),
+  gateway: () => import('./gateway.jsx').then(module => module.Gateway),
 };
+const loaded = {};
+const components = Object.fromEntries(Object.entries(loaders).map(([key, load]) => [key,
+  React.lazy(() => load().then(Component => { loaded[key] = Component; return { default: Component }; })),
+]));
 
-const BRAND_TITLE = 'Nexara Groups — Academy, Digital Marketing & Product Studio';
-
-function useDynamicTitle(route) {
-  React.useEffect(() => {
-    // Gateway and the themed home pages carry the full keyword-rich brand title
-    // (a bare "Home | Nexara Trust" wastes the highest-value SERP line, which
-    // crawlers read from the JS-rendered <title>, not the static HTML).
-    if (!route.theme || route.page === 'gateway' || route.page === 'home') {
-      document.title = BRAND_TITLE;
-      return;
-    }
-    const section = PAGE_TITLES[route.page] || route.page;
-    const theme = route.theme === 'trust' ? 'Nexara Trust' : 'Nexara';
-    document.title = `${section} | ${theme}`;
-  }, [route.theme, route.page]);
+export async function loadPresentation(route) {
+  const key = route.theme || 'gateway';
+  loaded[key] = await loaders[key]();
 }
 
 function App() {
@@ -41,16 +27,18 @@ function App() {
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
-  useDynamicTitle(route);
+  React.useEffect(() => {
+    updatePageSeo(route);
+  }, [route.theme, route.page, route.detail]);
+  React.useEffect(() => { document.documentElement.classList.remove('no-js'); }, []);
 
-  let el;
-  if (route.page === "gateway" || !route.theme) el = <Gateway />;
-  else if (route.theme === "trust") el = <TrustSite page={route.page} detail={route.detail} />;
-  else el = <NeoSite theme={route.theme} page={route.page} detail={route.detail} />;
+  const key = route.theme || 'gateway';
+  const Presentation = loaded[key] || components[key];
+  const el = <Presentation theme={route.theme} page={route.page} detail={route.detail} />;
 
   return (
     <>
-      <React.Suspense fallback={null}>{el}</React.Suspense>
+      <React.Suspense fallback={<div className="site-loading" role="status"><img src="/brand/nexara-logo.svg" alt="Nexara" width="220" height="54" /><span>Opening Nexara…</span></div>}>{el}</React.Suspense>
       <CookieConsent />
     </>
   );

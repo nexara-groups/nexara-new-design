@@ -14,8 +14,8 @@ import { parseRoute } from './shared.js';
 const { useCallback, useEffect, useState } = React;
 
 const STORE_KEY = 'cc-consent';
-const PRIVACY_URL = '/privacy-policy.html';
-const COOKIE_URL = '/cookie-policy.html';
+const PRIVACY_URL = '/privacy-policy';
+const COOKIE_URL = '/cookie-policy';
 
 function readConsent() {
   try {

@@ -4,9 +4,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "test": "node --test tests/*.test.mjs",
     "dev": "vite",
     "build": "vite build && node scripts/prerender.js",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:seo": "node scripts/verify-seo.js"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.0",

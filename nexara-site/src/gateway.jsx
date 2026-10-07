@@ -4,6 +4,7 @@ import {
 } from "framer-motion";
 import { DATA } from "./data.js";
 import { routeTo } from "./shared.js";
+import LocalContext from './LocalContext.jsx';
 import "./gateway-cinematic.css";
 
 const { useState, useEffect, useRef } = React;
@@ -68,24 +69,31 @@ function Side({ side, copy, phase, onEnter }) {
   );
 }
 
-function Gateway() {
+function Gateway({ initialPhase }) {
   const reduce = useReducedMotion();
   const g = DATA.gateway;
   const rootRef = useRef(null);
-  const [phase, setPhase] = useState(reduce ? "live" : "intro");
+  const [phase, setPhase] = useState(initialPhase || (reduce ? "live" : "intro"));
   const [exitTo, setExitTo] = useState(null);
+  const [scenesReady, setScenesReady] = useState(false);
   const [isMobile, setIsMobile] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(max-width: 820px)").matches
+    () => typeof window !== "undefined" && window.matchMedia("(max-width: 820px), (max-height: 600px)").matches
   );
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 820px)");
+    const mq = window.matchMedia("(max-width: 820px), (max-height: 600px)");
     const onChange = (e) => setIsMobile(e.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
   // mobile gets a clean stacked layout — skip the mouse-seam + heavy 3D scenes
-  const showScenes = !reduce && !isMobile;
+  const showScenes = scenesReady && !reduce && !isMobile;
+
+  useEffect(() => {
+    // Give the text and controls the first paint before loading WebGL.
+    const timer = setTimeout(() => setScenesReady(true), 900);
+    return () => clearTimeout(timer);
+  }, []);
 
   const mx = useMotionValue(0.5);
   const seam = useSpring(mx, { stiffness: 90, damping: 22, mass: 0.5 });
@@ -111,6 +119,7 @@ function Gateway() {
   function enter(world) { setExitTo(world); setTimeout(() => routeTo(world), 700); }
 
   return (
+    <div className="gateway-page">
     <div className="gw2" ref={rootRef} onMouseMove={onMove} onMouseLeave={onLeave} style={{ "--seam": "50%" }}>
       <div className="gw2-panel gw2-neo">
         <div className="gw2-neo-fx" aria-hidden="true">
@@ -137,6 +146,7 @@ function Gateway() {
         <motion.p className="gw2-sub"
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.8, ease: EASE }}>One company · Two worlds</motion.p>
+        <p className="gw2-location">Software & web development · Visakhapatnam</p>
       </div>
 
       {phase === "live" && (
@@ -158,6 +168,8 @@ function Gateway() {
             transition={{ duration: 0.7, ease: EASE }} />
         )}
       </AnimatePresence>
+    </div>
+    <LocalContext />
     </div>
   );
 }

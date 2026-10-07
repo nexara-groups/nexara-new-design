@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap");
 .neo{--bg:#000;--panel:#0b0b0d;--panel2:#101014;--line:rgba(255,255,255,.12);--text:#fff;--muted:#8a8a92;--accent:#ccff00;--cyan:#00f0ff;background:var(--bg);color:var(--text);font-family:"Space Grotesk",sans-serif}
 .neo .nav{background:rgba(0,0,0,.82);border-bottom:1px solid var(--line)}
 .neo .logo{font-family:"Syne",sans-serif;color:#fff;text-transform:uppercase}

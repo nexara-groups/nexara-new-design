@@ -1,19 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { DATA } from "./data.js";
-import App from "./app.jsx";
+import App, { loadPresentation } from "./app.jsx";
+import { parseRoute } from "./shared.js";
 
 import "./index.css";
 import "./legacy/base.css";
-import "./legacy/gateway.css";
-import "./legacy/neo.css";
-import "./legacy/trust.css";
-import "./legacy/neo-guide.css";
 import "./consent.css";
+import "./refinements.css";
 
-gsap.registerPlugin(ScrollTrigger);
-Object.assign(window, { React, gsap, ScrollTrigger, NEXARA: DATA });
-
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+// Keep the complete static page visible until its interactive presentation is ready.
+loadPresentation(parseRoute()).then(() => {
+  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+}).catch(error => console.error('Nexara could not load the interactive presentation.', error));

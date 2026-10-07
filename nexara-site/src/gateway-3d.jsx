@@ -4,6 +4,16 @@ import { MeshDistortMaterial } from "@react-three/drei";
 
 const { useRef } = React;
 
+function useSceneActivity() {
+  const [active, setActive] = React.useState(() => !document.hidden);
+  React.useEffect(() => {
+    const update = () => setActive(!document.hidden);
+    document.addEventListener('visibilitychange', update);
+    return () => document.removeEventListener('visibilitychange', update);
+  }, []);
+  return active ? 'always' : 'never';
+}
+
 function NeoObject() {
   const g = useRef();
   useFrame((state, dt) => {
@@ -26,8 +36,9 @@ function NeoObject() {
 }
 
 export function NeoScene() {
+  const frameloop = useSceneActivity();
   return (
-    <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 4], fov: 45 }}
+    <Canvas frameloop={frameloop} dpr={[1, 1.5]} camera={{ position: [0, 0, 4], fov: 45 }}
       gl={{ alpha: true, antialias: false }} style={{ position: "absolute", inset: 0 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[3, 2, 4]} intensity={2.2} color="#c8ff00" />
@@ -60,8 +71,9 @@ function TrustObject() {
 }
 
 export function TrustScene() {
+  const frameloop = useSceneActivity();
   return (
-    <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 4.2], fov: 45 }}
+    <Canvas frameloop={frameloop} dpr={[1, 1.5]} camera={{ position: [0, 0, 4.2], fov: 45 }}
       gl={{ alpha: true, antialias: false }} style={{ position: "absolute", inset: 0 }}>
       <TrustObject />
     </Canvas>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { DATA } from './data.js';
+import { routePath } from './seo.js';
 const { useMemo, useState, useEffect } = React;
 const STATIC_PAGES = ["home", "customers", "company", "contact"];
 const HAS_SCROLL_ANIMATION = true;
@@ -38,14 +39,13 @@ function parseRoute() {
   if (parts[0] === "neo" || parts[0] === "trust") {
     return {
       theme: parts[0],
-      page: parts[1] || "home",
+      page: parts.length > 3 ? 'not-found' : parts[1] || "home",
       detail: parts[2] || null,
     };
   }
-  const storedTheme = localStorage.getItem("nexara_theme") || "trust";
   return {
-    theme: storedTheme,
-    page: parts[0] || "home",
+    theme: 'trust',
+    page: parts.length > 2 ? 'not-found' : parts[0] || "home",
     detail: parts[1] || null,
   };
 }
@@ -54,14 +54,7 @@ function routeTo(theme, page = "home", detail = null) {
   if (theme === "neo" || theme === "trust") {
     localStorage.setItem("nexara_theme", theme);
   }
-  let path = "/";
-  if (theme) {
-    if (page === "gateway") {
-      path = "/";
-    } else {
-      path = "/" + [theme, page, detail].filter(Boolean).join("/");
-    }
-  }
+  const path = routePath(theme, page, detail);
   window.scrollTo(0, 0);
   const navigate = () => {
     window.history.pushState(null, "", path);

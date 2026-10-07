@@ -1,23 +1,36 @@
 import React from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, useInView } from 'framer-motion';
 import { GraduationCap, TrendingUp, Cpu, Shield, Mail } from 'lucide-react';
 import { DATA } from './data.js';
 import { voice, parseRoute, routeTo, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from './shared.js';
 import { NotFound } from './notfound.jsx';
 import { openCookiePreferences } from './CookieConsent.jsx';
+import ContactDetails from './ContactDetails.jsx';
+import LocalContext from './LocalContext.jsx';
+import { routePath } from './seo.js';
+import { HeroLighting, Tilt } from './components/ui/motion-primitives.jsx';
+import HeroIntro from './components/HeroIntro.jsx';
+import InternshipOverview from './components/InternshipOverview.jsx';
+import { runVisibleAnimation } from './animation.js';
+import './legacy/trust.css';
+import './trust-refinements.css';
+
+gsap.registerPlugin(ScrollTrigger);
 
 function CyclingWord({ words }) {
+  const reduceMotion = useReducedMotion();
   const [idx, setIdx] = React.useState(0);
   const [animKey, setAnimKey] = React.useState(0);
   React.useEffect(() => {
+    if (reduceMotion) return;
     const id = setTimeout(() => {
       setIdx(i => (i + 1) % words.length);
       setAnimKey(k => k + 1);
     }, 2200);
     return () => clearTimeout(id);
-  }, [animKey, words.length]);
+  }, [animKey, words.length, reduceMotion]);
   return (
     <span className="ahero-wrap">
       <span key={animKey} className="ahero-word">{words[idx]}</span>
@@ -83,21 +96,23 @@ const TRUST_HERO_PARTICLES = [
 
 function TrustHeroParticles({ variant = 'parent' }) {
   const reduceMotion = useReducedMotion();
+  const ref = React.useRef(null);
+  const visible = useInView(ref);
   return (
-    <div className={`tsx-hero-particles tsx-hero-particles-${variant}`} aria-hidden="true">
+    <div ref={ref} className={`tsx-hero-particles tsx-hero-particles-${variant}`} aria-hidden="true">
       {TRUST_HERO_PARTICLES.map((p, i) => (
         <motion.span
           key={`${variant}-${i}`}
           className="tsx-hero-particle"
           style={{ '--x': `${p.x}%`, '--y': `${p.y}%`, '--s': `${p.s}px` }}
           initial={{ opacity: reduceMotion ? 0.5 : 0.2, y: 0, scale: 1 }}
-          animate={reduceMotion ? { opacity: 0.58 } : {
+          animate={reduceMotion || !visible ? { opacity: 0.58 } : {
             opacity: [0.22, 0.92, 0.36],
             y: [-10, 18, -10],
             x: [-6, 10, -6],
             scale: [0.9, 1.22, 0.9],
           }}
-          transition={reduceMotion ? { duration: 0 } : {
+          transition={reduceMotion || !visible ? { duration: 0 } : {
             duration: p.dur,
             delay: p.d,
             repeat: Infinity,
@@ -126,7 +141,6 @@ function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }) {
     const reflection = reflectionRef.current;
     if (!loop || !thread || !comet || !digit || !reflection) return;
 
-    let rafId = 0;
     let t0 = performance.now();
 
     const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -140,9 +154,17 @@ function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }) {
       el.style.transform = `translate(${x1}px,${y1}px) rotate(${angle}rad) scaleX(${len})`;
     };
 
+    let geometry;
+    const measure = () => {
+      geometry = { box: loop.getBoundingClientRect(), target: targetRef?.current?.getBoundingClientRect() };
+    };
+    measure();
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(loop);
+    if (targetRef?.current) resizeObserver.observe(targetRef.current);
+
     function frame(now) {
-      const box = loop.getBoundingClientRect();
-      const target = targetRef?.current?.getBoundingClientRect();
+      const { box, target } = geometry;
       const w = box.width || window.innerWidth;
       const h = box.height || window.innerHeight;
       const sourceX = clamp(w * 0.09, 64, 180);
@@ -191,11 +213,10 @@ function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }) {
       digit.style.transform = `translate(${hitX}px,${hitY}px) translate(-50%,-50%) scale(${hasHit ? 1.16 : 1})`;
       digit.style.boxShadow = hasHit ? '0 0 42px rgba(26,109,255,.92)' : '0 0 0 rgba(26,109,255,0)';
 
-      rafId = requestAnimationFrame(frame);
     }
 
-    rafId = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(rafId);
+    const stopAnimation = runVisibleAnimation(loop, frame, { reducedMotion: reduceMotion });
+    return () => { stopAnimation(); resizeObserver.disconnect(); };
   }, [reduceMotion, targetRef]);
 
   return (
@@ -590,6 +611,7 @@ const TRUST_SHEET_DESCS = {
 
 function TrustNav({ page, detail }) {
   const navRef = React.useRef(null);
+  const sheetRef = React.useRef(null);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [hoveredPage, setHoveredPage] = React.useState(null);
   const [dragY, setDragY] = React.useState(0);
@@ -604,6 +626,27 @@ function TrustNav({ page, detail }) {
   }, []);
   React.useEffect(() => { setMenuOpen(false); }, [page, detail]);
   React.useEffect(() => { if (!menuOpen) setDragY(0); }, [menuOpen]);
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    const previousFocus = document.activeElement;
+    const links = sheetRef.current.querySelectorAll('a[href]');
+    links[0]?.focus({ preventScroll: true });
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') { setMenuOpen(false); return; }
+      if (event.key !== 'Tab' || !links.length) return;
+      const first = links[0], last = links[links.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    const onResize = () => { if (window.innerWidth > 768) setMenuOpen(false); };
+    document.addEventListener('keydown', onKeyDown);
+    window.addEventListener('resize', onResize);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('resize', onResize);
+      if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    };
+  }, [menuOpen]);
 
   const onSheetTouchStart = (e) => {
     dragStart.current = e.touches[0].clientY;
@@ -641,7 +684,7 @@ function TrustNav({ page, detail }) {
                 <li key={item.page}>
                   <a
                     className={`tsx-tubelight-btn${active ? ' active' : ''}${!active && hoveredPage === item.page ? ' hovered' : ''}`}
-                    href={`/trust/${item.page}`}
+                    href={routePath('trust', item.page)}
                     onClick={(e) => { e.preventDefault(); routeTo('trust', item.page); }}
                     onMouseEnter={() => setHoveredPage(item.page)}
                   >
@@ -663,19 +706,20 @@ function TrustNav({ page, detail }) {
         </nav>
         <div className="tsx-nav-right">
           <div className="theme-pill tsx-theme-pill" role="group" aria-label="Theme mode">
-            <a type="button" href={detail ? `/neo/${page}/${detail}` : `/neo/${page}`} onClick={(e) => { e.preventDefault(); routeTo('neo', page, detail); }}>Neo</a>
-            <a type="button" className="active" href={detail ? `/trust/${page}/${detail}` : `/trust/${page}`} onClick={(e) => { e.preventDefault(); routeTo('trust', page, detail); }}>Trust</a>
+            <a type="button" href={routePath('neo', page, detail)} onClick={(e) => { e.preventDefault(); routeTo('neo', page, detail); }}>Neo</a>
+            <a type="button" className="active" href={routePath('trust', page, detail)} onClick={(e) => { e.preventDefault(); routeTo('trust', page, detail); }}>Trust</a>
           </div>
           <a className="tsx-nav-cta" href="/trust/contact" onClick={(e) => { e.preventDefault(); routeTo('trust', 'contact'); }}>Talk to us <span aria-hidden="true">→</span></a>
-          <button className="tsx-nav-burger" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(o => !o)}>
+          <button className="tsx-nav-burger" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} aria-controls="trust-mobile-menu" onClick={() => setMenuOpen(o => !o)}>
             <span className={"tsx-burger-icon" + (menuOpen ? ' is-open' : '')}><i /><i /></span>
           </button>
         </div>
       </div>
       {menuOpen && <div className="tsx-nav-backdrop" aria-hidden="true" onClick={() => setMenuOpen(false)} />}
       <div
+        ref={sheetRef} id="trust-mobile-menu" inert={menuOpen ? undefined : ''}
         className={"tsx-nav-sheet" + (menuOpen ? ' is-open' : '')}
-        role="dialog" aria-label="Menu" aria-hidden={!menuOpen}
+        role="dialog" aria-label="Menu" aria-modal={menuOpen ? true : undefined} aria-hidden={!menuOpen}
         onTouchStart={onSheetTouchStart}
         onTouchMove={onSheetTouchMove}
         onTouchEnd={onSheetTouchEnd}
@@ -684,7 +728,7 @@ function TrustNav({ page, detail }) {
         <div className="tsx-nav-sheet-handle" aria-hidden="true" />
         <nav className="tsx-nav-sheet-links" aria-label="Primary mobile">
           {DATA.nav.map((item) => (
-            <a key={item.page} className={"tsx-nav-sheet-row" + (page === item.page ? ' active' : '')} href={`/trust/${item.page}`} onClick={(e) => { e.preventDefault(); setMenuOpen(false); routeTo('trust', item.page); }}>
+            <a key={item.page} className={"tsx-nav-sheet-row" + (page === item.page ? ' active' : '')} href={routePath('trust', item.page)} onClick={(e) => { e.preventDefault(); setMenuOpen(false); routeTo('trust', item.page); }}>
               <span className="tsx-sheet-label">{getTrustNavLabel(item)}</span>
               <span className="tsx-sheet-desc">{TRUST_SHEET_DESCS[item.page]}</span>
             </a>
@@ -970,6 +1014,8 @@ function TrustFooter() {
             <img src="/brand/nexara-logo.svg" alt="Nexara" style={{ height: 40, display: 'block' }} />
           </button>
           <p className="tsx-footer-brand-desc">Enterprise IT capability programmes for talent, digital growth and applied automation.</p>
+          <div className="footer-contact"><a href={DATA.contact.phone.href}>{DATA.contact.phone.display}</a><a href={DATA.contact.address.mapsHref} target="_blank" rel="noopener noreferrer">Visakhapatnam office ↗</a></div>
+          <address className="footer-address">{DATA.contact.address.street}<br />{DATA.contact.address.city}</address>
         </div>
         {cols.map(col => (
           <div key={col.label}>
@@ -998,10 +1044,10 @@ function TrustFooter() {
       <div className="tsx-footer-bottom">
         <p className="tsx-footer-copyright">© 2026 Nexara Private Limited (Nexara Groups). All rights reserved.</p>
         <nav className="tsx-footer-legal" aria-label="Legal">
-          <a href="/privacy-policy.html">Privacy Policy</a>
-          <a href="/terms-of-service.html">Terms of Service</a>
-          <a href="/cookie-policy.html">Cookie Policy</a>
-          <a href="/data-deletion.html">Data Deletion</a>
+          <a href="/privacy-policy">Privacy Policy</a>
+          <a href="/terms-of-service">Terms of Service</a>
+          <a href="/cookie-policy">Cookie Policy</a>
+          <a href="/data-deletion">Data Deletion</a>
           <button type="button" onClick={openCookiePreferences}>Cookie Preferences</button>
         </nav>
       </div>
@@ -1340,7 +1386,7 @@ function TrustHeroUnravel() {
     const litArr = titleSpans.map(() => 0);
     function applyLit(el, lit, prox) {
       const r = Math.round(120 + 124 * lit), g = Math.round(152 + 96 * lit), b = Math.round(198 + 57 * lit);
-      el.style.color = `rgba(${r},${g},${b},${(0.24 + 0.76 * lit).toFixed(2)})`;
+      el.style.color = `rgba(${r},${g},${b},${(0.82 + 0.18 * lit).toFixed(2)})`;
       const glow = lit * 0.32 + prox * 0.9;
       el.style.textShadow = `0 0 ${(20 + prox * 22).toFixed(0)}px rgba(150,196,255,${glow.toFixed(2)})`
         + (prox > 0.02 ? `,0 0 ${(74 * prox).toFixed(0)}px rgba(26,109,255,${(prox * 0.6).toFixed(2)})` : '');
@@ -1429,12 +1475,11 @@ function TrustHeroUnravel() {
       window.addEventListener("mousemove", onMouseMove, { passive: true });
     }
 
-    let rafId = 0;
     let t0 = performance.now();
 
     function renderLoop(now) {
       const time = (now - t0) / 1000;
-      state.p += (state.target - state.p) * 0.09;
+      state.p = prefersReducedMotion ? state.target : state.p + (state.target - state.p) * 0.09;
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
       mouse.x += (mouse.tx - mouse.x) * 0.05;
       mouse.y += (mouse.ty - mouse.y) * 0.05;
@@ -1522,17 +1567,9 @@ function TrustHeroUnravel() {
       // Core (always topmost)
       drawCore(ci, time);
 
-      rafId = heroVisible ? requestAnimationFrame(renderLoop) : 0;
     }
 
-    let heroVisible = true;
-    const io = new IntersectionObserver(([e]) => {
-      heroVisible = e.isIntersecting;
-      if (heroVisible && !rafId) rafId = requestAnimationFrame(renderLoop);
-    }, { threshold: 0 });
-    io.observe(wrapRef.current);
-
-    rafId = requestAnimationFrame(renderLoop);
+    const stopAnimation = runVisibleAnimation(wrapRef.current, renderLoop, { reducedMotion: prefersReducedMotion });
 
     const onResize = () => {
       measure();
@@ -1551,8 +1588,7 @@ function TrustHeroUnravel() {
     });
 
     return () => {
-      cancelAnimationFrame(rafId);
-      io.disconnect();
+      stopAnimation();
       window.removeEventListener("resize", onResize);
       window.removeEventListener("mousemove", onMouseMove);
       if (st) st.kill();
@@ -1561,7 +1597,8 @@ function TrustHeroUnravel() {
 
   return (
     <div ref={wrapRef} className="tsx-hero-runway" style={{ height: '600vh' }}>
-      <div className="tsx-hero-stage">
+      <div className="tsx-hero-stage" data-hero-surface>
+        <HeroLighting />
         <canvas ref={canvasRef} className="tsx-hero-canvas" aria-hidden="true" />
         
         <div className="tsx-hero-chapter" data-from="0" data-to="0.07">
@@ -1570,36 +1607,37 @@ function TrustHeroUnravel() {
             <span>N</span><span>E</span><span>X</span><span>A</span><span>R</span><span>A</span>
             <i className="tsx-wordmark-beam" aria-hidden="true"></i>
           </h1>
+          <HeroIntro theme="trust" />
         </div>
 
-        <div className="tsx-hero-chapter" data-from="0.125" data-to="0.225" aria-hidden="true">
+        <div className="tsx-hero-chapter" data-from="0.125" data-to="0.225">
           <p className="tsx-section-eyebrow">The premise</p>
           <h2 className="tsx-section-heading">One core.<br /><span className="serif" style={{ color: '#1D4ED8' }}>Three forces.</span></h2>
           <p className="tsx-sec-body" style={{ maxWidth: '34em', marginInline: 'auto' }}>Every engagement runs through a single operating core — then unravels into three disciplined divisions.</p>
         </div>
 
-        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#1D4ED8' }} data-from="0.27" data-to="0.45" aria-hidden="true">
+        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#1D4ED8' }} data-from="0.27" data-to="0.45">
           <p className="tsx-panel-idx">01 / DIVISION</p>
           <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Academy<br /><span className="serif" style={{ color: '#1D4ED8' }}>the talent engine.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Structured, cohort-based programmes that turn ambitious learners into capable engineers — sprint by sprint, review by review.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'academy')} style={{ marginTop: '20px' }}>Enter Academy →</button>
         </div>
 
-        <div className="tsx-hero-chapter ch-right" style={{ '--accent': '#1E40AF' }} data-from="0.45" data-to="0.63" aria-hidden="true">
+        <div className="tsx-hero-chapter ch-right" style={{ '--accent': '#1E40AF' }} data-from="0.45" data-to="0.63">
           <p className="tsx-panel-idx" style={{ right: 'max(9vw, 150px)', left: 'auto' }}>02 / DIVISION</p>
           <h2 className="tsx-section-heading" style={{ textAlign: 'right' }}>Labs<br /><span className="serif" style={{ color: '#1E40AF' }}>the systems forge.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'right' }}>Applied AI and automation systems, engineered from prototype to production with written specs and weekly demos.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'labs')} style={{ marginTop: '20px' }}>Enter Labs →</button>
         </div>
 
-        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#5B6472' }} data-from="0.63" data-to="0.81" aria-hidden="true">
+        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#5B6472' }} data-from="0.63" data-to="0.81">
           <p className="tsx-panel-idx">03 / DIVISION</p>
           <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Digital<br /><span className="serif" style={{ color: '#5B6472' }}>the growth signal.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Brand systems, web experiences and performance creative — built like software, measured like engineering.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'marketing')} style={{ marginTop: '20px' }}>Enter Marketing →</button>
         </div>
 
-        <div className="tsx-hero-chapter" data-from="0.86" data-to="1" aria-hidden="true">
+        <div className="tsx-hero-chapter" data-from="0.86" data-to="1">
           <p className="tsx-section-eyebrow">The weave</p>
           <h2 className="tsx-section-heading">Three disciplines.<br /><span className="serif" style={{ color: '#1D4ED8' }}>One standard.</span></h2>
           <div className="tsx-sec-actions" style={{ display: 'flex', gap: '16px', marginTop: '24px', justifyContent: 'center' }}>
@@ -1729,7 +1767,7 @@ function TrustDivisionsRail() {
             const accent = ACCENT[sec.id] || '#1D4ED8';
             const modules = (sec.modules || []).slice(0, 4);
             return (
-              <article key={sec.id} className="tsx-rail-panel" style={{ '--accent': accent }}>
+              <Tilt as="article" rotationFactor={3} key={sec.id} className="tsx-rail-panel" style={{ '--accent': accent }}>
                 <span className="tsx-panel-watermark" aria-hidden="true">0{i + 1}</span>
                 <span className="tsx-panel-ring" aria-hidden="true" />
                 <div className="tsx-panel-head">
@@ -1754,7 +1792,7 @@ function TrustDivisionsRail() {
                     Enter {getTrustSectionLabel(sec)} <span className="arr">→</span>
                   </button>
                 </div>
-              </article>
+              </Tilt>
             );
           })}
         </div>
@@ -2460,7 +2498,8 @@ function TrustSubpageHero({ section, page }) {
   const siblingPages = section.subpages || [];
   const titleRef = React.useRef(null);
   return (
-    <section className="tsx-subpage-modern-hero">
+    <section className="tsx-subpage-modern-hero" data-hero-surface>
+      <HeroLighting />
       <div className="tsx-hero-beams" aria-hidden="true">
         <span className="tsx-hero-beam tsx-hero-beam--1" />
         <span className="tsx-hero-beam tsx-hero-beam--2" />
@@ -2475,11 +2514,11 @@ function TrustSubpageHero({ section, page }) {
           <span className="tsx-subpage-modern-eyebrow">
             {getTrustSectionLabel(section)}
           </span>
-          <h1 ref={titleRef}>{page.title}</h1>
+          <h1 ref={titleRef} className={page.heading ? 'tsx-subpage-local-heading' : undefined}>{page.heading || page.title}</h1>
           <p>{page.callout.trust}</p>
           <div className="tsx-subpage-modern-actions">
             <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact', section.id)}>
-              {TRUST_SECTION_CTA[section.id] || section.hero.trust.primary}
+              {page.slug === 'internships' ? 'Discuss an internship' : TRUST_SECTION_CTA[section.id] || section.hero.trust.primary}
             </button>
             <button className="tsx-sec-btn-ghost" onClick={() => routeTo('trust', section.id)}>
               Back to {getTrustSectionLabel(section)}
@@ -2507,14 +2546,14 @@ function TrustSubpageCards({ page }) {
   return (
     <div className="tsx-subpage-feature-grid">
       {page.cards.map((card, i) => (
-        <article className={`tsx-subpage-feature-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={card.title}>
+        <Tilt as="article" className="tsx-subpage-feature-card" key={card.title}>
           <span className="tsx-subpage-feature-icon" aria-hidden="true">
             {SUBPAGE_CARD_ICONS[card.title] || DEFAULT_CARD_ICON}
           </span>
           <span className="tsx-subpage-feature-index">{String(i + 1).padStart(2, '0')}</span>
           <h3>{card.title}</h3>
           <p>{card.trust}</p>
-        </article>
+        </Tilt>
       ))}
     </div>
   );
@@ -2525,6 +2564,7 @@ function TrustSubpageDetailPage({ section, page, index }) {
   return (
     <main className="tsx-subpage-modern" style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' }}>
       <TrustSubpageHero section={section} page={page} />
+      {section.id === 'academy' && page.slug === 'internships' && <InternshipOverview theme="trust" />}
 
       <section className="tsx-subpage-dark-section">
         <div className="tsx-section-inner tsx-subpage-context-grid">
@@ -2661,13 +2701,12 @@ function TrustSectionHeroUnravel({ theme, section }) {
     let st;
     const BREATHE = !prefersReducedMotion;
 
-    let rafId = 0;
     let t0 = performance.now();
 
     function render(now) {
       const time = (now - t0) / 1000;
       if (BREATHE) state.target = 0.9 + Math.sin(time * 0.22) * 0.1;
-      state.p += (state.target - state.p) * 0.05;
+      state.p = prefersReducedMotion ? state.target : state.p + (state.target - state.p) * 0.05;
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
 
       const p = state.p;
@@ -2727,17 +2766,9 @@ function TrustSectionHeroUnravel({ theme, section }) {
         ctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
       });
 
-      rafId = sectionVisible ? requestAnimationFrame(render) : 0;
     }
 
-    let sectionVisible = true;
-    const io = new IntersectionObserver(([e]) => {
-      sectionVisible = e.isIntersecting;
-      if (sectionVisible && !rafId) rafId = requestAnimationFrame(render);
-    }, { threshold: 0 });
-    io.observe(wrapRef.current);
-
-    rafId = requestAnimationFrame(render);
+    const stopAnimation = runVisibleAnimation(wrapRef.current, render, { reducedMotion: prefersReducedMotion });
 
     const onResize = () => {
       measure();
@@ -2745,8 +2776,7 @@ function TrustSectionHeroUnravel({ theme, section }) {
     window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
-      cancelAnimationFrame(rafId);
-      io.disconnect();
+      stopAnimation();
       window.removeEventListener("resize", onResize);
       if (st) st.kill();
     };
@@ -2756,7 +2786,8 @@ function TrustSectionHeroUnravel({ theme, section }) {
 
   return (
     <div ref={wrapRef} className="tsx-hero-runway tsx-hero-runway--static" style={{ height: '100svh' }}>
-      <div className="tsx-hero-stage">
+      <div className="tsx-hero-stage" data-hero-surface>
+        <HeroLighting />
         <div className="tsx-hero-beams" aria-hidden="true">
           <span className="tsx-hero-beam tsx-hero-beam--1" />
           <span className="tsx-hero-beam tsx-hero-beam--2" />
@@ -3059,7 +3090,8 @@ function TrustPageHero({ eyebrow, title, accentWords, body, children, primaryLab
   const titleRef = React.useRef(null);
   return (
     <div className="tsx-hero-runway tsx-hero-runway--static" style={{ height: '100svh' }}>
-      <div className="tsx-hero-stage">
+      <div className="tsx-hero-stage" data-hero-surface>
+        <HeroLighting />
         <div className="tsx-hero-beams" aria-hidden="true">
           <span className="tsx-hero-beam tsx-hero-beam--1" />
           <span className="tsx-hero-beam tsx-hero-beam--2" />
@@ -3220,6 +3252,7 @@ function TrustContact({ detail }) {
         body={copy.body}
       >
         <a className="tsx-email-pill" href={`mailto:${copy.accent}`} style={{ marginTop: '20px', display: 'inline-block' }}>{copy.accent}</a>
+        <ContactDetails />
       </TrustPageHero>
 
       <section className="tsx-section-inner tsx-channel-section">
@@ -3412,6 +3445,7 @@ function TrustSite({ page, detail }) {
         {page === 'contact'   && <TrustContact detail={detail} />}
         {!validPage           && <NotFound theme="trust" page={page} />}
       </div>
+      {validPage && <LocalContext theme="trust" page={page} detail={detail} />}
       <TrustConcierge page={page} />
       <TrustFooter />
     </div>
