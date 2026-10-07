@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import LocalContext from './LocalContext';
 import { useRouter } from 'next/navigation';
 import { DATA } from '@/lib/data';
 import { STATIC_PAGES } from '@/lib/shared';
@@ -74,6 +75,7 @@ function TrustSite({ page, detail }: { page: string; detail: string | null }) {
         {!validPage           && <NotFound theme="trust" page={page} />}
       </div>
       <TrustConcierge page={page} />
+      <LocalContext theme={'trust'} page={page} detail={detail} />
       <TrustFooter />
     </div>
   );

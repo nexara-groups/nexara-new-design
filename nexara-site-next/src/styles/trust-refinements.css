@@ -1,0 +1,82 @@
+.trust.tsx-site {
+  --shadow-sheet: 0 6px 14px rgba(11, 31, 51, .06), 0 20px 42px -12px rgba(11, 31, 51, .18);
+}
+.trust.tsx-site :is(.tsx-sol-card, .tsx-ledger-plate, .tsx-proof-case-card, .tsx-channel-card, .tsx-pkg-card) {
+  box-shadow: var(--shadow-sheet), inset 0 1px 0 rgba(255, 255, 255, .65) !important;
+}
+.trust.tsx-site .tsx-channel-card { border-radius: 14px; }
+.trust.tsx-site .tsx-nav {
+  box-shadow: 0 8px 18px rgba(0, 7, 20, .12), 0 24px 48px -16px rgba(0, 7, 20, .3), inset 0 1px 0 rgba(255, 255, 255, .4);
+}
+.trust.tsx-site .tsx-nav:not(.scrolled) .tsx-nav-cta {
+  color: #0b1f33 !important;
+  background: rgba(26, 109, 255, .08) !important;
+  border-color: rgba(26, 109, 255, .2) !important;
+}
+.trust.tsx-site .tsx-nav:not(.scrolled) .tsx-nav-cta:hover {
+  color: #0b1f33 !important;
+  background: rgba(26, 109, 255, .14) !important;
+}
+.trust.tsx-site .tsx-theme-pill { padding: 4px; gap: 2px; }
+.trust.tsx-site .tsx-theme-pill a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 10px;
+  color: inherit;
+  border-radius: 20px;
+  font-size: 12px;
+  text-decoration: none;
+}
+.trust.tsx-site .tsx-theme-pill a.active { background: rgba(255, 255, 255, .6); color: #0b1f33; box-shadow: 0 2px 5px rgba(0, 7, 20, .14); }
+.trust.tsx-site .tsx-hero-runway--static { height: auto !important; }
+.trust.tsx-site .tsx-hero-runway--static .tsx-hero-stage {
+  position: relative;
+  height: auto;
+  min-height: min(900px, 100svh);
+  display: grid;
+  align-items: center;
+}
+.trust.tsx-site .tsx-hero-runway--static .tsx-hero-chapter {
+  position: relative;
+  inset: auto;
+  min-width: 0;
+  padding: clamp(64px, 8vw, 110px) clamp(20px, 6vw, 80px);
+}
+.trust.tsx-site .tsx-contact-page .tsx-hero-stage { min-height: min(840px, calc(100svh - 80px)); }
+.trust.tsx-site .tsx-contact-page .tsx-hero-chapter { padding-block: clamp(56px, 6vw, 84px); }
+.trust.tsx-site .tsx-contact-page .tsx-section-heading { font-size: clamp(2rem, 4.4vw, 4rem) !important; max-width: 20ch; text-wrap: balance; line-height: 1.08; letter-spacing: -.03em; }
+.trust.tsx-site .tsx-contact-page .tsx-sec-body { color: #bacce2 !important; font-size: 16px; }
+.trust.tsx-site .tsx-contact-page .tsx-email-pill { margin-top: 24px !important; margin-bottom: 0; }
+.trust.tsx-site .tsx-brief-form { padding: clamp(20px, 3vw, 36px); border-radius: 16px; background: #fff; box-shadow: var(--shadow-sheet); }
+.trust.tsx-site .tsx-checklist-panel { border-radius: 16px; box-shadow: var(--shadow-sheet); }
+.trust.tsx-site .tsx-field-input { width: 100%; }
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .trust.tsx-site :is(.tsx-sol-card, .tsx-proof-case-card, .tsx-channel-card, .tsx-pkg-card):hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(11, 31, 51, .08), 0 28px 54px -12px rgba(11, 31, 51, .22) !important;
+  }
+}
+@media (min-width: 769px) and (max-width: 1150px) {
+  .trust.tsx-site .tsx-nav-cta { display: none; }
+  .trust.tsx-site .tsx-nav-inner { gap: 16px; padding-inline: 20px; }
+}
+@media (max-width: 768px) {
+  .trust.tsx-site .tsx-main-offset { padding-top: 78px; }
+  .trust.tsx-site .tsx-nav { max-width: calc(100% - 24px); }
+  .trust.tsx-site .tsx-nav-inner { gap: 12px; width: 100%; }
+  .trust.tsx-site .tsx-logo { min-width: 0; flex: 1; }
+  .trust.tsx-site .tsx-logo img { max-width: 100%; height: auto !important; max-height: 40px; }
+  .trust.tsx-site .tsx-nav-right { gap: 8px; flex-shrink: 0; }
+  .trust.tsx-site .tsx-nav-burger { width: 44px; height: 44px; }
+  .trust.tsx-site .tsx-nav-sheet { background: rgba(232, 240, 251, .96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+  .trust.tsx-site .tsx-hero-runway--static .tsx-sec-actions { flex-wrap: wrap; }
+  .trust.tsx-site .tsx-contact-page .tsx-hero-stage { min-height: 0; }
+  .trust.tsx-site .tsx-contact-page .tsx-hero-chapter { padding: 48px 20px 56px; }
+  .trust.tsx-site .tsx-contact-page .tsx-section-heading { font-size: clamp(2rem, 7.5vw, 3rem) !important; }
+}
+
+.trust.tsx-site .tsx-subpage-modern-copy h1.tsx-subpage-local-heading { hyphens:none !important; word-break:normal !important; overflow-wrap:normal !important; }
+@media(max-width:600px) { .trust.tsx-site .tsx-subpage-modern-copy h1.tsx-subpage-local-heading { font-size:clamp(29px,8.4vw,40px) !important; line-height:1.17; } }

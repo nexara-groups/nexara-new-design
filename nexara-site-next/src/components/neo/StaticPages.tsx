@@ -1,4 +1,5 @@
 'use client';
+import ContactDetails from '../ContactDetails';
 import { DATA } from '@/lib/data';
 import { useBriefForm } from '@/lib/shared';
 import { NotFound } from '../NotFound';
@@ -105,6 +106,7 @@ function ContactHero({ theme, onStartBrief }: ContactHeroProps) {
         <h1 className="contact-hero__heading">{copy.title}</h1>
         <p className="contact-hero__subtext">{copy.body}</p>
         <a className="contact-hero__email-pill" href={`mailto:${copy.accent}`}>{copy.accent}</a>
+        <ContactDetails />
         <button className="contact-hero__cta" onClick={onStartBrief}>{copy.primary}</button>
       </div>
     </section>

@@ -1,0 +1,26 @@
+.neo {
+  --elev-1: 0 6px 14px rgba(0, 0, 0, .3), 0 18px 32px -10px rgba(0, 0, 0, .65);
+  --elev-2: 0 10px 22px rgba(0, 0, 0, .38), 0 28px 54px -12px rgba(0, 0, 0, .8);
+}
+.neo :is(.module-card, .neo-standard-card, .brief-form-panel, .brief-preview-panel) { box-shadow: var(--elev-2), inset 0 1px 0 rgba(255, 255, 255, .07); }
+.neo .contact-hero__body { max-width: 860px; width: 100%; }
+.neo .contact-details { --contact-surface: #151719; --contact-accent: #ccff00; --contact-muted: #b8c0ad; margin: 6px 0 28px; }
+.neo .contact-hero__heading { max-width: 16ch; text-wrap: balance; }
+.neo .brief-preview-panel { border-radius: 16px; }
+.neo .theme-pill { padding: 4px; gap: 2px; border-radius: 24px; }
+.neo .theme-pill a { display: inline-flex; justify-content: center; align-items: center; min-height: 36px; padding: 0 12px; border-radius: 20px; color: #bdc3b7; font-size: 12px; text-decoration: none; }
+.neo .theme-pill a.active { background: #ccff00; color: #090b05; box-shadow: 0 3px 8px rgba(0, 0, 0, .3); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .neo .module-card:hover { box-shadow: 0 14px 28px rgba(0, 0, 0, .4), 0 36px 64px -12px rgba(0, 0, 0, .85), inset 0 1px 0 rgba(204, 255, 0, .22); }
+}
+@media (max-width: 768px) {
+  .neo .nav nav { gap: 0; justify-content: space-between; }
+  .neo .nav nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; font-size: 14px; flex-shrink: 0; }
+  .neo .contact-hero { padding-block: 44px; }
+  .neo .brief-preview-text { font-size: 12px; }
+  .neo .brief-preview-panel { padding: 22px; }
+}
+
+@media(min-width:1024px){ .neo .neo-hero-title { font-size:clamp(90px,11.4vw,210px); max-width:82vw; } }
+.neo .neo-hero-runway--detail .neo-hero-stage { height:auto !important; min-height:0 !important; }
+.neo .neo-hero-runway--detail .neo-hero-chapter { min-height:0 !important; padding:clamp(90px,10vw,140px) 24px 80px; }

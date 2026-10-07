@@ -3,10 +3,9 @@ import Script from 'next/script';
 import '@/styles/index.css';
 import '@/styles/base.css';
 import '@/styles/gateway.css';
-import '@/styles/neo.css';
-import '@/styles/trust.css';
-import '@/styles/neo-guide.css';
 import '@/styles/consent.css';
+import '@/styles/refinements.css';
+import '@/styles/elevation.css';
 
 export const metadata: Metadata = {
   title: 'Nexara Groups — Academy, Digital Marketing & Product Studio',
@@ -14,7 +13,6 @@ export const metadata: Metadata = {
   keywords: 'Nexara, Nexara Groups, Nexara Private Limited, Nexara Academy, Nexara Digital Marketing, Nexara Labs, Nexara Product Studio, talent development, AI development India, digital marketing agency, tech training Visakhapatnam, software development India',
   authors: [{ name: 'Nexara Private Limited' }],
   robots: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1',
-  alternates: { canonical: 'https://nexaragroups.com/' },
   openGraph: {
     type: 'website',
     siteName: 'Nexara Groups',
@@ -34,49 +32,11 @@ export const metadata: Metadata = {
   verification: { google: 'fLwXJBPqsWL-8uTW8q2DDuRbOJnOY0WPe3xABNY4ftc' },
 };
 
-const ORG_JSONLD = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'Organization',
-      '@id': 'https://nexaragroups.com/#organization',
-      name: 'Nexara',
-      legalName: 'Nexara Private Limited',
-      alternateName: ['Nexara Groups', 'Nexara Group', 'Nexara Pvt Ltd'],
-      url: 'https://nexaragroups.com/',
-      logo: { '@type': 'ImageObject', url: 'https://nexaragroups.com/brand/nexara-logo.svg' },
-      email: 'info@nexaragroups.com',
-      contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: 'info@nexaragroups.com', areaServed: ['IN', 'AE', 'GB', 'US'], availableLanguage: ['en', 'hi', 'te'] },
-      description: 'Nexara Private Limited (Nexara Groups) is a structured talent and technology company operating three divisions: Academy (talent development), Digital Marketing (growth infrastructure), and Product Studio (AI software). Every engagement has a named owner, a written scope, and verified delivery.',
-      address: { '@type': 'PostalAddress', addressLocality: 'Visakhapatnam', addressRegion: 'Andhra Pradesh', addressCountry: 'IN' },
-      areaServed: ['IN', 'AE', 'GB', 'US'],
-      knowsAbout: ['Talent Development', 'Digital Marketing', 'AI Software', 'SaaS', 'Career Training'],
-      hasOfferCatalog: {
-        '@type': 'OfferCatalog',
-        name: 'Nexara Services',
-        itemListElement: [
-          { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Nexara Academy', description: 'Structured talent development. Cohort-based training with verified placement outcomes.' } },
-          { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Nexara Marketing', description: 'Full-stack growth infrastructure — positioning, brand build, campaigns, and measurement.' } },
-          { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Nexara Labs', description: 'Production AI software. SaaS products, applied AI, and intelligent systems shipped end-to-end.' } },
-        ],
-      },
-    },
-    {
-      '@type': 'WebSite',
-      '@id': 'https://nexaragroups.com/#website',
-      url: 'https://nexaragroups.com/',
-      name: 'Nexara Groups',
-      alternateName: 'Nexara Private Limited',
-      publisher: { '@id': 'https://nexaragroups.com/#organization' },
-      inLanguage: 'en-IN',
-    },
-  ],
-};
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="no-js" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{__html:"document.documentElement.classList.remove('no-js')"}} />
         <Script id="host-guard" strategy="beforeInteractive">{`
           (function () {
             var h = location.hostname;
@@ -85,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }
           })();
         `}</Script>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSONLD) }} />
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* Six families actually carrying the design (Inter/Syne/JetBrains Mono
@@ -113,12 +73,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           } catch (e) {}
           gtag('config', 'G-BPYYD3KQ99');
         `}</Script>
-        <noscript>
-          <div style={{ padding: 40, fontFamily: 'sans-serif', maxWidth: 700, margin: '0 auto' }}>
-            <h1>Nexara Groups</h1>
-            <p>Nexara Private Limited (Nexara Groups) builds talent through Academy, grows businesses through Digital Marketing, and ships AI software through Product Studio. Three forces. One operating standard. Based in Visakhapatnam, India — serving India, UAE, UK, and US.</p>
-          </div>
-        </noscript>
         {children}
       </body>
     </html>

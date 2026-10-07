@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import ContactDetails from '../ContactDetails';
 import { DATA } from '@/lib/data';
 import { useBriefForm, SECTION_HERO_WORDS } from '@/lib/shared';
 import { routeTo } from '@/lib/trust-router';
@@ -155,6 +156,7 @@ export function TrustContact({ detail }: TrustContactProps) {
         body={copy.body}
       >
         <a className="tsx-email-pill" href={`mailto:${copy.accent}`} style={{ marginTop: '20px', display: 'inline-block' }}>{copy.accent}</a>
+        <ContactDetails />
       </TrustPageHero>
 
       <section className="tsx-section-inner tsx-channel-section">

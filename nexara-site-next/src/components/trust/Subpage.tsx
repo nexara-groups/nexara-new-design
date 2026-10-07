@@ -1,4 +1,8 @@
 'use client';
+import HeroIntro from '../HeroIntro';
+import InternshipOverview from '../InternshipOverview';
+import { Tilt } from '../ui/motion-primitives';
+import { HeroLighting } from '../ui/motion-primitives';
 import React from 'react';
 import { DATA } from '@/lib/data';
 import { routeTo } from '@/lib/trust-router';
@@ -91,7 +95,7 @@ export function TrustSubpageHero({ section, page }: { section: TrustSectionData;
   const siblingPages = section.subpages || [];
   const titleRef = React.useRef(null);
   return (
-    <section className="tsx-subpage-modern-hero">
+    <section className="tsx-subpage-modern-hero" data-hero-surface><HeroLighting />
       <div className="tsx-hero-beams" aria-hidden="true">
         <span className="tsx-hero-beam tsx-hero-beam--1" />
         <span className="tsx-hero-beam tsx-hero-beam--2" />
@@ -106,11 +110,11 @@ export function TrustSubpageHero({ section, page }: { section: TrustSectionData;
           <span className="tsx-subpage-modern-eyebrow">
             {getTrustSectionLabel(section)}
           </span>
-          <h1 ref={titleRef}>{page.title}</h1>
+          <h1 ref={titleRef} className={page.slug === "internships" ? "tsx-subpage-local-heading" : undefined}>{page.slug === "internships" ? "Software internships in Vizag & Visakhapatnam" : page.title}</h1>
           <p>{page.callout.trust}</p>
           <div className="tsx-subpage-modern-actions">
             <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact', section.id)}>
-              {TRUST_SECTION_CTA[section.id] || section.hero.trust.primary}
+              {page.slug === 'internships' ? 'Discuss your internship' : TRUST_SECTION_CTA[section.id] || section.hero.trust.primary}
             </button>
             <button className="tsx-sec-btn-ghost" onClick={() => routeTo('trust', section.id)}>
               Back to {getTrustSectionLabel(section)}
@@ -138,14 +142,14 @@ export function TrustSubpageCards({ page }: { page: TrustSubpageData }) {
   return (
     <div className="tsx-subpage-feature-grid">
       {page.cards.map((card, i) => (
-        <article className={`tsx-subpage-feature-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={card.title}>
+        <Tilt as="article" className={`tsx-subpage-feature-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={card.title}>
           <span className="tsx-subpage-feature-icon" aria-hidden="true">
             {SUBPAGE_CARD_ICONS[card.title] || DEFAULT_CARD_ICON}
           </span>
           <span className="tsx-subpage-feature-index">{String(i + 1).padStart(2, '0')}</span>
           <h3>{card.title}</h3>
           <p>{card.trust}</p>
-        </article>
+        </Tilt>
       ))}
     </div>
   );
@@ -156,6 +160,7 @@ export function TrustSubpageDetailPage({ section, page, index }: { section: Trus
   return (
     <main className="tsx-subpage-modern" style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' } as React.CSSProperties}>
       <TrustSubpageHero section={section} page={page} />
+      {page.slug === "internships" && <InternshipOverview theme="trust" />}
 
       <section className="tsx-subpage-dark-section">
         <div className="tsx-section-inner tsx-subpage-context-grid">

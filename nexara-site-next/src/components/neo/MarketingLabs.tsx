@@ -137,10 +137,13 @@ export function MarketingSignalSection() {
       window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => { fit(); if (!rafId) rafId = window.requestAnimationFrame(draw); }, 120);
     };
+    const onVisibility=()=>{if(document.hidden){window.cancelAnimationFrame(rafId);rafId=0;}else if(visible&&!rafId)rafId=window.requestAnimationFrame(draw);};
+    document.addEventListener('visibilitychange',onVisibility);
     window.addEventListener('resize', onResize, { passive: true });
     rafId = window.requestAnimationFrame(draw);
     return () => {
       observer.disconnect();
+      document.removeEventListener('visibilitychange',onVisibility);
       window.clearTimeout(resizeTimer);
       window.removeEventListener('resize', onResize);
       if (rafId) window.cancelAnimationFrame(rafId);

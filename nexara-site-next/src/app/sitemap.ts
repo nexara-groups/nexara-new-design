@@ -1,11 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { ROUTES } from '@/lib/routes';
-
+import { getSeo, SITE_URL } from '@/lib/seo';
 export default function sitemap(): MetadataRoute.Sitemap {
-  return ROUTES.map((route) => ({
-    url: `https://nexaragroups.com/${route.path}`,
-    lastModified: new Date('2026-07-09'),
-    changeFrequency: 'weekly' as const,
-    priority: route.page === 'gateway' ? 1.0 : route.detail ? 0.6 : route.page === 'home' ? 0.9 : 0.7,
-  }));
+ const urls = new Set(ROUTES.map(route=>getSeo(route).canonical).filter((url): url is string=>Boolean(url)));
+ for (const path of ['privacy-policy.html','terms-of-service.html','cookie-policy.html','data-deletion.html']) urls.add(SITE_URL+'/'+path);
+ return [...urls].map(url=>({url}));
 }

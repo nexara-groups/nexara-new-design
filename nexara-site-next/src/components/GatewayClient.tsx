@@ -24,7 +24,7 @@ function MagneticCTA({ children, onClick, className, href }: {
   const sy = useSpring(y, { stiffness: 220, damping: 16 });
   const reduce = useReducedMotion();
   function move(e: React.MouseEvent) {
-    if (reduce || !ref.current) return;
+    if (reduce || !ref.current || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     const r = ref.current.getBoundingClientRect();
     x.set((e.clientX - (r.left + r.width / 2)) * 0.3);
     y.set((e.clientY - (r.top + r.height / 2)) * 0.45);
@@ -58,10 +58,10 @@ function Side({ side, copy, phase, onEnter }: {
   };
   return (
     <AnimatePresence>
-      {phase === "live" && (
+      {(
         <motion.div
           className={"gw2-content " + (left ? "gw2-content-left" : "gw2-content-right")}
-          variants={container} initial="hidden" animate="show">
+          variants={container} initial={false} animate="show">
           <motion.p className={"gw2-kicker " + (left ? "gw2-kicker-neo" : "gw2-kicker-trust")} variants={item}>{copy.kicker}</motion.p>
           <motion.h2 className={"gw2-title " + (left ? "gw2-title-neo" : "gw2-title-trust")} variants={item}>{copy.title}</motion.h2>
           <motion.p className={"gw2-body " + (left ? "" : "gw2-body-trust")} variants={item}>{copy.body}</motion.p>
@@ -83,14 +83,14 @@ function Gateway() {
   const router = useRouter();
   const routeTo = (theme: string | null, page = "home", detail: string | null = null) => {
     if (theme === "neo" || theme === "trust") {
-      localStorage.setItem("nexara_theme", theme);
+      try { localStorage.setItem("nexara_theme", theme); } catch {}
     }
     let path = "/";
     if (theme) {
       if (page === "gateway") {
         path = "/";
       } else {
-        path = "/" + [theme, page, detail].filter(Boolean).join("/");
+        path = "/" + [theme, page === 'home' ? null : page, detail].filter(Boolean).join("/");
       }
     }
     window.scrollTo(0, 0);
@@ -119,7 +119,18 @@ function Gateway() {
     return () => mq.removeEventListener("change", onChange);
   }, []);
   // mobile gets a clean stacked layout — skip the mouse-seam + heavy 3D scenes
-  const showScenes = !reduce && !isMobile;
+  const [scenesReady,setScenesReady]=useState(false);
+  const [active,setActive]=useState(true);
+  useEffect(()=>{
+    const query=window.matchMedia('(min-width: 821px) and (hover: hover) and (pointer: fine)');
+    const saveData=Boolean((navigator as Navigator & {connection?:{saveData?:boolean}}).connection?.saveData);
+    let timer:ReturnType<typeof setTimeout>;
+    const update=()=>{clearTimeout(timer);setScenesReady(false);if(query.matches&&!reduce&&!saveData)timer=setTimeout(()=>setScenesReady(true),1600);};
+    const visibility=()=>setActive(!document.hidden);
+    update();visibility();query.addEventListener('change',update);document.addEventListener('visibilitychange',visibility);
+    return()=>{clearTimeout(timer);query.removeEventListener('change',update);document.removeEventListener('visibilitychange',visibility);};
+  },[reduce]);
+  const showScenes = scenesReady && !reduce && !isMobile;
 
   const mx = useMotionValue(0.5);
   const seam = useSpring(mx, { stiffness: 90, damping: 22, mass: 0.5 });
@@ -135,14 +146,16 @@ function Gateway() {
   }, [seam]);
 
   useEffect(() => {
-    if (reduce) return;
+    if (reduce) { setPhase("live"); return; }
     const t = setTimeout(() => setPhase("live"), 500);
     return () => clearTimeout(t);
   }, [reduce]);
 
   function onMove(e: React.MouseEvent) { if (!reduce) mx.set(e.clientX / window.innerWidth); }
   function onLeave() { mx.set(0.5); }
-  function enter(world: 'neo' | 'trust') { setExitTo(world); setTimeout(() => routeTo(world), 700); }
+  const exitTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(()=>()=>clearTimeout(exitTimer.current),[]);
+  function enter(world: 'neo' | 'trust') { if(reduce){routeTo(world);return;}setExitTo(world);clearTimeout(exitTimer.current);exitTimer.current=setTimeout(()=>routeTo(world),700); }
 
   return (
     <div className="gw2" ref={rootRef} onMouseMove={onMove} onMouseLeave={onLeave} style={{ "--seam": "50%" } as React.CSSProperties}>
@@ -150,13 +163,13 @@ function Gateway() {
         <div className="gw2-neo-fx" aria-hidden="true">
           <div className="gw2-grid" />
           {showScenes && (
-            <React.Suspense fallback={null}><div className="gw2-stage"><NeoScene /></div></React.Suspense>
+            <React.Suspense fallback={null}><div className="gw2-stage"><NeoScene active={active} /></div></React.Suspense>
           )}
         </div>
       </div>
       <div className="gw2-panel gw2-trust">
         <div className="gw2-trust-fx" aria-hidden="true"><div className="gw2-lines" />
-          {showScenes && (<React.Suspense fallback={null}><div className="gw2-stage"><TrustScene /></div></React.Suspense>)}
+          {showScenes && (<React.Suspense fallback={null}><div className="gw2-stage"><TrustScene active={active} /></div></React.Suspense>)}
         </div>
       </div>
 
@@ -165,15 +178,15 @@ function Gateway() {
 
       <div className="gw2-brand">
         <motion.h1 className="gw2-wordmark"
-          initial={{ opacity: 0, letterSpacing: "0.55em", filter: "blur(7px)" }}
+          initial={false}
           animate={{ opacity: 1, letterSpacing: "0.16em", filter: "blur(0px)" }}
           transition={{ duration: 1.15, ease: EASE }}>NEXARA</motion.h1>
         <motion.p className="gw2-sub"
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          initial={false} animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.8, ease: EASE }}>One company · Two worlds</motion.p>
       </div>
 
-      {phase === "live" && (
+      {(
         <motion.p className="gw2-hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.8 }}>{isMobile ? "Tap a world to enter" : "Move across to feel both · click to enter"}</motion.p>
       )}

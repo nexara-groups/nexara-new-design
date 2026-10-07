@@ -1,4 +1,6 @@
 'use client';
+import { runVisibleAnimation } from '@/lib/animation';
+import { HeroLighting } from '../ui/motion-primitives';
 import React from 'react';
 import { DATA } from '@/lib/data';
 import { SECTION_HERO_WORDS, HAS_SCROLL_ANIMATION } from '@/lib/shared';
@@ -226,11 +228,11 @@ export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof Trust
     };
 
     const sprite = makeSprite(rgb);
-    let COUNT = window.innerWidth < 760 ? 260 : 560;
+    let COUNT = window.innerWidth < 760 ? 90 : 240;
     let parts: { t: number; j: number; sz: number }[] = [];
 
     function build() {
-      COUNT = window.innerWidth < 760 ? 260 : 560;
+      COUNT = window.innerWidth < 760 ? 90 : 240;
       parts = new Array(COUNT);
       for (let i = 0; i < COUNT; i++) {
         parts[i] = {
@@ -244,7 +246,7 @@ export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof Trust
 
     let W = 0, H = 0, CX = 0, CY = 0, SCALE = 1;
     function measure() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       W = canvas!.clientWidth; H = canvas!.clientHeight;
       canvas!.width = Math.round(W * dpr);
       canvas!.height = Math.round(H * dpr);
@@ -255,7 +257,7 @@ export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof Trust
     }
     measure();
 
-    const state = { p: 0, target: 1 };
+    const state = { p: prefersReducedMotion ? 1 : 0, target: 1 };
     const isDesktop = window.innerWidth > 760;
 
     // Hero no longer waits on three screens of scroll. The formation plays
@@ -268,7 +270,7 @@ export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof Trust
     let t0 = performance.now();
 
     function render(now: number) {
-      const time = (now - t0) / 1000;
+      const time = prefersReducedMotion ? 0 : (now - t0) / 1000;
       if (BREATHE) state.target = 0.9 + Math.sin(time * 0.22) * 0.1;
       state.p += (state.target - state.p) * 0.05;
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
@@ -330,26 +332,19 @@ export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof Trust
         ctx.drawImage(sprite, px - d / 2, py - d / 2, d, d);
       });
 
-      rafId = sectionVisible ? requestAnimationFrame(render) : 0;
+
     }
 
-    let sectionVisible = true;
-    const io = new IntersectionObserver(([e]) => {
-      sectionVisible = e?.isIntersecting ?? true;
-      if (sectionVisible && !rafId) rafId = requestAnimationFrame(render);
-    }, { threshold: 0 });
-    if (wrapRef.current) io.observe(wrapRef.current);
-
-    rafId = requestAnimationFrame(render);
+    const stop = runVisibleAnimation(canvas,render,{reducedMotion:prefersReducedMotion});
 
     const onResize = () => {
       measure();
+      render(performance.now());
     };
     window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
-      cancelAnimationFrame(rafId);
-      io.disconnect();
+      stop();
       window.removeEventListener("resize", onResize);
       if (st) st.kill();
     };
@@ -359,7 +354,7 @@ export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof Trust
 
   return (
     <div ref={wrapRef} className="tsx-hero-runway tsx-hero-runway--static" style={{ height: '100svh' }}>
-      <div className="tsx-hero-stage">
+      <div className="tsx-hero-stage" data-hero-surface><HeroLighting />
         <div className="tsx-hero-beams" aria-hidden="true">
           <span className="tsx-hero-beam tsx-hero-beam--1" />
           <span className="tsx-hero-beam tsx-hero-beam--2" />
@@ -450,7 +445,7 @@ export function TrustPageHero({ eyebrow, title, accentWords, body, children, pri
   const titleRef = React.useRef<HTMLHeadingElement | null>(null);
   return (
     <div className="tsx-hero-runway tsx-hero-runway--static" style={{ height: '100svh' }}>
-      <div className="tsx-hero-stage">
+      <div className="tsx-hero-stage" data-hero-surface><HeroLighting />
         <div className="tsx-hero-beams" aria-hidden="true">
           <span className="tsx-hero-beam tsx-hero-beam--1" />
           <span className="tsx-hero-beam tsx-hero-beam--2" />

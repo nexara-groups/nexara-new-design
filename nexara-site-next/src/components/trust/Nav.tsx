@@ -1,5 +1,7 @@
 'use client';
 import React from 'react';
+import Link from 'next/link';
+import { routePath } from '@/lib/seo';
 import { DATA } from '@/lib/data';
 import { routeTo } from '@/lib/trust-router';
 import { getTrustNavLabel, TRUST_NAV_ICONS, TRUST_SHEET_DESCS } from './shared';
@@ -16,6 +18,8 @@ function TrustNav({ page, detail }: TrustNavProps) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [hoveredPage, setHoveredPage] = React.useState<string | null>(null);
   const [dragY, setDragY] = React.useState(0);
+  const sheetRef = React.useRef<HTMLDivElement>(null);
+  const burgerRef = React.useRef<HTMLButtonElement>(null);
   const dragStart = React.useRef<number | null>(null);
 
   React.useEffect(() => {
@@ -49,12 +53,25 @@ function TrustNav({ page, detail }: TrustNavProps) {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
+  React.useEffect(()=>{
+    if(!menuOpen)return;
+    const sheet=sheetRef.current;
+    const links=()=>Array.from(sheet?.querySelectorAll<HTMLElement>('a[href],button:not([disabled])')||[]);
+    links()[0]?.focus();
+    const key=(event:KeyboardEvent)=>{
+      if(event.key==='Escape'){setMenuOpen(false);burgerRef.current?.focus();}
+      if(event.key==='Tab'){const items=[...links(),...(burgerRef.current?[burgerRef.current]:[])];const first=items[0],last=items.at(-1);
+        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}}
+    };
+    document.addEventListener('keydown',key);return()=>document.removeEventListener('keydown',key);
+  },[menuOpen]);
   return (
     <header className="tsx-nav" ref={navRef} role="banner">
       <div className="tsx-nav-inner">
-        <a className="tsx-logo" href="/trust" onClick={(e) => { e.preventDefault(); routeTo('trust', 'home'); }} aria-label="Nexara home">
+        <Link prefetch={false} className="tsx-logo" href="/trust"  aria-label="Nexara home">
           <img src="/brand/nexara-logo.svg" alt="Nexara" style={{ height: 48, display: 'block' }} />
-        </a>
+        </Link>
         <nav aria-label="Primary">
           <ul className="tsx-nav-links tsx-tubelight" onMouseLeave={() => setHoveredPage(null)}>
             {DATA.nav.map(item => {
@@ -62,10 +79,10 @@ function TrustNav({ page, detail }: TrustNavProps) {
               const glowing = hoveredPage ? hoveredPage === item.page : active;
               return (
                 <li key={item.page}>
-                  <a
+                  <Link prefetch={false}
                     className={`tsx-tubelight-btn${active ? ' active' : ''}${!active && hoveredPage === item.page ? ' hovered' : ''}`}
                     href={`/trust/${item.page}`}
-                    onClick={(e) => { e.preventDefault(); routeTo('trust', item.page); }}
+
                     onMouseEnter={() => setHoveredPage(item.page)}
                   >
                     {glowing && (
@@ -78,7 +95,7 @@ function TrustNav({ page, detail }: TrustNavProps) {
                     )}
                     <span className="tsx-tubelight-icon">{(TRUST_NAV_ICONS as Record<string, React.ReactNode>)[item.page]}</span>
                     {getTrustNavLabel(item)}
-                  </a>
+                  </Link>
                 </li>
               );
             })}
@@ -86,17 +103,17 @@ function TrustNav({ page, detail }: TrustNavProps) {
         </nav>
         <div className="tsx-nav-right">
           <div className="theme-pill tsx-theme-pill" role="group" aria-label="Theme mode">
-            <a type="button" href={detail ? `/neo/${page}/${detail}` : `/neo/${page}`} onClick={(e) => { e.preventDefault(); routeTo('neo', page, detail); }}>Neo</a>
-            <a type="button" className="active" href={detail ? `/trust/${page}/${detail}` : `/trust/${page}`} onClick={(e) => { e.preventDefault(); routeTo('trust', page, detail); }}>Trust</a>
+            <Link prefetch={false} href={routePath("neo",page,detail)} >Neo</Link>
+            <Link prefetch={false} className="active" href={routePath("trust",page,detail)} >Trust</Link>
           </div>
-          <a className="tsx-nav-cta" href="/trust/contact" onClick={(e) => { e.preventDefault(); routeTo('trust', 'contact'); }}>Talk to us <span aria-hidden="true">→</span></a>
-          <button className="tsx-nav-burger" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(o => !o)}>
+          <Link prefetch={false} className="tsx-nav-cta" href="/trust/contact" >Talk to us <span aria-hidden="true">→</span></Link>
+          <button ref={burgerRef} aria-controls="trust-mobile-menu" className="tsx-nav-burger" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(o => !o)}>
             <span className={"tsx-burger-icon" + (menuOpen ? ' is-open' : '')}><i /><i /></span>
           </button>
         </div>
       </div>
       {menuOpen && <div className="tsx-nav-backdrop" aria-hidden="true" onClick={() => setMenuOpen(false)} />}
-      <div
+      <div ref={sheetRef} id="trust-mobile-menu" inert={!menuOpen}
         className={"tsx-nav-sheet" + (menuOpen ? ' is-open' : '')}
         role="dialog" aria-label="Menu" aria-hidden={!menuOpen}
         onTouchStart={onSheetTouchStart}
@@ -107,16 +124,16 @@ function TrustNav({ page, detail }: TrustNavProps) {
         <div className="tsx-nav-sheet-handle" aria-hidden="true" />
         <nav className="tsx-nav-sheet-links" aria-label="Primary mobile">
           {DATA.nav.map((item) => (
-            <a key={item.page} className={"tsx-nav-sheet-row" + (page === item.page ? ' active' : '')} href={`/trust/${item.page}`} onClick={(e) => { e.preventDefault(); setMenuOpen(false); routeTo('trust', item.page); }}>
+            <Link prefetch={false} key={item.page} className={"tsx-nav-sheet-row" + (page === item.page ? ' active' : '')} href={`/trust/${item.page}`} onClick={()=>setMenuOpen(false)}>
               <span className="tsx-sheet-label">{getTrustNavLabel(item)}</span>
               <span className="tsx-sheet-desc">{TRUST_SHEET_DESCS[item.page]}</span>
-            </a>
+            </Link>
           ))}
         </nav>
         <div className="tsx-nav-sheet-footer">
-          <a className="tsx-nav-sheet-cta" href="/trust/contact" onClick={(e) => { e.preventDefault(); setMenuOpen(false); routeTo('trust', 'contact'); }}>
+          <Link prefetch={false} className="tsx-nav-sheet-cta" href="/trust/contact" onClick={()=>setMenuOpen(false)}>
             Start a Project <span className="arr" aria-hidden="true">→</span>
-          </a>
+          </Link>
         </div>
       </div>
     </header>

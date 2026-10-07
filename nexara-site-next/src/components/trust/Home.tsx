@@ -16,6 +16,7 @@ if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 export function TrustManifesto() {
   const wrapRef = React.useRef<HTMLElement | null>(null);
   React.useEffect(() => {
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     const el = wrapRef.current;
     if (!el) return;
     const textEl = el.querySelector(".tsx-manifesto-text");
@@ -67,6 +68,7 @@ export function TrustDivisionsRail() {
   const tickRef = React.useRef<HTMLSpanElement | null>(null);
 
   React.useEffect(() => {
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     if (!wrapRef.current || !trackRef.current) return;
     const track = trackRef.current;
     const wrap = wrapRef.current;

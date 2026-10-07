@@ -1,5 +1,7 @@
 'use client';
 import React from 'react';
+import Link from 'next/link';
+import { routePath } from '@/lib/seo';
 import { DATA } from '@/lib/data';
 import { routeTo } from '@/lib/neo-router';
 const { useState } = React;
@@ -39,31 +41,31 @@ function Nav({ theme, page, detail }: NavProps) {
   const [hoveredPage, setHoveredPage] = useState<string | null>(null);
   return (
     <header className="nav">
-      <a className="logo" href="/" onClick={(e) => { e.preventDefault(); routeTo(null as unknown as string, 'gateway'); }} aria-label="Nexara home"
+      <Link prefetch={false} className="logo" href="/"  aria-label="Nexara home"
         style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <img src="/brand/nexara-mark.svg" alt="" style={{ height: 28, display: 'block', filter: 'drop-shadow(0 0 7px rgba(160,200,255,.5))' }} />
         Nexara
-      </a>
+      </Link>
       <nav onMouseLeave={() => setHoveredPage(null)}>
         {DATA.nav.map((item) => {
           const active = page === item.page;
           const lit = hoveredPage ? hoveredPage === item.page : active;
           return (
-            <a
+            <Link prefetch={false}
               key={item.page}
               className={`${active ? 'active' : ''}${!active && hoveredPage === item.page ? ' hover-lit' : ''}`}
               href={theme ? `/${theme}/${item.page}` : `/trust/${item.page}`}
-              onClick={(e) => { e.preventDefault(); routeTo(theme, item.page); }}
+
               onMouseEnter={() => setHoveredPage(item.page)}
             >
               {item.label}
-            </a>
+            </Link>
           );
         })}
       </nav>
       <div className="theme-pill">
-        <a className={theme === "neo" ? "active" : ""} href={detail ? `/neo/${page}/${detail}` : `/neo/${page}`} onClick={(e) => { e.preventDefault(); routeTo("neo", page, detail); }}>Neo</a>
-        <a className={theme === "trust" ? "active" : ""} href={detail ? `/trust/${page}/${detail}` : `/trust/${page}`} onClick={(e) => { e.preventDefault(); routeTo("trust", page, detail); }}>Trust</a>
+        <Link prefetch={false} className={theme === "neo" ? "active" : ""} href={routePath("neo",page,detail)} >Neo</Link>
+        <Link prefetch={false} className={theme === "trust" ? "active" : ""} href={routePath("trust",page,detail)} >Trust</Link>
       </div>
     </header>
   );
@@ -88,11 +90,11 @@ function BreadcrumbBar({ page, detail }: BreadcrumbBarProps) {
 function SubNav({ theme, section, active }: SubNavProps) {
   return (
     <nav className="subnav" aria-label="Section navigation">
-      <button className={!active ? "active" : ""} onClick={() => routeTo(theme, section.id)}>Overview</button>
+      <Link prefetch={false} className={!active ? "active" : ""} href={`/${theme}/${section.id}`}>Overview</Link>
       {section.subpages.map((item) => (
-        <button key={item.slug} className={active?.slug === item.slug ? "active" : ""} onClick={() => routeTo(theme, section.id, item.slug)}>
+        <Link prefetch={false} key={item.slug} className={active?.slug === item.slug ? "active" : ""} href={`/${theme}/${section.id}/${item.slug}`}>
           {item.title}
-        </button>
+        </Link>
       ))}
     </nav>
   );

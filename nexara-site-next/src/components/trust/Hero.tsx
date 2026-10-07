@@ -3,6 +3,9 @@
 // changing animation timing. Revisit during a dedicated animation-code pass, not
 // as a rushed tail-end of this decomposition.
 'use client';
+import HeroIntro from '../HeroIntro';
+import InternshipOverview from '../InternshipOverview';
+import { HeroLighting } from '../ui/motion-primitives';
 import React from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -576,6 +579,7 @@ export function TrustHeroUnravel() {
     }
 
     let W = 0, H = 0, CX = 0, CY = 0, SCALE = 1;
+    let wordmarkGeometry = null;
 
     // Offscreen trail layer: particles + silk trails accumulate here so the
     // labels, rings, and core on the main canvas stay crisp every frame.
@@ -583,6 +587,7 @@ export function TrustHeroUnravel() {
     const tctx = trailCanvas.getContext('2d');
 
     function measure() {
+      wordmarkGeometry = null;
       const dpr = lowPower ? 1 : Math.min(window.devicePixelRatio || 1, 1.35);
       W = canvas.clientWidth; H = canvas.clientHeight;
       canvas.width = Math.round(W * dpr);
@@ -620,7 +625,7 @@ export function TrustHeroUnravel() {
       // Keep the unlit wordmark legible and premium. The strike still creates a
       // clear lift to white, but the resting state no longer reads as disabled.
       const r = Math.round(164 + 80 * lit), g = Math.round(195 + 53 * lit), b = Math.round(230 + 25 * lit);
-      el.style.color = `rgba(${r},${g},${b},${(0.68 + 0.32 * lit).toFixed(2)})`;
+      el.style.color = `rgba(${r},${g},${b},${(0.82 + 0.18 * lit).toFixed(2)})`;
       const glow = lit * 0.32 + prox * 0.9;
       el.style.textShadow = `0 0 ${(20 + prox * 22).toFixed(0)}px rgba(168, 200, 224,${glow.toFixed(2)})`
         + (prox > 0.02 ? `,0 0 ${(74 * prox).toFixed(0)}px rgba(102, 160, 204,${(prox * 0.6).toFixed(2)})` : '');
@@ -630,12 +635,13 @@ export function TrustHeroUnravel() {
       const leftPct = -14 + 118 * bp;
       beamEl.style.left = leftPct + '%';
       beamEl.style.opacity = (bp > 0.002 && bp < 0.998) ? '0.95' : '0';
-      const wmRect = titleRef.current.getBoundingClientRect();
+      if(!wordmarkGeometry)wordmarkGeometry={title:titleRef.current.getBoundingClientRect(),beamWidth:beamEl.offsetWidth,letters:titleSpans.map(el=>el.getBoundingClientRect())};
+      const wmRect = wordmarkGeometry.title;
       if (!wmRect.width) return;
-      const halfPct = (beamEl.offsetWidth / 2) / wmRect.width * 100;
+      const halfPct = (wordmarkGeometry.beamWidth / 2) / wmRect.width * 100;
       const beamCx = wmRect.left + wmRect.width * (leftPct + halfPct) / 100;
       titleSpans.forEach((el, i) => {
-        const r = el.getBoundingClientRect();
+        const r = wordmarkGeometry.letters[i];
         const reach = cl((beamCx - (r.left - 12)) / (r.width + 24));
         if (reach > litArr[i]) litArr[i] = reach;
         const prox = Math.max(0, 1 - Math.abs(beamCx - (r.left + r.width / 2)) / (r.width * 0.9));
@@ -690,7 +696,8 @@ export function TrustHeroUnravel() {
     let lastFrame = 0;
     let idleFrames = 0;
     let strikeComplete = false;
-    const frameInterval = 1000 / (lowPower ? 24 : 30);
+    let previousDraw = 0;
+    const frameInterval = 1000 / (lowPower ? 30 : 60);
     let st;
 
     if (!prefersReducedMotion) {
@@ -705,7 +712,7 @@ export function TrustHeroUnravel() {
         }
       });
     } else {
-      state.target = 0.95;
+      state.target = 0;
       wrapRef.current.style.height = "100svh";
     }
 
@@ -714,7 +721,7 @@ export function TrustHeroUnravel() {
       mouse.ty = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
       ensureRender();
     };
-    if (isDesktop && !lowPower) {
+    if (isDesktop && !lowPower && !prefersReducedMotion) {
       window.addEventListener("mousemove", onMouseMove, { passive: true });
     }
 
@@ -730,8 +737,10 @@ export function TrustHeroUnravel() {
         return;
       }
       lastFrame = now;
-      const time = (now - t0) / 1000;
-      state.p += (state.target - state.p) * (lowPower ? 0.32 : 0.22);
+      const delta = Math.min(50, now - (previousDraw || now - 16.7)) / 1000;
+      previousDraw = now;
+      const time = prefersReducedMotion ? 0 : (now - t0) / 1000;
+      state.p += (state.target - state.p) * (1 - Math.exp(-18 * delta));
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
       mouse.x += (mouse.tx - mouse.x) * 0.15;
       mouse.y += (mouse.ty - mouse.y) * 0.15;
@@ -820,6 +829,7 @@ export function TrustHeroUnravel() {
       // Core (always topmost)
       drawCore(ci, time);
 
+      canvas.dataset.renderMode=prefersReducedMotion?'reduced':'interactive';
       const stillMoving = Math.abs(state.target - state.p) > 0.0008
         || (!lowPower && Math.abs(mouse.tx - mouse.x) > 0.002)
         || (!lowPower && Math.abs(mouse.ty - mouse.y) > 0.002);
@@ -855,14 +865,17 @@ export function TrustHeroUnravel() {
       const top = rect.top + window.scrollY + mid * (rect.height - window.innerHeight);
       window.scrollTo({ top, behavior: "smooth" });
     };
-    dots.forEach((d, i) => {
-      d.addEventListener("click", () => handleDotClick(i));
-    });
+    const dotHandlers = dots.map((dot,index)=>{const handler=()=>handleDotClick(index);dot.addEventListener('click',handler);return {dot,handler};});
+    const onVisibility=()=>{if(document.hidden){cancelAnimationFrame(rafId);rafId=0;canvas.dataset.renderMode='paused';}else{previousDraw=0;ensureRender();}};
+    document.addEventListener('visibilitychange',onVisibility);
 
     return () => {
       cancelAnimationFrame(rafId);
       window.clearTimeout(resizeTimer);
       io.disconnect();
+      document.removeEventListener('visibilitychange',onVisibility);
+      dotHandlers.forEach(({dot,handler})=>dot.removeEventListener('click',handler));
+      delete canvas.dataset.renderMode;
       window.removeEventListener("resize", onResize);
       window.removeEventListener("mousemove", onMouseMove);
       if (st) st.kill();
@@ -871,7 +884,7 @@ export function TrustHeroUnravel() {
 
   return (
     <div ref={wrapRef} className="tsx-hero-runway" style={{ height: '600vh' }}>
-      <div className="tsx-hero-stage">
+      <div className="tsx-hero-stage" data-hero-surface><HeroLighting />
         <canvas ref={canvasRef} className="tsx-hero-canvas" aria-hidden="true" />
 
         <div className="tsx-hero-chapter" data-from="0" data-to="0.07">
@@ -880,6 +893,7 @@ export function TrustHeroUnravel() {
             <span>N</span><span>E</span><span>X</span><span>A</span><span>R</span><span>A</span>
             <i className="tsx-wordmark-beam" aria-hidden="true"></i>
           </h1>
+          <HeroIntro theme="trust" />
         </div>
 
         <div className="tsx-hero-chapter" data-from="0.125" data-to="0.225" aria-hidden="true">

@@ -11,3 +11,5 @@ routes = [
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
+# Next.js owns redirects; keep public legal files at their declared canonical URLs.
+html_handling = "none"

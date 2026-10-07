@@ -59,6 +59,7 @@ interface HomeIntakeCTAProps {
 function NeoManifesto() {
   const wrapRef = React.useRef<HTMLElement>(null);
   React.useEffect(() => {
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     const el = wrapRef.current;
     if (!el) return;
     const textEl = el.querySelector<HTMLElement>(".neo-manifesto-text");
@@ -109,6 +110,7 @@ function NeoDivisionsRail() {
   const progressRef = React.useRef<HTMLElement>(null);
 
   React.useEffect(() => {
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     if (!wrapRef.current || !trackRef.current) return;
     const track = trackRef.current;
     const wrap = wrapRef.current;

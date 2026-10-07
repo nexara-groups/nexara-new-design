@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { Tilt } from '../ui/motion-primitives';
 import ReactDOM from 'react-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { DATA } from '@/lib/data';
@@ -727,13 +728,13 @@ export function ModuleCard({ theme, eyebrow, title, children, visualTitle = null
   const isClickable = onClick !== null;
 
   return (
-    <motion.article 
+    <Tilt as={isClickable ? "button" : "article"} type={isClickable ? "button" : undefined}
       className={`${className} spotlight-card ${isClickable ? 'clickable-card' : ''}`} 
       onMouseMove={handleMouseMove}
       onClick={onClick || undefined}
       style={isClickable ? { cursor: "pointer" } : undefined}
       variants={CARD_MOTION}
-      initial={reduceMotion ? false : "hidden"}
+      initial={false}
       whileInView="show"
       viewport={{ once: true, amount: 0.24 }}
       whileTap={reduceMotion || !isClickable ? undefined : { scale: 0.985 }}
@@ -750,7 +751,7 @@ export function ModuleCard({ theme, eyebrow, title, children, visualTitle = null
           </div>
         )}
       </div>
-    </motion.article>
+    </Tilt>
   );
 }
 

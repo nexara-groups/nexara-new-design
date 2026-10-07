@@ -473,6 +473,12 @@ export const DATA = {
     },
   },
   contact: {
+    phone: { display: '9257535757', href: 'tel:+919257535757' },
+    address: {
+      street: 'First Floor, 1-83-14, MVP Sector 3, Sector 4, Sector 3, MVP Colony',
+      city: 'Visakhapatnam, Andhra Pradesh 530017',
+      mapsHref: 'https://www.google.com/maps/search/?api=1&query=Nexara+Private+Limited+1-83-14+MVP+Colony+Visakhapatnam+530017',
+    },
     neo: {
       eyebrow: "LET'S BUILD",
       title: "We work with builders. Start here.",

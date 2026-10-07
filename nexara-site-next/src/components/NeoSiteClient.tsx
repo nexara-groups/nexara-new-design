@@ -1,13 +1,14 @@
 'use client';
 import React from 'react';
+import LocalContext from './LocalContext';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import * as THREE from 'three';
+import dynamic from 'next/dynamic';
 // Was registered once, globally, in the old app's main.jsx entry point — Next.js's
 // App Router has no equivalent single entry point, and no file here re-registered
 // it, so ScrollTrigger.create() threw "_context is not a function" at runtime.
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
-if (typeof window !== 'undefined') Object.assign(window, { THREE, gsap, ScrollTrigger });
+if (typeof window !== 'undefined') Object.assign(window, { gsap, ScrollTrigger });
 import { DATA } from '@/lib/data';
 import { STATIC_PAGES, HAS_SCROLL_ANIMATION } from '@/lib/shared';
 import { useRouter } from 'next/navigation';
@@ -17,13 +18,15 @@ import { Nav, BreadcrumbBar } from './neo/Nav';
 import { Home } from './neo/Home';
 import { SectionPage } from './neo/SectionShell';
 import { Customers, Company, Contact } from './neo/StaticPages';
-import { NeoGuide } from './neo/Guide';
+const NeoGuide = dynamic(()=>import('./neo/Guide').then(module=>module.NeoGuide),{ssr:false});
 import { Footer } from './neo/Footer';
 
 function Site({ theme, page, detail }: { theme: 'trust' | 'neo'; page: string; detail: string | null }) {
   const router = useRouter();
   React.useEffect(() => { setNeoRouter(router); }, [router]);
   const isNeo = theme === "neo";
+  const [guideReady,setGuideReady]=React.useState(false);
+  React.useEffect(()=>{const timer=setTimeout(()=>setGuideReady(true),900);return()=>clearTimeout(timer);},[]);
   const section = (DATA.sections as Record<string, typeof DATA.sections.academy>)[page];
   React.useEffect(() => { window.scrollTo(0, 0); }, [theme, page]);
   const validPage = section || STATIC_PAGES.includes(page);
@@ -41,7 +44,8 @@ function Site({ theme, page, detail }: { theme: 'trust' | 'neo'; page: string; d
         {page === "contact" && <Contact theme={theme} detail={detail} />}
         {!validPage && <NotFound theme={theme} page={page} />}
       </div>
-      {isNeo && HAS_SCROLL_ANIMATION && <NeoGuide key={`${page}-${detail || "root"}`} />}
+      {guideReady && isNeo && HAS_SCROLL_ANIMATION && <NeoGuide key={`${page}-${detail || "root"}`} />}
+      <LocalContext theme={theme} page={page} detail={detail} />
       <Footer theme={theme} />
     </div>
   );

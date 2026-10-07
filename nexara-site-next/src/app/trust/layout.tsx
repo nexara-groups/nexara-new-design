@@ -1,3 +1,5 @@
+import '@/styles/trust.css';
+import '@/styles/trust-refinements.css';
 import CookieConsent from '@/components/CookieConsent';
 
 export default function TrustLayout({ children }: { children: React.ReactNode }) {

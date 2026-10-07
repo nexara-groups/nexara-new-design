@@ -1,5 +1,8 @@
 'use client';
 import React from 'react';
+import Link from 'next/link';
+import FooterContact from '../FooterContact';
+import { routePath } from '@/lib/seo';
 import { DATA } from '@/lib/data';
 import { routeTo } from '@/lib/trust-router';
 import { openCookiePreferences } from '../CookieConsent';
@@ -224,7 +227,7 @@ export function TrustFooter() {
                   <span className="tsx-footer-group-label">{group.label}</span>
                   <ul className="tsx-footer-links">
                     {group.links.map(l => (
-                      <li key={l.text}><button onClick={() => routeTo('trust', l.page, l.detail)}>{l.text}</button></li>
+                      <li key={l.text}><Link prefetch={false} href={routePath('trust',l.page,l.detail)}>{l.text}</Link></li>
                     ))}
                   </ul>
                 </div>
@@ -232,13 +235,14 @@ export function TrustFooter() {
             ) : (
               <ul className="tsx-footer-links">
                 {col.links.map(l => (
-                  <li key={l.text}><button onClick={() => routeTo('trust', l.page, l.detail)}>{l.text}</button></li>
+                  <li key={l.text}><Link prefetch={false} href={routePath('trust',l.page,l.detail)}>{l.text}</Link></li>
                 ))}
               </ul>
             )}
           </div>
         ))}
       </div>
+      <div className="tsx-footer-contact-row"><FooterContact /></div>
       <div className="tsx-footer-bottom">
         <p className="tsx-footer-copyright">© 2026 Nexara Private Limited (Nexara Groups). All rights reserved.</p>
         <nav className="tsx-footer-legal" aria-label="Legal">

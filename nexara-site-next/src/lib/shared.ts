@@ -39,7 +39,7 @@ function getBriefSections() {
   ];
 }
 
-function buildBriefText(sections, formData) {
+function buildBriefText(sections, formData, generatedOn = '') {
   return `NEXARA PROJECT SCOPE
 --------------------------------------------------
 Engagement Section: ${sections.find(s => s.id === formData.section)?.name || formData.section}
@@ -50,8 +50,7 @@ Current Assets/Tools: ${formData.context || "None/Not specified"}
 Primary Success Metric: ${formData.successMetric || "Not specified"}
 Decision-Maker Name: ${formData.name || "Not specified"}
 Contact Email: ${formData.email || "Not specified"}
---------------------------------------------------
-Generated on: ${new Date().toLocaleDateString()}`;
+--------------------------------------------------${generatedOn ? '\nGenerated on: ' + generatedOn : ''}`;
 }
 
 function buildBriefMailto(sections, formData, briefText) {
@@ -64,6 +63,8 @@ function useBriefForm(detail, options = {}) {
   const sections = useMemo(() => getBriefSections(), []);
   const initialSection = detail && sections.some(s => s.id === detail) ? detail : "home";
   const [showSuccess, setShowSuccess] = useState(false);
+  const [generatedOn,setGeneratedOn] = useState('');
+  useEffect(()=>setGeneratedOn(new Date().toISOString().slice(0,10)),[]);
   const [formData, setFormData] = useState({
     section: initialSection,
     city: "Visakhapatnam",
@@ -95,7 +96,7 @@ function useBriefForm(detail, options = {}) {
     }
   };
 
-  const briefText = buildBriefText(sections, formData);
+  const briefText = buildBriefText(sections, formData, generatedOn);
   const mailtoUrl = buildBriefMailto(sections, formData, briefText);
   const handleSubmit = (event) => {
     event.preventDefault();

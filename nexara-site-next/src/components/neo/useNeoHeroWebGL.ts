@@ -7,7 +7,7 @@ import * as THREE from 'three';
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
-type HeroRefs = {
+export type HeroRefs = {
   wrapRef: RefObject<HTMLDivElement | null>;
   canvasRef: RefObject<HTMLCanvasElement | null>;
   titleRef: RefObject<HTMLHeadingElement | null>;
@@ -303,7 +303,7 @@ class NeoHeroRenderer {
       antialias: false,
       depth: false,
       stencil: false,
-      powerPreference: 'high-performance',
+      powerPreference: lowPower ? 'low-power' : 'high-performance',
       premultipliedAlpha: true,
     });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -358,8 +358,8 @@ class NeoHeroRenderer {
     this.width = Math.max(1, Math.round(width));
     this.height = Math.max(1, Math.round(height));
     const nativeDpr = window.devicePixelRatio || 1;
-    const dprCap = this.lowPower ? 1 : 1.75;
-    const pixelBudget = this.lowPower ? 1_600_000 : 5_200_000;
+    const dprCap = this.lowPower ? 1 : 1.5;
+    const pixelBudget = this.lowPower ? 1_600_000 : 3_600_000;
     const budgetDpr = Math.sqrt(pixelBudget / Math.max(1, this.width * this.height));
     const effectiveDpr = Math.max(0.7, Math.min(nativeDpr, dprCap, budgetDpr)) * this.quality;
     const scale = Math.min(this.width, this.height) * 0.305;
@@ -461,6 +461,7 @@ export function useNeoHeroWebGL({
     const state = { current: 0, target: 0 };
     const mouse = { currentX: 0, currentY: 0, targetX: 0, targetY: 0 };
     let activeChapter = -1;
+    let lastDomProgress = -1;
     let engine: NeoHeroRenderer | null = null;
     let rafId = 0;
     let ambientTimerId = 0;
@@ -476,6 +477,8 @@ export function useNeoHeroWebGL({
     let renderSampleCount = 0;
 
     const updateChapters = (progress: number): void => {
+      if(Math.abs(progress-lastDomProgress)<0.0001)return;
+      lastDomProgress=progress;
       chapters.forEach((chapter, index) => {
         const opacity = opacityForAnchoredChapter(progress, index, chapterAnchors);
         const visible = opacity > 0.01;
@@ -522,7 +525,7 @@ export function useNeoHeroWebGL({
 
     const ensureRender = (): void => {
       cancelAmbientTimer();
-      if (engine && heroVisible && !contextLost && !document.hidden && !rafId) {
+      if (heroVisible && !contextLost && !document.hidden && !rafId) {
         rafId = window.requestAnimationFrame(renderFrame);
       }
     };
@@ -532,12 +535,12 @@ export function useNeoHeroWebGL({
       ambientTimerId = window.setTimeout(() => {
         ambientTimerId = 0;
         ensureRender();
-      }, lowPower ? 40 : 33);
+      }, lowPower ? 100 : 66);
     };
 
     const renderFrame = (now: number): void => {
       rafId = 0;
-      if (!engine || !heroVisible || contextLost || document.hidden) return;
+      if (!heroVisible || contextLost || document.hidden) return;
       const deltaMs = lastFrame ? Math.min(50, now - lastFrame) : 16.7;
       const deltaSeconds = deltaMs / 1000;
       lastFrame = now;
@@ -558,7 +561,7 @@ export function useNeoHeroWebGL({
       // two layers to stop in visibly different states.
       updateChapters(state.current);
 
-      engine.render({
+      engine?.render({
         progress: state.current,
         time: activeTime,
         mouseX: mouse.currentX,
@@ -584,7 +587,7 @@ export function useNeoHeroWebGL({
         if (frameEma > 20.5) quality = Math.max(0.72, quality - 0.08);
         else if (frameEma < 17.25) quality = Math.min(1, quality + 0.04);
         if (quality !== previousQuality) {
-          engine.setQuality(quality);
+          engine?.setQuality(quality);
           lastQualityChange = now;
         }
         frameSamples = 0;
@@ -614,8 +617,8 @@ export function useNeoHeroWebGL({
     canvas.addEventListener('webglcontextrestored', onContextRestored, false);
 
     try {
-      engine = new NeoHeroRenderer(canvas, lowPower);
-      wrap.classList.add('neo-webgl-ready');
+      if (!reducedMotion) engine = new NeoHeroRenderer(canvas, lowPower);
+      wrap.classList.add(engine ? 'neo-webgl-ready' : 'neo-webgl-fallback');
       resize();
     } catch (error) {
       console.error('Neo hero WebGL initialization failed; using static fallback.', error);
@@ -624,8 +627,8 @@ export function useNeoHeroWebGL({
 
     updateChapters(0);
     let scrollTrigger: ScrollTrigger | null = null;
-    if (reducedMotion) {
-      state.target = 0.95;
+    if (reducedMotion || !engine) {
+      state.target = 0;
       state.current = state.target;
       wrap.style.height = '100svh';
       updateChapters(state.target);
@@ -659,7 +662,7 @@ export function useNeoHeroWebGL({
       mouse.targetY = (event.clientY - window.innerHeight / 2) / Math.max(1, window.innerHeight / 2);
       ensureRender();
     };
-    if (!lowPower) window.addEventListener('mousemove', onMouseMove, { passive: true });
+    if (!lowPower && !reducedMotion) window.addEventListener('mousemove', onMouseMove, { passive: true });
 
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       heroVisible = Boolean(entry?.isIntersecting);
@@ -699,7 +702,7 @@ export function useNeoHeroWebGL({
         const midpoint = chapter.from === 0 ? 0 : (chapter.from + chapter.to) / 2;
         const rect = wrap.getBoundingClientRect();
         const top = rect.top + window.scrollY + midpoint * (rect.height - window.innerHeight);
-        window.scrollTo({ top, behavior: 'smooth' });
+        window.scrollTo({ top, behavior: reducedMotion ? 'auto' : 'smooth' });
       };
       dot.addEventListener('click', handler);
       return { dot, handler };

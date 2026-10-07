@@ -3,13 +3,17 @@
 // changing animation timing. Revisit during a dedicated animation-code pass, not
 // as a rushed tail-end of this decomposition.
 'use client';
+import HeroIntro from '../HeroIntro';
+import InternshipOverview from '../InternshipOverview';
+import { HeroLighting } from '../ui/motion-primitives';
 import React from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HAS_SCROLL_ANIMATION } from '@/lib/shared';
 import { routeTo } from '@/lib/neo-router';
 import { Sparkles } from './Guide';
-import { useNeoHeroWebGL } from './useNeoHeroWebGL';
+import dynamic from 'next/dynamic';
+const NeoHeroController=dynamic(()=>import('./NeoHeroController'),{ssr:false});
 
 // See trust/Hero.tsx for why this is repeated per-file rather than centralized.
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
@@ -347,27 +351,20 @@ function NeoHeroUnravel({ copy, theme }: NeoHeroUnravelProps) {
   const counterBarRef = React.useRef(null);
   const scrollCueRef = React.useRef(null);
 
-  useNeoHeroWebGL({
-    wrapRef,
-    canvasRef,
-    titleRef,
-    counterNumRef,
-    counterBarRef,
-    scrollCueRef,
-  });
 
   return (
     <div ref={wrapRef} className="neo-hero-runway">
-      <div className="neo-hero-stage">
+      <div className="neo-hero-stage" data-hero-surface><HeroLighting />
         <canvas ref={canvasRef} className="neo-hero-canvas" aria-hidden="true" />
+        <NeoHeroController wrapRef={wrapRef} canvasRef={canvasRef} titleRef={titleRef} counterNumRef={counterNumRef} counterBarRef={counterBarRef} scrollCueRef={scrollCueRef} />
 
         {/* Chapters Overlays */}
-        <div className="neo-hero-chapter" data-from="0" data-to="0.07">
+        <div className="neo-hero-chapter" style={{opacity:1,pointerEvents:"auto"}} data-from="0" data-to="0.07">
           <p className="kicker">An engineering company</p>
           <h1 ref={titleRef} className="neo-hero-title" aria-label="Nexara">
             <span>N</span><span>E</span><span>X</span><span>A</span><span>R</span><span>A</span>
           </h1>
-          <p className="hero-sub">Scroll to unravel</p>
+          <HeroIntro theme="neo" />
         </div>
 
         <div className="neo-hero-chapter" data-from="0.125" data-to="0.225" aria-hidden="true">

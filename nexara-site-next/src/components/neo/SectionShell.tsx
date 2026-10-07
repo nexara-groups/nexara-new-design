@@ -1,4 +1,9 @@
 'use client';
+import HeroIntro from '../HeroIntro';
+import InternshipOverview from '../InternshipOverview';
+import Link from 'next/link';
+import { routePath } from '@/lib/seo';
+import { HeroLighting } from '../ui/motion-primitives';
 import React from 'react';
 import type { Variants } from 'framer-motion';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -426,11 +431,14 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
       resizeTimer = window.setTimeout(() => { measure(); ensureRender(); }, 120);
     };
     window.addEventListener("resize", onResize, { passive: true });
+    const onVisibility=()=>{if(document.hidden){cancelAnimationFrame(rafId);rafId=0;}else ensureRender();};
+    document.addEventListener('visibilitychange',onVisibility);
 
     return () => {
       cancelAnimationFrame(rafId);
       window.clearTimeout(resizeTimer);
       io.disconnect();
+      document.removeEventListener('visibilitychange',onVisibility);
       window.removeEventListener("resize", onResize);
       if (st) st.kill();
     };
@@ -440,7 +448,7 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
 
   return (
     <div ref={wrapRef} className="neo-hero-runway" style={{ height: '260vh' }}>
-      <div className="neo-hero-stage">
+      <div className="neo-hero-stage" data-hero-surface><HeroLighting />
         <canvas ref={canvasRef} className="neo-hero-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
         <div className="neo-hero-chapter" style={{ opacity: 1, pointerEvents: 'auto' }}>
           <p className="kicker">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {section.name.toUpperCase()}</p>
@@ -477,7 +485,7 @@ function SectionPage({ theme, section, detail }: SectionPageProps) {
   const isNeo = theme === "neo";
   return (
     <main>
-      {isNeo ? (
+      {active ? <NeoDetailHero theme={theme} section={section} page={active} /> : isNeo ? (
         <NeoSectionHeroUnravel theme={theme} section={section} />
       ) : section.id === "academy" ? (
         <AcademyHero theme={theme} section={section} />
@@ -501,12 +509,21 @@ function SectionPage({ theme, section, detail }: SectionPageProps) {
           <MarketingFunnelSection />
         </>
       )}
+      {active?.slug === "internships" && <InternshipOverview theme={theme} />}
       <SubNav theme={theme} section={section} active={active} />
       <div key={active?.slug || "overview"} className="section-content-enter">
         {active ? <SubpageDetail theme={theme} section={section} page={active} /> : <SectionOverview theme={theme} section={section} />}
       </div>
     </main>
   );
+}
+
+function NeoDetailHero({theme,section,page}:SubpageDetailProps) {
+ const internship=page.slug==='internships';
+ return <section className="neo-hero-runway neo-hero-runway--detail"><div className="neo-hero-stage" data-hero-surface><HeroLighting/><div className="neo-hero-chapter" style={{opacity:1,pointerEvents:'auto'}}>
+ <p className="kicker">{section.name} / {page.title}</p><h1 className="ch-name">{internship?'Software internships in Vizag & Visakhapatnam':page.title}</h1><p className="lede">{voice(theme,page.callout)}</p>
+ <div className="hero-intro__links"><Link prefetch={false} href={routePath(theme,'contact',section.id)}>{internship?'Discuss your internship':'Start a project'} →</Link><Link prefetch={false} href={routePath(theme,section.id)}>Explore {section.name} →</Link></div>
+ </div></div></section>;
 }
 
 interface MarketContextProps {
@@ -689,7 +706,7 @@ function StackDetails({ theme, section }: StackDetailsProps) {
             className="stack-detail-card"
             key={item.title}
             variants={CARD_MOTION}
-            initial={reduceMotion ? false : "hidden"}
+            initial={false}
             whileInView="show"
             viewport={{ once: true, amount: 0.28 }}
             whileTap={reduceMotion ? undefined : { scale: 0.985 }}

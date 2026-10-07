@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { runVisibleAnimation } from '@/lib/animation';
 
 export function TrustParticleCanvas() {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -13,8 +14,7 @@ export function TrustParticleCanvas() {
     const BG = '#081726', LINE = 'rgba(143, 187, 221,', DOT = 'rgba(143, 187, 221,1)';
     const MAX_DIST = 150;
     let W: number, H: number, particles: any[], raf: number;
-    let lastFrame = 0;
-    const frameInterval = 1000 / 30;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Mouse proximity tracking state
     const mouse: { x: number | null; y: number | null } = { x: null, y: null };
@@ -45,11 +45,6 @@ export function TrustParticleCanvas() {
       particles = Array.from({ length: count }, () => new (Particle as any)());
     }
     function draw(now = performance.now()) {
-      if (now - lastFrame < frameInterval) {
-        raf = canvasVisible ? requestAnimationFrame(draw) : 0;
-        return;
-      }
-      lastFrame = now;
       ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
       for (let i = 0; i < particles.length; i++) {
         const a = particles[i];
@@ -83,24 +78,12 @@ export function TrustParticleCanvas() {
 
       ctx.fillStyle = DOT;
       for (let i = 0; i < particles.length; i++) {
-        const p = particles[i]; p.update();
+        const p = particles[i]; if(!reduced) p.update();
         ctx.globalAlpha = 0.55; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
       }
       ctx.globalAlpha = 1;
-      raf = canvasVisible ? requestAnimationFrame(draw) : 0;
-    }
 
-    let canvasVisible = true;
-    const visObs = new IntersectionObserver(([e]: IntersectionObserverEntry[]) => {
-      canvasVisible = e!.isIntersecting;
-      if (canvasVisible && !raf) { raf = requestAnimationFrame(draw); }
-    }, { threshold: 0 });
-    visObs.observe(canvas);
-    const onVisChange = () => {
-      if (document.hidden) { cancelAnimationFrame(raf); raf = 0; }
-      else if (canvasVisible) { raf = requestAnimationFrame(draw); }
-    };
-    document.addEventListener('visibilitychange', onVisChange);
+    }
 
     // Mouse event handlers
     const onMouseMove = (e: MouseEvent) => {
@@ -113,19 +96,18 @@ export function TrustParticleCanvas() {
       mouse.y = null;
     };
 
-    init(); draw();
+    init();
+    const stop = runVisibleAnimation(canvas,draw,{reducedMotion:reduced});
 
     canvas.addEventListener('mousemove', onMouseMove);
     canvas.addEventListener('mouseleave', onMouseLeave);
     let rt: ReturnType<typeof setTimeout>;
-    const onResize = () => { clearTimeout(rt); rt = setTimeout(() => { cancelAnimationFrame(raf); init(); draw(); }, 120); };
+    const onResize = () => { clearTimeout(rt); rt = setTimeout(() => { init(); draw(); }, 120); };
     window.addEventListener('resize', onResize);
 
     return () => {
-      cancelAnimationFrame(raf);
+      stop();
       clearTimeout(rt);
-      visObs.disconnect();
-      document.removeEventListener('visibilitychange', onVisChange);
       window.removeEventListener('resize', onResize);
       canvas.removeEventListener('mousemove', onMouseMove);
       canvas.removeEventListener('mouseleave', onMouseLeave);

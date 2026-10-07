@@ -19,7 +19,7 @@ function NeoObject() {
   return (
     <group ref={g} position={[0, 0.15, 0]}>
       <mesh>
-        <icosahedronGeometry args={[1, 8]} />
+        <icosahedronGeometry args={[1, 3]} />
         <MeshDistortMaterial color="#c8ff00" emissive="#c8ff00" emissiveIntensity={0.55}
           wireframe distort={0.5} speed={1.0} roughness={0.2} />
       </mesh>
@@ -27,9 +27,9 @@ function NeoObject() {
   );
 }
 
-export function NeoScene() {
+export function NeoScene({active=true}:{active?:boolean}) {
   return (
-    <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 4], fov: 45 }}
+    <Canvas frameloop={active ? "always" : "never"} dpr={[1, 1.25]} camera={{ position: [0, 0, 4], fov: 45 }}
       gl={{ alpha: true, antialias: false }} style={{ position: "absolute", inset: 0 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[3, 2, 4]} intensity={2.2} color="#c8ff00" />
@@ -61,9 +61,9 @@ function TrustObject() {
   );
 }
 
-export function TrustScene() {
+export function TrustScene({active=true}:{active?:boolean}) {
   return (
-    <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 4.2], fov: 45 }}
+    <Canvas frameloop={active ? "always" : "never"} dpr={[1, 1.25]} camera={{ position: [0, 0, 4.2], fov: 45 }}
       gl={{ alpha: true, antialias: false }} style={{ position: "absolute", inset: 0 }}>
       <TrustObject />
     </Canvas>
