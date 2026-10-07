@@ -9,4 +9,4 @@
 - [x] Apply approved elevation and responsive styles; integrate cards, heroes, internship content and crawlable Next links in existing components.
 - [x] Defer gateway WebGL until capable pointer/idle; bound geometry and DPR; pause hidden/offscreen work; fix Trust resume/cleanup and Neo reduced-motion/fallback chapter behavior.
 - [x] Run typecheck, unit tests, Next production build and OpenNext build. Check representative desktop/mobile/touch/reduced-motion/no-JavaScript routes and all-page HTTP metadata/contact/link/404 coverage.
-- [ ] Commit only Next.js changes on `codex/nexara-next-refinement`, deploy using the existing Next.js workflow after checks, and verify the live domain still serves Next.js and the new metadata/contact details.
+- [x] Commit only Next.js changes on `codex/nexara-next-refinement`, deploy using the existing Next.js workflow after checks, and verify the live domain still serves Next.js and the new metadata/contact details.

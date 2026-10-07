@@ -28,4 +28,13 @@ The existing Next.js App Router, both Trust and Neo presentations, Cloudflare Wo
 
 ## Deployment
 
-Use the existing `deploy-nexara-site-next.yml` workflow. After deployment, run the route verifier against `https://nexaragroups.com` and confirm the release still serves `/_next/` assets. Google indexing and rankings depend on subsequent crawling and external signals.
+Deployment completed through the existing `deploy-nexara-site-next.yml` workflow on `main`.
+
+- Application commit: `b07177d6f11b7e53615e552712b9dabf06c31601`.
+- Successful deployment: https://github.com/nexara-groups/nexara-new-design/actions/runs/37701669330
+- Cloudflare Worker version: `adbb01b4-832f-4bba-8216-ceae268330ce`.
+- Live verifier against `https://nexaragroups.com`: all 47 routes, 46 internal links, 24 sitemap URLs and 404/redirect/legal checks passed; pages serve `/_next/` assets.
+- Live Chrome confirmation: 8 cases, zero failures, contact hydration correct at all four widths, reduced motion correct, Neo hero idle rendering approximately 11.3 FPS and paused offscreen.
+- Local `main` and the existing preview URL on port 4273 now use the updated Next.js application.
+
+Google indexing and rankings depend on subsequent crawling and external signals.
