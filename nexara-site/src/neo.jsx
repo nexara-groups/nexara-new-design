@@ -11,6 +11,7 @@ import { voice, parseRoute, routeTo, useBriefForm, STATIC_PAGES, HAS_SCROLL_ANIM
 import { openCookiePreferences } from './CookieConsent.jsx';
 import ContactDetails from './ContactDetails.jsx';
 import LocalContext from './LocalContext.jsx';
+import FooterContact from './FooterContact.jsx';
 import { routePath } from './seo.js';
 import { HeroLighting, Tilt } from './components/ui/motion-primitives.jsx';
 import HeroIntro from './components/HeroIntro.jsx';
@@ -5549,17 +5550,18 @@ function Footer({ theme }) {
         <strong>Nexara</strong>
         <p>Academy, Digital Marketing and Labs. One company, two presentations.</p>
         <p>© 2026 Nexara Private Limited (Nexara Groups) · Visakhapatnam, India</p>
-        <div className="footer-contact"><a href={DATA.contact.phone.href}>{DATA.contact.phone.display}</a><a href={DATA.contact.address.mapsHref} target="_blank" rel="noopener noreferrer">Visakhapatnam office ↗</a></div>
-        <address className="footer-address">{DATA.contact.address.street}<br />{DATA.contact.address.city}</address>
+        <FooterContact />
       </div>
       <div>
         {Object.values(DATA.sections).map((s) => <button key={s.id} onClick={() => routeTo(theme, s.id)}>{s.name}</button>)}
         <button onClick={() => routeTo(theme, "company")}>Company</button>
         <button onClick={() => routeTo(theme, "contact")}>Contact</button>
-        <a href="/privacy-policy">Privacy</a>
-        <a href="/terms-of-service">Terms</a>
-        <a href="/cookie-policy">Cookies</a>
-        <a href="/data-deletion">Data Deletion</a>
+        <nav className="footer-legal" aria-label="Legal">
+          <a href="/privacy-policy">Privacy</a>
+          <a href="/terms-of-service">Terms</a>
+          <a href="/cookie-policy">Cookies</a>
+          <a href="/data-deletion">Data Deletion</a>
+        </nav>
         <button onClick={openCookiePreferences}>Cookie Preferences</button>
       </div>
     </footer>

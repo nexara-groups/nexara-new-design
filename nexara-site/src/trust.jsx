@@ -9,6 +9,7 @@ import { NotFound } from './notfound.jsx';
 import { openCookiePreferences } from './CookieConsent.jsx';
 import ContactDetails from './ContactDetails.jsx';
 import LocalContext from './LocalContext.jsx';
+import FooterContact from './FooterContact.jsx';
 import { routePath } from './seo.js';
 import { HeroLighting, Tilt } from './components/ui/motion-primitives.jsx';
 import HeroIntro from './components/HeroIntro.jsx';
@@ -1014,8 +1015,6 @@ function TrustFooter() {
             <img src="/brand/nexara-logo.svg" alt="Nexara" style={{ height: 40, display: 'block' }} />
           </button>
           <p className="tsx-footer-brand-desc">Enterprise IT capability programmes for talent, digital growth and applied automation.</p>
-          <div className="footer-contact"><a href={DATA.contact.phone.href}>{DATA.contact.phone.display}</a><a href={DATA.contact.address.mapsHref} target="_blank" rel="noopener noreferrer">Visakhapatnam office ↗</a></div>
-          <address className="footer-address">{DATA.contact.address.street}<br />{DATA.contact.address.city}</address>
         </div>
         {cols.map(col => (
           <div key={col.label}>
@@ -1041,6 +1040,7 @@ function TrustFooter() {
           </div>
         ))}
       </div>
+      <div className="tsx-footer-contact-row"><FooterContact /></div>
       <div className="tsx-footer-bottom">
         <p className="tsx-footer-copyright">© 2026 Nexara Private Limited (Nexara Groups). All rights reserved.</p>
         <nav className="tsx-footer-legal" aria-label="Legal">
