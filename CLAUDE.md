@@ -5,7 +5,6 @@
 | Directory | What |
 |-----------|------|
 | `nexara-site-next/` | **Active production site** — Next.js 15, App Router, OpenNext, Cloudflare Workers |
-| `nexara-site/` | Old Vite SPA — still on Cloudflare Pages but NOT serving nexaragroups.com |
 | `.github/workflows/` | CI — `deploy-nexara-site-next.yml` auto-deploys on push to main |
 
 ## Production
