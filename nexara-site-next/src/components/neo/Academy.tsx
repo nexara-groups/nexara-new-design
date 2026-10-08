@@ -71,7 +71,7 @@ export function AcademyHero({ theme, section }: AcademyHeroProps) {
       id: "books",
       label: theme === "neo" ? "01 / Skilling" : "1. Structured skilling",
       title: "Books & Tracks",
-      desc: theme === "neo" ? "Full-stack, AI, UX sprint-based builds." : "Role-aligned skilling across modern engineering & design.",
+      desc: theme === "neo" ? "Full-stack, AI, UX sprint-based builds." : "Skilling for specific engineering and design roles.",
       color: "var(--unbox-academy)",
       sub: "6 options",
       details: ["React & Node", "Applied AI", "UI/UX Systems", "DevOps basics"]
@@ -89,7 +89,7 @@ export function AcademyHero({ theme, section }: AcademyHeroProps) {
       id: "internships",
       label: theme === "neo" ? "03 / Projects" : "3. Managed internships",
       title: "Internships & Projects",
-      desc: theme === "neo" ? "Real projects, mentor pressure, actual ship cycles." : "Project scoping, task delivery, and portfolio creation.",
+      desc: theme === "neo" ? "Real projects, mentors on your case, actual ship cycles." : "Scoped projects, delivered tasks and a finished portfolio.",
       color: "var(--unbox-marketing)",
       sub: "4 stages",
       details: ["Real client projects", "Sprint delivery", "Junior workflows", "Deliverables code"]
@@ -98,7 +98,7 @@ export function AcademyHero({ theme, section }: AcademyHeroProps) {
       id: "placements",
       label: theme === "neo" ? "04 / Outcomes" : "4. Placements desk",
       title: "Placements Desk",
-      desc: theme === "neo" ? "No placement theater. Real portfolio matching." : "Employer-aligned hiring Desk & screening paths.",
+      desc: theme === "neo" ? "No placement theatre. Real portfolio matching." : "Screening and hiring paths matched to employer needs.",
       color: "var(--unbox-labs)",
       sub: "1 outcome",
       details: ["Portfolio matching", "Mock interviews", "Employer desks", "Offer tracking"]
@@ -457,9 +457,9 @@ export function AcademyTerminalSection() {
       ['c', '  [1/4] foundations        ', 's', '✓ systems · networks · git'],
       ['c', '  [2/4] core engineering   ', 's', '✓ apis · databases · cloud'],
       ['c', '  [3/4] specialisation     ', 's', '✓ ai/ml · security · devops'],
-      ['c', '  [4/4] industry residency ', 's', '✓ 12-week placement sprint'],
+      ['c', '  [4/4] industry residency ', 's', '✓ 12-week sprint or 6-month track'],
       ['p', 'nexara@academy:~$ ', 'k', 'run graduate --mode=hired'],
-      ['s', '  → offer received. compensation: above market.'],
+      ['s', '  → portfolio shipped. ready to interview.'],
       ['p', 'nexara@academy:~$ '],
     ];
 
@@ -552,17 +552,17 @@ export function AcademyBootSequence() {
   }, []);
 
   const phases = [
-    { when: 'Months 01–03', title: 'Foundations', desc: 'Unix, networking, version control, one language deep. No frameworks until you can explain what they abstract.' },
-    { when: 'Months 04–07', title: 'Core engineering', desc: 'APIs, data modelling, testing culture, cloud primitives. Weekly ship cadence with code review from Labs engineers.' },
-    { when: 'Months 08–09', title: 'Specialisation', desc: 'Branch into AI/ML, security, or platform engineering. Capstone scoped like a client engagement — because it is one.' },
-    { when: 'Months 10–12', title: 'Industry residency', desc: 'Embedded in a Nexara Labs squad or partner company. Real standups, real deadlines, real production access.' },
+    { when: 'Months 01–02', title: 'Foundations', desc: 'Unix, networking, version control, one language deep. No frameworks until you can explain what they abstract.' },
+    { when: 'Months 03–04', title: 'Core engineering', desc: 'APIs, data modelling, testing culture, cloud primitives. Weekly ships, with code review from Nexara engineers.' },
+    { when: 'Month 05', title: 'Specialisation', desc: 'Branch into AI/ML, security, or platform engineering. Capstone scoped like a client engagement, because it is one.' },
+    { when: 'Month 06', title: 'Industry residency', desc: 'Embedded in a Nexara product squad or a partner company. Real standups, real deadlines, real production access.' },
   ];
 
   return (
     <section className="acad-boot-section">
       <div className="acad-boot-inner">
         <div className="acad-boot-head">
-          <p className="acad-mono">// The twelve months</p>
+          <p className="acad-mono">// The six months</p>
           <h2 className="acad-boot-title">Boot sequence<br /><em>for a career.</em></h2>
         </div>
         <div className="acad-boot-timeline">

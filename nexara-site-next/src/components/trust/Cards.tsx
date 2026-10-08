@@ -59,7 +59,7 @@ export const TRUST_RUNLOG: Record<string, RunLogConfig> = {
       ['c', '  [1/4] foundations        ', 's', '✓ systems · networks · git'],
       ['c', '  [2/4] core engineering   ', 's', '✓ apis · databases · cloud'],
       ['c', '  [3/4] specialisation     ', 's', '✓ ai/ml · security · devops'],
-      ['c', '  [4/4] industry residency ', 's', '✓ 12-week placement sprint'],
+      ['c', '  [4/4] industry residency ', 's', '✓ 12-week sprint or 6-month track'],
       ['p', 'nexara@academy:~$ ', 'k', 'run graduate --mode=hired'],
       ['s', '  → portfolio shipped before the résumé. offer received.'],
       ['p', 'nexara@academy:~$ '],

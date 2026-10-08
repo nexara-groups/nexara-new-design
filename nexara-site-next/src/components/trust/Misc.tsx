@@ -76,7 +76,7 @@ export function TrustWork() {
 
 export function TrustProofStrip() {
   const stats = [
-    { num: '12', label: 'Months — standard Academy cohort',          accent: false },
+    { num: '6',  label: 'Months — full Academy programme (12-week sprints too)', accent: false },
     { num: '1',  label: 'Named owner — every engagement, no exception', accent: true  },
     { num: '8',  label: 'Cities in current operating scope',          accent: false },
     { num: '0',  label: 'Open-ended scopes without a written brief',  accent: false },
@@ -98,17 +98,17 @@ export function TrustProofStrip() {
 const TSX_SOLUTIONS = [
   {
     index: '01 — Product Studio', name: 'Product Studio', page: 'labs', linkLabel: 'Explore Product Studio',
-    desc: 'We build the system that solves the problem — SaaS, B2B products, integrations and internal tools, with AI and automation applied where it earns its place.',
+    desc: 'We build the system that solves the problem: SaaS, B2B products, integrations and internal tools, with AI and automation where it earns its place.',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>,
   },
   {
     index: '02 — Marketing', name: 'Digital Marketing', page: 'marketing', linkLabel: 'Explore Marketing',
-    desc: 'Strategy and campaigns that compound — positioning, websites, content operations, and performance systems with clear deliverables at every stage.',
+    desc: 'Strategy and campaigns that compound: positioning, websites, content and performance systems, with clear deliverables at every stage.',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
   },
   {
     index: '03 — Academy', name: 'Academy', page: 'academy', linkLabel: 'Explore Academy',
-    desc: 'Talent tracks for the next generation — cohort-based training, portfolio development, and placement readiness for students, colleges, and employers.',
+    desc: 'Talent tracks for the next generation: cohort-based training, portfolio development and placement readiness for students, colleges and employers.',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>,
   },
 ];
@@ -176,7 +176,7 @@ export function TrustEnterpriseStacks() {
       <div className="tsx-section-inner">
         <p className="tsx-section-eyebrow tsx-fade">Capability stacks</p>
         <h2 className="tsx-section-heading tsx-fade tsx-fade-d1" id="tsx-stack-h">Integrated stacks built from the same Nexara capabilities.</h2>
-        <p className="tsx-section-lede tsx-fade tsx-fade-d2">How the three lines interlock into combined plays — one capability set, recomposed for the outcome.</p>
+        <p className="tsx-section-lede tsx-fade tsx-fade-d2">How the three lines fit together into combined plays: one capability set, recomposed for each outcome.</p>
         <div className="tsx-stackcard-grid">
           {DATA.superSkills.map((item, index) => (
             <article

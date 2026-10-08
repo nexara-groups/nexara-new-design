@@ -54,7 +54,7 @@ export function TrustManifesto() {
       <div className="tsx-section-inner">
         <p className="tsx-section-eyebrow">Why Nexara</p>
         <p className="tsx-manifesto-text">
-          We are one engineering company that grows talent, builds intelligent systems, and secures market growth — one standard, three disciplines, zero shortcuts.
+          We are one engineering company that grows talent, builds software and builds market presence. One standard across three disciplines, and no shortcuts.
         </p>
       </div>
     </section>

@@ -734,9 +734,9 @@ function NeoGuide() {
       const railNarrEl = document.querySelector(".neo-rail-wrap");
       if (railNarrEl) {
         const divisions = [
-          { key: "narr-academy",   label: "academy",   mood: "money", line: "Academy — we grow engineers who actually ship. talent, forged in public." },
-          { key: "narr-labs",      label: "labs",      mood: "hype",  line: "Labs — we build the intelligence. real AI systems, not slideware." },
-          { key: "narr-marketing", label: "marketing", mood: "hype",  line: "Marketing — we make brands move. every campaign wired to a metric." },
+          { key: "narr-academy",   label: "academy",   mood: "money", line: "Academy: we grow engineers who actually ship. talent, built in public." },
+          { key: "narr-labs",      label: "labs",      mood: "hype",  line: "Product Studio: we build software that solves the problem. AI only where it earns it." },
+          { key: "narr-marketing", label: "marketing", mood: "hype",  line: "Marketing: we make brands move. every campaign tied to a metric." },
         ];
         triggers.push(ScrollTrigger.create({
           trigger: railNarrEl, start: "top top", end: "bottom bottom", scrub: true,

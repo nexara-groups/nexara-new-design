@@ -97,7 +97,7 @@ function NeoManifesto() {
       <div className="section-inner">
         <p className="kicker">Why Nexara</p>
         <p className="neo-manifesto-text">
-          Three engines. One standard. No shortcuts, no gap years, no vibes without receipts. We build people, systems and brands — and we ship it all from one house.
+          Three engines, one standard. No shortcuts, no gap years, no vibes without receipts. We build people, software and brands, all from one house.
         </p>
       </div>
     </section>
@@ -238,7 +238,7 @@ function NeoStandards() {
             <span className="neo-std-rule" aria-hidden="true" />
             <span className="neo-std-idx">/02</span>
             <h3>Demo every week</h3>
-            <p>Working software, live cohorts, running campaigns — shown weekly, not described in decks.</p>
+            <p>Working software, live cohorts, running campaigns. We show it weekly instead of describing it in decks.</p>
           </div>
           <div className="neo-standard-card">
             <span className="neo-std-rule" aria-hidden="true" />
@@ -250,7 +250,7 @@ function NeoStandards() {
             <span className="neo-std-rule" aria-hidden="true" />
             <span className="neo-std-idx">/04</span>
             <h3>Handover by design</h3>
-            <p>Documentation, access and training are part of the deliverable — never an afterthought.</p>
+            <p>Documentation, access and training are part of the deliverable. Never an afterthought.</p>
           </div>
         </div>
       </div>
@@ -266,7 +266,7 @@ function NeoFinalCTA() {
       <h2 className="neo-final-title">
         <a href="/neo/contact" onClick={(e) => { e.preventDefault(); routeTo('neo', 'contact'); }}>Begin.</a>
       </h2>
-      <p className="lede">Tell us which force you need — or let the brief decide.</p>
+      <p className="lede">Tell us which team you need, or let the brief decide.</p>
       <div className="neo-final-actions">
         <a className="neo-nav-cta neo-final-primary" href="/neo/contact" onClick={(e) => { e.preventDefault(); routeTo('neo', 'contact'); }}>
           Start a project <span className="arr" aria-hidden="true">↗</span>

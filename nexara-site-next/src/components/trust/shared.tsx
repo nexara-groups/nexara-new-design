@@ -22,9 +22,9 @@ export const TRUST_ACCENT: Record<string, string> = { academy: '#66A0CC', market
 
 export const TRUST_OPERATING_STANDARD = [
   { title: 'Written before built', body: "Every engagement starts with a written brief and scope. If it isn't written down, it isn't agreed." },
-  { title: 'Demo every week', body: 'Working software, live cohorts, running campaigns — shown weekly, not described in decks.' },
+  { title: 'Demo every week', body: 'Working software, live cohorts and running campaigns, shown every week rather than described in decks.' },
   { title: 'One accountable lead', body: 'Every cohort, system and campaign has a single named owner from kickoff to handover.' },
-  { title: 'Handover by design', body: 'Documentation, access and training are part of the deliverable — never an afterthought.' },
+  { title: 'Handover by design', body: 'Documentation, access and training come with the deliverable. They are never an afterthought.' },
 ];
 
 export function getTrustNavLabel(item: { trustLabel?: string; label: string }) {
@@ -38,8 +38,8 @@ export function getTrustSectionLabel(section: { id: string; name: string }) {
 
 export const TRUST_SHEET_DESCS: Record<string, string> = {
   academy:   "Talent built cohort by cohort, with reported placement readiness.",
-  marketing: "Market infrastructure — positioning, build, launch, optimise.",
-  labs:      "Software that solves the problem — SaaS, products and applied AI.",
+  marketing: "Market infrastructure: positioning, build, launch, optimise.",
+  labs:      "Software that solves the problem: SaaS, products and applied AI.",
   customers: "Verified client outcomes, indexed by engagement type.",
   contact:   "Start a scoped engagement with a named owner.",
 };

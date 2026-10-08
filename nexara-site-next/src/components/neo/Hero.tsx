@@ -381,7 +381,7 @@ function NeoHeroUnravel({ copy, theme }: NeoHeroUnravelProps) {
         <div className="neo-hero-chapter ch-left" style={{ '--accent': '#7c5cff' }} data-from="0.27" data-to="0.45" aria-hidden="true">
           <p className="ch-num">01 / DIVISION</p>
           <h2 className="ch-name">Academy<br /><span className="serif">we grow engineers.</span></h2>
-          <p className="lede">Cohort-based programmes that turn ambitious learners into working engineers — sprint by sprint, review by review.</p>
+          <p className="lede">Cohort-based programmes that turn ambitious learners into working engineers, sprint by sprint, review by review.</p>
           <button className="ch-link" onClick={() => routeTo('neo', 'academy')}>Enter Academy →</button>
         </div>
 
@@ -395,7 +395,7 @@ function NeoHeroUnravel({ copy, theme }: NeoHeroUnravelProps) {
         <div className="neo-hero-chapter ch-left" style={{ '--accent': '#00e5a0' }} data-from="0.63" data-to="0.81" aria-hidden="true">
           <p className="ch-num">03 / DIVISION</p>
           <h2 className="ch-name">Marketing<br /><span className="serif">we make brands move.</span></h2>
-          <p className="lede">Brand systems, web experiences and performance creative — built like software, measured like engineering.</p>
+          <p className="lede">Brand systems, web experiences and performance creative, built like software and measured like engineering.</p>
           <button className="ch-link" onClick={() => routeTo('neo', 'marketing')}>Enter Marketing →</button>
         </div>
 

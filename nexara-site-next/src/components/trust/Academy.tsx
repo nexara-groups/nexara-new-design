@@ -160,7 +160,7 @@ export function AcademyDepthStory({ section }: { section: AcademySection }) {
             <TrustChapter
               eyebrow="Delivery proof"
               title="Cohort outcomes"
-              sub="Evidence from work already shipped — not promises.">
+              sub="Evidence from work already shipped, not promises.">
               {/* TrustProofCards — cross-group dependency (TrustSiteClient.tsx) */}
               <TrustProofCards items={section.proof} />
             </TrustChapter>
@@ -192,7 +192,7 @@ export function AcademyDepthStory({ section }: { section: AcademySection }) {
   );
 }
 
-export function TrustCohortLadder({ section, eyebrow = 'The cohort path', title, sub = 'One path every cohort runs — assess, build, then prove.', ariaLabel = 'The cohort path' }: {
+export function TrustCohortLadder({ section, eyebrow = 'The cohort path', title, sub = 'One path every cohort runs: assess, build, then prove.', ariaLabel = 'The cohort path' }: {
   section: CohortLadderSection;
   eyebrow?: string;
   title?: React.ReactNode;
@@ -300,7 +300,7 @@ export function AcademyProcessTimeline({ section }: { section: AcademySection })
         <div className="tsx-signature-head tsx-fade">
           <span className="tsx-section-eyebrow">The cohort path</span>
           <h2 className="tsx-section-heading">From intake<br /><span className="serif">to hiring outcome.</span></h2>
-          <p className="tsx-signature-sub">One path every cohort runs — assess, build, then prove.</p>
+          <p className="tsx-signature-sub">One path every cohort runs: assess, build, then prove.</p>
         </div>
 
         <div className="tsx-apt-layout">

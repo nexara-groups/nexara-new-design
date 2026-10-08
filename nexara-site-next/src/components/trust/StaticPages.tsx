@@ -37,7 +37,7 @@ export function TrustCustomers({ detail }: TrustCustomersProps) {
         eyebrow={activeSection ? `${activeSection.name} — Proof` : "Delivery record"}
         title="Delivery proof"
         accentWords={SECTION_HERO_WORDS.trust.customers}
-        body="Live client platforms you can inspect today — a SaaS product, a medical library, sales calculators and websites — and the operating model behind each one."
+        body="Live client platforms you can inspect today: a SaaS product, a medical library, sales calculators and websites, plus the operating model behind each one."
         primaryLabel="Start an engagement"
         onPrimary={() => routeTo('trust', 'contact')}
       >
@@ -175,7 +175,7 @@ export function TrustContact({ detail }: TrustContactProps) {
         <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
           <span className="tsx-chapter-eyebrow">Where to start</span>
           <h2 className="tsx-chapter-title">Select a section</h2>
-          <p className="tsx-chapter-sub">Pick the line closest to what you need — it routes your request to the right team.</p>
+          <p className="tsx-chapter-sub">Pick the line closest to what you need and we route your request to the right team.</p>
         </header>
         <div className="tsx-channel-grid">
           {DATA.contact.channels.map(channel => {

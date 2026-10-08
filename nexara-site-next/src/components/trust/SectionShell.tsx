@@ -115,7 +115,7 @@ export function TrustSectionStory({ section, phase }: { section: TrustSection; p
           <TrustChapter
             eyebrow="Who this serves"
             title="Who this is for"
-            sub="The people and teams an engagement is built around — and the outcome each one is after.">
+            sub="The people and teams an engagement is built around, and the outcome each one is after.">
             <TrustLedgerRows framed items={section.audiences} titleKey="title" bodyKey="trust" />
           </TrustChapter>
 
@@ -161,7 +161,7 @@ export function TrustSectionStory({ section, phase }: { section: TrustSection; p
             <TrustChapter
               eyebrow="Delivery proof"
               title={section.id === 'academy' ? 'Cohort outcomes' : section.id === 'labs' ? 'Systems shipped' : 'Campaigns delivered'}
-              sub="Evidence from work already shipped — not promises.">
+              sub="Evidence from work already shipped, not promises.">
               <TrustProofCards items={section.proof} />
               {TRUST_RUNLOG[section.id] && (
                 <div className="tsx-runlog-wrap">

@@ -394,7 +394,7 @@ export function LabsBlueprintSection() {
           </div>
           <div className="nx-build-cap">
             <h3>Then the layers stack.</h3>
-            <p>Data, services, interface — each layer tested before the next lands on top of it.</p>
+            <p>Data, services, interface. Each layer is tested before the next one lands on top.</p>
           </div>
           <div className="nx-build-cap">
             <h3>Then it ships. <em>Live.</em></h3>
