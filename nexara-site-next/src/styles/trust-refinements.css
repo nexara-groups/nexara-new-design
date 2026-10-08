@@ -84,7 +84,7 @@
 /* Hero → next section hand-off. --tsx-exit (0→1) is driven by the hero loop
    over the last ~7% of the runway. Transform/opacity only. */
 .trust.tsx-site .tsx-hero-stage .tsx-hero-canvas {
-  opacity: calc(.72 * (1 - var(--tsx-exit, 0) * .55));
+  opacity: calc(.92 * (1 - var(--tsx-exit, 0) * .55));
   transform: translate3d(0, calc(var(--tsx-exit, 0) * -3%), 0) scale(calc(1 - var(--tsx-exit, 0) * .05));
   transform-origin: 50% 40%;
 }
@@ -164,3 +164,28 @@
 .trust.tsx-site .tsx-nav:not(.scrolled) .tsx-theme-pill a:not(.active) { color: rgba(11, 31, 51, .5); }
 .trust.tsx-site .tsx-work-scope { display: flex; flex-wrap: wrap; gap: 6px; }
 .trust.tsx-site .tsx-work-scope span { padding: 4px 10px; border-radius: 999px; background: rgba(102,160,204,.12); color: #2f5f86; font-size: 11.5px; font-weight: 600; }
+
+/* ═══ Hero legibility pass (brand kit: Action #215F94 / hover #265987, neutrals) ═══
+   Root causes: copy sat at 80% alpha, the wordmark rested at 82% alpha, the
+   canvas layer was 72% opacity, per-chapter --accent (#2C3F5E / #5B6472) was
+   reused as the CTA fill so Labs/Digital buttons vanished into the navy ground,
+   and the intro CTA used off-brand #1a6dff. Text is now opaque; atmosphere stays
+   on the canvas only. */
+.trust.tsx-site .tsx-hero-chapter .tsx-sec-body,
+.trust.tsx-site .tsx-hero-sub,
+.trust.tsx-site .tsx-scroll-cue,
+.trust.tsx-site .tsx-hero-counter { color: #DCE5F0; }
+.trust.tsx-site .hero-intro > p { color: #EDF1F5; }
+.trust.tsx-site .hero-intro > p span { color: #DCE2E9; }
+.trust.tsx-site .tsx-hero-chapter .tsx-btn-cta,
+.trust.tsx-site .hero-intro__links a:first-child {
+  background: #215F94 !important; color: #fff !important; border: 1px solid #66A0CC;
+  box-shadow: none !important;
+}
+.trust.tsx-site .tsx-hero-chapter .tsx-btn-cta:hover,
+.trust.tsx-site .hero-intro__links a:first-child:hover { background: #265987 !important; }
+.trust.tsx-site .hero-intro__links a:not(:first-child),
+.trust.tsx-site .tsx-hero-chapter .tsx-sec-btn-ghost {
+  color: #fff !important; background: rgba(255,255,255,.08) !important;
+  border: 1px solid rgba(220,226,233,.55) !important; box-shadow: none;
+}

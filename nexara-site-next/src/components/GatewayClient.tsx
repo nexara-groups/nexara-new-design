@@ -9,6 +9,9 @@ import "@/styles/gateway-cinematic.css";
 
 const { useState, useEffect, useRef } = React;
 const EASE = [0.16, 1, 0.3, 1];
+// Kick off the 3D chunk download at module load so it overlaps hydration.
+const scenesChunk = typeof window !== "undefined" ? import("./Gateway3D") : null;
+void scenesChunk;
 const NeoScene = React.lazy(() => import("./Gateway3D").then((m) => ({ default: m.NeoScene })));
 const TrustScene = React.lazy(() => import("./Gateway3D").then((m) => ({ default: m.TrustScene })));
 
@@ -102,6 +105,7 @@ function Gateway() {
     router.push(path);
   };
   const reduce = useReducedMotion();
+  useEffect(() => { router.prefetch("/neo"); router.prefetch("/trust"); }, [router]);
   const g = DATA.gateway;
   const rootRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState(reduce ? "live" : "intro");
@@ -124,11 +128,10 @@ function Gateway() {
   useEffect(()=>{
     const query=window.matchMedia('(min-width: 821px) and (hover: hover) and (pointer: fine)');
     const saveData=Boolean((navigator as Navigator & {connection?:{saveData?:boolean}}).connection?.saveData);
-    let timer:ReturnType<typeof setTimeout>;
-    const update=()=>{clearTimeout(timer);setScenesReady(false);if(query.matches&&!reduce&&!saveData)timer=setTimeout(()=>setScenesReady(true),1600);};
+    const update=()=>{setScenesReady(query.matches&&!reduce&&!saveData);};
     const visibility=()=>setActive(!document.hidden);
     update();visibility();query.addEventListener('change',update);document.addEventListener('visibilitychange',visibility);
-    return()=>{clearTimeout(timer);query.removeEventListener('change',update);document.removeEventListener('visibilitychange',visibility);};
+    return()=>{query.removeEventListener('change',update);document.removeEventListener('visibilitychange',visibility);};
   },[reduce]);
   const showScenes = scenesReady && !reduce && !isMobile;
 
@@ -151,28 +154,27 @@ function Gateway() {
     return () => clearTimeout(t);
   }, [reduce]);
 
-  function onMove(e: React.MouseEvent) { if (!reduce) mx.set(e.clientX / window.innerWidth); }
+  function onMove(e: React.MouseEvent) { if (reduce) return; mx.set(e.clientX / window.innerWidth); rootRef.current?.style.setProperty("--cy", e.clientY + "px"); }
   function onLeave() { mx.set(0.5); }
   const exitTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(()=>()=>clearTimeout(exitTimer.current),[]);
-  function enter(world: 'neo' | 'trust') { if(reduce){routeTo(world);return;}setExitTo(world);clearTimeout(exitTimer.current);exitTimer.current=setTimeout(()=>routeTo(world),700); }
+  function enter(world: 'neo' | 'trust') { if(reduce){routeTo(world);return;}setExitTo(world);clearTimeout(exitTimer.current);routeTo(world); }
 
   return (
     <div className="gw2" ref={rootRef} onMouseMove={onMove} onMouseLeave={onLeave} style={{ "--seam": "50%" } as React.CSSProperties}>
       <div className="gw2-panel gw2-neo">
         <div className="gw2-neo-fx" aria-hidden="true">
-          <div className="gw2-grid" />
           {showScenes && (
-            <React.Suspense fallback={null}><div className="gw2-stage"><NeoScene active={active} /></div></React.Suspense>
+            <React.Suspense fallback={null}><div className="gw2-stage gw2-stage-neo"><NeoScene active={active} /></div></React.Suspense>
           )}
         </div>
       </div>
       <div className="gw2-panel gw2-trust">
-        <div className="gw2-trust-fx" aria-hidden="true"><div className="gw2-lines" />
-          {showScenes && (<React.Suspense fallback={null}><div className="gw2-stage"><TrustScene active={active} /></div></React.Suspense>)}
+        <div className="gw2-trust-fx" aria-hidden="true">          {showScenes && (<React.Suspense fallback={null}><div className="gw2-stage gw2-stage-trust"><TrustScene active={active} /></div></React.Suspense>)}
         </div>
       </div>
 
+      <div className="gw2-seam" aria-hidden="true"><div className="gw2-seam-line" /></div>
       <Side side="neo" copy={g.neo} phase={phase} onEnter={() => enter("neo")} />
       <Side side="trust" copy={g.trust} phase={phase} onEnter={() => enter("trust")} />
 
@@ -188,7 +190,7 @@ function Gateway() {
 
       {(
         <motion.p className="gw2-hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 0.8 }}>{isMobile ? "Tap a world to enter" : "Move across to feel both · click to enter"}</motion.p>
+          transition={{ delay: 1, duration: 0.8 }}>{isMobile ? "Tap a side to enter" : "Slide across to feel both. Click to enter."}</motion.p>
       )}
 
       <AnimatePresence>
@@ -202,7 +204,7 @@ function Gateway() {
           <motion.div className={"gw2-wipe gw2-wipe-" + exitTo}
             initial={{ clipPath: "circle(0% at 50% 55%)" }}
             animate={{ clipPath: "circle(150% at 50% 55%)" }}
-            transition={{ duration: 0.7, ease: EASE }} />
+            transition={{ duration: 0.4, ease: EASE }} />
         )}
       </AnimatePresence>
     </div>

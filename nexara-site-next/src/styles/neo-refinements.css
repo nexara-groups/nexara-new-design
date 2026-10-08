@@ -39,13 +39,15 @@
 }
 .neo .neo-hero-runway { height: 480svh; }
 .neo .neo-hero-title { max-width: 80vw; }
+/* Tablet gap (761-1023px): 13vw base size overflowed the 80vw box and the clip-path cut the last letter. */
+@media (min-width: 761px) and (max-width: 1023px) { .neo .neo-hero-title { font-size: 10.5vw; max-width: 90vw; } }
 @media (prefers-reduced-motion: no-preference) {
   .neo .neo-hero-title { animation: neo-title-exposure 1100ms cubic-bezier(.16,1,.3,1) both; }
   .neo .neo-hero-canvas { animation: neo-camera-arrival 1400ms cubic-bezier(.16,1,.3,1) both; }
 }
 @keyframes neo-title-exposure {
   from { clip-path: inset(0 0 100% 0); }
-  to { clip-path: inset(0 0 0 0); }
+  to { clip-path: inset(-10% -5% -10% -5%); }
 }
 @keyframes neo-camera-arrival {
   from { opacity: .2; transform: scale(1.12); }

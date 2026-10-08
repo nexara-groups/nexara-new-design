@@ -625,7 +625,7 @@ export function TrustHeroUnravel() {
       // Keep the unlit wordmark legible and premium. The strike still creates a
       // clear lift to white, but the resting state no longer reads as disabled.
       const r = Math.round(164 + 80 * lit), g = Math.round(195 + 53 * lit), b = Math.round(230 + 25 * lit);
-      el.style.color = `rgba(${r},${g},${b},${(0.82 + 0.18 * lit).toFixed(2)})`;
+      el.style.color = `rgba(${r},${g},${b},${(0.96 + 0.04 * lit).toFixed(2)})`;
       const glow = lit * 0.32 + prox * 0.9;
       el.style.textShadow = `0 0 ${(20 + prox * 22).toFixed(0)}px rgba(168, 200, 224,${glow.toFixed(2)})`
         + (prox > 0.02 ? `,0 0 ${(74 * prox).toFixed(0)}px rgba(102, 160, 204,${(prox * 0.6).toFixed(2)})` : '');
