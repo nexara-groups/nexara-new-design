@@ -438,6 +438,51 @@ export const DATA = {
     { id: "marketing", section: "Digital Marketing", company: "Founder and regional business launches", neo: "The offer gets sharper before the market judges it. One system for brand, web and demand.", trust: "Positioning, site architecture, content and reporting delivered as one documented market-readiness workflow." },
     { id: "labs", section: "Product Studio", company: "SaaS, B2B products and internal platforms", neo: "We build the system that solves the problem — SaaS, products and integrations, with AI where it fits.", trust: "Custom software, SaaS, B2B platforms and integrations — with AI and automation applied where it earns its place." },
   ],
+  work: {
+    live: [
+      {
+        name: "Happy Farms", scope: ["SaaS platform", "Website"], logo: "/brand/clients/happy-farms.svg", url: "https://ourhappyfarms.com/",
+        sector: "Agri-training", place: "Andhra Pradesh",
+        line: "We built their entire SaaS platform — login modules and full management — plus the public site.",
+        does: "Natural farming training led by Prasad Juvvireddy: workshops, e-Safari farm visits, mentorship and export training across Andhra Pradesh.",
+        built: ["A complete SaaS product, built from the ground up", "Login modules for secure access", "Management modules to run day-to-day operations", "The public website that brings learners in"],
+      },
+      {
+        name: "Rise Medical Hub", scope: ["Website", "Medical library", "Digital marketing"], logo: "/brand/clients/rise-medical-hub.png", url: "https://risemedicalhub.com/",
+        sector: "Healthcare", place: "Visakhapatnam",
+        line: "We built their website and a medical library, and run their digital marketing.",
+        does: "A patient-first clinic in Madhurawada, Visakhapatnam offering EECP therapy, diagnostics, pharmacy and OPD services.",
+        built: ["A patient-first website", "A medical library for patients", "Ongoing digital marketing"],
+      },
+      {
+        name: "Qualigene Lifesciences", scope: ["Website", "Sales calculators"], logo: "/brand/clients/qualigene.png", url: "https://qualigene.in/",
+        sector: "Life sciences", place: "Andhra Pradesh",
+        line: "We elevated their digital presence and built calculators that help sell their products.",
+        does: "Science-led, antibiotic-free feed solutions for shrimp aquaculture and poultry.",
+        built: ["An elevated digital presence", "Product calculators that help customers choose and buy", "A science-led website"],
+      },
+      {
+        name: "Sai Nirmaan Architects", scope: ["Website", "Digital marketing"], logo: "/brand/clients/sai-nirmaan.png", url: "https://www.sainirmaanarchitects.com/",
+        sector: "Architecture", place: "Visakhapatnam",
+        line: "We built their portfolio website and run their digital marketing.",
+        does: "An architecture, interior and landscape practice with 300+ projects across 4+ states, led by Suresh Bandaru.",
+        built: ["A portfolio website for 300+ projects", "Ongoing digital marketing"],
+      },
+      {
+        name: "Nexara Voice", scope: ["In-house product"], logo: "/brand/nexara-mark.svg", url: "https://voice.nexaragroups.com/",
+        sector: "AI product", place: "In-house",
+        line: "Our own agent console for AI voice agents, built and run by Nexara Labs.",
+        does: "Nexara's in-house AI voice-agent product.",
+        built: ["Agent console for AI voice agents", "Built and run by Nexara Labs"],
+      },
+    ],
+    building: [
+      { name: "Stories of Kadai", kind: "Website + app" },
+      { name: "Gym app", kind: "Mobile app" },
+      { name: "HR portal", kind: "Internal platform" },
+      { name: "SaaS products", kind: "Product studio" },
+    ],
+  },
   company: {
     facts: [
       ["Status", "Incorporated capability firm"],

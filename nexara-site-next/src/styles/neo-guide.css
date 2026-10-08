@@ -501,6 +501,13 @@
   text-overflow: ellipsis;
 }
 
+/* Pinned near the right edge: open bubble + tag leftward so they stay on-screen */
+.neo-guide-overlay.is-cursor-guide .neo-guide-char-wrap.is-flipped .neo-guide-bubble,
+.neo-guide-overlay.is-cursor-guide .neo-guide-char-wrap.is-flipped .neo-guide-tag {
+  left: auto;
+  right: 0;
+}
+
 /* Beacon line — grows leftward from guide toward content */
 .neo-guide-beacon {
   position: absolute;
@@ -633,3 +640,7 @@
   .neo-server-rack-wrap { right: 0; }
   .neo-code-panel { width: 176px; }
 }
+
+/* Cursor on the nav: guide steps aside so the controls stay clear */
+.neo-guide-overlay.is-cursor-guide { transition: opacity .2s ease; }
+.neo-guide-overlay.is-cursor-guide.is-nav-hover { opacity: 0 !important; }

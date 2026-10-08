@@ -11,6 +11,7 @@ import { TrustHome } from './trust/Home';
 import { TrustSectionPage } from './trust/SectionShell';
 import { TrustCustomers, TrustCompany, TrustContact, TrustConcierge } from './trust/StaticPages';
 import { TrustFooter } from './trust/Misc';
+import { useSmoothScroll } from './useSmoothScroll';
 
 function setupTsxFade() {
   document.documentElement.classList.add('js-reveal-ready');
@@ -39,6 +40,7 @@ function setupTsxFade() {
 function TrustSite({ page, detail }: { page: string; detail: string | null }) {
   const router = useRouter();
   React.useEffect(() => { setTrustRouter(router); }, [router]);
+  useSmoothScroll();
   const section = (DATA.sections as Record<string, typeof DATA.sections.academy>)[page];
   React.useEffect(() => { window.scrollTo(0, 0); }, [page]);
   React.useEffect(() => setupTsxFade(), [page, detail]);

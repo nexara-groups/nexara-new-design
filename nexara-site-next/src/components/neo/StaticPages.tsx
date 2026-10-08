@@ -4,6 +4,7 @@ import { DATA } from '@/lib/data';
 import { useBriefForm } from '@/lib/shared';
 import { NotFound } from '../NotFound';
 import { HeroBanner } from './SectionShell';
+import { ClientCases, ClientLogoWall } from '../ClientCases';
 
 type Theme = 'trust' | 'neo';
 
@@ -29,12 +30,26 @@ function Customers({ theme, detail }: DetailPageProps) {
   const activeSection = detail ? (DATA.sections as Record<string, SectionSummary | undefined>)[detail] : null;
   if (detail && !activeSection) return <NotFound theme={theme} page={`customers/${detail}`} />;
   const proofItems = activeSection ? DATA.customers.filter((customer) => customer.id === detail) : DATA.customers;
-  const copy = theme === "neo"
-    ? { title: "Proof without fake trophies.", accent: "Readiness stays visible.", body: "Until public client stories are approved, Nexara shows the operating proof each section is built to produce." }
-    : { title: "Readiness proof across all three sections.", accent: "Clear outcomes by section.", body: "Each proof card is framed as a delivery model, not an invented customer claim." };
+  const copy = activeSection
+    ? { title: `${activeSection.name}, by the receipts.`, accent: "What this division produces.", body: "The operating proof this division is built to deliver, engagement after engagement." }
+    : { title: "Real clients. Live work.", accent: "Click any of it.", body: "A SaaS platform, a medical library, sales calculators and websites that sell — shipped for businesses in Visakhapatnam and across Andhra Pradesh." };
   return (
     <main>
       <HeroBanner compact theme={theme} eyebrow={activeSection ? `${activeSection.name} proof` : "Proof"} title={copy.title} accent={copy.accent} body={copy.body} />
+      {!activeSection && (
+        <section className="nx-proof-section">
+          <ClientLogoWall />
+          <ClientCases theme={theme} />
+        </section>
+      )}
+      {!activeSection && (
+        <div className="section-head nx-proof-divisions-head">
+          <div>
+            <p className="eyebrow">By division</p>
+            <h2>What each division delivers.</h2>
+          </div>
+        </div>
+      )}
       <section className="module-grid">
         {proofItems.map((customer) => (
           <article className="module-card" key={customer.company}>

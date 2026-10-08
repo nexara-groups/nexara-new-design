@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { PackageGrid, SpotlightCard } from '../ui/package-card';
 import { DATA } from '@/lib/data';
 import { routeTo } from '@/lib/trust-router';
 import { TrustCohortLadder, AcademyProcessTimeline } from './Academy';
@@ -361,42 +362,8 @@ export function TrustProofCards({ items }: { items: ProofItem[] }) {
 /* Legacy alias so any future callers still work */
 export function TrustProofStrips({ items }: { items: ProofItem[] }) { return <TrustProofCards items={items} />; }
 
-const PKG_THEMES = [
-  { head: 'tsx-pkg-head-dark',  badge: null as string | null },
-  { head: 'tsx-pkg-head-navy',  badge: 'Most Common' },
-  { head: 'tsx-pkg-head-dark',  badge: null as string | null },
-];
-
 export function TrustPackageCards({ packages }: { packages: AcademyPackage[] }) {
-  return (
-    <div className="tsx-pkg-grid">
-      {packages.map((pkg, i) => {
-        const theme = PKG_THEMES[i] || PKG_THEMES[0]!;
-        const featured = i === 1;
-        return (
-          <div className={`tsx-pkg-card${featured ? ' featured' : ''}`} key={pkg.name}>
-            <div className={`tsx-pkg-head ${theme.head}`}>
-              {theme.badge && <span className="tsx-pkg-badge">{theme.badge}</span>}
-              <span className="tsx-pkg-fit">{pkg.fit}</span>
-              <p className="tsx-pkg-name">{pkg.name}</p>
-              <span className="tsx-pkg-duration">{pkg.duration}</span>
-            </div>
-            <div className="tsx-pkg-body">
-              <ul className="tsx-pkg-list">
-                {pkg.includes.map(item => <li key={item}>{item}</li>)}
-              </ul>
-            </div>
-            <div className="tsx-pkg-foot">
-              <button className={featured ? 'tsx-pkg-cta-primary' : 'tsx-pkg-cta-ghost'}
-                onClick={() => routeTo('trust', 'contact')}>
-                {featured ? 'Start here' : 'Get in touch'}
-              </button>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+  return <PackageGrid packages={packages} ctaLabel="Request a proposal" onSelect={() => routeTo('trust', 'contact')} />;
 }
 
 export function TrustProcessTrack({ steps }: { steps: ProcessStep[] }) {
@@ -480,13 +447,14 @@ export function TrustModuleCards({ rows }: { rows: ModuleRow[] }) {
   return (
     <div className="tsx-module-grid">
       {rows.map((row, i) => (
-        <div className={`tsx-module-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={row.title}>
-          <div className="tsx-module-card-head">
-            <span className="tsx-module-icon" aria-hidden="true">{deliverIcon(row.title)}</span>
-            <h3 className="tsx-module-title">{row.title}</h3>
-          </div>
-          <p className="tsx-module-body">{row.trust || row.body}</p>
-        </div>
+        <SpotlightCard className={`nx-module nx-feature tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={row.title}>
+          <span className="nx-feature-top">
+            <span className="nx-feature-icon" aria-hidden="true">{deliverIcon(row.title)}</span>
+            <span className="nx-module-eyebrow">Module {String(i + 1).padStart(2, '0')}</span>
+          </span>
+          <h3 className="nx-module-title">{row.title}</h3>
+          <p className="nx-module-body">{row.trust || row.body}</p>
+        </SpotlightCard>
       ))}
     </div>
   );

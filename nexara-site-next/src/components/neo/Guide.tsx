@@ -163,7 +163,7 @@ function NeoGuide() {
     if (burst) gsap.set(burst, { autoAlpha: 0, scale: 0.2 });
 
     // --- shared brain: defined once, driven by desktop (cursor) AND mobile (touch/scroll) ---
-      const clean = (text) => (text || "").replace(/\s+/g, " ").trim();
+      const clean = (text) => (typeof text === "string" ? text : "").replace(/\s+/g, " ").trim();
       const shorten = (text, max = 46) => {
         const t = clean(text);
         return t.length > max ? `${t.slice(0, max).trim()}…` : t;
@@ -238,7 +238,7 @@ function NeoGuide() {
 
         // media
         if (/^(img|svg|video)$/.test(tag)) {
-          return { key: `media-${keyOf(el.getAttribute?.("alt") || el.className || tag)}`, label: "visual", line: pick([
+          return { key: `media-${keyOf(el.getAttribute?.("alt") || el.getAttribute?.("class") || tag)}`, label: "visual", line: pick([
             "this visual? it's giving art gallery fr.", "pixels ate and left no crumbs.", "lil graphic doing the MOST. respect.", "ok the visuals are not mid. we love to see it.", "this pic has aura ngl."
           ]) };
         }
@@ -278,6 +278,7 @@ function NeoGuide() {
           ".super-skill-card",
           ".section-card",
           ".module-card",
+          ".nx-module",
           ".stack-detail-card",
           ".package-card",
           ".process-grid article",
@@ -510,7 +511,7 @@ function NeoGuide() {
           };
         }
 
-        if (target.matches(".super-skill-card, .section-card, .module-card, .stack-detail-card, .package-card, .process-grid article")) {
+        if (target.matches(".super-skill-card, .section-card, .module-card, .nx-module, .stack-detail-card, .package-card, .process-grid article")) {
           const key = `card-${textFrom(target, "h3")}`;
           return {
             key,
@@ -753,9 +754,17 @@ function NeoGuide() {
 
       const onMove = (event) => {
         if (!guideLive) return;
-        const offsetRight = event.clientX > window.innerWidth - 180;
-        const x = clamp(event.clientX + (offsetRight ? -340 : 24), 12, window.innerWidth - 340);
-        const y = clamp(event.clientY + 18, 84, window.innerHeight - 108);
+        // Trail to the RIGHT of the cursor, clear of whatever is being read, and
+        // never jump to its left. Near the right edge he pins to the edge and
+        // his bubble/tag open leftward instead of running off-screen.
+        const x = clamp(event.clientX + 72, 12, window.innerWidth - 100);
+        charWrap.classList.toggle("is-flipped", x > window.innerWidth - 340);
+        // Never let him (or his bubble, which sits above him) cover the nav:
+        // step aside while the cursor is on the header, and keep his top
+        // clamp low enough that the bubble clears the header's bottom edge.
+        const navBottom = document.querySelector(".nav")?.getBoundingClientRect().bottom ?? 74;
+        guide.classList.toggle("is-nav-hover", event.clientY < navBottom);
+        const y = clamp(event.clientY + 18, navBottom + 96, window.innerHeight - 108);
         gsap.to(charWrap, { x, y, duration: 0.2, ease: "power3.out", overwrite: "auto" });
         gsap.to(spotlight, { autoAlpha: 1, top: y + 38, duration: 0.18, overwrite: "auto" });
 

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { routePath } from '@/lib/seo';
 import { DATA } from '@/lib/data';
 import { routeTo } from '@/lib/trust-router';
+import { getLenis } from '../useSmoothScroll';
 import { getTrustNavLabel, TRUST_NAV_ICONS, TRUST_SHEET_DESCS } from './shared';
 
 type DetailSlug = string | null;
@@ -25,7 +26,15 @@ function TrustNav({ page, detail }: TrustNavProps) {
   React.useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
-    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
+    // Tuck away while scrolling down, come back on any scroll up.
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      nav.classList.toggle('scrolled', y > 8);
+      if (Math.abs(y - lastY) < 6) return;
+      nav.classList.toggle('is-tucked', y > lastY && y > 160 && !nav.classList.contains('menu-open'));
+      lastY = y;
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -51,7 +60,11 @@ function TrustNav({ page, detail }: TrustNavProps) {
   };
   React.useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    const lenis = getLenis();
+    if (menuOpen) lenis?.stop();
+    navRef.current?.classList.toggle('menu-open', menuOpen);
+    if (menuOpen) navRef.current?.classList.remove('is-tucked');
+    return () => { document.body.style.overflow = ''; if (menuOpen) lenis?.start(); };
   }, [menuOpen]);
   React.useEffect(()=>{
     if(!menuOpen)return;

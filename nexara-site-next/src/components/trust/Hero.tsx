@@ -107,7 +107,7 @@ export function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }: {
     let lastFrame = 0;
     let visible = true;
     let resizeTimer: number | undefined;
-    const frameInterval = 1000 / 30;
+    const frameInterval = 1000 / 60; // comet travels ~400px/s; 30fps stepped visibly
     const shouldAnimate = !reduceMotion && !window.matchMedia('(max-width: 760px)').matches;
 
     const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -153,7 +153,7 @@ export function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }: {
     function frame(now) {
       rafId = 0;
       if (!visible || document.hidden) return;
-      if (now - lastFrame < frameInterval) {
+      if (now - lastFrame < frameInterval - 1) {
         rafId = requestAnimationFrame(frame);
         return;
       }
@@ -630,7 +630,9 @@ export function TrustHeroUnravel() {
       el.style.textShadow = `0 0 ${(20 + prox * 22).toFixed(0)}px rgba(168, 200, 224,${glow.toFixed(2)})`
         + (prox > 0.02 ? `,0 0 ${(74 * prox).toFixed(0)}px rgba(102, 160, 204,${(prox * 0.6).toFixed(2)})` : '');
     }
-    function strikeUpdate(bp) {
+    // latch=false is the load-time glint: letters flare as the beam passes
+    // and settle back, so the scroll-driven strike keeps its payoff.
+    function strikeUpdate(bp, latch = true) {
       if (!beamEl || !titleRef.current) return;
       const leftPct = -14 + 118 * bp;
       beamEl.style.left = leftPct + '%';
@@ -643,9 +645,9 @@ export function TrustHeroUnravel() {
       titleSpans.forEach((el, i) => {
         const r = wordmarkGeometry.letters[i];
         const reach = cl((beamCx - (r.left - 12)) / (r.width + 24));
-        if (reach > litArr[i]) litArr[i] = reach;
+        if (latch && reach > litArr[i]) litArr[i] = reach;
         const prox = Math.max(0, 1 - Math.abs(beamCx - (r.left + r.width / 2)) / (r.width * 0.9));
-        applyLit(el, ss(litArr[i]), ss(prox));
+        applyLit(el, ss(latch ? litArr[i] : Math.max(litArr[i], prox * 0.85)), ss(prox));
       });
     }
 
@@ -696,7 +698,13 @@ export function TrustHeroUnravel() {
     let lastFrame = 0;
     let idleFrames = 0;
     let strikeComplete = false;
+    // Entrance: one unhurried beam pass shortly after load.
+    const INTRO_DELAY = 0.45, INTRO_DUR = 1.3;
+    let introDone = prefersReducedMotion;
+    const stageEl = wrapRef.current.querySelector('.tsx-hero-stage');
+    let lastExit = -1;
     let previousDraw = 0;
+    let lastDraw = 0;
     const frameInterval = 1000 / (lowPower ? 30 : 60);
     let st;
 
@@ -732,24 +740,28 @@ export function TrustHeroUnravel() {
     function renderLoop(now) {
       rafId = 0;
       if (!heroVisible || document.hidden) return;
-      if (now - lastFrame < frameInterval) {
-        rafId = requestAnimationFrame(renderLoop);
-        return;
-      }
       lastFrame = now;
       const delta = Math.min(50, now - (previousDraw || now - 16.7)) / 1000;
       previousDraw = now;
       const time = prefersReducedMotion ? 0 : (now - t0) / 1000;
       state.p += (state.target - state.p) * (1 - Math.exp(-18 * delta));
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
-      mouse.x += (mouse.tx - mouse.x) * 0.15;
-      mouse.y += (mouse.ty - mouse.y) * 0.15;
+      mouse.x += (mouse.tx - mouse.x) * (1 - Math.exp(-10 * delta));
+      mouse.y += (mouse.ty - mouse.y) * (1 - Math.exp(-10 * delta));
 
       const p = state.p;
       // Beam strike owns p ∈ [0, STRIKE]; the convergence is remapped to run
       // over the remaining scroll so nothing fires until the wordmark is lit.
       const pc = p <= STRIKE ? 0 : (p - STRIKE) / (1 - STRIKE);
-      if (p < STRIKE) {
+      if (!introDone && (state.target > 0.002 || time > INTRO_DELAY + INTRO_DUR)) {
+        introDone = true;
+        if (p < STRIKE) strikeUpdate(p / STRIKE);
+      }
+      if (!introDone) {
+        const ip = cl((time - INTRO_DELAY) / INTRO_DUR);
+        // ease-in-out: the blade accelerates in and glides off.
+        strikeUpdate(ip < .5 ? 4 * ip * ip * ip : 1 - Math.pow(-2 * ip + 2, 3) / 2, false);
+      } else if (p < STRIKE) {
         strikeComplete = false;
         strikeUpdate(p / STRIKE);
       } else if (!strikeComplete) {
@@ -757,6 +769,19 @@ export function TrustHeroUnravel() {
         strikeComplete = true;
       }
       updateChapters(pc);
+      // Hand-off: over the last stretch of the runway the field recedes and
+      // the next section's paper rises in, instead of a hard sticky release.
+      const exit = ss(cl((p - 0.93) / 0.07));
+      if (stageEl && Math.abs(exit - lastExit) > 0.001) {
+        stageEl.style.setProperty('--tsx-exit', exit.toFixed(3));
+        lastExit = exit;
+      }
+      // Scroll-linked copy above updates every frame; on low-power devices only
+      // the canvas paint below is throttled (to frameInterval). Capping the
+      // whole loop made the chapter text step at half the scroll rate.
+      const skipDraw = lowPower && lastDraw && now - lastDraw < frameInterval - 1;
+      if (!skipDraw) {
+      lastDraw = now;
       ctx.clearRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'source-over';
 
@@ -786,7 +811,7 @@ export function TrustHeroUnravel() {
           const dlen = Math.hypot(ddx, ddy) || 1;
           const nX = -ddy / dlen, nY = ddx / dlen;
           particles[si].forEach(pt => {
-            pt.t = (pt.t + .0058) % 1;
+            pt.t = (pt.t + delta * .348) % 1;
             const e  = ss(pt.t);
             const mx = mouse.x * W * .032 * (1 - e);
             const my = mouse.y * H * .032 * (1 - e);
@@ -828,9 +853,11 @@ export function TrustHeroUnravel() {
 
       // Core (always topmost)
       drawCore(ci, time);
+      }
 
       canvas.dataset.renderMode=prefersReducedMotion?'reduced':'interactive';
-      const stillMoving = Math.abs(state.target - state.p) > 0.0008
+      const stillMoving = !introDone
+        || Math.abs(state.target - state.p) > 0.0008
         || (!lowPower && Math.abs(mouse.tx - mouse.x) > 0.002)
         || (!lowPower && Math.abs(mouse.ty - mouse.y) > 0.002);
       if (stillMoving) {
@@ -886,6 +913,7 @@ export function TrustHeroUnravel() {
     <div ref={wrapRef} className="tsx-hero-runway" style={{ height: '600vh' }}>
       <div className="tsx-hero-stage" data-hero-surface><HeroLighting />
         <canvas ref={canvasRef} className="tsx-hero-canvas" aria-hidden="true" />
+        <div className="tsx-hero-handoff" aria-hidden="true" />
 
         <div className="tsx-hero-chapter" data-from="0" data-to="0.07">
           <p className="tsx-section-eyebrow">Enterprise IT systems</p>

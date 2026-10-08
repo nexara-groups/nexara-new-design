@@ -7,7 +7,7 @@ import { HAS_SCROLL_ANIMATION } from '@/lib/shared';
 import { routeTo } from '@/lib/trust-router';
 import { getTrustSectionLabel, TRUST_ACCENT, TRUST_OPERATING_STANDARD } from './shared';
 import { TrustHeroFlat, TrustHeroUnravel } from './Hero';
-import { TrustSolutionsGrid, TrustEnterpriseStacks, TrustProofStrip, TrustMarketContext } from './Misc';
+import { TrustSolutionsGrid, TrustEnterpriseStacks, TrustWork, TrustProofStrip, TrustMarketContext } from './Misc';
 import { TrustLedgerRows } from './Cards';
 
 // See trust/Hero.tsx for why this is repeated per-file rather than centralized.
@@ -170,6 +170,8 @@ export function TrustHome() {
           <TrustSolutionsGrid />
           {/* Proof — combined plays interlock */}
           <TrustEnterpriseStacks />
+          {/* Proof — live client work, then work in delivery */}
+          <TrustWork />
           {/* Outcome — governed capability in figures */}
           <TrustProofStrip />
           <TrustMarketContext />
@@ -195,6 +197,8 @@ export function TrustHome() {
           </section>
           {/* Proof — the three forces interlock into combined plays */}
           <TrustEnterpriseStacks />
+          {/* Proof — live client work, then work in delivery */}
+          <TrustWork />
           {/* Outcome — governed capability in figures */}
           <TrustProofStrip />
           <TrustMarketContext />

@@ -4,6 +4,7 @@ import { useEffect, type RefObject } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
+import { chapterDirection, opacityForAnchoredChapter } from '@/lib/hero-chapters';
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
@@ -51,6 +52,7 @@ const VERTEX_SHADER = /* glsl */ `
   varying vec3 vColor;
   varying float vAlpha;
   varying float vFocus;
+  varying float vEnergy;
 
   const float TAU = 6.28318530718;
 
@@ -121,7 +123,11 @@ const VERTEX_SHADER = /* glsl */ `
   }
 
   vec3 formation(int id, float strand, float t, float jitter, vec3 cloudPos, float time) {
-    if (id == 0) return cloudPos;
+    if (id == 0) {
+      float angle = t * TAU + strand * (TAU / 3.0) + time * 0.18;
+      float radius = 1.75 + strand * 0.17 + sin(time * 0.65 + strand) * 0.045;
+      return vec3(cos(angle) * radius, sin(angle + strand * 0.3) * radius * 0.62, sin(angle) * 0.42);
+    }
     if (id == 1) return monolith(strand, t, jitter, time);
     if (id == 2) return bloom(strand, t, time);
     if (id == 3) return strand < 0.5 ? signature(strand, t, jitter, time) : orbit(strand, t, jitter, time);
@@ -131,7 +137,7 @@ const VERTEX_SHADER = /* glsl */ `
   }
 
   float formationAlpha(int id, float strand) {
-    if (id == 0) return 0.48;
+    if (id == 0) return 0.92;
     if (id == 3) return strand < 0.5 ? 1.0 : 0.13;
     if (id == 4) return strand > 0.5 && strand < 1.5 ? 1.0 : 0.13;
     if (id == 5) return strand > 1.5 ? 1.0 : 0.13;
@@ -140,6 +146,7 @@ const VERTEX_SHADER = /* glsl */ `
   }
 
   float focusWeight(int id, float strand) {
+    if (id == 0) return 0.85;
     if (id == 3 && strand < 0.5) return 1.0;
     if (id == 4 && strand > 0.5 && strand < 1.5) return 1.0;
     if (id == 5 && strand > 1.5) return 1.0;
@@ -156,6 +163,15 @@ const VERTEX_SHADER = /* glsl */ `
     vec3 fromPos = formation(fromId, aStrand, aT, aJitter, aCloud, uTime);
     vec3 toPos = formation(toId, aStrand, aT, aJitter, aCloud, uTime);
     vec3 position = mix(fromPos, toPos, blend);
+    // A small flowing arc carries particles between their existing formations.
+    // It vanishes at both ends so every chapter keeps its original silhouette.
+    float transition = fromId == toId ? 0.0 : sin(blend * 3.14159265);
+    float flow = aT * TAU * 2.0 + aStrand * 2.1 + uTime * 0.6;
+    position += vec3(cos(flow), sin(flow), sin(flow * 0.5)) * transition * 0.16;
+
+    // Travelling light moves along the strands without extra geometry or bloom.
+    float wave = 0.5 + 0.5 * cos(aT * TAU * 2.0 - uTime * 1.6 + aStrand * 2.1);
+    vEnergy = pow(wave, 12.0);
 
     float ry = p * 4.4 + uTime * 0.05 + uMouseX * 0.28;
     float rx = -0.16 + sin(p * 3.14159265) * 0.12 + uMouseY * 0.2;
@@ -170,7 +186,7 @@ const VERTEX_SHADER = /* glsl */ `
     float perspective = 3.6 / max(0.65, 3.6 + z2);
 
     gl_Position = vec4(x1 * perspective * uNdcScale.x, -y2 * perspective * uNdcScale.y + 0.04, 0.0, 1.0);
-    gl_PointSize = max(1.0, aSize * perspective * uPointScale * uPixelRatio);
+    gl_PointSize = max(1.0, aSize * perspective * uPointScale * uPixelRatio * (1.0 + vEnergy * 0.65));
 
     vAlpha = mix(formationAlpha(fromId, aStrand), formationAlpha(toId, aStrand), blend);
     vFocus = mix(focusWeight(fromId, aStrand), focusWeight(toId, aStrand), blend);
@@ -179,6 +195,12 @@ const VERTEX_SHADER = /* glsl */ `
       : aStrand < 1.5
         ? vec3(1.0, 0.361, 0.541)
         : vec3(0.0, 0.898, 0.627);
+
+    // Depth hierarchy: near particles read brighter and slightly whiter, far
+    // ones recede, so the formation has a foreground without extra geometry.
+    float depth = clamp((perspective - 0.72) / 0.62, 0.0, 1.0);
+    vAlpha *= mix(0.42, 1.12, depth);
+    vColor = mix(vColor, vec3(1.0), depth * depth * 0.18);
   }
 `;
 
@@ -186,15 +208,16 @@ const POINT_FRAGMENT_SHADER = /* glsl */ `
   precision highp float;
   varying vec3 vColor;
   varying float vAlpha;
+  varying float vEnergy;
 
   void main() {
     vec2 centered = gl_PointCoord - 0.5;
     float radius = length(centered) * 2.0;
     float halo = pow(max(0.0, 1.0 - radius), 2.35);
-    float core = smoothstep(0.34, 0.0, radius);
-    float alpha = (halo * 0.48 + core * 0.9) * vAlpha;
+    float core = 1.0 - smoothstep(0.0, 0.34, radius);
+    float alpha = (halo * (0.48 + vEnergy * 0.25) + core * 0.9) * vAlpha;
     if (alpha < 0.012) discard;
-    gl_FragColor = vec4(vColor * (0.78 + core * 0.8), alpha);
+    gl_FragColor = vec4(mix(vColor, vec3(1.0), core * vEnergy * 0.35) * (0.78 + core * 0.8), alpha);
   }
 `;
 
@@ -203,13 +226,76 @@ const LINE_FRAGMENT_SHADER = /* glsl */ `
   varying vec3 vColor;
   varying float vAlpha;
   varying float vFocus;
+  varying float vEnergy;
 
   void main() {
-    float alpha = vAlpha * vFocus * 0.2;
+    float alpha = vAlpha * vFocus * (0.2 + vEnergy * 0.32);
     if (alpha < 0.008) discard;
     gl_FragColor = vec4(vColor, alpha);
   }
 `;
+
+// Ambient dust: a screen-space field at three depths. Shares the formation's
+// uniforms, so scroll and pointer give it parallax for free.
+const DUST_VERTEX_SHADER = /* glsl */ `
+  precision highp float;
+  uniform float uProgress;
+  uniform float uTime;
+  uniform float uMouseX;
+  uniform float uMouseY;
+  uniform float uPixelRatio;
+  attribute vec3 aSeed;
+  attribute float aPhase;
+  varying vec3 vColor;
+  varying float vAlpha;
+
+  void main() {
+    float depth = aSeed.z;
+    vec2 p = aSeed.xy;
+    // Slow upward drift, plus scroll parallax: near motes travel further.
+    p.y = mod(p.y + 1.0 + uTime * (0.004 + depth * 0.014) + uProgress * (0.35 + depth * 1.4), 2.0) - 1.0;
+    p.x += sin(uTime * 0.17 + aPhase * 6.2831) * 0.012 * (0.4 + depth);
+    p += vec2(-uMouseX, uMouseY) * (0.006 + depth * 0.03);
+    gl_Position = vec4(p * 1.04, 0.0, 1.0);
+
+    float twinkle = 0.55 + 0.45 * sin(uTime * (0.5 + aPhase * 0.9) + aPhase * 6.2831);
+    gl_PointSize = mix(1.4, 3.6, depth * depth) * uPixelRatio;
+    vAlpha = mix(0.16, 0.6, depth) * twinkle;
+    vColor = aPhase > 0.9
+      ? vec3(0.8, 1.0, 0.0)
+      : mix(vec3(0.72, 0.8, 1.0), vec3(0.6, 0.5, 1.0), fract(aPhase * 7.0));
+  }
+`;
+
+const DUST_FRAGMENT_SHADER = /* glsl */ `
+  precision highp float;
+  varying vec3 vColor;
+  varying float vAlpha;
+  void main() {
+    float r = length(gl_PointCoord - 0.5) * 2.0;
+    float a = pow(max(0.0, 1.0 - r), 2.2) * vAlpha;
+    if (a < 0.01) discard;
+    gl_FragColor = vec4(vColor, a);
+  }
+`;
+
+function createDustGeometry(count: number): THREE.BufferGeometry {
+  const seed = new Float32Array(count * 3);
+  const phase = new Float32Array(count);
+  for (let index = 0; index < count; index += 1) {
+    seed[index * 3] = Math.random() * 2 - 1;
+    seed[index * 3 + 1] = Math.random() * 2 - 1;
+    // Three loose depth bands: most motes far, a few close to the lens.
+    const band = Math.random();
+    seed[index * 3 + 2] = band < 0.6 ? Math.random() * 0.35 : band < 0.9 ? 0.35 + Math.random() * 0.35 : 0.7 + Math.random() * 0.3;
+    phase[index] = Math.random();
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+  geometry.setAttribute('aSeed', new THREE.BufferAttribute(seed, 3));
+  geometry.setAttribute('aPhase', new THREE.BufferAttribute(phase, 1));
+  return geometry;
+}
 
 function createSeeds(countPerStrand: number): Seed[] {
   const seeds: Seed[] = [];
@@ -288,6 +374,8 @@ class NeoHeroRenderer {
   private readonly lineGeometry: THREE.BufferGeometry;
   private readonly pointMaterial: THREE.ShaderMaterial;
   private readonly lineMaterial: THREE.ShaderMaterial;
+  private readonly dustGeometry: THREE.BufferGeometry;
+  private readonly dustMaterial: THREE.ShaderMaterial;
   private readonly uniforms: Record<string, THREE.IUniform>;
   private width = 1;
   private height = 1;
@@ -342,11 +430,24 @@ class NeoHeroRenderer {
       blending: THREE.AdditiveBlending,
     });
 
+    this.dustGeometry = createDustGeometry(lowPower ? 110 : 320);
+    this.dustMaterial = new THREE.ShaderMaterial({
+      uniforms: this.uniforms,
+      vertexShader: DUST_VERTEX_SHADER,
+      fragmentShader: DUST_FRAGMENT_SHADER,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+
+    const dust = new THREE.Points(this.dustGeometry, this.dustMaterial);
+    dust.frustumCulled = false;
     const points = new THREE.Points(this.pointGeometry, this.pointMaterial);
     points.frustumCulled = false;
     const lines = new THREE.LineSegments(this.lineGeometry, this.lineMaterial);
     lines.frustumCulled = false;
-    this.scene.add(lines, points);
+    this.scene.add(dust, lines, points);
   }
 
   setQuality(quality: number): void {
@@ -386,6 +487,8 @@ class NeoHeroRenderer {
   dispose(): void {
     this.pointGeometry.dispose();
     this.lineGeometry.dispose();
+    this.dustGeometry.dispose();
+    this.dustMaterial.dispose();
     this.pointMaterial.dispose();
     this.lineMaterial.dispose();
     this.renderer.renderLists.dispose();
@@ -403,20 +506,6 @@ type ChapterState = {
   visible: boolean | null;
 };
 
-function opacityForAnchoredChapter(progress: number, index: number, anchors: number[]): number {
-  const crossfade = 0.035;
-  const isFirst = index === 0;
-  const isLast = index === anchors.length - 1;
-  const leftBoundary = isFirst ? 0 : ((anchors[index - 1] ?? 0) + (anchors[index] ?? 0)) / 2;
-  const rightBoundary = isLast ? 1 : ((anchors[index] ?? 1) + (anchors[index + 1] ?? 1)) / 2;
-  const fadeIn = isFirst
-    ? 1
-    : THREE.MathUtils.smoothstep(progress, leftBoundary - crossfade / 2, leftBoundary + crossfade / 2);
-  const fadeOut = isLast
-    ? 1
-    : 1 - THREE.MathUtils.smoothstep(progress, rightBoundary - crossfade / 2, rightBoundary + crossfade / 2);
-  return Math.min(fadeIn, fadeOut);
-}
 
 export function useNeoHeroWebGL({
   wrapRef,
@@ -447,10 +536,7 @@ export function useNeoHeroWebGL({
     const chapterAnchors = chapters.map((chapter) => (
       chapter.from === 0 ? 0 : (chapter.from + chapter.to) / 2
     ));
-    // The explicit exit anchor prevents the final chapter from trapping the
-    // page. Every other anchor is a stable, fully readable narrative state.
-    const snapAnchors = [...chapterAnchors, 1];
-    const nearestAnchor = (progress: number, anchors = snapAnchors): number => anchors.reduce(
+    const nearestAnchor = (progress: number, anchors = chapterAnchors): number => anchors.reduce(
       (nearest, anchor) => (
         Math.abs(anchor - progress) < Math.abs(nearest - progress) ? anchor : nearest
       ),
@@ -464,10 +550,10 @@ export function useNeoHeroWebGL({
     let lastDomProgress = -1;
     let engine: NeoHeroRenderer | null = null;
     let rafId = 0;
-    let ambientTimerId = 0;
     let heroVisible = true;
     let contextLost = false;
     let lastFrame = 0;
+    let lastDraw = 0;
     let activeTime = 0;
     let frameEma = 16.7;
     let frameSamples = 0;
@@ -482,11 +568,19 @@ export function useNeoHeroWebGL({
       chapters.forEach((chapter, index) => {
         const opacity = opacityForAnchoredChapter(progress, index, chapterAnchors);
         const visible = opacity > 0.01;
+        // Arriving copy rises from below; leaving copy lifts away, so the
+        // sequence reads as one continuous upward drift.
+        const hidden = 1 - opacity;
+        const lift = -chapterDirection(progress, index, chapterAnchors) * hidden * hidden * 34;
         chapter.el.style.opacity = opacity.toFixed(3);
-        chapter.el.style.transform = `translate3d(0, ${((1 - opacity) * 26).toFixed(1)}px, 0)`;
+        chapter.el.style.transform = `translate3d(0, ${lift.toFixed(1)}px, 0)`;
         if (visible !== chapter.visible) {
           chapter.visible = visible;
+          // Hidden chapters keep a promoted layer (will-change) but skip
+          // raster and compositing entirely.
+          chapter.el.style.visibility = visible ? 'visible' : 'hidden';
           chapter.el.style.pointerEvents = visible ? 'auto' : 'none';
+          chapter.el.inert = !visible;
           chapter.el.setAttribute('aria-hidden', visible ? 'false' : 'true');
         }
       });
@@ -495,7 +589,11 @@ export function useNeoHeroWebGL({
       const nextActive = Math.max(0, chapterAnchors.indexOf(activeAnchor));
 
       if (nextActive !== activeChapter) {
-        dots.forEach((dot, index) => dot.classList.toggle('is-active', index === nextActive));
+        dots.forEach((dot, index) => {
+          dot.classList.toggle('is-active', index === nextActive);
+          if (index === nextActive) dot.setAttribute('aria-current', 'step');
+          else dot.removeAttribute('aria-current');
+        });
         if (counterNumRef.current) counterNumRef.current.textContent = `0${nextActive + 1}`;
         activeChapter = nextActive;
       }
@@ -506,8 +604,7 @@ export function useNeoHeroWebGL({
       const spread = THREE.MathUtils.smoothstep(progress, 0, 0.07);
       titleSpans.forEach((span, index) => {
         const direction = index - (titleSpans.length - 1) / 2;
-        span.style.transform = `translate3d(${(direction * spread * 34).toFixed(1)}px, 0, 0)`;
-        span.style.opacity = (1 - spread).toFixed(3);
+        span.style.transform = `translate3d(${(direction * spread * 14).toFixed(1)}px, 0, 0)`;
       });
     };
 
@@ -517,30 +614,17 @@ export function useNeoHeroWebGL({
       if (width > 0 && height > 0) engine?.resize(width, height);
     };
 
-    const cancelAmbientTimer = (): void => {
-      if (!ambientTimerId) return;
-      window.clearTimeout(ambientTimerId);
-      ambientTimerId = 0;
-    };
-
     const ensureRender = (): void => {
-      cancelAmbientTimer();
       if (heroVisible && !contextLost && !document.hidden && !rafId) {
         rafId = window.requestAnimationFrame(renderFrame);
       }
     };
 
-    const scheduleAmbientRender = (): void => {
-      if (reducedMotion || !engine || !heroVisible || contextLost || document.hidden || rafId || ambientTimerId) return;
-      ambientTimerId = window.setTimeout(() => {
-        ambientTimerId = 0;
-        ensureRender();
-      }, lowPower ? 100 : 66);
-    };
-
     const renderFrame = (now: number): void => {
       rafId = 0;
       if (!heroVisible || contextLost || document.hidden) return;
+      // Keep a stable display clock. Timer-based idle frames made the scene
+      // visibly judder and changed its speed when the pointer moved.
       const deltaMs = lastFrame ? Math.min(50, now - lastFrame) : 16.7;
       const deltaSeconds = deltaMs / 1000;
       lastFrame = now;
@@ -561,6 +645,17 @@ export function useNeoHeroWebGL({
       // two layers to stop in visibly different states.
       updateChapters(state.current);
 
+      // Low-power devices: throttle only the WebGL draw to 30fps. The chapter
+      // copy above still tracks scroll every frame — capping the whole loop made
+      // scroll-linked text step at half the scroll rate (visible jitter).
+      const skipDraw = lowPower && lastDraw && now - lastDraw < 1000 / 30 - 1;
+      if (skipDraw) {
+        canvas.dataset.renderMode = 'interactive';
+        if (stillMoving || (!reducedMotion && !saveData && engine)) ensureRender();
+        return;
+      }
+      lastDraw = now;
+
       engine?.render({
         progress: state.current,
         time: activeTime,
@@ -575,9 +670,9 @@ export function useNeoHeroWebGL({
         renderSampleCount = 0;
       }
 
-      // Quality decisions use interaction frames only. Ambient rendering is
-      // intentionally throttled and must not be mistaken for a slow device.
-      if (stillMoving && deltaMs < 45) {
+      // Desktop ambient and interaction frames now share the display clock.
+      // Exclude intentionally capped mobile frames from quality decisions.
+      if (!lowPower) {
         frameEma = frameEma * 0.92 + deltaMs * 0.08;
         frameSamples += 1;
       }
@@ -594,8 +689,7 @@ export function useNeoHeroWebGL({
       }
 
       canvas.dataset.renderMode = reducedMotion ? 'reduced' : stillMoving ? 'interactive' : 'ambient';
-      if (stillMoving) ensureRender();
-      else scheduleAmbientRender();
+      if (stillMoving || (!reducedMotion && !saveData && engine)) ensureRender();
     };
 
     const onContextLost = (event: Event): void => {
@@ -604,7 +698,6 @@ export function useNeoHeroWebGL({
       wrap.classList.add('neo-webgl-fallback');
       if (rafId) window.cancelAnimationFrame(rafId);
       rafId = 0;
-      cancelAmbientTimer();
       canvas.dataset.renderMode = 'paused';
     };
     const onContextRestored = (): void => {
@@ -637,16 +730,6 @@ export function useNeoHeroWebGL({
         trigger: wrap,
         start: 'top top',
         end: 'bottom bottom',
-        snap: {
-          snapTo: (progress) => nearestAnchor(progress),
-          delay: 0.06,
-          duration: { min: 0.14, max: 0.28 },
-          ease: 'power2.out',
-          inertia: false,
-          onStart: () => wrap.classList.add('neo-hero-settling'),
-          onInterrupt: () => wrap.classList.remove('neo-hero-settling'),
-          onComplete: () => wrap.classList.remove('neo-hero-settling'),
-        },
         onUpdate: (self) => {
           state.target = self.progress;
           ensureRender();
@@ -666,15 +749,14 @@ export function useNeoHeroWebGL({
 
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       heroVisible = Boolean(entry?.isIntersecting);
-      if (heroVisible) ensureRender();
+      if (heroVisible) { lastFrame = 0; ensureRender(); }
       else {
         if (rafId) window.cancelAnimationFrame(rafId);
         rafId = 0;
-        cancelAmbientTimer();
         canvas.dataset.renderMode = 'paused';
       }
     });
-    intersectionObserver.observe(wrap);
+    intersectionObserver.observe(wrap.querySelector('.neo-hero-stage') || wrap);
 
     const resizeObserver = typeof ResizeObserver !== 'undefined'
       ? new ResizeObserver(() => resize())
@@ -686,7 +768,6 @@ export function useNeoHeroWebGL({
       if (document.hidden) {
         if (rafId) window.cancelAnimationFrame(rafId);
         rafId = 0;
-        cancelAmbientTimer();
         canvas.dataset.renderMode = 'paused';
       } else if (!document.hidden) {
         lastFrame = 0;
@@ -712,7 +793,6 @@ export function useNeoHeroWebGL({
 
     return () => {
       if (rafId) window.cancelAnimationFrame(rafId);
-      cancelAmbientTimer();
       scrollTrigger?.kill();
       intersectionObserver.disconnect();
       resizeObserver?.disconnect();

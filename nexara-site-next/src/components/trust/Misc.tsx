@@ -34,6 +34,46 @@ type FooterColumn =
     };
 
 
+export function TrustWork() {
+  const { live, building } = DATA.work;
+  return (
+    <section className="tsx-work" aria-labelledby="tsx-work-h">
+      <div className="tsx-section-inner">
+        <p className="tsx-section-eyebrow tsx-fade">Delivery record</p>
+        <h2 className="tsx-section-heading tsx-fade tsx-fade-d1" id="tsx-work-h">Delivered work, <span className="serif">on the record.</span></h2>
+        <p className="tsx-section-lede tsx-fade tsx-fade-d2">Live client platforms you can inspect today, and the engagements currently in delivery.</p>
+        <div className="tsx-work-grid">
+          {live.map((w, i) => (
+            <a key={w.url} className={`tsx-work-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} href={w.url} target="_blank" rel="noopener noreferrer">
+              <span className="tsx-work-plate"><img src={w.logo} alt={`${w.name} logo`} loading="lazy" decoding="async" /></span>
+              <span className="tsx-work-meta">
+                <span>Record {String(i + 1).padStart(2, '0')}</span>
+                <span>{w.sector} · {w.place}</span>
+              </span>
+              <h3>{w.name}</h3>
+              <p>{w.line}</p>
+              <span className="tsx-work-scope" aria-label="Scope">{w.scope.map((t) => <span key={t}>{t}</span>)}</span>
+              <span className="tsx-work-foot">
+                <span className="tsx-work-status"><i aria-hidden="true" />Live</span>
+                <span className="tsx-work-link">Visit site <span aria-hidden="true">↗</span></span>
+              </span>
+            </a>
+          ))}
+        </div>
+        <div className="tsx-work-bench tsx-fade">
+          <span className="tsx-work-bench-label">In delivery</span>
+          <ul>
+            {building.map((b) => (
+              <li key={b.name}><b>{b.name}</b><span>{b.kind}</span></li>
+            ))}
+            <li><b>+ further engagements in the pipeline</b></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function TrustProofStrip() {
   const stats = [
     { num: '12', label: 'Months — standard Academy cohort',          accent: false },

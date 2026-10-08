@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { Tilt } from '../ui/motion-primitives';
+import { PackageGrid } from '../ui/package-card';
 import ReactDOM from 'react-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { DATA } from '@/lib/data';
@@ -715,42 +716,30 @@ export function CardVisual({ title, theme }: CardVisualProps) {
   );
 }
 
-export function ModuleCard({ theme, eyebrow, title, children, visualTitle = null, className = "module-card", onClick = null }: ModuleCardProps) {
+export function ModuleCard({ theme, eyebrow, title, children, visualTitle = null, className = "", onClick = null }: ModuleCardProps) {
   const reduceMotion = useReducedMotion();
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    e.currentTarget.style.setProperty("--mouse-x", `${x}px`);
-    e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
-  };
-
   const isClickable = onClick !== null;
 
+  // Spotlight border position comes from Tilt's --light-x/--light-y (see styles/cards.css).
   return (
     <Tilt as={isClickable ? "button" : "article"} type={isClickable ? "button" : undefined}
-      className={`${className} spotlight-card ${isClickable ? 'clickable-card' : ''}`} 
-      onMouseMove={handleMouseMove}
+      className={`nx-card nx-module ${className} ${isClickable ? 'is-clickable' : ''}`}
       onClick={onClick || undefined}
-      style={isClickable ? { cursor: "pointer" } : undefined}
       variants={CARD_MOTION}
       initial={false}
       whileInView="show"
       viewport={{ once: true, amount: 0.24 }}
       whileTap={reduceMotion || !isClickable ? undefined : { scale: 0.985 }}
     >
-      <div className="spotlight-glow" />
-      <div className="card-content-wrapper">
-        <span>{eyebrow}</span>
-        {visualTitle && <CardVisual title={visualTitle} theme={theme} />}
-        <h3>{title}</h3>
-        <p>{children}</p>
-        {isClickable && (
-          <div className="card-click-prompt" style={{ marginTop: "16px", fontSize: "0.75rem", fontFamily: "var(--font-mono)", opacity: 0.7, textTransform: "uppercase" }}>
-            {theme === "neo" ? "full drop →" : "View specifications →"}
-          </div>
-        )}
-      </div>
+      <span className="nx-module-eyebrow">{eyebrow}</span>
+      {visualTitle && <div className="nx-module-visual"><CardVisual title={visualTitle} theme={theme} /></div>}
+      <h3 className="nx-module-title">{title}</h3>
+      <p className="nx-module-body">{children}</p>
+      {isClickable && (
+        <span className="nx-module-cta">
+          {theme === "neo" ? "Open the full drop" : "View specifications"} <span aria-hidden="true">→</span>
+        </span>
+      )}
     </Tilt>
   );
 }
@@ -1292,23 +1281,8 @@ export function InteractiveTimeline({ theme, section }: InteractiveTimelineProps
         </p>
       </div>
 
-      <div className="package-grid" style={{ marginTop: "48px" }}>
-        {section.packages.map((pkg) => (
-          <article 
-            className="package-card" 
-            key={pkg.name}
-            style={{ cursor: "pointer" }}
-            onClick={() => routeTo(theme, "contact", section.id)}
-          >
-            <span>{pkg.fit}</span>
-            <h3>{pkg.name}</h3>
-            <div className="package-meta">
-              <strong>{pkg.price}</strong>
-              <small>{pkg.duration}</small>
-            </div>
-            <ul>{pkg.includes.map((item) => <li key={item}>{item}</li>)}</ul>
-          </article>
-        ))}
+      <div style={{ marginTop: "48px" }}>
+        <PackageGrid packages={section.packages} onSelect={() => routeTo(theme, "contact", section.id)} />
       </div>
     </section>
   );

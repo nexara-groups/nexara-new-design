@@ -24,3 +24,151 @@
 @media(min-width:1024px){ .neo .neo-hero-title { font-size:clamp(90px,11.4vw,210px); max-width:82vw; } }
 .neo .neo-hero-runway--detail .neo-hero-stage { height:auto !important; min-height:0 !important; }
 .neo .neo-hero-runway--detail .neo-hero-chapter { min-height:0 !important; padding:clamp(90px,10vw,140px) 24px 80px; }
+
+/* A single optical opening, followed by natural scroll-led chapters. */
+.neo .neo-hero-stage {
+  background:
+    radial-gradient(ellipse at 20% 18%, rgba(124,92,255,.24), transparent 52%),
+    radial-gradient(ellipse at 88% 82%, rgba(204,255,0,.12), transparent 45%),
+    #080a0c;
+}
+.neo .neo-hero-stage::before { display: none; }
+.neo .neo-hero-stage::after {
+  background: radial-gradient(ellipse at 50% 50%, transparent 30%, #080a0c 85%);
+  opacity: .25; mix-blend-mode: normal;
+}
+.neo .neo-hero-runway { height: 480svh; }
+.neo .neo-hero-title { max-width: 80vw; }
+@media (prefers-reduced-motion: no-preference) {
+  .neo .neo-hero-title { animation: neo-title-exposure 1100ms cubic-bezier(.16,1,.3,1) both; }
+  .neo .neo-hero-canvas { animation: neo-camera-arrival 1400ms cubic-bezier(.16,1,.3,1) both; }
+}
+@keyframes neo-title-exposure {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes neo-camera-arrival {
+  from { opacity: .2; transform: scale(1.12); }
+  to { opacity: 1; transform: scale(1); }
+}
+@media (max-width: 760px) { .neo .neo-hero-runway { height: 380svh; } }
+
+.neo .neo-hero-rail { gap: 0; }
+.neo .neo-hero-rail button { width: 100px; min-height: 44px; }
+.neo .neo-hero-rail button:focus-visible { outline: 1px solid #ccff00; outline-offset: 3px; }
+.neo-webgl-fallback .neo-hero-rail { display: none; }
+
+@media (max-width: 760px) {
+  .neo .neo-hero-title { font-size: 11vw; max-width: 90vw; }
+}
+
+/* ── Hero hierarchy & finish ───────────────────────────────────────────────
+   kicker (tag) → display title → serif accent → lede → action. Same palette:
+   lime #ccff00 on near-black, division accents via --accent. */
+.neo .neo-hero-stage {
+  background:
+    radial-gradient(ellipse at 20% 18%, rgba(124,92,255,.22), transparent 52%),
+    #080a0c;
+}
+/* Display title: soft vertical light falloff, lit from above. Applied per
+   letter so the spread transform never breaks the text clip. */
+.neo .neo-hero-title span {
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8ea 46%, #c9d2b4 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.neo .neo-hero-chapter .kicker {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 7px 14px 7px 12px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent, #7c5cff) 34%, transparent);
+  background: color-mix(in srgb, var(--accent, #7c5cff) 8%, rgba(8,10,12,.4));
+  color: color-mix(in srgb, var(--accent, #7c5cff) 70%, #fff);
+  text-shadow: none;
+}
+.neo .neo-hero-chapter .kicker::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: #ccff00; box-shadow: 0 0 10px rgba(204,255,0,.8);
+}
+.neo .neo-hero-chapter .ch-num { display: inline-flex; align-items: center; gap: 12px; text-shadow: none; }
+.neo .neo-hero-chapter .ch-num::before {
+  content: ""; width: 32px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent, #7c5cff));
+}
+.neo .neo-hero-chapter.ch-right .ch-num { flex-direction: row-reverse; }
+.neo .neo-hero-chapter.ch-right .ch-num::before { background: linear-gradient(270deg, transparent, var(--accent, #7c5cff)); }
+/* Lighter shadows: the radial scrim already carries legibility, and smaller
+   blur radii are far cheaper to repaint on 2x displays. */
+.neo .neo-hero-chapter .ch-name,
+.neo .neo-hero-chapter .h-display { text-shadow: 0 2px 18px rgba(0,0,0,.55); }
+.neo .neo-hero-chapter .serif { text-shadow: 0 0 28px color-mix(in srgb, var(--accent, #7c5cff) 30%, transparent); }
+.neo .neo-hero-chapter .lede { color: #c9d0da; text-shadow: none; }
+.neo .neo-hero-chapter .ch-link {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: color-mix(in srgb, var(--accent, #7c5cff) 10%, transparent);
+  transition: background .25s, color .25s, box-shadow .25s, transform .25s cubic-bezier(.16,1,.3,1);
+}
+.neo .neo-hero-chapter .ch-link:hover {
+  box-shadow: 0 10px 30px -10px color-mix(in srgb, var(--accent, #7c5cff) 70%, transparent);
+  transform: translateY(-2px);
+}
+.neo .neo-hero-chapter .btn-solid { box-shadow: 0 10px 34px -12px rgba(204,255,0,.65); }
+.neo .neo-hero-counter .neo-counter-bar i { background: linear-gradient(90deg, #7c5cff, #ccff00); }
+.neo .neo-hero-counter strong { color: #ccff00; }
+
+/* ── Hero atmosphere ───────────────────────────────────────────────────────
+   Sits behind the WebGL canvas. Every layer is a static paint animated by
+   transform/opacity only, so it composites without repainting. */
+.neo .neo-atmos { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+
+/* Perspective floor: a lime grid receding to a horizon, drifting toward you. */
+.neo .neo-atmos-floor {
+  position: absolute; left: -30%; right: -30%; bottom: 0; height: 44%;
+  perspective: 380px; perspective-origin: 50% 0%;
+  -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,.55) 35%, transparent 88%);
+  mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,.55) 35%, transparent 88%);
+  opacity: .55;
+}
+.neo .neo-atmos-floor i {
+  position: absolute; left: 0; right: 0; bottom: -10%; height: 220%;
+  transform-origin: 50% 100%; transform: rotateX(70deg);
+  background-image:
+    linear-gradient(rgba(204,255,0,.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(204,255,0,.11) 1px, transparent 1px);
+  background-size: 72px 72px;
+  will-change: transform;
+}
+
+/* HUD orbit rings: thin arcs on a tilted plane behind the formation. */
+.neo .neo-atmos-rings { position: absolute; left: 50%; top: 48%; width: 0; height: 0; }
+.neo .neo-atmos-rings i {
+  position: absolute; left: 0; top: 0; aspect-ratio: 1; border-radius: 50%;
+  border: 1px solid rgba(200,215,255,.10);
+  -webkit-mask-image: conic-gradient(#000 0 22%, transparent 22% 31%, #000 31% 64%, transparent 64% 70%, #000 70% 86%, transparent 86%);
+  mask-image: conic-gradient(#000 0 22%, transparent 22% 31%, #000 31% 64%, transparent 64% 70%, #000 70% 86%, transparent 86%);
+  translate: -50% -50%; transform: scaleY(.38) rotate(0deg);
+  will-change: transform;
+}
+.neo .neo-atmos-rings i:nth-child(1) { width: 64vmin; border-color: rgba(204,255,0,.14); }
+.neo .neo-atmos-rings i:nth-child(2) { width: 92vmin; }
+.neo .neo-atmos-rings i:nth-child(3) { width: 124vmin; border-style: dashed; border-color: rgba(200,215,255,.07); }
+
+/* Corner brackets: quiet engineering frame. */
+.neo .neo-atmos-frame i { position: absolute; width: 18px; height: 18px; border: 1px solid rgba(204,255,0,.32); }
+.neo .neo-atmos-frame i:nth-child(1) { top: 92px; left: 28px; border-right: 0; border-bottom: 0; }
+.neo .neo-atmos-frame i:nth-child(2) { top: 92px; right: 28px; border-left: 0; border-bottom: 0; }
+.neo .neo-atmos-frame i:nth-child(3) { bottom: 28px; left: 28px; border-right: 0; border-top: 0; }
+.neo .neo-atmos-frame i:nth-child(4) { bottom: 28px; right: 28px; border-left: 0; border-top: 0; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .neo .neo-atmos-floor i { animation: neo-floor-drift 5.5s linear infinite; }
+  .neo .neo-atmos-rings i:nth-child(1) { animation: neo-ring-spin 46s linear infinite; }
+  .neo .neo-atmos-rings i:nth-child(2) { animation: neo-ring-spin 74s linear infinite reverse; }
+  .neo .neo-atmos-rings i:nth-child(3) { animation: neo-ring-spin 120s linear infinite; }
+}
+@keyframes neo-floor-drift { to { transform: rotateX(70deg) translate3d(0, 72px, 0); } }
+@keyframes neo-ring-spin { to { transform: scaleY(.38) rotate(360deg); } }
+
+@media (max-width: 760px) {
+  .neo .neo-atmos-rings, .neo .neo-atmos-frame { display: none; }
+  .neo .neo-atmos-floor { height: 32%; opacity: .4; }
+}
+.neo .neo-hero-runway--detail .neo-atmos { display: none; }

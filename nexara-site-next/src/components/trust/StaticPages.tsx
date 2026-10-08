@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { ClientCases, ClientLogoWall } from '../ClientCases';
 import ContactDetails from '../ContactDetails';
 import { DATA } from '@/lib/data';
 import { useBriefForm, SECTION_HERO_WORDS } from '@/lib/shared';
@@ -33,15 +34,15 @@ export function TrustCustomers({ detail }: TrustCustomersProps) {
   return (
     <main className="tsx-customers-page">
       <TrustPageHero
-        eyebrow={activeSection ? `${activeSection.name} — Proof` : "Operating Proof"}
+        eyebrow={activeSection ? `${activeSection.name} — Proof` : "Delivery record"}
         title="Delivery proof"
         accentWords={SECTION_HERO_WORDS.trust.customers}
-        body="Each engagement is framed as a delivery model — scope evidence, the work produced, and the operating readiness handed over. No invented logos, no vanity metrics."
+        body="Live client platforms you can inspect today — a SaaS product, a medical library, sales calculators and websites — and the operating model behind each one."
         primaryLabel="Start an engagement"
         onPrimary={() => routeTo('trust', 'contact')}
       >
         <div className="tsx-page-hero-stats">
-          {[["3","solution lines"],["3","proof records"],["100%","scoped & owned"]].map(([v, l]) => (
+          {[[String(DATA.work.live.length),"live platforms"],[String(DATA.work.building.length),"in delivery"],["3","solution lines"]].map(([v, l]) => (
             <div key={l} className="tsx-page-hero-stat">
               <span className="tsx-page-hero-stat-value">{v}</span>
               <span className="tsx-page-hero-stat-label">{l}</span>
@@ -49,6 +50,17 @@ export function TrustCustomers({ detail }: TrustCustomersProps) {
           ))}
         </div>
       </TrustPageHero>
+      {!activeSection && (
+        <section className="tsx-section-inner nx-proof-section">
+          <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
+            <span className="tsx-chapter-eyebrow">Client record</span>
+            <h2 className="tsx-chapter-title">The businesses, and what we delivered</h2>
+            <p className="tsx-chapter-sub">What each client does, and the platforms Nexara built and runs for them.</p>
+          </header>
+          <ClientLogoWall />
+          <ClientCases theme="trust" />
+        </section>
+      )}
       <section className="tsx-section-inner tsx-proof-table-section">
         <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
           <span className="tsx-chapter-eyebrow">Operating proof</span>

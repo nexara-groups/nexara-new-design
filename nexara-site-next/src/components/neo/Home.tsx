@@ -165,16 +165,114 @@ function NeoDivisionsRail() {
   );
 }
 
+function NeoWork() {
+  const { live, building } = DATA.work;
+  return (
+    <section className="section neo-work" id="work">
+      <div className="section-inner">
+        <div className="section-head">
+          <div>
+            <p className="kicker">Receipts</p>
+            <h2 className="h-section">Live work.<br /><span className="serif">Click any of it.</span></h2>
+          </div>
+        </div>
+        <div className="neo-work-grid">
+          {live.map((w, i) => (
+            <a key={w.url} className="neo-work-card" href={w.url} target="_blank" rel="noopener noreferrer">
+              <span className="neo-work-meta">
+                <span className="neo-work-live"><i />Live</span>
+                <span>{String(i + 1).padStart(2, '0')} / {w.sector}</span>
+              </span>
+              <span className="neo-work-logo"><img src={w.logo} alt={`${w.name} logo`} loading="lazy" decoding="async" /></span>
+              <h3>{w.name}</h3>
+              <p>{w.line}</p>
+              <span className="neo-work-scope">{w.scope.map((t) => <span key={t}>{t}</span>)}</span>
+              <span className="neo-work-url">{w.url.replace(/^https:\/\/(www\.)?/, '').replace(/\/$/, '')} <span className="arr">↗</span></span>
+            </a>
+          ))}
+        </div>
+        <div className="neo-work-bench">
+          <span className="neo-work-bench-label">On the bench</span>
+          <ul>
+            {building.map((b) => (
+              <li key={b.name}><b>{b.name}</b><span>{b.kind}</span></li>
+            ))}
+            <li className="neo-work-more"><b>+ more in the pipeline</b></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NeoStandards() {
+  const wrapRef = React.useRef<HTMLElement>(null);
+  // Cards rise in one after another, each drawing its lime rule as it lands.
+  React.useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ scrollTrigger: { trigger: wrap.querySelector('.neo-standards-grid'), start: 'top 82%', once: true } });
+      tl.from('.neo-standard-card', { y: 48, autoAlpha: 0, duration: 0.8, ease: 'power3.out', stagger: 0.12 })
+        .from('.neo-standard-card .neo-std-rule', { scaleX: 0, duration: 0.7, ease: 'power2.inOut', stagger: 0.12 }, 0.25);
+    }, wrap);
+    return () => ctx.revert();
+  }, []);
+  return (
+    <section className="section standards" ref={wrapRef}>
+      <div className="section-inner">
+        <div className="section-head">
+          <div>
+            <p className="kicker">The operating standard</p>
+            <h2 className="h-section">Every division runs<br />on the same spine.</h2>
+          </div>
+        </div>
+        <div className="neo-standards-grid">
+          <div className="neo-standard-card">
+            <span className="neo-std-rule" aria-hidden="true" />
+            <span className="neo-std-idx">/01</span>
+            <h3>Written before built</h3>
+            <p>Every engagement starts with a written brief and scope. If it isn't written down, it isn't agreed.</p>
+          </div>
+          <div className="neo-standard-card">
+            <span className="neo-std-rule" aria-hidden="true" />
+            <span className="neo-std-idx">/02</span>
+            <h3>Demo every week</h3>
+            <p>Working software, live cohorts, running campaigns — shown weekly, not described in decks.</p>
+          </div>
+          <div className="neo-standard-card">
+            <span className="neo-std-rule" aria-hidden="true" />
+            <span className="neo-std-idx">/03</span>
+            <h3>One accountable lead</h3>
+            <p>Every cohort, system and campaign has a single named owner from kickoff to handover.</p>
+          </div>
+          <div className="neo-standard-card">
+            <span className="neo-std-rule" aria-hidden="true" />
+            <span className="neo-std-idx">/04</span>
+            <h3>Handover by design</h3>
+            <p>Documentation, access and training are part of the deliverable — never an afterthought.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function NeoFinalCTA() {
+  const { phone } = DATA.contact;
   return (
     <section className="neo-final-cta">
       <p className="kicker">Ready when you are</p>
-      <button onClick={() => routeTo('neo', 'contact')} aria-label="Begin — start a brief" style={{ border: 0, background: 'none', padding: 0 }}>
-        <span className="neo-final-cta">
-          <a href="#contact" onClick={(e) => { e.preventDefault(); routeTo('neo', 'contact'); }}>Begin.</a>
-        </span>
-      </button>
+      <h2 className="neo-final-title">
+        <a href="/neo/contact" onClick={(e) => { e.preventDefault(); routeTo('neo', 'contact'); }}>Begin.</a>
+      </h2>
       <p className="lede">Tell us which force you need — or let the brief decide.</p>
+      <div className="neo-final-actions">
+        <a className="neo-nav-cta neo-final-primary" href="/neo/contact" onClick={(e) => { e.preventDefault(); routeTo('neo', 'contact'); }}>
+          Start a project <span className="arr" aria-hidden="true">↗</span>
+        </a>
+        <a className="neo-final-secondary" href={phone.href}>Call {phone.display}</a>
+      </div>
     </section>
   );
 }
@@ -193,38 +291,8 @@ function Home({ theme }: HomeProps) {
             <NeoHeroUnravel copy={copy} theme={theme} />
             <NeoManifesto />
             <NeoDivisionsRail />
-            <section className="section standards">
-              <div className="section-inner">
-                <div className="section-head">
-                  <div>
-                    <p className="kicker">The operating standard</p>
-                    <h2 className="h-section">Every division runs<br />on the same spine.</h2>
-                  </div>
-                </div>
-                <div className="neo-standards-grid">
-                  <div className="neo-standard-card">
-                    <span className="neo-std-idx">/01</span>
-                    <h3>Written before built</h3>
-                    <p>Every engagement starts with a written brief and scope. If it isn't written down, it isn't agreed.</p>
-                  </div>
-                  <div className="neo-standard-card">
-                    <span className="neo-std-idx">/02</span>
-                    <h3>Demo every week</h3>
-                    <p>Working software, live cohorts, running campaigns — shown weekly, not described in decks.</p>
-                  </div>
-                  <div className="neo-standard-card">
-                    <span className="neo-std-idx">/03</span>
-                    <h3>One accountable lead</h3>
-                    <p>Every cohort, system and campaign has a single named owner from kickoff to handover.</p>
-                  </div>
-                  <div className="neo-standard-card">
-                    <span className="neo-std-idx">/04</span>
-                    <h3>Handover by design</h3>
-                    <p>Documentation, access and training are part of the deliverable — never an afterthought.</p>
-                  </div>
-                </div>
-              </div>
-            </section>
+            <NeoWork />
+            <NeoStandards />
             <NeoFinalCTA />
           </>
         )

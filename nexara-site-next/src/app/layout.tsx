@@ -1,11 +1,37 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+// Self-hosted (same-origin, latin subset) — replaces the render-blocking Google
+// Fonts stylesheet. @fontsource keeps the real family names, so CSS is unchanged.
+import '@fontsource/syne/latin-600.css';
+import '@fontsource/syne/latin-700.css';
+import '@fontsource/syne/latin-800.css';
+import '@fontsource/space-grotesk/latin-400.css';
+import '@fontsource/space-grotesk/latin-500.css';
+import '@fontsource/space-grotesk/latin-600.css';
+import '@fontsource/space-grotesk/latin-700.css';
+import '@fontsource/jetbrains-mono/latin-400.css';
+import '@fontsource/jetbrains-mono/latin-500.css';
+import '@fontsource/jetbrains-mono/latin-700.css';
+import '@fontsource/plus-jakarta-sans/latin-400.css';
+import '@fontsource/plus-jakarta-sans/latin-500.css';
+import '@fontsource/plus-jakarta-sans/latin-600.css';
+import '@fontsource/plus-jakarta-sans/latin-700.css';
+import '@fontsource/plus-jakarta-sans/latin-800.css';
+import '@fontsource/libre-baskerville/latin-400.css';
+import '@fontsource/libre-baskerville/latin-700.css';
+import '@fontsource/libre-baskerville/latin-400-italic.css';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-500.css';
+import '@fontsource/inter/latin-600.css';
+import '@fontsource/inter/latin-700.css';
+import '@fontsource/inter/latin-800.css';
 import '@/styles/index.css';
 import '@/styles/base.css';
 import '@/styles/gateway.css';
 import '@/styles/consent.css';
 import '@/styles/refinements.css';
 import '@/styles/elevation.css';
+import '@/styles/cards.css';
 
 export const metadata: Metadata = {
   title: 'Nexara Groups — Academy, Digital Marketing & Product Studio',
@@ -46,15 +72,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           })();
         `}</Script>
 
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* Six families actually carrying the design (Inter/Syne/JetBrains Mono
-            are the workhorses; Space Grotesk = Neo body, Plus Jakarta = base
-            body, Libre Baskerville = serif accents). Geist, Geist Mono and
-            Fraunces were dead weight — every rule that named them declares an
-            in-list fallback, and Fraunces' variable axes alone were the
-            heaviest files in the old 9-family request. */}
-        <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
       <body>
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-BPYYD3KQ99" strategy="afterInteractive" />

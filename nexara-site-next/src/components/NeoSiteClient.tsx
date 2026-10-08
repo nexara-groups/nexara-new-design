@@ -20,10 +20,12 @@ import { SectionPage } from './neo/SectionShell';
 import { Customers, Company, Contact } from './neo/StaticPages';
 const NeoGuide = dynamic(()=>import('./neo/Guide').then(module=>module.NeoGuide),{ssr:false});
 import { Footer } from './neo/Footer';
+import { useSmoothScroll } from './useSmoothScroll';
 
 function Site({ theme, page, detail }: { theme: 'trust' | 'neo'; page: string; detail: string | null }) {
   const router = useRouter();
   React.useEffect(() => { setNeoRouter(router); }, [router]);
+  useSmoothScroll();
   const isNeo = theme === "neo";
   const [guideReady,setGuideReady]=React.useState(false);
   React.useEffect(()=>{const timer=setTimeout(()=>setGuideReady(true),900);return()=>clearTimeout(timer);},[]);

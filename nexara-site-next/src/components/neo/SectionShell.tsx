@@ -572,7 +572,7 @@ function SectionOverview({ theme, section }: SectionOverviewProps) {
           </div>
           <p>{theme === "neo" ? "Four engines doing the actual work. Tap any one for the full breakdown." : "Core capability modules that make up this solution line."}</p>
         </div>
-        <div className="module-grid">
+        <div className="module-grid nx-bento">
           {section.modules.map((module, i) => (
             <ModuleCard
               key={module.title}
@@ -644,7 +644,7 @@ function SubpageDetail({ theme, section, page }: SubpageDetailProps) {
         <p className="eyebrow">{section.name} / {page.title}</p>
         <h2>{voice(theme, page.callout)}</h2>
       </section>
-      <section className="module-grid compact">
+      <section className="module-grid compact nx-grid-2">
         {page.cards.map((card) => (
           <ModuleCard key={card.title} theme={theme} eyebrow={page.title} title={card.title} visualTitle={card.title}>
             {voice(theme, card)}

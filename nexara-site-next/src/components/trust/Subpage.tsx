@@ -142,13 +142,15 @@ export function TrustSubpageCards({ page }: { page: TrustSubpageData }) {
   return (
     <div className="tsx-subpage-feature-grid">
       {page.cards.map((card, i) => (
-        <Tilt as="article" className={`tsx-subpage-feature-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={card.title}>
-          <span className="tsx-subpage-feature-icon" aria-hidden="true">
-            {SUBPAGE_CARD_ICONS[card.title] || DEFAULT_CARD_ICON}
+        <Tilt as="article" className={`nx-card nx-module nx-feature tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`} key={card.title}>
+          <span className="nx-feature-top">
+            <span className="nx-feature-icon" aria-hidden="true">
+              {SUBPAGE_CARD_ICONS[card.title] || DEFAULT_CARD_ICON}
+            </span>
+            <span className="nx-module-eyebrow">{String(i + 1).padStart(2, '0')} / {String(page.cards.length).padStart(2, '0')}</span>
           </span>
-          <span className="tsx-subpage-feature-index">{String(i + 1).padStart(2, '0')}</span>
-          <h3>{card.title}</h3>
-          <p>{card.trust}</p>
+          <h3 className="nx-module-title">{card.title}</h3>
+          <p className="nx-module-body">{card.trust}</p>
         </Tilt>
       ))}
     </div>

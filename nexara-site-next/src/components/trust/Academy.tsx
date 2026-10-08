@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { PackageGrid } from '../ui/package-card';
 import { DATA } from '@/lib/data';
 import { routeTo } from '@/lib/trust-router';
 import { TRUST_RUNLOG, TrustRunLog, TrustDeliverableCards, TrustProofCards, TrustFaqAccordion } from './Cards';
@@ -133,46 +134,7 @@ export function AcademyDisplayCards({ packages }: { packages: AcademyPackage[] }
 }
 
 export function AcademyPackageGrid({ packages }: { packages: AcademyPackage[] }) {
-  return (
-    <div className="tsx-engage-grid">
-      {packages.map((pkg, i) => {
-        const featured = i === 1;
-        return (
-          <div key={pkg.name} className={`tsx-engage-card${featured ? ' featured' : ''}`}>
-            <div className="tsx-engage-card-header">
-              {featured && <span className="tsx-engage-badge">Most common</span>}
-              <div className="tsx-engage-card-title-row">
-                <p className="tsx-engage-name">{pkg.name}</p>
-                <span className="tsx-engage-fit">{pkg.fit}</span>
-              </div>
-            </div>
-            <div className="tsx-engage-meta">
-              <span className="tsx-engage-price">{pkg.price}</span>
-              <span className="tsx-engage-dur">{pkg.duration}</span>
-            </div>
-            <ul className="tsx-engage-list">
-              {pkg.includes.map(item => (
-                <li key={item}>
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 8.5l3 3 7-7"/>
-                  </svg>
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <div className="tsx-engage-foot">
-              <button
-                className={featured ? 'tsx-engage-cta-primary' : 'tsx-engage-cta-ghost'}
-                onClick={() => routeTo('trust', 'contact')}
-              >
-                {featured ? 'Start here →' : 'Get in touch'}
-              </button>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+  return <PackageGrid packages={packages} ctaLabel="Request a proposal" onSelect={() => routeTo('trust', 'contact', 'academy')} />;
 }
 
 export function AcademyDepthStory({ section }: { section: AcademySection }) {

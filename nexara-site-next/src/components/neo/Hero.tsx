@@ -5,7 +5,6 @@
 'use client';
 import HeroIntro from '../HeroIntro';
 import InternshipOverview from '../InternshipOverview';
-import { HeroLighting } from '../ui/motion-primitives';
 import React from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -354,7 +353,13 @@ function NeoHeroUnravel({ copy, theme }: NeoHeroUnravelProps) {
 
   return (
     <div ref={wrapRef} className="neo-hero-runway">
-      <div className="neo-hero-stage" data-hero-surface><HeroLighting />
+      <div className="neo-hero-stage" data-hero-surface>
+        {/* Atmosphere: static layers animated by transform/opacity only. */}
+        <div className="neo-atmos" aria-hidden="true">
+          <div className="neo-atmos-floor"><i /></div>
+          <div className="neo-atmos-rings"><i /><i /><i /></div>
+          <div className="neo-atmos-frame"><i /><i /><i /><i /></div>
+        </div>
         <canvas ref={canvasRef} className="neo-hero-canvas" aria-hidden="true" />
         <NeoHeroController wrapRef={wrapRef} canvasRef={canvasRef} titleRef={titleRef} counterNumRef={counterNumRef} counterBarRef={counterBarRef} scrollCueRef={scrollCueRef} />
 
@@ -407,14 +412,14 @@ function NeoHeroUnravel({ copy, theme }: NeoHeroUnravelProps) {
         </div>
 
         {/* HUD */}
-        <div className="neo-hero-rail" aria-hidden="true">
-          <button data-label="Nexara"></button>
-          <button data-label="Premise"></button>
-          <button data-label="Academy"></button>
-          <button data-label="Labs"></button>
-          <button data-label="Marketing"></button>
-          <button data-label="Begin"></button>
-        </div>
+        <nav className="neo-hero-rail" aria-label="Hero chapters">
+          <button type="button" data-label="Nexara" aria-label="Nexara"></button>
+          <button type="button" data-label="Premise" aria-label="Premise"></button>
+          <button type="button" data-label="Academy" aria-label="Academy"></button>
+          <button type="button" data-label="Labs" aria-label="Labs"></button>
+          <button type="button" data-label="Marketing" aria-label="Marketing"></button>
+          <button type="button" data-label="Begin" aria-label="Begin"></button>
+        </nav>
         <div className="neo-hero-counter" aria-hidden="true">
           <strong ref={counterNumRef}>01</strong> / 06
           <span className="neo-counter-bar"><i ref={counterBarRef}></i></span>
