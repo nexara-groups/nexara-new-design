@@ -134,3 +134,10 @@
 .trust.tsx-site .tsx-stackcard-stack-label,
 .trust.tsx-site .tsx-assumption-panel p strong { color: #566B85 !important; }
 .cc-banner.cc-theme-trust .cc-btn-solid { background: #215F94 !important; }
+
+/* Homepage plain-language 'what we do' block (Neo home). */
+.local-context__home { margin-top: 36px; }
+.local-context__teams { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin: 0 0 28px; }
+.local-context__teams h4 { margin: 0 0 8px; font-size: 16px; font-weight: 600; }
+.local-context__teams p { margin: 0; font-size: 15px; line-height: 1.7; }
+@media (max-width: 760px) { .local-context__teams { grid-template-columns: 1fr; gap: 20px; } }

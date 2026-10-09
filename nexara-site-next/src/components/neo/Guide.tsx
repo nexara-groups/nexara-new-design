@@ -7,6 +7,7 @@ import React from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HAS_SCROLL_ANIMATION } from '@/lib/shared';
+import '@/styles/neo-guide.css';
 
 // See trust/Hero.tsx for why this is repeated per-file rather than centralized.
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);

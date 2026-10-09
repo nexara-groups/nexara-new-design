@@ -74,7 +74,7 @@ function Side({ side, copy, phase, onEnter }: {
             ))}
           </motion.div>
           <motion.div variants={item}>
-            <MagneticCTA className={"gw2-cta " + (left ? "gw2-cta-neo" : "gw2-cta-trust")} href={left ? "/neo" : "/trust"} onClick={(e) => { e.preventDefault(); onEnter(); }}>{copy.cta}</MagneticCTA>
+            <MagneticCTA className={"gw2-cta " + (left ? "gw2-cta-neo" : "gw2-cta-trust")} href={left ? "/" : "/trust"} onClick={(e) => { e.preventDefault(); onEnter(); }}>{copy.cta}</MagneticCTA>
           </motion.div>
         </motion.div>
       )}
@@ -91,8 +91,8 @@ function Gateway() {
     let path = "/";
     if (theme) {
       if (page === "gateway") {
-        path = "/";
-      } else {
+        path = "/gateway";
+      } else if (!(theme === "neo" && page === "home")) {
         path = "/" + [theme, page === 'home' ? null : page, detail].filter(Boolean).join("/");
       }
     }
@@ -105,7 +105,7 @@ function Gateway() {
     router.push(path);
   };
   const reduce = useReducedMotion();
-  useEffect(() => { router.prefetch("/neo"); router.prefetch("/trust"); }, [router]);
+  useEffect(() => { router.prefetch("/"); router.prefetch("/trust"); }, [router]);
   const g = DATA.gateway;
   const rootRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState(reduce ? "live" : "intro");

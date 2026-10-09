@@ -1,6 +1,5 @@
 import '@/styles/neo.css';
 import '@/styles/neo-refinements.css';
-import '@/styles/neo-guide.css';
 import CookieConsent from '@/components/CookieConsent';
 
 export default function NeoLayout({ children }: { children: React.ReactNode }) {

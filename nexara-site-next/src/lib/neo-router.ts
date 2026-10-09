@@ -13,7 +13,7 @@ export function setNeoRouter(router: ReturnType<typeof useRouter>) {
 }
 
 export function routeTo(theme: string, page = 'home', detail: string | null = null) {
-  const path = theme === 'gateway' || !theme ? '/' : '/' + [theme, page === 'home' ? null : page, detail].filter(Boolean).join('/');
+  const path = theme === 'gateway' ? '/gateway' : (!theme || (theme === 'neo' && page === 'home')) ? '/' : '/' + [theme, page === 'home' ? null : page, detail].filter(Boolean).join('/');
   window.scrollTo(0, 0);
   // base.css declares `@view-transition { navigation: auto; }`, which already
   // wraps every router.push in its own view transition. Also calling

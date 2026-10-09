@@ -8,7 +8,7 @@ export const INDEX_ROBOTS = 'index, follow, max-snippet:-1, max-image-preview:la
 // One content registry drives build metadata, client navigation and the sitemap.
 const pages: Record<string, [string, string, string, string]> = {
   gateway: ['Nexara | Software Company in Visakhapatnam (Vizag)', 'Nexara is a software company in Visakhapatnam. We build custom software and websites, run digital marketing, and train the next batch of tech talent.', 'Software and website development in Visakhapatnam', 'Nexara Private Limited builds software and websites, runs digital marketing and trains tech talent, all in Visakhapatnam (Vizag). Product Studio, Digital Solutions and Academy are three teams under one roof. Pick the one that fits your project.'],
-  home: ['IT Company in Vizag | Software & Web Development | Nexara', 'Nexara is an IT company in Vizag. Custom software, SaaS, websites, digital marketing and talent programmes, from our office in MVP Colony.', 'An IT company in Vizag for people, products and growth', 'From our office in MVP Colony, Visakhapatnam, we help businesses build software, launch websites and connect their tools. Academy trains technical talent, Digital Solutions builds market presence, and Product Studio delivers software and automation.'],
+  home: ['Nexara | Software Company in Visakhapatnam (Vizag)', 'Nexara is a software company in Visakhapatnam. We build custom software, SaaS and websites, run digital marketing, and train the next batch of tech talent.', 'An IT company in Vizag for people, products and growth', 'From our office in MVP Colony, Visakhapatnam, we help businesses build software, launch websites and connect their tools. Academy trains technical talent, Digital Solutions builds market presence, and Product Studio delivers software and automation.'],
   academy: ['Software Training in Visakhapatnam | Nexara Academy', 'Software training in Visakhapatnam: full-stack, AI, design and cloud tracks, with real projects, mentor reviews, internships and placement prep.', 'Technology training in Visakhapatnam', 'Nexara Academy works with learners, colleges and employers in Visakhapatnam through structured training, real projects and mentor reviews. Pick a technical track, talk to us about a managed internship, or plan placement prep for a specific role.'],
   'academy/tracks': ['Full Stack & AI Courses in Visakhapatnam | Nexara', 'Compare Nexara Academy tracks in full-stack development, AI and data, design and cloud operations. Project-led tech training in Visakhapatnam.', 'Choose a software training track in Vizag', 'Our tracks cover full-stack development, AI and data, product design and cloud operations. Tell Nexara Academy your current skills, the role you’re aiming for and what you want to build, and we’ll work out the right learning scope.'],
   'academy/internships': ['Software Internships in Vizag & Visakhapatnam | Nexara', 'Software internships in Vizag with Nexara Academy: mentor pods, real projects, weekly demos and a completion report. Call 9257535757.', 'Managed software internships in Visakhapatnam', 'Nexara Academy runs managed internships built around real projects, for learners and institutions. Mentor pods, weekly reviews and completion reports let learners and college placement teams in Vizag see progress.'],
@@ -39,8 +39,12 @@ export const LOCAL_FAQS: Record<string, [string, string][]> = {
   company: [['Where is Nexara based?', `${DATA.contact.address.street}, ${DATA.contact.address.city}.`], ['What should I look for in a top IT company in Vizag?', 'Check the team’s relevant skills, delivery process, who owns the code and accounts, how they do QA and what support covers. At Nexara we start with a written brief and a named owner, so all of this is settled before a build.']],
 };
 
+// Neo is the primary presentation: its home page is '/', the Neo/Trust chooser lives at /gateway,
+// and every other page's canonical URL is its /neo/... path (Trust pages are alternates).
 export function routePath(theme: Theme | null, page = 'home', detail: string | null = null) {
-  if (!theme || page === 'gateway') return '/';
+  if (page === 'gateway') return '/gateway';
+  if (!theme) theme = 'neo';
+  if (theme === 'neo' && page === 'home') return '/';
   return '/' + [theme, page === 'home' ? null : page, detail].filter(Boolean).join('/');
 }
 
@@ -57,14 +61,16 @@ export function getSeo(route: Pick<Route, 'theme' | 'page' | 'detail'>) {
     heading = `${sections[detail]!.name} delivery models in Visakhapatnam`;
     body = `${sections[detail]!.name} engagements are framed around written requirements, the work delivered and operational readiness. Discuss the applicable delivery model and evidence requirements with Nexara before agreeing your project scope.`;
   }
-  // Neo is an alternate presentation of the same business/service pages.
+  // Trust is an alternate presentation of the same pages; every theme canonicalises to Neo.
+  // The /gateway chooser is a utility page and stays out of the index.
+  const isGateway = page === 'gateway';
   const canonicalDetail = page === 'contact' ? null : detail;
-  const canonical = SITE_URL + routePath(route.theme ? 'trust' : null, page, canonicalDetail);
-  return { valid: true, key, title, description, heading, body, canonical, robots: INDEX_ROBOTS, faqs: LOCAL_FAQS[key] || [] };
+  const canonical = SITE_URL + routePath('neo', page, canonicalDetail);
+  return { valid: true, key, title, description, heading, body, canonical, robots: isGateway ? 'noindex, follow' : INDEX_ROBOTS, faqs: LOCAL_FAQS[key] || [] };
 }
 
 export function getRoutes() {
-  const routes: Route[] = [{ theme: null, page: 'gateway', detail: null, path: '' }];
+  const routes: Route[] = [{ theme: null, page: 'gateway', detail: null, path: 'gateway' }];
   for (const theme of ['trust', 'neo'] as const) {
     for (const page of ['home', ...Object.keys(sections), 'customers', 'company', 'contact']) {
       routes.push({ theme, page, detail: null, path: routePath(theme, page).slice(1) });
@@ -93,8 +99,8 @@ export function getStructuredData(route: Pick<Route, 'theme' | 'page' | 'detail'
   const webPageId = `${seo.canonical}#webpage`;
   const graph: Record<string, unknown>[] = [organization, { '@type': 'WebSite', '@id': `${SITE_URL}/#website`, url: `${SITE_URL}/`, name: 'Nexara', alternateName: ['Nexara Groups', 'Nexara Private Limited', 'nexaragroups.com'], publisher: { '@id': organizationId }, inLanguage: 'en-IN' }, { '@type': route.page === 'contact' ? 'ContactPage' : route.page === 'company' ? 'AboutPage' : 'WebPage', '@id': webPageId, url: seo.canonical, name: seo.title, description: seo.description, isPartOf: { '@id': `${SITE_URL}/#website` }, about: { '@id': organizationId }, inLanguage: 'en-IN' }];
   if (route.theme) {
-    const items: { '@type': string; position: number; name: string; item: string }[] = [{ '@type': 'ListItem', position: 1, name: 'Nexara', item: `${SITE_URL}/` }, { '@type': 'ListItem', position: 2, name: 'IT services', item: `${SITE_URL}/trust` }];
-    if (route.page !== 'home') items.push({ '@type': 'ListItem', position: 3, name: sections[route.page]?.name || route.page[0]!.toUpperCase() + route.page.slice(1), item: SITE_URL + routePath('trust', route.page) });
+    const items: { '@type': string; position: number; name: string; item: string }[] = [{ '@type': 'ListItem', position: 1, name: 'Nexara', item: `${SITE_URL}/` }];
+    if (route.page !== 'home') items.push({ '@type': 'ListItem', position: 2, name: sections[route.page]?.name || route.page[0]!.toUpperCase() + route.page.slice(1), item: SITE_URL + routePath('neo', route.page) });
     if (route.detail && route.page !== 'contact') items.push({ '@type': 'ListItem', position: items.length + 1, name: sections[route.page]?.subpages.find(item => item.slug === route.detail)?.title || sections[route.detail]?.name || route.detail, item: seo.canonical! });
     graph.push({ '@type': 'BreadcrumbList', '@id': `${seo.canonical}#breadcrumb`, itemListElement: items });
     graph[2]!.breadcrumb = { '@id': `${seo.canonical}#breadcrumb` };

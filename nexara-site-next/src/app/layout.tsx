@@ -27,7 +27,6 @@ import '@fontsource/inter/latin-700.css';
 import '@fontsource/inter/latin-800.css';
 import '@/styles/index.css';
 import '@/styles/base.css';
-import '@/styles/gateway.css';
 import '@/styles/consent.css';
 import '@/styles/refinements.css';
 import '@/styles/elevation.css';
