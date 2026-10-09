@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { DATA } from '@/lib/data';
+import { DATA, neoSectionName } from '@/lib/data';
 import { voice } from '@/lib/shared';
 
 export function NotFound({ theme, page }: { theme: 'trust' | 'neo' | null; page?: string }) {
@@ -44,9 +44,9 @@ export function NotFound({ theme, page }: { theme: 'trust' | 'neo' | null; page?
         {sections.map((section) => (
           <article className="module-card" key={section.id}>
             <span>{section.index}</span>
-            <h3>{section.name}</h3>
+            <h3>{theme === 'neo' ? neoSectionName(section) : section.name}</h3>
             <p>{voice(theme, section.short)}</p>
-            <button onClick={() => routeTo(theme, section.id)}>Open {section.name}</button>
+            <button onClick={() => routeTo(theme, section.id)}>Open {theme === 'neo' ? neoSectionName(section) : section.name}</button>
           </article>
         ))}
       </section>

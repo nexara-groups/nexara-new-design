@@ -87,7 +87,7 @@ function TrustNav({ page, detail }: TrustNavProps) {
         </Link>
         <nav aria-label="Primary">
           <ul className="tsx-nav-links tsx-tubelight" onMouseLeave={() => setHoveredPage(null)}>
-            {DATA.nav.map(item => {
+            {DATA.nav.filter(item => !item.neoOnly).map(item => {
               const active = page === item.page;
               const glowing = hoveredPage ? hoveredPage === item.page : active;
               return (
@@ -136,7 +136,7 @@ function TrustNav({ page, detail }: TrustNavProps) {
       >
         <div className="tsx-nav-sheet-handle" aria-hidden="true" />
         <nav className="tsx-nav-sheet-links" aria-label="Primary mobile">
-          {DATA.nav.map((item) => (
+          {DATA.nav.filter(item => !item.neoOnly).map((item) => (
             <Link prefetch={false} key={item.page} className={"tsx-nav-sheet-row" + (page === item.page ? ' active' : '')} href={`/trust/${item.page}`} onClick={()=>setMenuOpen(false)}>
               <span className="tsx-sheet-label">{getTrustNavLabel(item)}</span>
               <span className="tsx-sheet-desc">{TRUST_SHEET_DESCS[item.page]}</span>

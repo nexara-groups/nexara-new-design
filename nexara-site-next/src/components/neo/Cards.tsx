@@ -4,7 +4,7 @@ import { Tilt } from '../ui/motion-primitives';
 import { PackageGrid } from '../ui/package-card';
 import ReactDOM from 'react-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { DATA } from '@/lib/data';
+import { DATA, neoSectionName, neoLabel } from '@/lib/data';
 import { HAS_SCROLL_ANIMATION, voice } from '@/lib/shared';
 import { routeTo } from '@/lib/neo-router';
 
@@ -304,7 +304,7 @@ export function NexaraUnbox({ theme }: ThemeProps) {
               <button key={face.label} ref={el => { wordPlayRefs.current[i] = el; }}
                 style={{ "--face-color": face.color, "--word-fill": "0%" } as CssVars}
                 onClick={() => routeTo(theme, face.section)}>
-                <span>{face.label}</span>
+                <span>{neoLabel(face.label)}</span>
               </button>
             ))}
           </div>
@@ -323,7 +323,7 @@ export function NexaraUnbox({ theme }: ThemeProps) {
                 <div className="unbox-face" ref={el => { faceRefs.current[i] = el; }}
                   style={{ "--face-color": face.color } as CssVars}>
                   <span>{face.sub}</span>
-                  <strong>{face.label}</strong>
+                  <strong>{neoLabel(face.label)}</strong>
                 </div>
               </div>
             ))}
@@ -336,7 +336,7 @@ export function NexaraUnbox({ theme }: ThemeProps) {
                 <div key={label} ref={el => { signalCardRefs.current[i] = el; }}
                   className="unbox-signal-card"
                   style={{ transform: `rotateY(${i * 90}deg) translateZ(280px)` }}>
-                  <span>{label}</span>
+                  <span>{neoLabel(label)}</span>
                   <strong>{value}</strong>
                 </div>
               ))}
@@ -360,7 +360,7 @@ export function NexaraUnbox({ theme }: ThemeProps) {
                 style={{ "--face-color": face.color, "--card-fill": "0%", transform: "translateX(22px)" } as CssVars}
                 onClick={() => routeTo(theme, face.section)}>
                 <span>{face.sub}</span>
-                <strong>{face.label}</strong>
+                <strong>{neoLabel(face.label)}</strong>
                 <small>queued</small>
               </button>
             ))}
@@ -947,7 +947,7 @@ export function SectionCards({ theme, sections }: SectionCardsProps) {
             >
               <div className="card-header">
                 <span className="card-description">{section.index} — Practice</span>
-                <h3>{section.name}</h3>
+                <h3>{neoSectionName(section)}</h3>
               </div>
               <div className="card-content">
                 <p>{voice(theme, section.short)}</p>
@@ -974,7 +974,7 @@ export function SectionCards({ theme, sections }: SectionCardsProps) {
                     minHeight: "auto"
                   }}
                 >
-                  Explore {section.name} &rarr;
+                  Explore {neoSectionName(section)} &rarr;
                 </button>
               </div>
             </div>
@@ -1004,10 +1004,10 @@ export function SectionCards({ theme, sections }: SectionCardsProps) {
             whileTap={reduceMotion ? undefined : { scale: 0.985 }}
           >
             <span>{section.index}</span>
-            <h3>{section.name}</h3>
+            <h3>{neoSectionName(section)}</h3>
             <p>{voice(theme, section.short)}</p>
             <div>{section.stack.slice(0, 4).map((x) => <small key={x}>{x}</small>)}</div>
-            <button onClick={() => routeTo(theme, section.id)}>Enter {section.name}</button>
+            <button onClick={() => routeTo(theme, section.id)}>Enter {neoSectionName(section)}</button>
           </motion.article>
         ))}
       </div>

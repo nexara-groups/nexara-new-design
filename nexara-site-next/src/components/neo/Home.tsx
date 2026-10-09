@@ -2,7 +2,7 @@
 import React from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { DATA } from '@/lib/data';
+import { DATA, neoSectionName, neoLabel } from '@/lib/data';
 import { HAS_SCROLL_ANIMATION } from '@/lib/shared';
 import { routeTo } from '@/lib/neo-router';
 import { HeroBanner } from './SectionShell';
@@ -148,15 +148,15 @@ function NeoDivisionsRail() {
         <div className="neo-rail-track" ref={trackRef}>
           {sections.map((sec, i) => (
             <button key={sec.id} className="neo-rail-panel" style={{ '--accent': i === 0 ? '#7c5cff' : i === 1 ? '#ff5c8a' : '#00e5a0' } as React.CSSProperties} onClick={() => routeTo('neo', sec.id)}>
-              <span className="neo-panel-idx">0{i + 1} / {sec.name.toUpperCase()}</span>
+              <span className="neo-panel-idx">0{i + 1} / {neoSectionName(sec).toUpperCase()}</span>
               <span className="neo-panel-orb" />
               <span className="neo-panel-ring" />
-              <h3>{sec.name}<br /><span className="serif">{sec.headline || (i === 0 ? "we grow engineers" : i === 1 ? "we make brands move" : "we build intelligence")}</span></h3>
+              <h3>{neoSectionName(sec)}<br /><span className="serif">{sec.headline || (i === 0 ? "we grow engineers" : i === 1 ? "we make brands move" : "we build intelligence")}</span></h3>
               <p>{sec.short.neo || sec.desc}</p>
               <span className="panel-tags">
                 {sec.stack.slice(0, 4).map(tag => <span key={tag}>{tag}</span>)}
               </span>
-              <span className="btn">Enter {sec.name} <span className="arr">→</span></span>
+              <span className="btn">Enter {neoSectionName(sec)} <span className="arr">→</span></span>
             </button>
           ))}
         </div>
@@ -180,7 +180,10 @@ function NeoWork() {
           {live.map((w, i) => (
             <a key={w.url} className="neo-work-card" href={w.url} target="_blank" rel="noopener noreferrer">
               <span className="neo-work-meta">
-                <span className="neo-work-live"><i />Live</span>
+                <span className="neo-work-tags">
+                  <span className="neo-work-live"><i />Live</span>
+                  {w.badge && <span className="nx-badge">{w.badge}</span>}
+                </span>
                 <span>{String(i + 1).padStart(2, '0')} / {w.sector}</span>
               </span>
               <span className="neo-work-logo"><img src={w.logo} alt={`${w.name} logo`} loading="lazy" decoding="async" /></span>
@@ -195,7 +198,7 @@ function NeoWork() {
           <span className="neo-work-bench-label">On the bench</span>
           <ul>
             {building.map((b) => (
-              <li key={b.name}><b>{b.name}</b><span>{b.kind}</span></li>
+              <li key={b.name}><b>{b.name}</b><span>{neoLabel(b.kind)}</span></li>
             ))}
             <li className="neo-work-more"><b>+ more in the pipeline</b></li>
           </ul>
@@ -324,7 +327,7 @@ function HomeProof({ theme, category }: HomeProofProps) {
               <span className="receipt-tag">{theme === "neo" ? "Receipt" : "Record"}</span>
               <span className="receipt-index">{String(i + 1).padStart(2, "0")}</span>
             </div>
-            <h3 className="receipt-engine">{customer.section}</h3>
+            <h3 className="receipt-engine">{neoLabel(customer.section)}</h3>
             <p className="receipt-context">{customer.company}</p>
             <p className="receipt-result">{customer[theme]}</p>
           </article>

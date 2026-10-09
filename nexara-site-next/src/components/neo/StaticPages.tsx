@@ -1,10 +1,11 @@
 'use client';
 import ContactDetails from '../ContactDetails';
-import { DATA } from '@/lib/data';
+import { DATA, neoSectionName, neoLabel } from '@/lib/data';
 import { useBriefForm } from '@/lib/shared';
 import { NotFound } from '../NotFound';
 import { HeroBanner } from './SectionShell';
 import { ClientCases, ClientLogoWall } from '../ClientCases';
+import { NeoAbout } from './About';
 
 type Theme = 'trust' | 'neo';
 
@@ -31,11 +32,11 @@ function Customers({ theme, detail }: DetailPageProps) {
   if (detail && !activeSection) return <NotFound theme={theme} page={`customers/${detail}`} />;
   const proofItems = activeSection ? DATA.customers.filter((customer) => customer.id === detail) : DATA.customers;
   const copy = activeSection
-    ? { title: `${activeSection.name}, by the receipts.`, accent: "What this division produces.", body: "The operating proof this division is built to deliver, engagement after engagement." }
-    : { title: "Real clients. Live work.", accent: "Click any of it.", body: "A SaaS platform, a medical library, sales calculators and websites that sell — shipped for businesses in Visakhapatnam and across Andhra Pradesh." };
+    ? { title: `${neoSectionName(activeSection)}, by the receipts.`, accent: "What this division produces.", body: "The operating proof this division is built to deliver, engagement after engagement." }
+    : { title: "Real clients. Live work.", accent: "Click any of it.", body: "A SaaS platform, an e-commerce site, a medical library, sales calculators and websites that sell — shipped for businesses in Visakhapatnam and across Andhra Pradesh." };
   return (
     <main>
-      <HeroBanner compact theme={theme} eyebrow={activeSection ? `${activeSection.name} proof` : "Proof"} title={copy.title} accent={copy.accent} body={copy.body} />
+      <HeroBanner compact theme={theme} eyebrow={activeSection ? `${neoSectionName(activeSection)} proof` : "Proof"} title={copy.title} accent={copy.accent} body={copy.body} />
       {!activeSection && (
         <section className="nx-proof-section">
           <ClientLogoWall />
@@ -53,7 +54,7 @@ function Customers({ theme, detail }: DetailPageProps) {
       <section className="module-grid">
         {proofItems.map((customer) => (
           <article className="module-card" key={customer.company}>
-            <span>{customer.section}</span>
+            <span>{neoLabel(customer.section)}</span>
             <h3>{customer.company}</h3>
             <p>{customer[theme]}</p>
           </article>
@@ -63,13 +64,18 @@ function Customers({ theme, detail }: DetailPageProps) {
   );
 }
 
+// Neo gets the full About page; the Trust company page below is unchanged.
 function Company({ theme }: ThemeOnlyProps) {
+  return theme === "neo" ? <NeoAbout /> : <TrustCompany theme={theme} />;
+}
+
+function TrustCompany({ theme }: ThemeOnlyProps) {
   const company = DATA.company[theme];
   return (
     <main>
-      <HeroBanner compact theme={theme} eyebrow="Company" title={theme === "neo" ? "Incorporated, then built to move." : "The operating idea is simple."} accent="Capability compounds." body={company.manifesto} />
+      <HeroBanner compact theme={theme} eyebrow={theme === "neo" ? "About Nexara" : "Company"} title={theme === "neo" ? "Incorporated, then built to move." : "The operating idea is simple."} accent="Capability compounds." body={company.manifesto} />
       <section className="fact-strip">
-        {DATA.company.facts.map(([label, value]) => (
+        {(theme === "neo" ? DATA.company.neo.facts : DATA.company.facts).map(([label, value]) => (
           <article key={label}>
             <span>{label}</span>
             <strong>{value}</strong>
@@ -93,7 +99,7 @@ function Company({ theme }: ThemeOnlyProps) {
           </div>
         </div>
         <div className="module-grid compact">
-          {DATA.company.standards.map((item) => (
+          {(theme === "neo" ? DATA.company.neo.standards : DATA.company.standards).map((item) => (
             <article className="module-card" key={item.title}>
               <span>Standard</span>
               <h3>{item.title}</h3>
@@ -169,7 +175,7 @@ function Contact({ theme, detail }: DetailPageProps) {
                   className={formData.section === s.id ? "brief-select-btn is-active" : "brief-select-btn"}
                   onClick={() => handleChange("section", s.id)}
                 >
-                  {s.name}
+                  {neoSectionName(s)}
                 </button>
               ))}
             </div>
@@ -307,8 +313,8 @@ function Contact({ theme, detail }: DetailPageProps) {
       <section className="module-grid compact">
         {DATA.contact.channels.map((channel) => (
           <article className={"module-card " + (formData.section === channel.section ? "is-active" : "")} key={channel.title}>
-            <span>{channel.section === "home" ? "Combined" : (DATA.sections as Record<string, SectionSummary | undefined>)[channel.section]?.name}</span>
-            <h3>{channel.title}</h3>
+            <span>{channel.section === "home" ? "Combined" : neoSectionName((DATA.sections as Record<string, SectionSummary | undefined>)[channel.section]!)}</span>
+            <h3>{neoLabel(channel.title)}</h3>
             <p>{channel.body}</p>
             <button onClick={() => handleLaneSelect(channel.section)}>{theme === "neo" ? "Set this lane" : "Select lane"}</button>
           </article>

@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { routePath } from '@/lib/seo';
-import { DATA } from '@/lib/data';
+import { DATA, neoSectionName } from '@/lib/data';
 import { routeTo } from '@/lib/neo-router';
 import { getLenis } from '../useSmoothScroll';
 const { useState } = React;
@@ -37,6 +37,9 @@ interface SubNavProps {
   section: Section;
   active?: Subpage | null;
 }
+
+// Contact stays out of the Neo nav: the "Start a project" CTA already goes there.
+const NEO_NAV = DATA.nav.filter((item) => !item.trustOnly);
 
 function Nav({ theme, page, detail }: NavProps) {
   const [hoveredPage, setHoveredPage] = useState<string | null>(null);
@@ -105,7 +108,7 @@ function Nav({ theme, page, detail }: NavProps) {
       <nav onMouseLeave={() => setHoveredPage(null)}>
         <span className="neo-nav-ind" aria-hidden="true"
           style={ind ? { width: ind.w, transform: `translateX(${ind.x}px)`, opacity: 1 } : { opacity: 0 }} />
-        {DATA.nav.map((item) => {
+        {NEO_NAV.map((item) => {
           const active = page === item.page;
           const lit = hoveredPage ? hoveredPage === item.page : active;
           return (
@@ -124,10 +127,10 @@ function Nav({ theme, page, detail }: NavProps) {
           );
         })}
       </nav>
-      <div className="theme-pill">
+      {page !== "blog" && <div className="theme-pill">
         <Link prefetch={false} className={theme === "neo" ? "active" : ""} href={routePath("neo",page,detail)} >Neo</Link>
         <Link prefetch={false} className={theme === "trust" ? "active" : ""} href={routePath("trust",page,detail)} >Trust</Link>
-      </div>
+      </div>}
       <Link prefetch={false} className="neo-nav-cta" href={`/${theme || 'neo'}/contact`}>
         Start a project <span className="arr" aria-hidden="true">↗</span>
       </Link>
@@ -137,7 +140,7 @@ function Nav({ theme, page, detail }: NavProps) {
       </button>
       <div id="neo-menu" className="neo-menu" hidden={!menuOpen} data-lenis-prevent>
         <nav aria-label="Main">
-          {DATA.nav.map((item, i) => (
+          {NEO_NAV.map((item, i) => (
             <Link prefetch={false} key={item.page} className={page === item.page ? 'active' : ''}
               href={`/${theme || 'trust'}/${item.page}`} onClick={() => setMenuOpen(false)}
               style={{ '--i': i } as React.CSSProperties}>
@@ -156,8 +159,8 @@ function Nav({ theme, page, detail }: NavProps) {
 
 function BreadcrumbBar({ page, detail }: BreadcrumbBarProps) {
   const section = (DATA.sections as Record<string, Section>)[page];
-  const labels: Record<string, string> = { customers: "Proof", company: "Company", contact: "Contact" };
-  const current = section ? section.name : labels[page];
+  const labels: Record<string, string> = { customers: "Proof", company: "About", contact: "Contact" };
+  const current = section ? neoSectionName(section) : labels[page];
   const subpage = detail ? section?.subpages.find((item) => item.slug === detail)?.title : null;
   // A lone "Nexara" crumb (home) says nothing — skip the strip entirely.
   if (!current) return null;

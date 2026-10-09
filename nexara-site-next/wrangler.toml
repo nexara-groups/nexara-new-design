@@ -7,7 +7,11 @@ account_id = "ca93de7853e49bb397e5a95ca6c01a03"
 routes = [
   { pattern = "nexaragroups.com/*", zone_name = "nexaragroups.com" },
   # www is served by this Worker only to 301 it to the apex (see src/middleware.ts).
-  { pattern = "www.nexaragroups.com/*", zone_name = "nexaragroups.com" }
+  { pattern = "www.nexaragroups.com/*", zone_name = "nexaragroups.com" },
+  # Brand alias domains: served only to 301 to nexaragroups.com (see ALIAS_HOSTS in src/middleware.ts).
+  # The apex hostnames are already attached to this Worker in the dashboard.
+  { pattern = "www.nexaraprivatelimited.in/*", zone_name = "nexaraprivatelimited.in" },
+  { pattern = "www.nexaraprivatelimited.com/*", zone_name = "nexaraprivatelimited.com" }
 ]
 
 [assets]

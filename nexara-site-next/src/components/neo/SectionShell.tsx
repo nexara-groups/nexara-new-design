@@ -9,7 +9,7 @@ import type { Variants } from 'framer-motion';
 import { motion, useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { DATA } from '@/lib/data';
+import { DATA, neoSectionName } from '@/lib/data';
 import { voice, SECTION_HERO_WORDS } from '@/lib/shared';
 import { routeTo } from '@/lib/neo-router';
 import { NotFound } from '../NotFound';
@@ -87,7 +87,7 @@ interface HeroBannerProps {
 }
 
 function HeroBanner({ theme, eyebrow, title, accent, body, section, compact = false }: HeroBannerProps) {
-  const stats = section ? section.stats : [["3", "equal sections"], ["2", "presentations"], ["1", "incorporated company"], ["4", "intake routes"]];
+  const stats = section ? section.stats : [["3", "teams"], ["2026", "incorporated"], ["Vizag", "headquarters"], ["1", "named owner per project"]];
   return (
     <section className={"hero-banner" + (compact ? " compact" : "")}>
       <div className="hero-bg">
@@ -451,7 +451,7 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
       <div className="neo-hero-stage" data-hero-surface><HeroLighting />
         <canvas ref={canvasRef} className="neo-hero-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
         <div className="neo-hero-chapter" style={{ opacity: 1, pointerEvents: 'auto' }}>
-          <p className="kicker">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {section.name.toUpperCase()}</p>
+          <p className="kicker">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {neoSectionName(section).toUpperCase()}</p>
           <h1 className="ch-name" style={{ color: '#fff', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 800, textTransform: section.id === "academy" ? 'none' : 'uppercase' }}>
             {section.id === "academy" ? (
               <>We don't hire engineers.<br />We <em style={{ fontStyle: 'normal', color: '#7c5cff' }}>compile</em> them.</>
@@ -521,8 +521,8 @@ function SectionPage({ theme, section, detail }: SectionPageProps) {
 function NeoDetailHero({theme,section,page}:SubpageDetailProps) {
  const internship=page.slug==='internships';
  return <section className="neo-hero-runway neo-hero-runway--detail"><div className="neo-hero-stage" data-hero-surface><HeroLighting/><div className="neo-hero-chapter" style={{opacity:1,pointerEvents:'auto'}}>
- <p className="kicker">{section.name} / {page.title}</p><h1 className="ch-name">{internship?'Software internships in Vizag & Visakhapatnam':page.title}</h1><p className="lede">{voice(theme,page.callout)}</p>
- <div className="hero-intro__links"><Link prefetch={false} href={routePath(theme,'contact',section.id)}>{internship?'Discuss your internship':'Start a project'} →</Link><Link prefetch={false} href={routePath(theme,section.id)}>Explore {section.name} →</Link></div>
+ <p className="kicker">{neoSectionName(section)} / {page.title}</p><h1 className="ch-name">{internship?'Software internships in Vizag & Visakhapatnam':page.title}</h1><p className="lede">{voice(theme,page.callout)}</p>
+ <div className="hero-intro__links"><Link prefetch={false} href={routePath(theme,'contact',section.id)}>{internship?'Discuss your internship':'Start a project'} →</Link><Link prefetch={false} href={routePath(theme,section.id)}>Explore {neoSectionName(section)} →</Link></div>
  </div></div></section>;
 }
 
@@ -568,7 +568,7 @@ function SectionOverview({ theme, section }: SectionOverviewProps) {
         <div className="section-head">
           <div>
             <p className="eyebrow">{theme === "neo" ? "What we run" : "Capabilities"}</p>
-            <h2>{theme === "neo" ? `Inside ${section.name}.` : `What ${section.name} delivers.`}</h2>
+            <h2>{theme === "neo" ? `Inside ${neoSectionName(section)}.` : `What ${neoSectionName(section)} delivers.`}</h2>
           </div>
           <p>{theme === "neo" ? "Four engines doing the actual work. Tap any one for the full breakdown." : "Core capability modules that make up this solution line."}</p>
         </div>
@@ -577,7 +577,7 @@ function SectionOverview({ theme, section }: SectionOverviewProps) {
             <ModuleCard
               key={module.title}
               theme={theme}
-              eyebrow={theme === "neo" ? `Module 0${i + 1}` : section.name}
+              eyebrow={theme === "neo" ? `Module 0${i + 1}` : neoSectionName(section)}
               title={module.title}
               visualTitle={module.title}
               onClick={() => setActiveModule(module)}
@@ -592,7 +592,7 @@ function SectionOverview({ theme, section }: SectionOverviewProps) {
         <ModuleModal
           theme={theme}
           module={activeModule}
-          eyebrow={section.name}
+          eyebrow={neoSectionName(section)}
           onClose={() => setActiveModule(null)}
         />
       )}
@@ -641,7 +641,7 @@ function SubpageDetail({ theme, section, page }: SubpageDetailProps) {
   return (
     <>
       <section className="detail-hero">
-        <p className="eyebrow">{section.name} / {page.title}</p>
+        <p className="eyebrow">{neoSectionName(section)} / {page.title}</p>
         <h2>{voice(theme, page.callout)}</h2>
       </section>
       <section className="module-grid compact nx-grid-2">
@@ -670,12 +670,12 @@ function AudienceFit({ theme, section }: AudienceFitProps) {
       <div className="section-head">
         <div>
           <p className="eyebrow">{theme === "neo" ? "Who's this for" : "Audience fit"}</p>
-          <h2>{theme === "neo" ? `${section.name} for the learner, the founder, and the team hiring both.` : `Who ${section.name} is designed to support.`}</h2>
+          <h2>{theme === "neo" ? `${neoSectionName(section)} for the learner, the founder, and the team hiring both.` : `Who ${neoSectionName(section)} is designed to support.`}</h2>
         </div>
       </div>
       <div className="module-grid compact">
         {section.audiences.map((item) => (
-          <ModuleCard key={item.title} theme={theme} eyebrow={section.name} title={item.title}>
+          <ModuleCard key={item.title} theme={theme} eyebrow={neoSectionName(section)} title={item.title}>
             {voice(theme, item)}
           </ModuleCard>
         ))}
@@ -697,7 +697,7 @@ function StackDetails({ theme, section }: StackDetailsProps) {
       <div className="section-head">
         <div>
           <p className="eyebrow">{theme === "neo" ? "Stack receipts" : "Delivery stack"}</p>
-          <h2>{theme === "neo" ? `${section.name} stack with the details turned on.` : `${section.name} capabilities, outcomes and deliverables.`}</h2>
+          <h2>{theme === "neo" ? `${neoSectionName(section)} stack with the details turned on.` : `${neoSectionName(section)} capabilities, outcomes and deliverables.`}</h2>
         </div>
       </div>
       <div className="stack-detail-grid">

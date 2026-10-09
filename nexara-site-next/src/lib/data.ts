@@ -4,7 +4,8 @@ export const DATA = {
     { label: "Marketing", trustLabel: "Digital Solutions", page: "marketing" },
     { label: "Labs", trustLabel: "Product Studio", page: "labs" },
     { label: "Proof", trustLabel: "Delivery Proof", page: "customers" },
-    { label: "Contact", trustLabel: "Enquiry", page: "contact" },
+    { label: "About", trustLabel: "About", page: "company", neoOnly: true },
+    { label: "Contact", trustLabel: "Enquiry", page: "contact", trustOnly: true },
   ],
   gateway: {
     neo: {
@@ -24,7 +25,7 @@ export const DATA = {
   },
   home: {
     neo: {
-      eyebrow: "🚀 NEXARA GEN Z",
+      eyebrow: "🚀 NEXARA",
       title: "We build tomorrow's",
       accent: "internet_",
       body: "Cohorts, campaigns and software, all from one studio. Three obsessions, one door each. Pick yours.",
@@ -44,7 +45,7 @@ export const DATA = {
     neo: {
       eyebrow: "// UNBOX NEXARA",
       title: "Three engines, one core.",
-      body: "Scroll and watch Academy, Digital Marketing and Product Studio click into one setup built for growth-city teams.",
+      body: "Scroll and watch Academy, Digital Marketing and Labs click into one setup built for growth-city teams.",
       sequence: "NEXARA CORE",
     },
     trust: {
@@ -333,14 +334,15 @@ export const DATA = {
       id: "labs",
       index: "03",
       name: "Product Studio",
+      neoName: "Labs",
       short: { neo: "We build the system that solves the problem. SaaS, products, integrations, AI where it fits.", trust: "Software that solves the problem: SaaS, B2B products and integrations, with AI where it earns its place." },
       statement: "Technology is never the point. The problem is. We build the system that solves it: SaaS, B2B products, integrations, and AI only where it earns its place.",
       hero: {
         neo: {
-          eyebrow: "🛠️ PRODUCT STUDIO",
+          eyebrow: "🛠️ NEXARA LABS",
           title: "We build the system that solves the problem.",
           accent: "SaaS, products, integrations — AI where it fits.",
-          body: "Product Studio turns business problems into working software: SaaS platforms, B2B products, internal tools and the integrations that tie them together. AI and automation only go in where they earn it.",
+          body: "Labs turns business problems into working software: SaaS platforms, B2B products, internal tools and the integrations that tie them together. AI and automation only go in where they earn it.",
           primary: "See what we build",
           secondary: "Product proof",
         },
@@ -353,12 +355,13 @@ export const DATA = {
           secondary: "See how we build",
         },
       },
-      stats: [["4", "delivery pillars"], ["3", "build packages"], ["4", "stage delivery"], ["100%", "problem-scoped"]],
+      stats: [["5", "delivery pillars"], ["3", "build packages"], ["4", "stage delivery"], ["100%", "problem-scoped"]],
       modules: [
         { title: "Custom Software & SaaS", neo: "Web apps and SaaS built from scratch, architecture to ship. No template traps.", trust: "Web apps and SaaS platforms built from scratch: architecture, product UI and a clear path to ship and scale." },
         { title: "B2B Products & Platforms", neo: "Portals, dashboards and internal platforms that run the actual operation.", trust: "Portals, dashboards and internal platforms that run real business operations, not demos." },
         { title: "Integrations & Systems", neo: "APIs, pipelines and internal tools so your stack finally talks to itself.", trust: "APIs, data pipelines and systems integration so tools, teams and data actually talk to each other." },
         { title: "AI & Automation", neo: "RAG, agents and document AI, added where they earn it and with brakes on.", trust: "RAG, agents and document AI applied where they earn their place, with evaluation, guardrails and human review." },
+        { title: "E-commerce & Product Sites", neo: "Catalogues, model directories and quote flows for businesses that sell considered purchases. Prototyped before it's built.", trust: "Product catalogues, model directories, calculators and enquiry flows for businesses with considered purchases, built after the business is understood and prototypes are agreed." },
       ],
       stack: ["Product Architecture", "SaaS Builds", "B2B Platforms", "Integrations", "AI & Automation", "Cloud & DevOps"],
       audiences: [
@@ -388,6 +391,7 @@ export const DATA = {
       faqs: [
         ["Do you only build AI products?", "No. We build SaaS, B2B products, internal platforms and integrations. AI and automation go in where they genuinely help, never just to look modern."],
         ["Can you build a full product from scratch?", "Yes. We take it from problem framing and architecture through build, launch and support, MVP to scale, on whichever stack fits the job."],
+        ["Do you build e-commerce and product sites?", "Yes. We build product catalogues, model directories, calculators and quote or site-survey flows, after we understand the business and prototype with you. Sri Engineering Works, live in October 2026, was our first build in this category."],
         ["What is the first step?", "Every engagement starts by framing the problem and the outcome. We map the solution, scope the build, and agree a roadmap before any development begins."],
       ],
       intake: { primary: "Scope a build", secondary: "Tell us the problem, your current tools, the users and the outcome you need. We return a solution approach, scope and roadmap before any build." },
@@ -415,6 +419,17 @@ export const DATA = {
           ],
         },
         {
+          slug: "ecommerce",
+          title: "E-commerce & product sites",
+          callout: { neo: "Catalogues, estimators and quote flows that help buyers choose. Built after we understand your business, not before.", trust: "Product catalogues, specification directories and enquiry flows for businesses that sell considered purchases, built after we understand the business and agree prototypes with you." },
+          cards: [
+            { title: "Catalogues & model directories", neo: "Every product or model in one searchable directory, so buyers find the right one without calling first.", trust: "Product catalogues and model or specification directories with search, structured so buyers can compare and shortlist." },
+            { title: "Quote & site-survey flows", neo: "Enquiry, quote and free site-survey requests that reach your team with the details they need.", trust: "Enquiry, quote-request and site-survey flows that capture the details your team needs to respond." },
+            { title: "Calculators & estimators", neo: "Tools like a cooling estimator that help a buyer work out what they need before they ask.", trust: "Calculators and estimators that help a buyer size or choose a product before making an enquiry." },
+            { title: "Blog & search content", neo: "A blog and product pages written so search can find them.", trust: "A blog and product content structured for search and kept consistent with the catalogue." },
+          ],
+        },
+        {
           slug: "delivery",
           title: "Build & Delivery",
           callout: { neo: "Scope to launch, with the boring parts (hosting, access, monitoring) handled.", trust: "From architecture to launch, with hosting, access control and monitoring settled before go-live." },
@@ -429,6 +444,7 @@ export const DATA = {
       proof: [
         { name: "SaaS platform", result: { neo: "A real product shipped, with auth, billing and a path to scale. Not a prototype", trust: "Custom SaaS product scoped, built and shipped with auth, billing and a clear path to scale" }, org: "Product build" },
         { name: "B2B operations portal", result: { neo: "Spreadsheets and disconnected tools became one workflow", trust: "Internal B2B platform that replaced manual spreadsheets and disconnected tools with one workflow" }, org: "B2B platform" },
+        { name: "E-commerce & product site", result: { neo: "Sri Engineering Works: our first e-commerce build, live in October 2026 after multiple prototypes", trust: "Product site for an HVAC company with a model directory, a cooling estimator and a site survey flow. Our first e-commerce build, live October 2026" }, org: "E-commerce" },
         { name: "AI-assisted workflow", result: { neo: "AI added to the work that repeats — with review where it counts", trust: "Document and knowledge workflow automated with retrieval and a human review step where it counts" }, org: "AI & automation" },
       ],
     },
@@ -441,11 +457,25 @@ export const DATA = {
   work: {
     live: [
       {
+        name: "Sai Nirmaan Architects", scope: ["Website", "Digital marketing"], logo: "/brand/clients/sai-nirmaan.png", url: "https://www.sainirmaanarchitects.com/", badge: "First client",
+        sector: "Architecture", place: "Visakhapatnam",
+        line: "We built their portfolio website and run their digital marketing.",
+        does: "An architecture, interior and landscape practice with 300+ projects across 4+ states, led by Suresh Bandaru.",
+        built: ["A portfolio website for 300+ projects", "Ongoing digital marketing"],
+      },
+      {
         name: "Happy Farms", scope: ["SaaS platform", "Website"], logo: "/brand/clients/happy-farms.svg", url: "https://ourhappyfarms.com/",
         sector: "Agri-training", place: "Andhra Pradesh",
-        line: "We built their entire SaaS platform, login and management modules included, plus the public site.",
+        line: "We enabled their digital journey and built their trust signals, on top of a full SaaS platform with login and management modules, plus the public site.",
         does: "Natural farming training led by Prasad Juvvireddy: workshops, e-Safari farm visits, mentorship and export training across Andhra Pradesh.",
-        built: ["A complete SaaS product, built from the ground up", "Login modules for secure access", "Management modules to run day-to-day operations", "The public website that brings learners in"],
+        built: ["A complete SaaS product, built from the ground up", "Login modules for secure access", "Management modules to run day-to-day operations", "The public website that brings learners in", "Their digital journey, enabled, with trust signals built in"],
+      },
+      {
+        name: "Sri Engineering Works", scope: ["E-commerce", "Product catalogue", "Website"], logo: "/brand/clients/sri-engineering-works.png", url: "https://sriengineeringworks.com/", badge: "Just launched",
+        sector: "HVAC", place: "Hyderabad & Visakhapatnam",
+        line: "We built their e-commerce and product site, with an AC model directory, a Cooling Estimator and a free site survey request flow.",
+        does: "An HVAC company founded in 2018 and based in Hyderabad, with a branch and warehouse in Visakhapatnam. Proprietor K. Nagaraju. It sells, installs and maintains Split, Cassette, Tower, Ductable and VRV/VRF systems and chillers, works with Voltas, Daikin, Dunham-Bush and O General, and offers AMC contracts.",
+        built: ["An e-commerce and product site, our first build in that category", "A product catalogue: an AC model directory with search", "A Cooling Estimator calculator", "A free site survey and quote request flow", "A blog", "Multiple prototypes before the final build"],
       },
       {
         name: "Rise Medical Hub", scope: ["Website", "Medical library", "Digital marketing"], logo: "/brand/clients/rise-medical-hub.png", url: "https://risemedicalhub.com/",
@@ -460,13 +490,6 @@ export const DATA = {
         line: "We elevated their digital presence and built calculators that help sell their products.",
         does: "Science-led, antibiotic-free feed solutions for shrimp aquaculture and poultry.",
         built: ["An elevated digital presence", "Product calculators that help customers choose and buy", "A science-led website"],
-      },
-      {
-        name: "Sai Nirmaan Architects", scope: ["Website", "Digital marketing"], logo: "/brand/clients/sai-nirmaan.png", url: "https://www.sainirmaanarchitects.com/",
-        sector: "Architecture", place: "Visakhapatnam",
-        line: "We built their portfolio website and run their digital marketing.",
-        does: "An architecture, interior and landscape practice with 300+ projects across 4+ states, led by Suresh Bandaru.",
-        built: ["A portfolio website for 300+ projects", "Ongoing digital marketing"],
       },
       {
         name: "Nexara Voice", scope: ["In-house product"], logo: "/brand/nexara-mark.svg", url: "https://voice.nexaragroups.com/",
@@ -484,6 +507,11 @@ export const DATA = {
     ],
   },
   company: {
+    // Rendered on the About page only when non-empty. photo/bio/linkedin are optional (initials avatar when no photo).
+    founders: [
+      { name: "Seshu Kumar Puvvala", role: "Director" },
+      { name: "Pala Raju Garigipati", role: "Director" },
+    ] as { name: string; role: string; photo?: string; bio?: string; linkedin?: string }[],
     facts: [
       ["Status", "Incorporated capability firm"],
       ["Forces", "Academy, Digital, Labs"],
@@ -497,13 +525,49 @@ export const DATA = {
       { title: "Outcome reporting", body: "Academy, Digital and Labs each report progress, completion and next steps on an agreed cadence." },
     ],
     neo: {
-      manifesto: "Nexara Gen Z is the IT company that doesn't act like one. Academy turns learning into portfolio proof, Digital Marketing turns offers into market signal, and Product Studio turns ideas into working software. We ship daily across all three.",
+      facts: [
+        ["Status", "Incorporated company"],
+        ["Teams", "Academy, Digital Marketing, Labs"],
+        ["Standard", "Named owner, written scope, reported cadence"],
+        ["Operating region", "India-first growth markets"],
+      ],
+      standards: [
+        { title: "Verified claims", body: "Public numbers, client names and guarantees appear only after evidence and approval. If we can't show it, we don't claim it." },
+        { title: "Scoped delivery", body: "Every engagement opens with audience, goals, deliverables, timeline, a named owner and success criteria — in writing." },
+        { title: "Data boundaries", body: "Before any Labs build, we settle hosting, access, auditability, human review and risk level." },
+        { title: "Outcome reporting", body: "Academy, Digital Marketing and Labs each report progress, completion and next steps on an agreed cadence." },
+      ],
+      // About page (Neo only). Story paragraphs live in the component because they carry links.
+      about: {
+        hero: {
+          title: "Built in Vizag.",
+          accent: "Shipped for real clients.",
+          body: "Nexara Private Limited is a software, marketing and training studio in Visakhapatnam. We run three teams (Academy, Digital Marketing and Labs) to one standard: a written scope, a named owner and regular reporting.",
+        },
+        steps: [
+          { title: "Understand the business", body: "We start with how the business makes money, who buys and what slows it down. Nothing gets designed until we have those answers." },
+          { title: "Prototype before we commit", body: "We build rough versions and show them early. If the first one misses, we make another one. Sri Engineering Works went through multiple prototypes before we settled on the build." },
+          { title: "Ship only what's needed", body: "We deliver what the business needs and leave out what it doesn't. No unwanted solution gets pushed just because it's the one we already had." },
+        ],
+        example: {
+          label: "Worked example",
+          title: "Sri Engineering Works",
+          body: "An HVAC company based in Hyderabad, with a branch and warehouse in Visakhapatnam. We took time to learn how they sell, install and maintain cooling systems, built multiple prototypes, and kept the design consistent from page to page. It was our first e-commerce and product site, a new category for us. It has an AC model directory, a Cooling Estimator and a free site survey request flow, and nothing they didn't ask for.",
+        },
+        milestones: [
+          { when: "31 May 2026", before: "Incorporated in Visakhapatnam", body: "Nexara Private Limited is formed." },
+          { before: "First client: ", name: "Sai Nirmaan Architects", body: "A portfolio website and ongoing digital marketing for an architecture practice." },
+          { when: "July 2026", name: "Happy Farms", after: " SaaS platform live", body: "Login and management modules, plus the public site." },
+          { when: "October 2026", name: "Sri Engineering Works", after: " live: our first e-commerce build", body: "A product site with an AC model directory, a Cooling Estimator and a site survey flow." },
+        ] as { when?: string; before?: string; name?: string; after?: string; body: string }[],
+      },
+      manifesto: "Nexara is the IT company that doesn't act like one. Academy turns learning into portfolio proof, Digital Marketing turns offers into market signal, and Labs turns ideas into working software. We ship daily across all three.",
       principles: [
         { title: "Keep the three engines loud", body: "Academy, Digital Marketing and Labs each keep their own edge while sharing one Nexara operating standard." },
         { title: "Build proof people can feel", body: "Show work, flows, scopes, outputs and review loops before making big outcome claims." },
         { title: "Move fast without going vague", body: "Momentum only counts when the offer, owner, timeline and next action are locked." },
-        { title: "Ship production-grade or don't ship", body: "Every site, cohort, campaign and AI system should be built for real use, not presentation theatre." },
-        { title: "Never let the brand go generic", body: "Gen Z can sound sharp and the Firm can sound formal, but both should feel unmistakably Nexara." },
+        { title: "Ship production-grade or don't ship", body: "Every site, cohort, campaign and AI system should be built for real use, not for show." },
+        { title: "Never ship the generic version", body: "If it could carry anyone else's logo, it's not done. Every page, pitch and project should be unmistakably Nexara." },
       ],
     },
     trust: {
@@ -519,7 +583,7 @@ export const DATA = {
   },
   contact: {
     // Exactly as on the MCA master data and GST certificate. Programs and directories cross-check these.
-    legal: { name: 'Nexara Private Limited', brand: 'Nexara Groups', cin: 'U62012AP2026PTC126146', gstin: '37AALCN7053N1ZR', incorporated: '2026-05-31' },
+    legal: { name: 'Nexara Private Limited', domain: 'nexaragroups.com', cin: 'U62012AP2026PTC126146', gstin: '37AALCN7053N1ZR', incorporated: '2026-05-31' },
     phone: { display: '9257535757', href: 'tel:+919257535757' },
     address: {
       street: 'No. 1-83-14, MIG-IV, Sector 3, 1st Floor, M.V.P. Colony',
@@ -561,3 +625,12 @@ export const DATA = {
     checklist: ["Force and city", "Audience or user group", "Timeline and schedule", "Current assets or tools", "Success metric", "Decision-maker contact"],
   },
 };
+
+// Neo-facing division names. DATA.sections / customers / channels are shared with Trust,
+// whose copy ("Product Studio", "Digital Solutions") must not change, so Neo maps on render.
+export const neoSectionName = <T extends { name?: string; neoName?: string }>(section: T): T['name'] => (section.neoName ?? section.name) as T['name'];
+const NEO_LABELS: Record<string, string> = {
+  "Product Studio": "Labs", "Product studio": "Labs", "AI & Automation": "Labs",
+  "Digital Solutions": "Digital Marketing", "Digital": "Digital Marketing", "Talent Programmes": "Academy",
+};
+export const neoLabel = <T extends string | undefined>(label: T): T => (label !== undefined && NEO_LABELS[label] ? NEO_LABELS[label] : label) as T;

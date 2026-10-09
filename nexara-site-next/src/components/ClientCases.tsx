@@ -3,7 +3,7 @@
 // what Nexara built). Shared by /neo/customers and /trust/customers; skinned by
 // the .neo / .trust ancestor in styles/cards.css.
 import { Check, ArrowUpRight } from 'lucide-react';
-import { DATA } from '@/lib/data';
+import { DATA, neoLabel } from '@/lib/data';
 import { SpotlightCard } from './ui/package-card';
 
 export function ClientLogoWall() {
@@ -30,6 +30,7 @@ export function ClientCases({ theme }: { theme: 'neo' | 'trust' }) {
           <div className="nx-case-id">
             <span className="nx-case-plate"><img src={w.logo} alt={`${w.name} logo`} loading="lazy" decoding="async" /></span>
             <span className="nx-case-num">{isNeo ? `Case ${String(i + 1).padStart(2, '0')}` : `Record ${String(i + 1).padStart(2, '0')}`}</span>
+            {isNeo && w.badge && <span className="nx-badge">{w.badge}</span>}
             <h3>{w.name}</h3>
             <p className="nx-case-place">{w.sector} · {w.place}</p>
             <span className="nx-case-scope">{w.scope.map((t) => <span key={t}>{t}</span>)}</span>
@@ -54,7 +55,7 @@ export function ClientCases({ theme }: { theme: 'neo' | 'trust' }) {
       <div className="nx-case-bench">
         <span className="nx-case-label">{isNeo ? 'On the bench' : 'In delivery'}</span>
         <ul>
-          {building.map((b) => <li key={b.name}><b>{b.name}</b><span>{b.kind}</span></li>)}
+          {building.map((b) => <li key={b.name}><b>{b.name}</b><span>{isNeo ? neoLabel(b.kind) : b.kind}</span></li>)}
           <li><b>{isNeo ? '+ more in the pipeline' : '+ further engagements in the pipeline'}</b></li>
         </ul>
       </div>

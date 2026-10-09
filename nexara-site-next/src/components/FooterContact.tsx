@@ -19,7 +19,7 @@ export default function FooterContact() {
       <ul>{social.map(link => <li key={link.href}><a href={link.href} target="_blank" rel="noopener noreferrer me">{link.label} <ArrowUpRight size={15} aria-hidden="true" /></a></li>)}</ul>
     </div>
     <p className="footer-contact-block__legal">
-      {legal.brand} is the brand of {legal.name}. CIN {legal.cin} · GSTIN {legal.gstin} · Registered office: {address.street}, {address.city}.
+      {legal.name}. CIN {legal.cin} · GSTIN {legal.gstin} · Registered office: {address.street}, {address.city}.
     </p>
   </div>;
 }

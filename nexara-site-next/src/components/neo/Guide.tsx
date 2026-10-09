@@ -736,7 +736,7 @@ function NeoGuide() {
       if (railNarrEl) {
         const divisions = [
           { key: "narr-academy",   label: "academy",   mood: "money", line: "Academy: we grow engineers who actually ship. talent, built in public." },
-          { key: "narr-labs",      label: "labs",      mood: "hype",  line: "Product Studio: we build software that solves the problem. AI only where it earns it." },
+          { key: "narr-labs",      label: "labs",      mood: "hype",  line: "Labs: we build software that solves the problem. AI only where it earns it." },
           { key: "narr-marketing", label: "marketing", mood: "hype",  line: "Marketing: we make brands move. every campaign tied to a metric." },
         ];
         triggers.push(ScrollTrigger.create({
