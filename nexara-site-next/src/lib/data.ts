@@ -524,6 +524,12 @@ export const DATA = {
       city: 'Visakhapatnam, Andhra Pradesh 530017',
       mapsHref: 'https://www.google.com/maps/search/?api=1&query=Nexara+Private+Limited+1-83-14+MVP+Colony+Visakhapatnam+530017',
     },
+    // Official profiles. Also emitted as Organization.sameAs so search engines tie them to this site.
+    social: [
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/company/nexara-private-limited/' },
+      { label: 'Instagram', href: 'https://www.instagram.com/nexaraprivatelimited/' },
+      { label: 'Google', href: 'https://www.google.com/search?kgmid=/g/11zf6hqkp8' },
+    ],
     neo: {
       eyebrow: "LET'S BUILD",
       title: "We work with builders. Start here.",

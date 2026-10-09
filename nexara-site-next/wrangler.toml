@@ -5,7 +5,9 @@ compatibility_flags = ["nodejs_compat"]
 account_id = "ca93de7853e49bb397e5a95ca6c01a03"
 
 routes = [
-  { pattern = "nexaragroups.com/*", zone_name = "nexaragroups.com" }
+  { pattern = "nexaragroups.com/*", zone_name = "nexaragroups.com" },
+  # www is served by this Worker only to 301 it to the apex (see src/middleware.ts).
+  { pattern = "www.nexaragroups.com/*", zone_name = "nexaragroups.com" }
 ]
 
 [assets]

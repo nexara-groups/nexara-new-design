@@ -16,6 +16,9 @@
 .footer-contact-block a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: inherit; font-size: 14px; text-decoration: none; }
 .footer-contact-block__phone > a { font-family: Inter,system-ui,sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -.025em; }
 .footer-contact-block address { max-width: 70ch; font-size: 14px; line-height: 1.8; font-style: normal; color: var(--depth-muted,var(--muted)); }
+.footer-contact-block__social { grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 24px; }
+.footer-contact-block__social .footer-contact-block__label { margin: 0; }
+.footer-contact-block__social ul { display: flex; flex-wrap: wrap; gap: 0 20px; margin: 0; padding: 0; list-style: none; }
 .footer-contact-block a:hover { text-decoration: underline; text-underline-offset: 5px; }
 .footer-contact-block a:focus-visible, .footer-legal a:focus-visible { outline: 2px solid var(--depth-accent,var(--accent)); outline-offset: 4px; }
 .trust .tsx-footer-contact-row { max-width: 1200px; margin: 0 auto 28px; padding-inline: clamp(20px,5vw,80px); }

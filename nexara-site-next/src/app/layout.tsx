@@ -34,14 +34,14 @@ import '@/styles/elevation.css';
 import '@/styles/cards.css';
 
 export const metadata: Metadata = {
-  title: 'Nexara Groups — Academy, Digital Marketing & Product Studio',
+  title: 'Nexara | Software Company in Visakhapatnam (Vizag)',
   description: "Nexara Groups: Academy trains talent, Digital Marketing builds growth, Product Studio ships software. Named owners, written scope, claims we can verify. Based in Visakhapatnam, India.",
   keywords: 'Nexara, Nexara Groups, Nexara Private Limited, Nexara Academy, Nexara Digital Marketing, Nexara Labs, Nexara Product Studio, talent development, AI development India, digital marketing agency, tech training Visakhapatnam, software development India',
   authors: [{ name: 'Nexara Private Limited' }],
   robots: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1',
   openGraph: {
     type: 'website',
-    siteName: 'Nexara Groups',
+    siteName: 'Nexara',
     title: 'Nexara Groups — Academy, Digital Marketing & Product Studio',
     description: 'Three teams, one standard. Nexara Private Limited builds careers, grows brands and ships production software, all from one house.',
     url: 'https://nexaragroups.com/',
