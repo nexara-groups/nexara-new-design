@@ -117,3 +117,20 @@
  :is(.tsx-rail-track,.neo-rail-track) { display:grid !important; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); width:100% !important; transform:none !important; }
  :is(.tsx-rail-panel,.neo-rail-panel) { width:100% !important; min-height:0 !important; }
 }
+
+/* Trust contrast (WCAG AA): accent text on light surfaces uses brand action blue; muted/ghost text uses a darker slate.
+   Tokens are untouched, so fills, borders and dark sections keep the light-blue accent. */
+.trust.tsx-site :is(.tsx-manifesto, .tsx-rail-stage, .tsx-standard-head, .tsx-enterprise-stacks, .tsx-work, .tsx-market-context, .tsx-final-cta, .tsx-ledger-plate) .tsx-section-eyebrow,
+.trust.tsx-site .tsx-manifesto-text :is(.w.accent, .w.accent.on),
+.trust.tsx-site .tsx-section-heading .serif,
+.trust.tsx-site .tsx-rail-panel :is(.tsx-panel-idx, .tsx-panel-module-num, .tsx-panel-cta, h3 .serif),
+.trust.tsx-site .tsx-ledger-plate :is(.tsx-ledger-plate-label, .tsx-ledger-rownum),
+.trust.tsx-site .tsx-work-bench-label,
+.trust.tsx-site .tsx-assumption-panel .tsx-panel-title,
+.trust.tsx-site .tsx-final-cta a em { color: #215F94 !important; }
+.trust.tsx-site .tsx-rail-panel .panel-tags span,
+.trust.tsx-site .tsx-enterprise-stacks .tsx-section-lede,
+.trust.tsx-site .tsx-stat-band .tsx-stat-sublabel,
+.trust.tsx-site .tsx-stackcard-stack-label,
+.trust.tsx-site .tsx-assumption-panel p strong { color: #566B85 !important; }
+.cc-banner.cc-theme-trust .cc-btn-solid { background: #215F94 !important; }

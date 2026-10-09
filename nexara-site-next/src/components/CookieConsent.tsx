@@ -169,6 +169,7 @@ export default function CookieConsent({ theme }: { theme: 'trust' | 'neo' | null
             <label className="cc-switch">
               <input
                 type="checkbox"
+                aria-label="Allow analytics cookies (Google Analytics)"
                 checked={analytics}
                 onChange={(e) => setAnalytics(e.target.checked)}
               />

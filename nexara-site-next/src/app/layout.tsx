@@ -74,7 +74,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
       </head>
       <body>
-        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-BPYYD3KQ99" strategy="afterInteractive" />
         <Script id="ga-consent" strategy="beforeInteractive">{`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -89,6 +88,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             if (_cc && _cc.analytics === true) gtag('consent', 'update', { 'analytics_storage': 'granted' });
           } catch (e) {}
           gtag('config', 'G-BPYYD3KQ99');
+        `}</Script>
+        {/* gtag.js (180 KB) loads after first interaction or 3 s post-load, so it never competes with first paint.
+            Queued dataLayer events and the consent default above are replayed when it arrives. */}
+        <Script id="ga-loader" strategy="afterInteractive">{`
+          (function () {
+            var done = false, evs = ['pointerdown', 'keydown', 'scroll', 'touchstart'];
+            function load() {
+              if (done) return; done = true;
+              evs.forEach(function (e) { removeEventListener(e, load); });
+              var s = document.createElement('script');
+              s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-BPYYD3KQ99';
+              document.head.appendChild(s);
+            }
+            evs.forEach(function (e) { addEventListener(e, load, { passive: true, once: true }); });
+            function later() { setTimeout(load, 3000); }
+            if (document.readyState === 'complete') later(); else addEventListener('load', later);
+          })();
         `}</Script>
         {children}
       </body>

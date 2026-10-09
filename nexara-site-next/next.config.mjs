@@ -3,6 +3,8 @@ import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  // Inline the (small) stylesheets so they stop blocking first paint and the font chain starts immediately.
+  experimental: { inlineCss: true },
   async headers() {
     return [{ source: '/:path*', headers: [{ key: 'Strict-Transport-Security', value: 'max-age=31536000' }] }];
   },
