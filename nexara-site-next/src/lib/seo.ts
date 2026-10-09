@@ -81,7 +81,8 @@ export function getStructuredData(route: Pick<Route, 'theme' | 'page' | 'detail'
   const organizationId = `${SITE_URL}/#organization`;
   const organization = {
     '@type': ['Organization', 'LocalBusiness'], '@id': organizationId,
-    name: 'Nexara', legalName: 'Nexara Private Limited', alternateName: ['Nexara Groups', 'Nexara Group'],
+    name: 'Nexara', legalName: DATA.contact.legal.name, foundingDate: DATA.contact.legal.incorporated, taxID: DATA.contact.legal.gstin,
+    identifier: { '@type': 'PropertyValue', propertyID: 'CIN', value: DATA.contact.legal.cin }, alternateName: ['Nexara Groups', 'Nexara Group'],
     url: `${SITE_URL}/`, logo: `${SITE_URL}/brand/nexara-logo-512.png`, sameAs: DATA.contact.social.map(link => link.href), image: `${SITE_URL}/brand/og-image.png`,
     description: 'Software, websites, digital marketing and tech training in Visakhapatnam (Vizag).',
     telephone: '+919257535757', email: 'info@nexaragroups.com', hasMap: DATA.contact.address.mapsHref,

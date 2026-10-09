@@ -12,7 +12,7 @@ const teams = [
 
 export default function GatewayAbout() {
   const intro = getSeo({ theme: null, page: 'gateway', detail: null });
-  const { phone, address, social } = DATA.contact;
+  const { phone, address, social, legal } = DATA.contact;
   return (
     <section className="gw-about" aria-labelledby="gw-about-title">
       <div className="gw-about__inner">
@@ -32,8 +32,9 @@ export default function GatewayAbout() {
         </ul>
         <div className="gw-about__meta">
           <address>
-            <strong>Nexara Private Limited</strong><br />
+            <strong>{legal.name}</strong><br />
             {address.street}, {address.city}<br />
+            CIN {legal.cin} · GSTIN {legal.gstin}<br />
             <a href={phone.href}>{phone.display}</a> · <a href="mailto:info@nexaragroups.com">info@nexaragroups.com</a>
           </address>
           <ul className="gw-about__social">

@@ -518,9 +518,11 @@ export const DATA = {
     },
   },
   contact: {
+    // Exactly as on the MCA master data and GST certificate. Programs and directories cross-check these.
+    legal: { name: 'Nexara Private Limited', brand: 'Nexara Groups', cin: 'U62012AP2026PTC126146', gstin: '37AALCN7053N1ZR', incorporated: '2026-05-31' },
     phone: { display: '9257535757', href: 'tel:+919257535757' },
     address: {
-      street: 'First Floor, 1-83-14, MVP Sector 3, Sector 4, Sector 3, MVP Colony',
+      street: 'No. 1-83-14, MIG-IV, Sector 3, 1st Floor, M.V.P. Colony',
       city: 'Visakhapatnam, Andhra Pradesh 530017',
       mapsHref: 'https://www.google.com/maps/search/?api=1&query=Nexara+Private+Limited+1-83-14+MVP+Colony+Visakhapatnam+530017',
     },

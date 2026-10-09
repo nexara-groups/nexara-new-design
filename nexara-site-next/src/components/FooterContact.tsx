@@ -3,7 +3,7 @@ import { Phone, MapPin, ArrowUpRight } from 'lucide-react';
 import { DATA } from '@/lib/data';
 
 export default function FooterContact() {
-  const { phone, address, social } = DATA.contact;
+  const { phone, address, social, legal } = DATA.contact;
   return <div className="footer-contact-block">
     <div className="footer-contact-block__phone">
       <span className="footer-contact-block__label"><Phone size={16} aria-hidden="true" /> Call Nexara</span>
@@ -18,5 +18,8 @@ export default function FooterContact() {
       <span className="footer-contact-block__label">Find Nexara</span>
       <ul>{social.map(link => <li key={link.href}><a href={link.href} target="_blank" rel="noopener noreferrer me">{link.label} <ArrowUpRight size={15} aria-hidden="true" /></a></li>)}</ul>
     </div>
+    <p className="footer-contact-block__legal">
+      {legal.brand} is the brand of {legal.name}. CIN {legal.cin} · GSTIN {legal.gstin} · Registered office: {address.street}, {address.city}.
+    </p>
   </div>;
 }
