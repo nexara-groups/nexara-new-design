@@ -28,9 +28,7 @@ import '@fontsource/inter/latin-800.css';
 import '@/styles/index.css';
 import '@/styles/base.css';
 import '@/styles/consent.css';
-import '@/styles/refinements.css';
-import '@/styles/elevation.css';
-import '@/styles/cards.css';
+import '@/styles/shared.css';
 
 export const metadata: Metadata = {
   title: 'Nexara | Software Company in Visakhapatnam (Vizag)',

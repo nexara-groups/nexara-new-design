@@ -192,7 +192,7 @@ export function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }: {
       // half-clipped at the viewport edge and read as a stray UI artifact.
       digit.style.opacity = hasHit ? '1' : '0';
       digit.style.transform = `translate(${hitX}px,${hitY}px) translate(-50%,-50%) scale(${hasHit ? 1.16 : 1})`;
-      digit.style.boxShadow = hasHit ? '0 0 42px rgba(102, 160, 204,.92)' : '0 0 0 rgba(102, 160, 204,0)';
+      digit.style.boxShadow = hasHit ? '0 0 42px rgba(30, 122, 77,.92)' : '0 0 0 rgba(30, 122, 77,0)';
 
       if (shouldAnimate) rafId = requestAnimationFrame(frame);
     }
@@ -248,42 +248,6 @@ export function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }: {
   );
 }
 
-export function TrustHeroFlat() {
-  const copy = DATA.home.trust;
-  return (
-    <section className="tsx-hero" aria-label="Hero">
-      <TrustParticleCanvas />
-      <div className="tsx-hero-rule" aria-hidden="true" />
-      <div className="tsx-hero-copy">
-        <p className="tsx-eyebrow">{copy.eyebrow}</p>
-        <h1 className="tsx-h1">{copy.title}<br /><span>{copy.accent}</span></h1>
-        <p className="tsx-hero-sub">{copy.body}</p>
-        <div className="tsx-hero-actions">
-          <button className="tsx-btn-primary" onClick={() => routeTo('trust', 'contact')}>Plan an Engagement</button>
-          <button className="tsx-btn-ghost" onClick={() => routeTo('trust', 'academy')}>Explore Solutions</button>
-        </div>
-      </div>
-      <div className="tsx-hero-card" role="complementary" aria-label="Nexara at a glance">
-        <div className="tsx-hero-card-header">
-          <p>Nexara / Enterprise</p>
-          <p>Capability index</p>
-        </div>
-        <div>
-          {Object.values(DATA.sections).map((section) => (
-            <div className="tsx-stat tsx-stat-link" key={section.id} role="link" tabIndex={0}
-              onClick={() => routeTo('trust', section.id)}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') routeTo('trust', section.id); }}>
-              <div className="tsx-stat-label">{getTrustSectionLabel(section)}</div>
-              <div className="tsx-stat-value">{section.index}<span>{section.stackDetails.length} modules</span></div>
-              <div className="tsx-stat-dot" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function TrustHeroUnravel() {
   const wrapRef = React.useRef<HTMLDivElement | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
@@ -316,9 +280,9 @@ export function TrustHeroUnravel() {
     //   p 0.86→1.00   re-conv    all three stream back into core
     //
     const DIVS = [
-      { label: 'Academy', r: 26,  g: 109, b: 255 },
-      { label: 'Labs',    r: 109, g: 74,  b: 255 },
-      { label: 'Digital', r: 0,   g: 170, b: 204 },
+      { label: 'Academy', r: 30, g: 122, b: 77 },
+      { label: 'Labs',    r: 115, g: 214, b: 165 },
+      { label: 'Digital', r: 46, g: 158, b: 102 },
     ];
 
     const makeSprite = (r, g, b) => {
@@ -537,16 +501,16 @@ export function TrustHeroUnravel() {
       const pulse = W * .05 + Math.sin(time * 2.2) * W * .012;
 
       const atm = ctx.createRadialGradient(CX, CY, 0, CX, CY, pulse * 2.8);
-      atm.addColorStop(0,  `rgba(205, 222, 235,${.06 * intensity})`);
-      atm.addColorStop(.4, `rgba(102, 160, 204,${.1 * intensity})`);
-      atm.addColorStop(1,  'rgba(102, 160, 204,0)');
+      atm.addColorStop(0,  `rgba(205, 235, 220,${.06 * intensity})`);
+      atm.addColorStop(.4, `rgba(30, 122, 77,${.1 * intensity})`);
+      atm.addColorStop(1,  'rgba(30, 122, 77,0)');
       ctx.fillStyle = atm;
       ctx.beginPath(); ctx.arc(CX, CY, pulse * 2.8, 0, TAU); ctx.fill();
 
       const grd = ctx.createRadialGradient(CX, CY, 0, CX, CY, pulse);
       grd.addColorStop(0,  `rgba(255,255,255,${.95 * intensity})`);
-      grd.addColorStop(.3, `rgba(152, 188, 216,${.72 * intensity})`);
-      grd.addColorStop(1,  'rgba(102, 160, 204,0)');
+      grd.addColorStop(.3, `rgba(152, 216, 184,${.72 * intensity})`);
+      grd.addColorStop(1,  'rgba(30, 122, 77,0)');
       ctx.fillStyle = grd;
       ctx.beginPath(); ctx.arc(CX, CY, pulse, 0, TAU); ctx.fill();
 
@@ -557,7 +521,7 @@ export function TrustHeroUnravel() {
       // Instrument ring: slowly rotating ticks, every 4th one long.
       const tickR = pulse * 1.6;
       const rot = time * 0.15;
-      ctx.strokeStyle = 'rgba(152, 188, 216,1)';
+      ctx.strokeStyle = 'rgba(152, 216, 184,1)';
       ctx.lineWidth = 1;
       ctx.globalAlpha = 0.30 * intensity;
       for (let i = 0; i < 24; i++) {
@@ -624,11 +588,11 @@ export function TrustHeroUnravel() {
     function applyLit(el, lit, prox) {
       // Keep the unlit wordmark legible and premium. The strike still creates a
       // clear lift to white, but the resting state no longer reads as disabled.
-      const r = Math.round(164 + 80 * lit), g = Math.round(195 + 53 * lit), b = Math.round(230 + 25 * lit);
+      const r = Math.round(214 + 32 * lit), g = Math.round(222 + 26 * lit), b = Math.round(208 + 36 * lit);
       el.style.color = `rgba(${r},${g},${b},${(0.96 + 0.04 * lit).toFixed(2)})`;
       const glow = lit * 0.32 + prox * 0.9;
-      el.style.textShadow = `0 0 ${(20 + prox * 22).toFixed(0)}px rgba(168, 200, 224,${glow.toFixed(2)})`
-        + (prox > 0.02 ? `,0 0 ${(74 * prox).toFixed(0)}px rgba(102, 160, 204,${(prox * 0.6).toFixed(2)})` : '');
+      el.style.textShadow = `0 0 ${(20 + prox * 22).toFixed(0)}px rgba(168, 224, 196,${glow.toFixed(2)})`
+        + (prox > 0.02 ? `,0 0 ${(74 * prox).toFixed(0)}px rgba(30, 122, 77,${(prox * 0.6).toFixed(2)})` : '');
     }
     // latch=false is the load-time glint: letters flare as the beam passes
     // and settle back, so the scroll-driven strike keeps its payoff.
@@ -915,7 +879,7 @@ export function TrustHeroUnravel() {
         <canvas ref={canvasRef} className="tsx-hero-canvas" aria-hidden="true" />
         <div className="tsx-hero-handoff" aria-hidden="true" />
 
-        <div className="tsx-hero-chapter" data-from="0" data-to="0.07">
+        <div className="tsx-hero-chapter" style={{ opacity: 1, pointerEvents: "auto" }} data-from="0" data-to="0.07">
           <p className="tsx-section-eyebrow">Enterprise IT systems</p>
           <h1 ref={titleRef} className="tsx-hero-title tsx-hero-title--strike" aria-label="Nexara">
             <span>N</span><span>E</span><span>X</span><span>A</span><span>R</span><span>A</span>
@@ -926,34 +890,34 @@ export function TrustHeroUnravel() {
 
         <div className="tsx-hero-chapter" data-from="0.125" data-to="0.225" aria-hidden="true">
           <p className="tsx-section-eyebrow">The premise</p>
-          <h2 className="tsx-section-heading">One core.<br /><span className="serif" style={{ color: '#3D6A94' }}>Three forces.</span></h2>
-          <p className="tsx-sec-body" style={{ maxWidth: '34em', marginInline: 'auto' }}>Every engagement runs through a single operating core — then unravels into three disciplined divisions.</p>
+          <h2 className="tsx-section-heading">One core.<br /><span className="serif" style={{ color: '#3D9469' }}>Three forces.</span></h2>
+          <p className="tsx-sec-body" style={{ maxWidth: '34em', marginInline: 'auto' }}>Every engagement runs through a single operating core, then unravels into three disciplined divisions.</p>
         </div>
 
-        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#3D6A94' } as React.CSSProperties} data-from="0.27" data-to="0.45" aria-hidden="true">
+        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#3D9469' } as React.CSSProperties} data-from="0.27" data-to="0.45" aria-hidden="true">
           <p className="tsx-panel-idx">01 / DIVISION</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Academy<br /><span className="serif" style={{ color: '#3D6A94' }}>the talent engine.</span></h2>
-          <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Structured, cohort-based programmes that turn ambitious learners into capable engineers — sprint by sprint, review by review.</p>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Academy<br /><span className="serif" style={{ color: '#3D9469' }}>the talent engine.</span></h2>
+          <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Structured, cohort-based programmes that turn ambitious learners into capable engineers, sprint by sprint, review by review.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'academy')} style={{ marginTop: '20px' }}>Enter Academy →</button>
         </div>
 
-        <div className="tsx-hero-chapter ch-right" style={{ '--accent': '#2C3F5E' } as React.CSSProperties} data-from="0.45" data-to="0.63" aria-hidden="true">
+        <div className="tsx-hero-chapter ch-right" style={{ '--accent': '#2C5E45' } as React.CSSProperties} data-from="0.45" data-to="0.63" aria-hidden="true">
           <p className="tsx-panel-idx" style={{ right: 'max(9vw, 150px)', left: 'auto' }}>02 / DIVISION</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'right' }}>Labs<br /><span className="serif" style={{ color: '#2C3F5E' }}>the systems forge.</span></h2>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'right' }}>Labs<br /><span className="serif" style={{ color: '#2C5E45' }}>the systems forge.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'right' }}>Applied AI and automation systems, engineered from prototype to production with written specs and weekly demos.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'labs')} style={{ marginTop: '20px' }}>Enter Labs →</button>
         </div>
 
-        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#5B6472' } as React.CSSProperties} data-from="0.63" data-to="0.81" aria-hidden="true">
+        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#6F6B5E' } as React.CSSProperties} data-from="0.63" data-to="0.81" aria-hidden="true">
           <p className="tsx-panel-idx">03 / DIVISION</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Digital<br /><span className="serif" style={{ color: '#5B6472' }}>the growth signal.</span></h2>
-          <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Brand systems, web experiences and performance creative — built like software, measured like engineering.</p>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Digital<br /><span className="serif" style={{ color: '#6F6B5E' }}>the growth signal.</span></h2>
+          <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Brand systems, web experiences and performance creative, built like software, measured like engineering.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'marketing')} style={{ marginTop: '20px' }}>Enter Marketing →</button>
         </div>
 
         <div className="tsx-hero-chapter" data-from="0.86" data-to="1" aria-hidden="true">
           <p className="tsx-section-eyebrow">The weave</p>
-          <h2 className="tsx-section-heading">Three disciplines.<br /><span className="serif" style={{ color: '#3D6A94' }}>One standard.</span></h2>
+          <h2 className="tsx-section-heading">Three disciplines.<br /><span className="serif" style={{ color: '#3D9469' }}>One standard.</span></h2>
           <div className="tsx-sec-actions" style={{ display: 'flex', gap: '16px', marginTop: '24px', justifyContent: 'center' }}>
             <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>Start a request <span className="arr">→</span></button>
             <button className="tsx-sec-btn-ghost" onClick={() => {

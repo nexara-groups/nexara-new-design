@@ -59,14 +59,15 @@ const DEFAULT_CARD_ICON = (
   </svg>
 );
 
-export function TrustSubpageBand({ section, page }: { section: TrustSectionData; page: TrustSubpageData }) {
+export function TrustSubpageBand({ section, page, onOpen }: { section: TrustSectionData; page: TrustSubpageData; onOpen?: () => void }) {
+  const open = onOpen ?? (() => routeTo('trust', section.id, page.slug, { scroll: false }));
   return (
     <div className="tsx-subpage-band" id={`${section.id}-${page.slug}`}>
       <div className="tsx-section-inner">
         <div className="tsx-subpage-cards-head tsx-fade">
           <span className="tsx-section-eyebrow">{page.title}</span>
           <h2 className="tsx-section-heading">{page.callout.trust}</h2>
-          <button className="tsx-subpage-band-link" onClick={() => routeTo('trust', section.id, page.slug)}>
+          <button className="tsx-subpage-band-link" onClick={open}>
             Open {page.title}
           </button>
         </div>
@@ -76,7 +77,7 @@ export function TrustSubpageBand({ section, page }: { section: TrustSectionData;
               type="button"
               className={`tsx-subpage-icon-card tsx-fade tsx-fade-d${Math.min(i + 1, 4)}`}
               key={card.title}
-              onClick={() => routeTo('trust', section.id, page.slug)}
+              onClick={open}
             >
               <div className="tsx-subpage-icon-wrap" aria-hidden="true">
                 {SUBPAGE_CARD_ICONS[card.title] || DEFAULT_CARD_ICON}
@@ -91,7 +92,7 @@ export function TrustSubpageBand({ section, page }: { section: TrustSectionData;
   );
 }
 
-export function TrustSubpageHero({ section, page }: { section: TrustSectionData; page: TrustSubpageData }) {
+function TrustSubpageHero({ section, page }: { section: TrustSectionData; page: TrustSubpageData }) {
   const siblingPages = section.subpages || [];
   const titleRef = React.useRef(null);
   return (
@@ -138,7 +139,7 @@ export function TrustSubpageHero({ section, page }: { section: TrustSectionData;
   );
 }
 
-export function TrustSubpageCards({ page }: { page: TrustSubpageData }) {
+function TrustSubpageCards({ page }: { page: TrustSubpageData }) {
   return (
     <div className="tsx-subpage-feature-grid">
       {page.cards.map((card, i) => (
@@ -157,32 +158,20 @@ export function TrustSubpageCards({ page }: { page: TrustSubpageData }) {
   );
 }
 
-export function TrustSubpageDetailPage({ section, page, index }: { section: TrustSectionData; page: TrustSubpageData; index: number }) {
+/** In-page tab panel — same section shell, no separate thin subpage. */
+export function TrustSubpagePanel({ section, page }: { section: TrustSectionData; page: TrustSubpageData }) {
   const proofItems = section.proof || [];
   return (
-    <main className="tsx-subpage-modern" style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' } as React.CSSProperties}>
-      <TrustSubpageHero section={section} page={page} />
-      {page.slug === "internships" && <InternshipOverview theme="trust" />}
-
-      <section className="tsx-subpage-dark-section">
-        <div className="tsx-section-inner tsx-subpage-context-grid">
-          <div>
-            <span className="tsx-story-step-pill">Context</span>
-            <span className="tsx-subpage-modern-eyebrow">Context</span>
-            <h2>Where this fits in the engagement.</h2>
-          </div>
-          <p>{section.statement}</p>
-        </div>
-      </section>
-
+    <div className="tsx-subpage-panel" id="section-panel" role="tabpanel">
       <section className="tsx-subpage-light-section">
         <div className="tsx-section-inner">
-          <span className="tsx-story-step-pill">Capability detail</span>
+          <span className="tsx-story-step-pill">{page.title}</span>
           <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
-            <span className="tsx-chapter-eyebrow">Capability detail</span>
-            <h2 className="tsx-chapter-title">What {page.title} includes</h2>
-            <p className="tsx-chapter-sub">A focused view of the work inside this part of {getTrustSectionLabel(section)}.</p>
+            <span className="tsx-chapter-eyebrow">{getTrustSectionLabel(section)} / {page.title}</span>
+            <h2 className="tsx-chapter-title">{page.callout.trust}</h2>
+            <p className="tsx-chapter-sub">What {page.title} includes inside {getTrustSectionLabel(section)}.</p>
           </header>
+          {page.slug === "internships" && <InternshipOverview theme="trust" />}
           <TrustSubpageCards page={page} />
         </div>
       </section>
@@ -225,6 +214,17 @@ export function TrustSubpageDetailPage({ section, page, index }: { section: Trus
           />
         </div>
       </section>
+    </div>
+  );
+}
+
+/** @deprecated Prefer TrustSubpagePanel inside TrustSectionPage. Kept for any legacy import. */
+export function TrustSubpageDetailPage({ section, page, index }: { section: TrustSectionData; page: TrustSubpageData; index: number }) {
+  void index;
+  return (
+    <main className="tsx-subpage-modern" style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' } as React.CSSProperties}>
+      <TrustSubpageHero section={section} page={page} />
+      <TrustSubpagePanel section={section} page={page} />
     </main>
   );
 }

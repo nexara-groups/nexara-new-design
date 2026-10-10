@@ -1,16 +1,18 @@
 'use client';
 import React from 'react';
-import LocalContext from './LocalContext';
 import { useRouter } from 'next/navigation';
 import { DATA } from '@/lib/data';
 import { STATIC_PAGES } from '@/lib/shared';
 import { setTrustRouter } from '@/lib/trust-router';
 import { NotFound } from './NotFound';
-import { TrustNav } from './trust/Nav';
-import { TrustHome } from './trust/Home';
+import { SiteNav } from './shared/SiteNav';
+import { SiteFooter } from './shared/SiteFooter';
+import { Home } from './shared/Home';
 import { TrustSectionPage } from './trust/SectionShell';
-import { TrustCustomers, TrustCompany, TrustContact, TrustConcierge } from './trust/StaticPages';
-import { TrustFooter } from './trust/Misc';
+import { TrustContact, TrustConcierge } from './trust/StaticPages';
+import { Proof } from './shared/Proof';
+import { About } from './shared/About';
+import { MarketingPage } from './shared/MarketingPage';
 import { useSmoothScroll } from './useSmoothScroll';
 
 function setupTsxFade() {
@@ -67,18 +69,17 @@ function TrustSite({ page, detail }: { page: string; detail: string | null }) {
   return (
     <div className="site trust tsx-site">
       <a className="skip-link" href="#main">Skip to content</a>
-      <TrustNav page={page} detail={detail} />
-      <div id="main" className={page !== 'home' ? 'tsx-main-offset' : ''}>
-        {page === 'home'      && <TrustHome />}
-        {section              && <TrustSectionPage section={section} detail={detail} />}
-        {page === 'customers' && <TrustCustomers detail={detail} />}
-        {page === 'company'   && <TrustCompany />}
+      <SiteNav theme="trust" page={page} detail={detail} />
+      <div id="main">
+        {page === 'home'      && <Home theme="trust" />}
+        {section              && (page === 'marketing' ? <MarketingPage theme="trust" /> : <TrustSectionPage section={section} detail={detail} />)}
+        {page === 'customers' && <Proof theme="trust" detail={detail} />}
+        {page === 'company'   && <About theme="trust" />}
         {page === 'contact'   && <TrustContact detail={detail} />}
         {!validPage           && <NotFound theme="trust" page={page} />}
       </div>
       <TrustConcierge page={page} />
-      <LocalContext theme={'trust'} page={page} detail={detail} />
-      <TrustFooter />
+      <SiteFooter theme="trust" />
     </div>
   );
 }

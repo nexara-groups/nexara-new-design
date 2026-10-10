@@ -16,7 +16,7 @@ interface ProcessStep {
   body: string;
 }
 
-// TrustBlueprint, TrustFunnel and TrustSignatureModule are all called with
+// TrustFunnel and TrustSignatureModule are all called with
 // academy/marketing/labs section data interchangeably (see TrustSectionPage
 // call sites) — real union type from DATA, not a hand-rolled subset, since
 // TrustSignatureModule forwards the same value into AcademyProcessTimeline/
@@ -211,96 +211,6 @@ export function TrustLedgerRows({ items, titleKey = 'title', bodyKey = 'body', f
   return body;
 }
 
-// Shared reveal-on-scroll hook used only by the components below (mirrors the
-// local-helper pattern already used in Academy.tsx for section-scoped data).
-function useTrustReveal(threshold = 0.3): [React.RefObject<HTMLElement | null>, boolean] {
-  const ref = React.useRef<HTMLElement | null>(null);
-  const [shown, setShown] = React.useState(false);
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce || !('IntersectionObserver' in window)) { setShown(true); return; }
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) { setShown(true); obs.disconnect(); } });
-    }, { threshold });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return [ref, shown];
-}
-
-export function TrustSignalLine() {
-  const [ref, drawn] = useTrustReveal(0.3);
-  return (
-    <div className={"tsx-signal" + (drawn ? " is-drawn" : "")} ref={ref as React.RefObject<HTMLDivElement>}>
-      <div className="tsx-dimline" data-label="Signal" aria-hidden="true" />
-      <svg className="tsx-signal-svg" viewBox="0 0 1200 200" aria-hidden="true">
-        <path className="tsx-signal-guide" d="M0,100 H1200" vectorEffect="non-scaling-stroke" />
-        <path className="tsx-signal-guide tsx-signal-guide2" d="M0,150 H1200" vectorEffect="non-scaling-stroke" />
-        <path className="tsx-signal-wave" vectorEffect="non-scaling-stroke"
-          d="M0,100 C110,100 150,38 230,40 C320,42 360,168 470,150 C590,131 650,24 770,58 C880,89 960,156 1060,120 C1130,96 1170,92 1200,96" />
-      </svg>
-      <p className="tsx-signal-caption">Attention is a signal. <em>We tune it.</em></p>
-    </div>
-  );
-}
-
-export function TrustUnboxAssembly() {
-  const copy: UnboxCopy = DATA.unbox.trust;
-  const faces: UnboxFace[] = DATA.unbox.faces;
-  const [ref, drawn] = useTrustReveal(0.25);
-  return (
-    <section className="tsx-unbox tsx-section-inner" ref={ref as React.RefObject<HTMLElement>} aria-label={copy.eyebrow}>
-      <div className="tsx-signature-head tsx-fade">
-        <p className="tsx-section-eyebrow">{copy.eyebrow}</p>
-        <h2 className="tsx-section-heading">One operating core.<br /><span className="serif">Six capabilities.</span></h2>
-      </div>
-      <div className={"tsx-unbox-assembly" + (drawn ? " is-drawn" : "")}>
-        <div className="tsx-unbox-core" aria-hidden="true">{copy.sequence}</div>
-        <div className="tsx-unbox-stem" aria-hidden="true" />
-        <div className="tsx-unbox-grid">
-          {faces.map((f, i) => (
-            <button className="tsx-unbox-face tsx-fade" style={{ transitionDelay: (i * 70) + 'ms' }} onClick={() => routeTo('trust', f.section)} key={f.label}>
-              <span className="tsx-unbox-num" aria-hidden="true">/{String(i + 1).padStart(2, '0')}</span>
-              <span className="tsx-unbox-label">{f.label}</span>
-              <span className="tsx-unbox-sub">{f.sub}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function TrustCountUp({ value, className }: { value: string | number; className?: string }) {
-  const ref = React.useRef<HTMLSpanElement>(null);
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const target = parseInt(String(value).replace(/\D/g, ''), 10);
-    const suffix = String(value).replace(/[0-9]/g, '');
-    if (!target || !('IntersectionObserver' in window)) { el.textContent = String(value); return; }
-    let done = false, tickId = 0;
-    const run = () => {
-      const t0 = performance.now(), dur = 1100;
-      const tick = (now: number) => {
-        const p = Math.min(1, (now - t0) / dur);
-        const eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = Math.round(eased * target) + suffix;
-        if (p < 1) tickId = requestAnimationFrame(tick);
-      };
-      tickId = requestAnimationFrame(tick);
-    };
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting && !done) { done = true; run(); obs.disconnect(); } });
-    }, { threshold: 0.5 });
-    obs.observe(el);
-    return () => { obs.disconnect(); cancelAnimationFrame(tickId); };
-  }, [value]);
-  return <span ref={ref} className={className}>{value}</span>;
-}
-
 export function TrustFaqAccordion({ faqs }: { faqs: [string, string][] }) {
   const [openIndex, setOpenIndex] = React.useState<number | null>(null);
   return (
@@ -359,9 +269,6 @@ export function TrustProofCards({ items }: { items: ProofItem[] }) {
   );
 }
 
-/* Legacy alias so any future callers still work */
-export function TrustProofStrips({ items }: { items: ProofItem[] }) { return <TrustProofCards items={items} />; }
-
 export function TrustPackageCards({ packages }: { packages: AcademyPackage[] }) {
   return <PackageGrid packages={packages} ctaLabel="Request a proposal" onSelect={() => routeTo('trust', 'contact')} />;
 }
@@ -380,9 +287,6 @@ export function TrustProcessTrack({ steps }: { steps: ProcessStep[] }) {
     </div>
   );
 }
-
-/* Legacy alias */
-export function TrustProcessTimeline({ steps }: { steps: ProcessStep[] }) { return <TrustProcessTrack steps={steps} />; }
 
 // Local helper — used only by TrustDeliverableCards / TrustModuleCards below
 // (mirrors the local-icon-map pattern already used in Academy.tsx).
@@ -412,6 +316,19 @@ function deliverIcon(title = ''): React.ReactNode {
   return DELIVER_ICONS.layers;
 }
 
+function DeliverChips({ items }: { items: string[] }) {
+  return (
+    <div className="tsx-deliver-chips">
+      {items.map((d) => (
+        <span className="tsx-deliver-chip" key={d}>
+          <svg className="tsx-deliver-chk" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          {d}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function TrustDeliverableCards({ rows }: { rows: DeliverableRow[] }) {
   return (
     <div className="tsx-deliver-grid">
@@ -426,24 +343,15 @@ export function TrustDeliverableCards({ rows }: { rows: DeliverableRow[] }) {
             <h3 className="tsx-deliver-title">{row.title}</h3>
           </div>
           <hr className="tsx-deliver-rule" aria-hidden="true" />
-          <div className="tsx-deliver-chips">
-            {row.deliverables.map((d) => (
-              <span className="tsx-deliver-chip" key={d}>
-                <svg className="tsx-deliver-chk" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                {d}
-              </span>
-            ))}
-          </div>
+          <DeliverChips items={row.deliverables} />
         </article>
       ))}
     </div>
   );
 }
 
-export function TrustDeliverableRows({ rows }: { rows: DeliverableRow[] }) { return <TrustDeliverableCards rows={rows} />; }
-
 /* Capability / stack modules — shadcn feature card pattern. */
-export function TrustModuleCards({ rows }: { rows: ModuleRow[] }) {
+export function TrustModuleCards({ rows, meta }: { rows: ModuleRow[]; meta?: (row: ModuleRow, index: number) => React.ReactNode }) {
   return (
     <div className="tsx-module-grid">
       {rows.map((row, i) => (
@@ -454,63 +362,10 @@ export function TrustModuleCards({ rows }: { rows: ModuleRow[] }) {
           </span>
           <h3 className="nx-module-title">{row.title}</h3>
           <p className="nx-module-body">{row.trust || row.body}</p>
+          {meta?.(row, i)}
         </SpotlightCard>
       ))}
     </div>
-  );
-}
-
-export function TrustBlueprint({ section }: { section: SignatureSection }) {
-  const mods = (section.modules || []).slice(0, 4);
-  const [ref, drawn] = useTrustReveal(0.3);
-  if (!mods.length) return null;
-  return (
-    <section className="tsx-signature tsx-blueprint-section" aria-label="System architecture">
-      <div className="tsx-section-inner">
-        <div className="tsx-signature-head tsx-fade">
-          <span className="tsx-section-eyebrow">System architecture</span>
-          <h2 className="tsx-section-heading">How a Product Studio build<br /><span className="serif">fits together.</span></h2>
-          <p className="tsx-signature-sub">How discovery, build and controls connect into one system.</p>
-        </div>
-        <div className={"tsx-blueprint-grid" + (drawn ? " is-drawn" : "")} ref={ref as React.RefObject<HTMLDivElement>}>
-          <span className="tsx-blueprint-bus" aria-hidden="true" />
-          {mods.map((m, i) => (
-            <div className="tsx-blueprint-node tsx-fade" style={{ transitionDelay: (i * 80) + 'ms' }} key={m.title}>
-              <span className="tsx-blueprint-num">{String(i + 1).padStart(2, '0')}</span>
-              <h3>{m.title}</h3>
-              <p>{m.trust}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function TrustFunnel({ section }: { section: SignatureSection }) {
-  const mods = (section.modules || []).slice(0, 4);
-  if (!mods.length) return null;
-  return (
-    <section className="tsx-signature tsx-funnel-section" aria-label="The growth funnel">
-      <div className="tsx-section-inner">
-        <div className="tsx-signature-head tsx-fade">
-          <span className="tsx-section-eyebrow">The growth funnel</span>
-          <h2 className="tsx-section-heading">Attention<br /><span className="serif">to outcome.</span></h2>
-          <p className="tsx-signature-sub">How attention becomes a decision, stage by stage.</p>
-        </div>
-        <div className="tsx-funnel">
-          {mods.map((m, i) => (
-            <div className="tsx-funnel-stage tsx-fade" style={{ transitionDelay: (i * 90) + 'ms', '--w': (100 - i * 15) + '%' } as React.CSSProperties} key={m.title}>
-              <div className="tsx-funnel-bar">
-                <span className="tsx-funnel-step">{String(i + 1).padStart(2, '0')}</span>
-                <span className="tsx-funnel-name">{m.title}</span>
-              </div>
-              <p className="tsx-funnel-desc">{m.trust}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -525,6 +380,5 @@ export function TrustSignatureModule({ section }: { section: SignatureSection })
       sub="One path: frame the problem, design the system, build, then launch."
     />
   );
-  if (section.id === 'marketing') return <TrustFunnel section={section} />;
   return null;
 }

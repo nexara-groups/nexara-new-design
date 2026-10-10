@@ -13,7 +13,7 @@
   --cc-muted: #6b6b6b;         /* secondary text                  */
   --cc-rule: #e2e0d9;          /* hairlines / borders             */
   --cc-radius: 8px;
-  --cc-font: 'Inter', system-ui, sans-serif;
+  --cc-font: var(--font-body);
 }
 
 .cc-banner-text a { color: var(--cc-accent); }
@@ -113,33 +113,33 @@
   .cc-banner, .cc-modal, .cc-modal-card, .cc-slider, .cc-slider::before { transition-duration: 0.01ms; }
 }
 
-/* ── Trust theme: warm paper, enterprise blue (tokens from trust.css) ── */
+/* ── Trust theme: Field palette (paper, ink, green; no blue). See docs/TRUST_DESIGN.md ── */
 .cc-banner.cc-theme-trust {
-  --cc-accent: #66A0CC;
-  --cc-accent-dark: #1257D6;
-  background: rgba(248, 250, 252, 0.96);
-  border-top: 1px solid rgba(23, 32, 51, 0.12);
-  box-shadow: 0 -12px 34px rgba(11, 31, 51, 0.10);
+  --cc-accent: #1E7A4D;
+  --cc-accent-dark: #155C39;
+  background: rgba(250, 249, 246, 0.96);
+  border-top: 1px solid rgba(28, 30, 24, 0.12);
+  box-shadow: 0 -12px 34px rgba(21, 32, 26, 0.10);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
-.cc-banner.cc-theme-trust .cc-banner-text strong { color: #0B1F33; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 1.02rem; }
-.cc-banner.cc-theme-trust .cc-banner-text p { color: #5B7290; }
+.cc-banner.cc-theme-trust .cc-banner-text strong { color: #15201A; font-family: var(--font-body); font-weight: 600; font-size: 1.02rem; }
+.cc-banner.cc-theme-trust .cc-banner-text p { color: #5F6359; }
 .cc-banner.cc-theme-trust .cc-btn { border-radius: 9px; }
 .cc-banner.cc-theme-trust .cc-btn-solid { color: #fff; }
-.cc-banner.cc-theme-trust .cc-btn-ghost { color: #0B1F33; border-color: rgba(23, 32, 51, 0.22); }
-.cc-banner.cc-theme-trust .cc-btn-ghost:hover { border-color: #0B1F33; color: #0B1F33; }
+.cc-banner.cc-theme-trust .cc-btn-ghost { color: #15201A; border-color: rgba(28, 30, 24, 0.22); }
+.cc-banner.cc-theme-trust .cc-btn-ghost:hover { border-color: #15201A; color: #15201A; }
 
 .cc-modal.cc-theme-trust {
-  --cc-accent: #66A0CC;
-  --cc-accent-dark: #1257D6;
-  --cc-card-fg: #0B1F33;
-  --cc-muted: #5B7290;
-  background: rgba(11, 31, 51, 0.45);
+  --cc-accent: #1E7A4D;
+  --cc-accent-dark: #155C39;
+  --cc-card-fg: #15201A;
+  --cc-muted: #5F6359;
+  background: rgba(21, 32, 26, 0.45);
 }
 .cc-modal.cc-theme-trust .cc-modal-card { border-radius: 14px; }
-.cc-modal.cc-theme-trust h3 { font-family: 'Inter', sans-serif; font-weight: 600; }
+.cc-modal.cc-theme-trust h3 { font-family: var(--font-body); font-weight: 600; }
 .cc-modal.cc-theme-trust .cc-btn { border-radius: 9px; }
 .cc-modal.cc-theme-trust .cc-btn-solid { color: #fff; }
-.cc-modal.cc-theme-trust .cc-btn-ghost { color: #0B1F33; border-color: rgba(23, 32, 51, 0.22); }
-.cc-modal.cc-theme-trust .cc-btn-ghost:hover { border-color: #0B1F33; color: #0B1F33; }
+.cc-modal.cc-theme-trust .cc-btn-ghost { color: #15201A; border-color: rgba(28, 30, 24, 0.22); }
+.cc-modal.cc-theme-trust .cc-btn-ghost:hover { border-color: #15201A; color: #15201A; }

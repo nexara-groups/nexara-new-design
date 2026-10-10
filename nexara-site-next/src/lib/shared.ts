@@ -9,14 +9,12 @@ const HAS_SCROLL_ANIMATION = true;
 const SECTION_HERO_WORDS = {
   trust: {
     academy:   ['on record', 'by design', 'end-to-end', 'to plan'],
-    marketing: ['that converts', 'with proof', 'on-brand', 'to launch'],
     labs:      ['to spec', 'in production', 'on time', 'with receipts'],
     customers: ['on time', 'as scoped', 'with proof', 'as documented'],
     contact:   ['with governance', 'named and scoped', 'cleanly', 'on the record'],
   },
   neo: {
     academy:   ['different', 'proof-ready', 'placed', 'fast'],
-    marketing: ['loud', 'viral', 'live', 'sticky'],
     labs:      ['shipped', 'smart', 'real', 'in prod'],
     customers: ['proven', 'real', 'public', 'receipted'],
   },

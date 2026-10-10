@@ -31,7 +31,12 @@ See `nexara-site-next/docs/DEPLOY_RUNBOOK.md` for full details.
 
 - `nexara-site-next/wrangler.toml` — Worker config, has `account_id` set
 - `nexara-site-next/src/app/layout.tsx` — root metadata (OG, SEO, Google verification)
+- `nexara-site-next/docs/TRUST_DESIGN.md` — Trust design handbook: Field palette (no blue), tokens, component recipes, motion, page-conversion method and queue
 - `.github/workflows/deploy-nexara-site-next.yml` — CI deploy workflow (Node 22, uses `CLOUDFLARE_API_TOKEN` secret)
+
+## Site structure (Neo + Trust)
+
+Neo and Trust share one structure; only voice (Neo = Gen Z, Trust = corporate) and skin differ. Edit structure in `src/lib/site.ts`, chrome copy in `src/lib/copy.ts`, content in `src/lib/data.ts`. Never add a page/section to one theme only. See `nexara-site-next/docs/SITE_STRUCTURE.md`.
 
 ## Dev server
 

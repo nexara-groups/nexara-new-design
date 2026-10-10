@@ -14,10 +14,7 @@ const pages: Record<string, [string, string, string, string]> = {
   'academy/tracks': ['Full Stack & AI Courses in Visakhapatnam | Nexara', 'Compare Nexara training tracks in full-stack development, AI and data, design and cloud operations. Project-led tech training in Visakhapatnam.', 'Choose a software training track in Vizag', 'Our tracks cover full-stack development, AI and data, product design and cloud operations. Tell Nexara your current skills, the role you’re aiming for and what you want to build, and we’ll work out the right learning scope.'],
   'academy/internships': ['Software Internships in Vizag & Visakhapatnam | Nexara', 'Software internships in Vizag with Nexara: mentor pods, real projects, weekly demos and a completion report. Call 9257535757.', 'Managed software internships in Visakhapatnam', 'Nexara runs managed internships built around real projects, for learners and institutions. Mentor pods, weekly reviews and completion reports let learners and college placement teams in Vizag see progress.'],
   'academy/placements': ['IT Placement Preparation in Vizag | Nexara', 'Get ready for IT roles in Vizag with portfolio reviews, interview practice and matching with employers. Talk to Nexara about what you need.', 'Prepare for IT opportunities in Vizag', 'Get interview-ready with portfolio support, technical and behavioural interview practice, and role-fit screening. We coordinate with hiring partners when that’s in your programme scope. We don’t offer a general placement guarantee.'],
-  marketing: ['Digital Marketing Agency in Visakhapatnam | Nexara', 'Digital marketing in Visakhapatnam: brand identity, websites, content, SEO basics and campaigns, with reporting you can actually read.', 'Digital marketing and website services in Vizag', 'Nexara puts brand positioning, websites, content and campaigns together for businesses in Visakhapatnam. Every engagement ties the offer, the website and the measurement plan together, so each piece of work has a reason.'],
-  'marketing/brand': ['Brand Identity & Design in Visakhapatnam | Nexara', 'Brand identity in Visakhapatnam: positioning, visual identity, messaging and launch assets, with written guidelines so the brand stays consistent.', 'Brand identity for businesses in Visakhapatnam', 'We turn your offer into clear positioning, a visual identity and messaging. The brand assets and guidelines we build carry straight into your website, content and campaigns.'],
-  'marketing/web': ['Website Design & Development in Visakhapatnam | Nexara', 'Business websites, landing pages and product pages in Visakhapatnam, built to work on mobile, with clear enquiry flows and SEO basics.', 'Website design and development in Visakhapatnam', 'For businesses in Vizag, we design corporate sites, landing pages and product pages around what the visitor came to do. Scope can include responsive design, development, enquiry flows, metadata, heading structure and internal links. We agree the deliverables before work starts.'],
-  'marketing/growth': ['SEO & Growth Campaigns in Vizag | Nexara', 'SEO, paid ads, retargeting and creative testing in Vizag. Every campaign has a defined audience, budget and reporting.', 'Growth campaigns for businesses in Vizag', 'We tie paid ads, content, retargeting and creative testing to a clear audience and offer. Nexara agrees what gets measured and reported before a campaign launches, so decisions come from evidence.'],
+  marketing: ['Digital Marketing Agency in Visakhapatnam | Nexara', 'Digital marketing in Visakhapatnam that starts before the ads: website, brand, Google listings, search and content, then paid campaigns reported against enquiries.', 'Found, trusted, then grown', 'Nexara builds the digital presence a customer meets when they search, then search and content visibility, then paid ads, retargeting and creators. Spend starts after the business can be found and contacted. AI citations are not guaranteed.'],
   labs: ['Software Development Company in Visakhapatnam | Nexara', 'Custom software, SaaS, B2B portals and integrations in Visakhapatnam, with AI automation where it fits the business problem.', 'Custom software development in Visakhapatnam', 'Nexara builds software that runs business operations: SaaS platforms, B2B portals, dashboards, internal tools and integrations. We start with the users and the business problem, then move through architecture, development, QA and launch.'],
   'labs/products': ['Custom SaaS & B2B Software Development in Vizag | Nexara', 'Custom SaaS, B2B portals and software platforms built in Vizag. We define the users, workflows, integrations and delivery scope with you.', 'SaaS and B2B software development in Vizag', 'We build the product around the workflows your users actually need: login, operational dashboards, business portals and connected systems. Nexara in Visakhapatnam scopes the product, its integrations and the road from build to handover.'],
   'labs/ai-automation': ['AI Automation & Integration in Visakhapatnam | Nexara', 'AI automation in Visakhapatnam: retrieval, agents, document AI and integrations, with evaluation, guardrails and human review where they matter.', 'AI automation for businesses in Visakhapatnam', 'We use retrieval, agent workflows and document AI when they solve a specific operational problem. The data sources, integrations, evaluation and review controls get scoped together with the software.'],
@@ -27,6 +24,15 @@ const pages: Record<string, [string, string, string, string]> = {
   company: ['About Nexara | Software & IT Company in Visakhapatnam', 'About Nexara Private Limited, a software and IT company in Visakhapatnam with three teams: tech training, digital marketing and custom software.', 'A software and IT company based in Visakhapatnam', 'Nexara Private Limited works from MVP Colony in Visakhapatnam, Andhra Pradesh. Our three divisions share one way of delivering: a written scope, a named owner, a reporting cadence and clear handover responsibilities.'],
   contact: ['Contact Nexara in Visakhapatnam | Call 9257535757', 'Talk to Nexara in MVP Colony, Visakhapatnam about software, websites, marketing or training. Call 9257535757 or send your project brief.', 'Talk to our team in MVP Colony, Visakhapatnam', 'Call us on 9257535757, email info@nexaragroups.com or drop by our office in MVP Colony, Visakhapatnam. Tell us whether you need software, a website, digital marketing or a training programme, and your request goes to the right team.'],
 };
+
+// Sections whose subpages are in-page anchors on one scrolling page, not routes of their own.
+// Their old detail URLs 301 to the anchor (next.config.mjs), so they are neither routed nor indexed.
+const IN_PAGE_SECTIONS = new Set(['marketing']);
+const detailSlugs = (page: string) => (IN_PAGE_SECTIONS.has(page) ? [] : sections[page]?.subpages.map(item => item.slug));
+
+// Marketing's visible FAQ is worded per voice; JSON-LD must match what each URL shows.
+export const marketingFaqs = (theme: Theme | null): [string, string][] =>
+  theme === 'neo' ? DATA.sections.marketing.page.faqsNeo : (DATA.sections.marketing.faqs as [string, string][]);
 
 export const LOCAL_FAQS: Record<string, [string, string][]> = {
   'labs/ecommerce': [
@@ -41,7 +47,6 @@ export const LOCAL_FAQS: Record<string, [string, string][]> = {
     ['How do I confirm duration, fees and the schedule?', 'Send your preferred dates and college requirements to Nexara. Request written confirmation of the programme’s duration, schedule, fees, project deliverables and completion-report requirements before enrolling.'],
   ],
   home: [['Is Nexara the same as Nexera, Nexora or Nexar?', 'No. We are Nexara, spelled N-E-X-A-R-A: Nexara Private Limited, based in Visakhapatnam, India, at nexaragroups.com. We are not affiliated with other companies that have similar names.'], ['What should I look for in a top IT company in Vizag?', 'Look at their relevant work, technical skills, a written scope, who owns what, and who handles QA and support. Ask how they’ll report progress and hand over the finished system.'], ['Does Nexara develop both software and websites?', 'Yes. Our software team handles custom software, SaaS and integrations. Our digital marketing team handles business websites, landing pages and campaigns. We agree the scope for each project.']],
-  'marketing/web': [['How do I choose the best website development company in Vizag?', 'Compare how they handle mobile, page speed, relevant work, content and SEO basics, plus what support looks like after launch. Ask for a written scope that covers design, development, hosting and handover.'], ['Can Nexara build a website with SEO foundations?', 'Website engagements can include metadata, heading structure, internal linking, responsive layouts and an enquiry flow. Confirm the content, SEO and maintenance deliverables in your project scope.']],
   company: [['Where is Nexara based?', `${DATA.contact.address.street}, ${DATA.contact.address.city}.`], ['What should I look for in a top IT company in Vizag?', 'Check the team’s relevant skills, delivery process, who owns the code and accounts, how they do QA and what support covers. At Nexara we start with a written brief and a named owner, so all of this is settled before a build.']],
 };
 
@@ -50,6 +55,8 @@ export const LOCAL_FAQS: Record<string, [string, string][]> = {
 export function routePath(theme: Theme | null, page = 'home', detail: string | null = null) {
   if (page === 'gateway') return '/gateway';
   if (!theme) theme = 'neo';
+  // Blog is shared content: Neo's URL is the canonical /blog, Trust renders the same posts under /trust/blog.
+  if (page === 'blog') return (theme === 'trust' ? '/trust' : '') + '/blog' + (detail ? '/' + detail : '');
   if (theme === 'neo' && page === 'home') return '/';
   return '/' + [theme, page === 'home' ? null : page, detail].filter(Boolean).join('/');
 }
@@ -57,7 +64,7 @@ export function routePath(theme: Theme | null, page = 'home', detail: string | n
 export function getSeo(route: Pick<Route, 'theme' | 'page' | 'detail'>) {
   const { page, detail } = route;
   const key = page + (detail && sections[page] ? `/${detail}` : '');
-  const validDetail = !detail || (sections[page]?.subpages.some(item => item.slug === detail)) || (page === 'customers' && !!sections[detail]) || (page === 'contact' && ['home', ...Object.keys(sections)].includes(detail));
+  const validDetail = !detail || !!detailSlugs(page)?.includes(detail) || (page === 'customers' && !!sections[detail]) || (page === 'contact' && ['home', ...Object.keys(sections)].includes(detail));
   const entry = pages[key];
   if (!entry || !validDetail || (route.theme && !['trust', 'neo'].includes(route.theme))) return { valid: false, title: 'Page not found | Nexara', description: 'Software, website, marketing and training services from Nexara in Visakhapatnam.', robots: 'noindex, follow', canonical: null, schema: [] };
   let [title, description, heading, body] = entry;
@@ -82,7 +89,7 @@ export function getRoutes() {
   for (const theme of ['trust', 'neo'] as const) {
     for (const page of ['home', ...Object.keys(sections), 'customers', 'company', 'contact']) {
       routes.push({ theme, page, detail: null, path: routePath(theme, page).slice(1) });
-      const details = sections[page]?.subpages.map(item => item.slug) || (page === 'customers' ? Object.keys(sections) : page === 'contact' ? ['home', ...Object.keys(sections)] : []);
+      const details = detailSlugs(page) || (page === 'customers' ? Object.keys(sections) : page === 'contact' ? ['home', ...Object.keys(sections)] : []);
       for (const detail of details) routes.push({ theme, page, detail, path: routePath(theme, page, detail).slice(1) });
     }
   }
@@ -123,7 +130,29 @@ export function getStructuredData(route: Pick<Route, 'theme' | 'page' | 'detail'
     graph.push(...people);
   }
   if (sections[route.page]) graph.push({ '@type': 'Service', '@id': `${seo.canonical}#service`, name: seo.heading, description: seo.body, url: seo.canonical, provider: { '@id': organizationId }, areaServed: organization.areaServed, mainEntityOfPage: { '@id': webPageId } });
+
+  // FAQPage lives in JSON-LD. Visible FAQs belong in real page sections (home, About, division pages), not a forced SEO band.
+  const faqs = pageFaqs(route, seo.faqs || []);
+  if (faqs.length) {
+    graph.push({
+      '@type': 'FAQPage',
+      '@id': `${seo.canonical}#faq`,
+      mainEntity: faqs.map(([question, answer]) => ({
+        '@type': 'Question',
+        name: question,
+        acceptedAnswer: { '@type': 'Answer', text: answer },
+      })),
+    });
+  }
+
   return { '@context': 'https://schema.org', '@graph': graph };
+}
+
+function pageFaqs(route: Pick<Route, 'theme' | 'page' | 'detail'>, fromSeo: [string, string][]): [string, string][] {
+  if (route.detail) return fromSeo;
+  const fromSection = route.page === 'marketing' ? marketingFaqs(route.theme) : (sections[route.page]?.faqs || []) as [string, string][];
+  const seen = new Set(fromSeo.map(([q]) => q));
+  return [...fromSeo, ...fromSection.filter(([q]) => !seen.has(q))];
 }
 
 // Blog JSON-LD. Publisher is the same Organization node (@id) the rest of the site uses.

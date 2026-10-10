@@ -160,7 +160,7 @@ export default function CookieConsent({ theme }: { theme: 'trust' | 'neo' | null
 
           <div className="cc-row">
             <div className="cc-row-text">
-              <strong>Analytics — Google Analytics</strong>
+              <strong>Analytics (Google Analytics)</strong>
               <span>
                 Helps us understand visits and improve the site. Sets <code>_ga</code> /{' '}
                 <code>_ga_*</code> cookies.

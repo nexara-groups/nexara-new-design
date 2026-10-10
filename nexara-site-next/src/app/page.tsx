@@ -1,5 +1,4 @@
 import '@/styles/neo.css';
-import '@/styles/neo-refinements.css';
 import { pageMetadata } from '@/lib/metadata';
 import { PageSchema } from '@/components/PageSchema';
 import { Site } from '@/components/NeoSiteClient';

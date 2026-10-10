@@ -2,8 +2,9 @@
 import React from 'react';
 import { PackageGrid } from '../ui/package-card';
 import { DATA } from '@/lib/data';
+import { ACADEMY_LANES, ACADEMY_STEP_LINKS } from '@/lib/academy-story';
 import { routeTo } from '@/lib/trust-router';
-import { TRUST_RUNLOG, TrustRunLog, TrustDeliverableCards, TrustProofCards, TrustFaqAccordion } from './Cards';
+import { TRUST_RUNLOG, TrustRunLog, TrustProofCards, TrustFaqAccordion } from './Cards';
 import { TrustChapter } from './SectionShell';
 
 type AcademySection = typeof DATA.sections.academy;
@@ -24,132 +25,119 @@ interface CohortLadderSection {
   process?: ProcessStep[];
 }
 
-const ACADEMY_PKG_ICONS = [
-  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M10 2l2.4 5 5.6.8-4 3.9.9 5.5L10 14.7l-4.9 2.5.9-5.5-4-3.9 5.6-.8z"/></svg>,
-  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="7" cy="7" r="3"/><circle cx="14" cy="7" r="2"/><path d="M1 17c0-3.31 2.69-6 6-6s6 2.69 6 6"/><path d="M14 12c1.66 0 4 .84 4 2.5V17h-3"/></svg>,
-  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M3 4h14v3H3zM3 10h14v3H3zM3 16h8v3H3z"/></svg>,
-];
-
-const CARD_POSITIONS = [
-  { left: 0,   top: 44 },
-  { left: 124, top: 0  },
-  { left: 248, top: 44 },
-];
-const CARD_Z_BASE = [10, 30, 20];
-
-export function AcademyDisplayCard({ pkg, index, isActive, onEnter }: {
-  pkg: AcademyPackage;
-  index: number;
-  isActive: boolean;
-  onEnter: () => void;
-}) {
-  const icon = ACADEMY_PKG_ICONS[index] || ACADEMY_PKG_ICONS[0];
-  const featured = index === 1;
-  const pos = CARD_POSITIONS[index] || CARD_POSITIONS[0]!;
-
-  return (
-    <div
-      onMouseEnter={onEnter}
-      style={{
-        position: 'absolute',
-        left: pos.left,
-        top: pos.top,
-        width: 260,
-        zIndex: isActive ? 40 : CARD_Z_BASE[index],
-        opacity: isActive ? 1 : 0.68,
-        filter: isActive ? 'none' : 'grayscale(35%) brightness(0.98)',
-        transform: isActive ? 'translateY(-14px)' : 'translateY(0)',
-        boxShadow: isActive
-          ? (featured
-              ? '0 16px 44px rgba(102, 160, 204,0.18), 0 2px 8px rgba(0,0,0,0.07)'
-              : '0 10px 32px rgba(0,0,0,0.13)')
-          : '0 1px 4px rgba(0,0,0,0.06)',
-        transition: 'transform 0.32s cubic-bezier(.22,1,.36,1), opacity 0.22s ease, filter 0.22s ease, box-shadow 0.22s ease',
-        cursor: 'default',
-      }}
-      className={[
-        'flex select-none flex-col rounded-2xl border-2 bg-white px-5 py-4',
-        isActive
-          ? (featured ? 'border-[#66A0CC]' : 'border-slate-300')
-          : (featured ? 'border-[#66A0CC]/40' : 'border-slate-200'),
-      ].join(' ')}
-    >
-      <div className="flex items-center gap-2 mb-3">
-        <span className={`inline-flex rounded-full p-1.5 ${featured ? 'bg-blue-100' : 'bg-slate-100'}`}>
-          <span className={featured ? 'text-blue-500' : 'text-slate-400'}>{icon}</span>
-        </span>
-        <p className={`text-sm font-semibold leading-tight ${featured ? 'text-blue-600' : 'text-slate-700'}`}>{pkg.name}</p>
-      </div>
-      <p className="text-xs font-medium text-slate-500 mb-1">{pkg.fit}</p>
-      <div className="text-xs text-slate-400 mb-3">{pkg.duration}</div>
-      <ul className="space-y-1.5 flex-1">
-        {pkg.includes.map(item => (
-          <li key={item} className="text-xs text-slate-500 flex items-start gap-1.5">
-            <svg viewBox="0 0 16 16" className="w-3 h-3 text-[#66A0CC] shrink-0 mt-px" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 8.5l3 3 7-7"/>
-            </svg>
-            {item}
-          </li>
-        ))}
-      </ul>
-      <button
-        className={`mt-4 w-full py-2 rounded-lg text-xs font-semibold transition-colors ${
-          featured
-            ? 'bg-[#66A0CC] text-white hover:bg-[#44719C]'
-            : 'border border-slate-200 text-slate-600 hover:border-[#66A0CC] hover:text-[#66A0CC]'
-        }`}
-        onClick={() => routeTo('trust', 'contact')}
-      >
-        {featured ? 'Start here →' : 'Get in touch'}
-      </button>
-    </div>
-  );
+function AcademyPackageGrid({ packages }: { packages: AcademyPackage[] }) {
+  return <PackageGrid packages={packages} ctaLabel="Request a proposal" onSelect={() => routeTo('trust', 'contact', 'academy')} />;
 }
 
-export function AcademyDisplayCards({ packages }: { packages: AcademyPackage[] }) {
-  const [active, setActive] = React.useState(1);
+/** Students first; colleges and employers as secondary lanes with explicit package → subpage maps. */
+export function AcademyWhoLane({ section }: { section: AcademySection }) {
+  const primary = ACADEMY_LANES.find((l) => l.role === 'primary')!;
+  const secondary = ACADEMY_LANES.filter((l) => l.role === 'secondary');
+  const primaryAudience = section.audiences.find((a) => a.title === primary.audience) || section.audiences[0];
 
   return (
-    <div className="flex flex-col gap-8">
-      <div style={{ overflowX: 'auto', overflowY: 'visible', paddingBottom: 20 }}>
-        <div
-          className="relative"
-          style={{ width: 508, height: 318, minWidth: 508 }}
-          onMouseLeave={() => setActive(1)}
-        >
-          {packages.slice(0, 3).map((pkg, i) => (
-            <AcademyDisplayCard
-              key={pkg.name}
-              pkg={pkg}
-              index={i}
-              isActive={active === i}
-              onEnter={() => setActive(i)}
-            />
-          ))}
+    <TrustChapter
+      eyebrow="Who this serves"
+      title="Built for students first"
+      sub="Colleges and employers join the same path through their own package."
+    >
+      <div className="tsx-acad-who">
+        <article className="tsx-acad-who-primary">
+          <span className="tsx-acad-who-badge">Primary</span>
+          <h3 className="tsx-acad-who-title">{primary.audience}</h3>
+          <p className="tsx-acad-who-body">{primaryAudience?.trust || primary.trust.body}</p>
+          <p className="tsx-acad-who-map">{primary.trust.map}</p>
+          <button
+            type="button"
+            className="tsx-btn-primary"
+            onClick={() => routeTo('trust', 'academy', primary.subpage, { scroll: false })}
+          >
+            Open {primary.subpageLabel} →
+          </button>
+        </article>
+        <div className="tsx-acad-who-secondary">
+          {secondary.map((lane) => {
+            const audience = section.audiences.find((a) => a.title === lane.audience);
+            return (
+              <article className="tsx-acad-who-card" key={lane.audience}>
+                <span className="tsx-acad-who-badge tsx-acad-who-badge--muted">Secondary</span>
+                <h3 className="tsx-acad-who-title">{lane.audience}</h3>
+                <p className="tsx-acad-who-body">{audience?.trust || lane.trust.body}</p>
+                <p className="tsx-acad-who-map">{lane.trust.map}</p>
+                <button
+                  type="button"
+                  className="tsx-btn-ghost"
+                  onClick={() => routeTo('trust', 'academy', lane.subpage, { scroll: false })}
+                >
+                  Open {lane.subpageLabel} →
+                </button>
+              </article>
+            );
+          })}
         </div>
       </div>
-      <p className="text-xs text-slate-400">Hover each card to preview. All programmes carry a named engagement owner.</p>
-    </div>
+    </TrustChapter>
   );
 }
 
-export function AcademyPackageGrid({ packages }: { packages: AcademyPackage[] }) {
-  return <PackageGrid packages={packages} ctaLabel="Request a proposal" onSelect={() => routeTo('trust', 'contact', 'academy')} />;
+/** Compact path links instead of three essay subpage bands. */
+export function AcademyPathLinks({
+  section,
+  onOpen,
+}: {
+  section: AcademySection;
+  onOpen: (slug: string) => void;
+}) {
+  return (
+    <div className="tsx-acad-pathlinks">
+      <div className="tsx-section-inner">
+        <header className="tsx-chapter-head">
+          <span className="tsx-chapter-eyebrow">Explore the path</span>
+          <h2 className="tsx-chapter-title">Tracks, internships, placements</h2>
+          <p className="tsx-chapter-sub">Same spine as Map → Cohort → Proof → Place. Open the stage you need.</p>
+        </header>
+        <div className="tsx-acad-pathlinks-grid">
+          {section.subpages.map((page, i) => {
+            const lane = ACADEMY_LANES.find((l) => l.subpage === page.slug);
+            return (
+              <button
+                type="button"
+                key={page.slug}
+                className="tsx-acad-pathlink"
+                onClick={() => onOpen(page.slug)}
+              >
+                <span className="tsx-acad-pathlink-step">{String(i + 1).padStart(2, '0')}</span>
+                <span className="tsx-acad-pathlink-title">{page.title}</span>
+                <span className="tsx-acad-pathlink-map">{lane?.trust.map || page.callout.trust}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function AcademyDepthStory({ section }: { section: AcademySection }) {
   return (
     <>
-      <div className="tsx-overview tsx-story tsx-story-light-band">
+      <div className="tsx-darkrail">
         <div className="tsx-section-inner">
-          {/* TrustChapter — cross-group dependency (TrustSiteClient.tsx) */}
-          <TrustChapter
-            eyebrow="What we deliver"
-            title="What you get"
-            sub="The concrete artifacts you walk away with.">
-            {/* TrustDeliverableCards — cross-group dependency (TrustSiteClient.tsx) */}
-            <TrustDeliverableCards rows={section.stackDetails} />
-          </TrustChapter>
+          <header className="tsx-chapter-head">
+            <span className="tsx-chapter-eyebrow tsx-darkrail-eyebrow">Match your lane</span>
+            <h2 className="tsx-chapter-title tsx-darkrail-title">Audience → package → stage</h2>
+            <p className="tsx-chapter-sub tsx-darkrail-sub">
+              Students take Career Cohort. Colleges and employers enter beside them.
+            </p>
+          </header>
+          <div className="tsx-acad-lane-legend" aria-hidden="true">
+            {ACADEMY_LANES.map((lane) => (
+              <span key={lane.audience} className={lane.role === 'primary' ? 'is-primary' : undefined}>
+                {lane.trust.map}
+              </span>
+            ))}
+          </div>
+          <AcademyPackageGrid packages={section.packages} />
         </div>
       </div>
 
@@ -159,32 +147,21 @@ export function AcademyDepthStory({ section }: { section: AcademySection }) {
             <span className="tsx-story-step-pill">Delivery proof</span>
             <TrustChapter
               eyebrow="Delivery proof"
-              title="Cohort outcomes"
-              sub="Evidence from work already shipped, not promises.">
-              {/* TrustProofCards — cross-group dependency (TrustSiteClient.tsx) */}
+              title="What held up"
+              sub="Learner outcomes first. College and employer proof beside them."
+            >
               <TrustProofCards items={section.proof} />
             </TrustChapter>
           </div>
         </section>
       )}
 
-      <div className="tsx-darkrail">
-        <div className="tsx-section-inner">
-          <header className="tsx-chapter-head">
-            <span className="tsx-chapter-eyebrow tsx-darkrail-eyebrow">Engagement packages</span>
-            <h2 className="tsx-chapter-title tsx-darkrail-title">Ways to engage</h2>
-            <p className="tsx-chapter-sub tsx-darkrail-sub">Scoped entry points, matched to where you are.</p>
-          </header>
-          <AcademyPackageGrid packages={section.packages} />
-        </div>
-      </div>
-
       <div className="tsx-section-inner tsx-story-tail">
         <TrustChapter
           eyebrow="Common questions"
           title="Before you commit"
-          sub="The questions teams ask most, answered up front.">
-          {/* TrustFaqAccordion — cross-group dependency (TrustSiteClient.tsx) */}
+          sub="The questions teams ask most, answered up front."
+        >
           <TrustFaqAccordion faqs={section.faqs as [string, string][]} />
         </TrustChapter>
       </div>
@@ -253,14 +230,6 @@ export function TrustCohortLadder({ section, eyebrow = 'The cohort path', title,
   );
 }
 
-/* ─── Academy Process Timeline ─── */
-const ACADEMY_STEP_META = [
-  { timing: 'Week 1',      outcome: 'Written learner brief' },
-  { timing: 'Weeks 2–8',  outcome: 'Progress on the record' },
-  { timing: 'Weeks 7–10', outcome: 'Interview-ready portfolio' },
-  { timing: 'Week 10+',   outcome: 'Placement or outcome report' },
-];
-
 export function AcademyProcessTimeline({ section }: { section: AcademySection }) {
   const steps = section.process || [];
   const railRef = React.useRef<HTMLOListElement>(null);
@@ -298,15 +267,15 @@ export function AcademyProcessTimeline({ section }: { section: AcademySection })
     <section className="tsx-signature tsx-apt-section" aria-label="The cohort path">
       <div className="tsx-section-inner">
         <div className="tsx-signature-head tsx-fade">
-          <span className="tsx-section-eyebrow">The cohort path</span>
-          <h2 className="tsx-section-heading">From intake<br /><span className="serif">to hiring outcome.</span></h2>
-          <p className="tsx-signature-sub">One path every cohort runs: assess, build, then prove.</p>
+          <span className="tsx-section-eyebrow">The path</span>
+          <h2 className="tsx-section-heading">Map → Cohort → Proof → Place</h2>
+          <p className="tsx-signature-sub">One spine every programme runs. Students walk it first.</p>
         </div>
 
         <div className="tsx-apt-layout">
           <ol className="tsx-apt-rail" ref={railRef}>
             {steps.map((s, i) => {
-              const meta: { timing?: string; outcome?: string } = ACADEMY_STEP_META[i] || {};
+              const meta = ACADEMY_STEP_LINKS[i];
               return (
                 <li className="tsx-apt-step tsx-fade" style={{ transitionDelay: (i * 100) + 'ms' }} key={s.step}>
                   <div className="tsx-apt-spine-col">
@@ -314,12 +283,13 @@ export function AcademyProcessTimeline({ section }: { section: AcademySection })
                     {i < steps.length - 1 && <span className="tsx-apt-connector" aria-hidden="true" />}
                   </div>
                   <div className="tsx-apt-body">
-                    <span className="tsx-apt-timing">{meta.timing}</span>
+                    <span className="tsx-apt-timing">{meta?.timing}</span>
                     <h3 className="tsx-apt-title">{s.title}</h3>
                     <p className="tsx-apt-desc">{s.body}</p>
                     <span className="tsx-apt-outcome">
                       <span className="tsx-apt-outcome-mark" aria-hidden="true" />
-                      {meta.outcome}
+                      {meta?.outcome}
+                      {meta?.opensLabel ? ` · opens ${meta.opensLabel}` : ''}
                     </span>
                   </div>
                 </li>
@@ -339,8 +309,8 @@ export function AcademyProcessTimeline({ section }: { section: AcademySection })
           <button className="tsx-btn-primary" onClick={() => routeTo('trust', 'academy', 'tracks')}>
             See the tracks →
           </button>
-          <button className="tsx-btn-ghost" onClick={() => routeTo('trust', 'contact')}>
-            Plan an Academy programme
+          <button className="tsx-btn-ghost" onClick={() => routeTo('trust', 'contact', 'academy')}>
+            Plan a student cohort
           </button>
         </div>
       </div>

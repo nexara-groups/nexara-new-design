@@ -12,13 +12,13 @@ export function setTrustRouter(router: ReturnType<typeof useRouter>) {
   _trustRouter = router;
 }
 
-export function routeTo(theme: string, page = 'home', detail: string | null = null) {
+export function routeTo(theme: string, page = 'home', detail: string | null = null, opts?: { scroll?: boolean }) {
   const path = theme === 'gateway' ? '/gateway' : (!theme || (theme === 'neo' && page === 'home')) ? '/' : '/' + [theme, page === 'home' ? null : page, detail].filter(Boolean).join('/');
-  window.scrollTo(0, 0);
+  if (opts?.scroll !== false) window.scrollTo(0, 0);
   // base.css declares `@view-transition { navigation: auto; }`, which already
   // wraps every router.push in its own view transition. Also calling
   // document.startViewTransition() here raced that automatic one and threw
   // "InvalidStateError: Transition was aborted because of invalid state",
   // leaving a stuck transition snapshot covering the page.
-  if (_trustRouter) _trustRouter.push(path);
+  if (_trustRouter) _trustRouter.push(path, { scroll: false });
 }

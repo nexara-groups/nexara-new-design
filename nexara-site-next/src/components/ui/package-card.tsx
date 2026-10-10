@@ -6,7 +6,7 @@ import React from 'react';
 import { Check, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export type Package = {
+type Package = {
   name: string;
   fit: string;
   price: string;
@@ -30,7 +30,7 @@ export function SpotlightCard({ className, children, ...props }: React.HTMLAttri
   );
 }
 
-export function PackageCard({ pkg, index, ctaLabel = 'Scope this package', onSelect }: {
+function PackageCard({ pkg, index, ctaLabel = 'Scope this package', onSelect }: {
   pkg: Package;
   index: number;
   ctaLabel?: string;

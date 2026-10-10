@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { ClientCases, ClientLogoWall } from '../ClientCases';
 import ContactDetails from '../ContactDetails';
 import { DATA } from '@/lib/data';
 import { useBriefForm, SECTION_HERO_WORDS } from '@/lib/shared';
@@ -26,120 +25,6 @@ type TrustConciergeProps = {
 };
 
 type TrustSection = (typeof DATA.sections)[keyof typeof DATA.sections];
-
-export function TrustCustomers({ detail }: TrustCustomersProps) {
-  const activeSection = detail ? DATA.sections[detail as keyof typeof DATA.sections] : null;
-  if (detail && !activeSection) return <NotFound theme="trust" page={`customers/${detail}`} />;
-  const proofItems = activeSection ? DATA.customers.filter(customer => customer.id === detail) : DATA.customers;
-  return (
-    <main className="tsx-customers-page">
-      <TrustPageHero
-        eyebrow={activeSection ? `${activeSection.name} — Proof` : "Delivery record"}
-        title="Delivery proof"
-        accentWords={SECTION_HERO_WORDS.trust.customers}
-        body="Live client platforms you can inspect today: a SaaS product, a medical library, sales calculators and websites, plus the operating model behind each one."
-        primaryLabel="Start an engagement"
-        onPrimary={() => routeTo('trust', 'contact')}
-      >
-        <div className="tsx-page-hero-stats">
-          {[[String(DATA.work.live.length),"live platforms"],[String(DATA.work.building.length),"in delivery"],["3","solution lines"]].map(([v, l]) => (
-            <div key={l} className="tsx-page-hero-stat">
-              <span className="tsx-page-hero-stat-value">{v}</span>
-              <span className="tsx-page-hero-stat-label">{l}</span>
-            </div>
-          ))}
-        </div>
-      </TrustPageHero>
-      {!activeSection && (
-        <section className="tsx-section-inner nx-proof-section">
-          <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
-            <span className="tsx-chapter-eyebrow">Client record</span>
-            <h2 className="tsx-chapter-title">The businesses, and what we delivered</h2>
-            <p className="tsx-chapter-sub">What each client does, and the platforms Nexara built and runs for them.</p>
-          </header>
-          <ClientLogoWall />
-          <ClientCases theme="trust" />
-        </section>
-      )}
-      <section className="tsx-section-inner tsx-proof-table-section">
-        <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
-          <span className="tsx-chapter-eyebrow">Operating proof</span>
-          <h2 className="tsx-chapter-title">Delivery model proof</h2>
-          <p className="tsx-chapter-sub">Every engagement framed as scope evidence, the work produced, and the readiness handed over.</p>
-        </header>
-        <TrustLedgerTable
-          label="Delivery model proof"
-          columns={["Section", "Engagement type", "What was produced"]}
-          rows={proofItems.map(c => [c.section, c.company, c.trust])}
-        />
-      </section>
-      {!activeSection && (
-        <section className="tsx-section-inner tsx-proof-bysection">
-          <div className="tsx-dimline" data-label="By solution line" aria-hidden="true" />
-          {Object.values(DATA.sections).map((sec) => (
-            <div className="tsx-proof-group" key={sec.id}>
-              <div className="tsx-proof-group-head">
-                <span className="tsx-section-eyebrow">{getTrustSectionLabel(sec)}</span>
-                <h3 className="tsx-section-heading">{sec.short.trust}</h3>
-              </div>
-              <TrustProofCards items={sec.proof} />
-            </div>
-          ))}
-        </section>
-      )}
-      <section className="tsx-section-inner">
-        <TrustIntakeBand spaced heading="Start a scoped engagement" sub="Tell us what you need. Nexara maps the right next step." />
-      </section>
-    </main>
-  );
-}
-
-export function TrustCompany() {
-  const company = DATA.company.trust;
-  return (
-    <main className="tsx-company-page">
-      <div className="tsx-sec-header">
-        <div className="tsx-sec-header-inner">
-          <div>
-            <span className="tsx-sec-eyebrow">About Nexara</span>
-            <h1 className="tsx-sec-h1">The operating idea is simple.</h1>
-            <p className="tsx-sec-body">{company.manifesto}</p>
-          </div>
-          <div className="tsx-spec-panel">
-            <span className="tsx-spec-panel-label">Company facts</span>
-            {DATA.company.facts.map(([label, value]) => (
-              <div className="tsx-spec-row" key={label}>
-                <span className="tsx-spec-label">{label}</span>
-                <span className="tsx-spec-value-text">{value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <section className="tsx-section-inner tsx-principles-section">
-        <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
-          <span className="tsx-chapter-eyebrow">How we operate</span>
-          <h2 className="tsx-chapter-title">Operating principles</h2>
-          <p className="tsx-chapter-sub">The commitments that hold steady across every engagement.</p>
-        </header>
-        <TrustLedgerRows items={company.principles} titleKey="title" bodyKey="body" />
-      </section>
-      <section className="tsx-section-inner tsx-standards-section">
-        <header className="tsx-chapter-head tsx-page-chapter tsx-fade">
-          <span className="tsx-chapter-eyebrow">Governance</span>
-          <h2 className="tsx-chapter-title">Delivery governance</h2>
-          <p className="tsx-chapter-sub">The standards each engagement is measured against.</p>
-        </header>
-        <TrustLedgerTable
-          label="Delivery governance"
-          columns={["Standard", "Commitment"]}
-          rows={DATA.company.standards.map(item => [item.title, item.body])}
-        />
-        <TrustIntakeBand spaced heading="Work with Nexara" sub="Pick a solution line and open an engagement." />
-      </section>
-    </main>
-  );
-}
 
 /* Icon map for channel selection cards */
 const CHANNEL_ICONS: Record<string, React.ReactNode> = {
@@ -316,7 +201,7 @@ export function TrustConcierge({ page }: TrustConciergeProps) {
     <button
       className={`tsx-concierge${shown ? ' is-shown' : ''}`}
       onClick={() => routeTo('trust', 'contact')}
-      aria-label="Talk to Nexara — start a request"
+      aria-label="Talk to Nexara: start a request"
     >
       <span className="tsx-concierge-dot" aria-hidden="true" />
       <span className="tsx-concierge-label">Talk to us</span>

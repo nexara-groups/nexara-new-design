@@ -17,46 +17,6 @@ interface NeoAvatarSVGProps {
   className?: string;
 }
 
-const SPARKLE_DATA = [
-  { left: "8%",  top: "18%", delay: "0s",   duration: "10s", char: "✦" },
-  { left: "84%", top: "12%", delay: "1.5s", duration: "12s", char: "✸" },
-  { left: "70%", top: "65%", delay: "3s",   duration: "11s", char: "✦" },
-  { left: "15%", top: "72%", delay: "0.8s", duration: "13s", char: "✸" },
-  { left: "48%", top: "28%", delay: "2s",   duration: "8s",  char: "✦" },
-  { left: "92%", top: "50%", delay: "4s",   duration: "14s", char: "✸" },
-];
-
-function Sparkles() {
-  const layerRef = React.useRef(null);
-  React.useEffect(() => {
-    let raf = 0;
-    let visible = true;
-    const update = () => {
-      raf = 0;
-      if (visible && layerRef.current) {
-        layerRef.current.style.transform = `translateY(${window.scrollY * 0.45}px)`;
-      }
-    };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
-    const io = new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting;
-      if (visible) onScroll();
-    }, { threshold: 0 });
-    if (layerRef.current) io.observe(layerRef.current.closest(".neo-hero-sticky") || layerRef.current);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => { cancelAnimationFrame(raf); io.disconnect(); window.removeEventListener('scroll', onScroll); };
-  }, []);
-  return (
-    <div className="sparkles-layer" ref={layerRef}>
-      {SPARKLE_DATA.map((p, i) => (
-        <span key={i} className="sparkle-star" style={{ left: p.left, top: p.top, animationDelay: p.delay, animationDuration: p.duration }}>{p.char}</span>
-      ))}
-    </div>
-  );
-}
-
-
 function NeoAvatarSVG({ id = "neo-avatar", className = "" }: NeoAvatarSVGProps) {
   return (
     <svg id={id} className={`neo-avatar-svg ${className}`} viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -716,9 +676,9 @@ function NeoGuide() {
 
       // Premise + closing beats (single-enter sections).
       [
-        { sel: ".neo-manifesto", key: "narr-premise", label: "the premise", mood: "smirk",
+        { sel: ".nx-manifesto", key: "narr-premise", label: "the premise", mood: "smirk",
           line: "the premise: we build people, systems and brands — shipped from one house. this part's the thesis." },
-        { sel: ".neo-final-cta", key: "narr-close", label: "your move", mood: "hype",
+        { sel: ".nx-final-cta", key: "narr-close", label: "your move", mood: "hype",
           line: "that's the tour. your move whenever — no rush." },
       ].forEach((n) => {
         const el = document.querySelector(n.sel);
@@ -731,13 +691,13 @@ function NeoGuide() {
       });
 
       // Divisions: three panels inside one pinned rail — fire per active panel
-      // (same 0/1/2 index the rail itself uses).
-      const railNarrEl = document.querySelector(".neo-rail-wrap");
+      // (same order as DATA.sections, which the rail renders).
+      const railNarrEl = document.querySelector(".nx-rail-wrap");
       if (railNarrEl) {
         const divisions = [
           { key: "narr-academy",   label: "academy",   mood: "money", line: "Academy: we grow engineers who actually ship. talent, built in public." },
+          { key: "narr-marketing", label: "marketing", mood: "hype",  line: "Marketing: found and trusted before a rupee goes to ads." },
           { key: "narr-labs",      label: "labs",      mood: "hype",  line: "Labs: we build software that solves the problem. AI only where it earns it." },
-          { key: "narr-marketing", label: "marketing", mood: "hype",  line: "Marketing: we make brands move. every campaign tied to a metric." },
         ];
         triggers.push(ScrollTrigger.create({
           trigger: railNarrEl, start: "top top", end: "bottom bottom", scrub: true,
@@ -821,6 +781,18 @@ function NeoGuide() {
           onLeaveBack: hideFollower,
         }));
       }
+      // Stay clear of the footer — never park over link columns.
+      const footerEl = document.querySelector("footer");
+      if (footerEl) {
+        triggers.push(ScrollTrigger.create({
+          trigger: footerEl,
+          start: "top bottom-=48",
+          onEnter: hideFollower,
+          onLeaveBack: () => {
+            if (!homeHero || window.scrollY > homeHero.offsetHeight - window.innerHeight + 80) showFollower();
+          },
+        }));
+      }
       if (!homeHero || window.scrollY > homeHero.offsetHeight - window.innerHeight + 80) {
         showFollower();
       }
@@ -888,6 +860,18 @@ function NeoGuide() {
       }));
     } else {
       showScrollGuide();
+    }
+    // Mobile guide sits in a fixed right rail — hide it over the footer so links stay tappable.
+    const footerEl = document.querySelector("footer");
+    if (footerEl) {
+      triggers.push(ScrollTrigger.create({
+        trigger: footerEl,
+        start: "top bottom-=48",
+        onEnter: hideScrollGuide,
+        onLeaveBack: () => {
+          if (!homeHero || homeHero.getBoundingClientRect().bottom < 80) showScrollGuide();
+        },
+      }));
     }
 
     // Mobile: keep the face alive (blink) but DON'T auto-pop the bubble on idle —
@@ -981,4 +965,4 @@ function NeoGuide() {
   );
 }
 
-export { Sparkles, NeoAvatarSVG, NeoGuide };
+export { NeoGuide };

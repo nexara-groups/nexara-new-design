@@ -1,8 +1,6 @@
 'use client';
 import HeroIntro from '../HeroIntro';
 import InternshipOverview from '../InternshipOverview';
-import Link from 'next/link';
-import { routePath } from '@/lib/seo';
 import { HeroLighting } from '../ui/motion-primitives';
 import React from 'react';
 import type { Variants } from 'framer-motion';
@@ -14,11 +12,16 @@ import { voice, SECTION_HERO_WORDS } from '@/lib/shared';
 import { routeTo } from '@/lib/neo-router';
 import { NotFound } from '../NotFound';
 import { SubNav } from './Nav';
+import { useSectionTabs } from '../useSectionTabs';
 import { CyclingWord } from './Hero';
-import { AcademyHero, AcademyTerminalSection, AcademyBootSequence } from './Academy';
-import { MarketingHero, LabsHero, LabsBlueprintSection, MarketingSignalSection, MarketingFunnelSection } from './MarketingLabs';
-import { ModuleCard, ModuleModal, BeforeAfterSlider, RoiEstimator, InteractiveTimeline, CARD_MOTION } from './Cards';
-const { useState, useMemo } = React;
+import { AcademyHero, AcademyOverview } from './Academy';
+import { LabsHero } from './MarketingLabs';
+import { LabsProblemTable, LabsLayerMap, LabsModuleMeta, LabsStages, LabsProofMap } from '../shared/LabsMap';
+import { LabsProducts, LabsSpecialisms } from '../shared/LabsShowcase';
+import { PackageGrid } from '../ui/package-card';
+import { COPY } from '@/lib/copy';
+import { LABS_FLOW, voiced, type LabsBlock } from '@/lib/site';
+import { ModuleCard, CARD_MOTION } from './Cards';
 
 // See trust/Hero.tsx for why this is repeated per-file rather than centralized.
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
@@ -146,7 +149,7 @@ function NeoSectionHero({ theme, section, variant, children }: NeoSectionHeroPro
         </h1>
         <p className="hero-body">{copy.body}</p>
         <div className="hero-actions">
-          <button onClick={() => routeTo(theme, section.id, section.subpages[0]!.slug)}>{copy.primary}</button>
+          <button onClick={() => routeTo(theme, section.id, section.subpages[0]!.slug, { scroll: false })}>{copy.primary}</button>
           <button className="secondary" onClick={() => routeTo(theme, "customers", section.id)}>{copy.secondary}</button>
         </div>
       </div>
@@ -451,7 +454,7 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
       <div className="neo-hero-stage" data-hero-surface><HeroLighting />
         <canvas ref={canvasRef} className="neo-hero-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
         <div className="neo-hero-chapter" style={{ opacity: 1, pointerEvents: 'auto' }}>
-          <p className="kicker">{section.id === "academy" ? "01" : section.id === "labs" ? "02" : "03"} / {neoSectionName(section).toUpperCase()}</p>
+          <p className="kicker">{section.id === "academy" ? "01" : section.id === "marketing" ? "02" : "03"} / {neoSectionName(section).toUpperCase()}</p>
           <h1 className="ch-name" style={{ color: '#fff', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 800, textTransform: section.id === "academy" ? 'none' : 'uppercase' }}>
             {section.id === "academy" ? (
               <>We don't hire engineers.<br />We <em style={{ fontStyle: 'normal', color: '#7c5cff' }}>compile</em> them.</>
@@ -480,155 +483,91 @@ interface SectionPageProps {
 }
 
 function SectionPage({ theme, section, detail }: SectionPageProps) {
-  const active = useMemo(() => section.subpages.find((p) => p.slug === detail), [section, detail]);
-  if (detail && !active) return <NotFound theme={theme} page={`${section.id}/${detail}`} />;
+  const detailKnown = !detail || section.subpages.some((p) => p.slug === detail);
+  const { active, selectTab } = useSectionTabs(theme, section, detailKnown ? detail ?? null : null);
+  if (detail && !detailKnown) return <NotFound theme={theme} page={`${section.id}/${detail}`} />;
   const isNeo = theme === "neo";
+  // Tabs swap the panel under the real section hero — never a thin separate page,
+  // and never a Next soft-nav remount (that was jumping scroll to top).
   return (
     <main>
-      {active ? <NeoDetailHero theme={theme} section={section} page={active} /> : isNeo ? (
+      {isNeo ? (
         <NeoSectionHeroUnravel theme={theme} section={section} />
       ) : section.id === "academy" ? (
         <AcademyHero theme={theme} section={section} />
-      ) : section.id === "marketing" ? (
-        <MarketingHero theme={theme} section={section} />
       ) : section.id === "labs" ? (
         <LabsHero theme={theme} section={section} />
       ) : (
         <HeroBanner compact theme={theme} section={section} eyebrow={section.hero[theme].eyebrow} title={section.hero[theme].title} accent={section.hero[theme].accent} body={section.hero[theme].body} />
       )}
-      {section.id === 'academy' && !active && (
-        <>
-          <AcademyTerminalSection />
-          <AcademyBootSequence />
-        </>
-      )}
-      {section.id === 'labs' && !active && <LabsBlueprintSection />}
-      {section.id === 'marketing' && !active && (
-        <>
-          <MarketingSignalSection />
-          <MarketingFunnelSection />
-        </>
-      )}
-      {active?.slug === "internships" && <InternshipOverview theme={theme} />}
-      <SubNav theme={theme} section={section} active={active} />
-      <div key={active?.slug || "overview"} className="section-content-enter">
-        {active ? <SubpageDetail theme={theme} section={section} page={active} /> : <SectionOverview theme={theme} section={section} />}
+      <SubNav section={section} active={active} onSelect={selectTab} />
+      <div key={active?.slug || "overview"} className="section-content-enter" id="section-panel" role="tabpanel">
+        {active ? (
+          <>
+            {active.slug === "internships" && <InternshipOverview theme={theme} />}
+            <SubpageDetail theme={theme} section={section} page={active} />
+          </>
+        ) : (
+          <>
+            {section.id === 'academy' ? (
+              <AcademyOverview theme={theme} section={section as typeof DATA.sections.academy} />
+            ) : section.id === 'labs' ? (
+              <LabsOverview theme={theme} onOpen={selectTab} />
+            ) : null}
+          </>
+        )}
       </div>
     </main>
   );
 }
 
-function NeoDetailHero({theme,section,page}:SubpageDetailProps) {
- const internship=page.slug==='internships';
- return <section className="neo-hero-runway neo-hero-runway--detail"><div className="neo-hero-stage" data-hero-surface><HeroLighting/><div className="neo-hero-chapter" style={{opacity:1,pointerEvents:'auto'}}>
- <p className="kicker">{neoSectionName(section)} / {page.title}</p><h1 className="ch-name">{internship?'Software internships in Vizag & Visakhapatnam':page.title}</h1><p className="lede">{voice(theme,page.callout)}</p>
- <div className="hero-intro__links"><Link prefetch={false} href={routePath(theme,'contact',section.id)}>{internship?'Discuss your internship':'Start a project'} →</Link><Link prefetch={false} href={routePath(theme,section.id)}>Explore {neoSectionName(section)} →</Link></div>
- </div></div></section>;
-}
-
-interface MarketContextProps {
-  theme: Theme;
-  compact?: boolean;
-}
-
-function MarketContext({ theme, compact = false }: MarketContextProps) {
-  const market = DATA.market;
-  return (
-    <section className={"market-context" + (compact ? " compact" : "")}>
+/* Labs overview: LABS_FLOW is shared with Trust (trust/SectionShell.tsx). Same blocks, same order. */
+function LabsOverview({ theme, onOpen }: { theme: Theme; onOpen: (slug: string | null) => void }) {
+  const labs = DATA.sections.labs;
+  const head = (block: Exclude<LabsBlock, 'map' | 'cta'>) => (
+    <div className="section-head">
       <div>
-        <p className="eyebrow">Operating context</p>
-        <h2>{voice(theme, market.title)}</h2>
-        <p>{voice(theme, market.body)}</p>
+        <p className="eyebrow">{voiced(COPY.labs[block].kicker, theme)}</p>
+        <h2>{voiced(COPY.labs[block].title, theme)}</h2>
       </div>
-      <div className="market-cities">
-        {market.cities.map((city) => <span key={city}>{city}</span>)}
-      </div>
-      {!compact && (
-        <div className="market-assumptions">
-          {market.assumptions.map((item) => <p key={item}>{item}</p>)}
-        </div>
-      )}
-    </section>
+    </div>
   );
-}
-
-interface SectionOverviewProps {
-  theme: Theme;
-  section: SectionData;
-}
-
-function SectionOverview({ theme, section }: SectionOverviewProps) {
-  const isMarketing = section.id === "marketing";
-  const [activeModule, setActiveModule] = useState<ModuleItem | null>(null);
-
-  return (
-    <>
-      {/* 1 — What it does: the offer, framed */}
+  const BLOCKS: Record<LabsBlock, () => React.ReactNode> = {
+    problems: () => <section className="content-band">{head('problems')}<LabsProblemTable theme={theme} /></section>,
+    map: () => <LabsLayerMap theme={theme} />,
+    modules: () => (
       <section className="modules-band">
-        <div className="section-head">
-          <div>
-            <p className="eyebrow">{theme === "neo" ? "What we run" : "Capabilities"}</p>
-            <h2>{theme === "neo" ? `Inside ${neoSectionName(section)}.` : `What ${neoSectionName(section)} delivers.`}</h2>
-          </div>
-          <p>{theme === "neo" ? "Four engines doing the actual work. Tap any one for the full breakdown." : "Core capability modules that make up this solution line."}</p>
-        </div>
+        {head('modules')}
         <div className="module-grid nx-bento">
-          {section.modules.map((module, i) => (
+          {labs.modules.map((m, i) => (
             <ModuleCard
-              key={module.title}
+              key={m.id}
               theme={theme}
-              eyebrow={theme === "neo" ? `Module 0${i + 1}` : neoSectionName(section)}
-              title={module.title}
-              visualTitle={module.title}
-              onClick={() => setActiveModule(module)}
+              eyebrow={`Module 0${i + 1}`}
+              title={m.title}
+              visualTitle={m.title}
+              footer={<LabsModuleMeta theme={theme} moduleId={m.id} onOpen={onOpen} />}
             >
-              {voice(theme, module)}
+              {voiced(m.problem, theme)}
             </ModuleCard>
           ))}
         </div>
       </section>
-
-      {activeModule && (
-        <ModuleModal
-          theme={theme}
-          module={activeModule}
-          eyebrow={neoSectionName(section)}
-          onClose={() => setActiveModule(null)}
-        />
-      )}
-
-      {/* 2 — Who it's for */}
-      <AudienceFit theme={theme} section={section} />
-
-      {/* 3 — How it works */}
-      <InteractiveTimeline theme={theme} section={section} />
-
-      {/* 4 — What you get */}
-      <StackDetails theme={theme} section={section} />
-
-      {/* 5 — Quality proof (marketing-specific signature moments) */}
-      {isMarketing && <BeforeAfterSlider theme={theme} />}
-      {isMarketing && <RoiEstimator theme={theme} />}
-
-      {/* 6-8 — Receipts, FAQ, CTA */}
-      <TerminalZone theme={theme} section={section} />
-    </>
-  );
-}
-
-interface TerminalZoneProps {
-  theme: Theme;
-  section: SectionData;
-}
-
-function TerminalZone({ theme, section }: TerminalZoneProps) {
-  return (
-    <div className="terminal-zone">
-      <ProofCards theme={theme} section={section} />
-      <FAQ section={section} />
-      <IntakeCTA theme={theme} section={section} />
-    </div>
-  );
+    ),
+    specialisms: () => <section className="content-band">{head('specialisms')}<LabsSpecialisms theme={theme} /></section>,
+    stages: () => <section className="content-band">{head('stages')}<LabsStages theme={theme} /></section>,
+    proof: () => <section className="content-band">{head('proof')}<LabsProofMap theme={theme} /></section>,
+    products: () => <section className="content-band">{head('products')}<LabsProducts theme={theme} /></section>,
+    engage: () => (
+      <section className="content-band" id="labs-engage">
+        {head('engage')}
+        <PackageGrid packages={labs.packages} ctaLabel={voiced(COPY.labs.engage.cta, theme)} onSelect={() => routeTo(theme, 'contact', 'labs')} />
+      </section>
+    ),
+    faqs: () => <><div className="content-band">{head('faqs')}</div><FAQ section={labs} bare /></>,
+    cta: () => <IntakeCTA theme={theme} section={labs} />,
+  };
+  return <>{LABS_FLOW.map((block) => <React.Fragment key={block}>{BLOCKS[block]()}</React.Fragment>)}</>;
 }
 
 interface SubpageDetailProps {
@@ -656,31 +595,6 @@ function SubpageDetail({ theme, section, page }: SubpageDetailProps) {
       <FAQ section={section} />
       <IntakeCTA theme={theme} section={section} />
     </>
-  );
-}
-
-interface AudienceFitProps {
-  theme: Theme;
-  section: SectionData;
-}
-
-function AudienceFit({ theme, section }: AudienceFitProps) {
-  return (
-    <section className="content-band">
-      <div className="section-head">
-        <div>
-          <p className="eyebrow">{theme === "neo" ? "Who's this for" : "Audience fit"}</p>
-          <h2>{theme === "neo" ? `${neoSectionName(section)} for the learner, the founder, and the team hiring both.` : `Who ${neoSectionName(section)} is designed to support.`}</h2>
-        </div>
-      </div>
-      <div className="module-grid compact">
-        {section.audiences.map((item) => (
-          <ModuleCard key={item.title} theme={theme} eyebrow={neoSectionName(section)} title={item.title}>
-            {voice(theme, item)}
-          </ModuleCard>
-        ))}
-      </div>
-    </section>
   );
 }
 
@@ -726,12 +640,13 @@ function StackDetails({ theme, section }: StackDetailsProps) {
 
 interface FAQProps {
   section: SectionData;
+  bare?: boolean;
 }
 
-function FAQ({ section }: FAQProps) {
+function FAQ({ section, bare = false }: FAQProps) {
   return (
     <section className="faq-band">
-      <p className="eyebrow">FAQ</p>
+      {!bare && <p className="eyebrow">FAQ</p>}
       {section.faqs.map(([q, a]) => (
         <details key={q}>
           <summary>{q}</summary>
@@ -783,18 +698,4 @@ function ProofCards({ theme, section }: ProofCardsProps) {
   );
 }
 
-export {
-  HeroBanner,
-  NeoSectionHero,
-  SectionPage,
-  MarketContext,
-  NeoSectionHeroUnravel,
-  SectionOverview,
-  TerminalZone,
-  AudienceFit,
-  StackDetails,
-  SubpageDetail,
-  FAQ,
-  IntakeCTA,
-  ProofCards,
-};
+export { HeroBanner, NeoSectionHero, SectionPage };

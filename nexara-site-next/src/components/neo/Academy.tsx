@@ -2,8 +2,11 @@
 import React from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS } from '@/lib/shared';
+import { DATA } from '@/lib/data';
+import { ACADEMY_LANES } from '@/lib/academy-story';
+import { HAS_SCROLL_ANIMATION, SECTION_HERO_WORDS, voice } from '@/lib/shared';
 import { routeTo } from '@/lib/neo-router';
+import { PackageGrid } from '../ui/package-card';
 import { CyclingWord } from './Hero';
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
@@ -496,16 +499,15 @@ export function AcademyTerminalSection() {
     };
 
     const ctx = gsap.context(() => {
+      // No pin — pinSpacing was adding ~3 viewports of empty black after Overview.
       gsap.to(st, {
         n: charSpans.length,
         ease: 'none',
         scrollTrigger: {
           trigger: wrap,
-          start: 'top top',
-          end: '+=220%',
-          scrub: 0.4,
-          pin: true,
-          pinSpacing: true,
+          start: 'top 75%',
+          end: 'bottom 35%',
+          scrub: 0.35,
         },
         onUpdate: apply,
       });
@@ -517,7 +519,8 @@ export function AcademyTerminalSection() {
   return (
     <section ref={wrapRef} className="acad-terminal-section">
       <div className="acad-terminal-inner">
-        <p className="acad-mono" style={{ marginBottom: '20px' }}>// Scroll to execute the curriculum</p>
+        <p className="acad-mono" style={{ marginBottom: '12px' }}>// Student path · Map → Cohort → Proof → Place</p>
+        <p className="acad-terminal-lede">Curriculum runs as you scroll. Same spine colleges and employers plug into later.</p>
         <div className="acad-terminal">
           <div className="acad-term-bar">
             <span className="acad-dot acad-dot-r"></span>
@@ -562,8 +565,9 @@ export function AcademyBootSequence() {
     <section className="acad-boot-section">
       <div className="acad-boot-inner">
         <div className="acad-boot-head">
-          <p className="acad-mono">// The six months</p>
-          <h2 className="acad-boot-title">Boot sequence<br /><em>for a career.</em></h2>
+          <p className="acad-mono">// Six months on the path</p>
+          <h2 className="acad-boot-title">Boot sequence<br /><em>Map → Place.</em></h2>
+          <p className="acad-boot-lede">Time axis for the student lane. Foundations through residency = Map through Place.</p>
         </div>
         <div className="acad-boot-timeline">
           <span className="acad-boot-track"></span>
@@ -578,5 +582,106 @@ export function AcademyBootSequence() {
         </div>
       </div>
     </section>
+  );
+}
+
+type AcademyData = typeof DATA.sections.academy;
+
+/**
+ * Academy overview spine (Neo):
+ * Who (students first) → Terminal path → Boot timeline → Lane packages → Proof → Ask
+ * Hero stays outside this component.
+ */
+export function AcademyOverview({ theme, section }: { theme: Theme; section: AcademyData }) {
+  const primary = ACADEMY_LANES.find((l) => l.role === 'primary')!;
+  const secondary = ACADEMY_LANES.filter((l) => l.role === 'secondary');
+  const isNeo = theme === 'neo';
+
+  return (
+    <>
+      <section className="acad-who-band">
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">{isNeo ? 'Who first' : 'Audience'}</p>
+            <h2>{isNeo ? 'Built for students. Everyone else rides shotgun.' : 'Students first. Colleges and employers beside them.'}</h2>
+          </div>
+          <p>{isNeo ? 'One map. Three doors. Student lane is the default.' : 'Primary lane for learners; secondary lanes for institutions and hiring teams.'}</p>
+        </div>
+        <div className="acad-who">
+          <article className="acad-who-primary">
+            <span className="acad-who-badge">Primary</span>
+            <h3>{primary.audience}</h3>
+            <p>{isNeo ? primary.neo.body : primary.trust.body}</p>
+            <p className="acad-who-map">{isNeo ? primary.neo.map : primary.trust.map}</p>
+            <button type="button" onClick={() => routeTo(theme, 'academy', primary.subpage, { scroll: false })}>
+              Open {primary.subpageLabel} →
+            </button>
+          </article>
+          <div className="acad-who-secondary">
+            {secondary.map((lane) => (
+              <article className="acad-who-card" key={lane.audience}>
+                <span className="acad-who-badge muted">Secondary</span>
+                <h3>{lane.audience}</h3>
+                <p>{isNeo ? lane.neo.body : lane.trust.body}</p>
+                <p className="acad-who-map">{isNeo ? lane.neo.map : lane.trust.map}</p>
+                <button type="button" className="ghost" onClick={() => routeTo(theme, 'academy', lane.subpage, { scroll: false })}>
+                  Open {lane.subpageLabel} →
+                </button>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <AcademyTerminalSection />
+      <AcademyBootSequence />
+
+      <section className="acad-match-band">
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">{isNeo ? 'Match your lane' : 'Engagement packages'}</p>
+            <h2>{isNeo ? 'Audience → package → stage.' : 'Audience maps to package.'}</h2>
+          </div>
+          <p>{isNeo ? 'Students grab Career Cohort. Colleges and employers take the side doors.' : 'Each package opens a stage on the same path.'}</p>
+        </div>
+        <div className="acad-lane-legend" aria-hidden="true">
+          {ACADEMY_LANES.map((lane) => (
+            <span key={lane.audience} className={lane.role === 'primary' ? 'is-primary' : undefined}>
+              {isNeo ? lane.neo.map : lane.trust.map}
+            </span>
+          ))}
+        </div>
+        <PackageGrid packages={section.packages} onSelect={() => routeTo(theme, 'contact', 'academy')} />
+      </section>
+
+      <div className="terminal-zone">
+        <section className="proof-cards acad-proof">
+          {section.proof.map((item) => (
+            <article key={item.name} className="acad-proof-card">
+              <span className="acad-proof-org">{item.org}</span>
+              <h3>{item.name}</h3>
+              <p>{voice(theme, item.result)}</p>
+            </article>
+          ))}
+        </section>
+        <section className="faq-band">
+          <p className="eyebrow">FAQ</p>
+          {section.faqs.map(([q, a]) => (
+            <details key={q}>
+              <summary>{q}</summary>
+              <p>{a}</p>
+            </details>
+          ))}
+        </section>
+        <section className="intake-cta">
+          <div>
+            <p className="eyebrow">{isNeo ? 'Next move' : 'Recommended next step'}</p>
+            <h2>{section.intake.primary}</h2>
+            <p>{section.intake.secondary}</p>
+          </div>
+          <button onClick={() => routeTo(theme, 'contact', section.id)}>{isNeo ? "Let's build" : 'Request a consultation'}</button>
+        </section>
+      </div>
+    </>
   );
 }

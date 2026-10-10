@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import LocalContext from './LocalContext';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import dynamic from 'next/dynamic';
@@ -14,12 +13,15 @@ import { STATIC_PAGES, HAS_SCROLL_ANIMATION } from '@/lib/shared';
 import { useRouter } from 'next/navigation';
 import { setNeoRouter } from '@/lib/neo-router';
 import { NotFound } from './NotFound';
-import { Nav, BreadcrumbBar } from './neo/Nav';
-import { Home } from './neo/Home';
+import { SiteNav } from './shared/SiteNav';
+import { SiteFooter } from './shared/SiteFooter';
+import { Home } from './shared/Home';
 import { SectionPage } from './neo/SectionShell';
-import { Customers, Company, Contact } from './neo/StaticPages';
+import { Contact } from './neo/StaticPages';
+import { Proof } from './shared/Proof';
+import { About } from './shared/About';
+import { MarketingPage } from './shared/MarketingPage';
 const NeoGuide = dynamic(()=>import('./neo/Guide').then(module=>module.NeoGuide),{ssr:false});
-import { Footer } from './neo/Footer';
 import { useSmoothScroll } from './useSmoothScroll';
 
 function Site({ theme, page, detail }: { theme: 'trust' | 'neo'; page: string; detail: string | null }) {
@@ -28,7 +30,8 @@ function Site({ theme, page, detail }: { theme: 'trust' | 'neo'; page: string; d
   useSmoothScroll();
   const isNeo = theme === "neo";
   const [guideReady,setGuideReady]=React.useState(false);
-  React.useEffect(()=>{const timer=setTimeout(()=>setGuideReady(true),900);return()=>clearTimeout(timer);},[]);
+  // The cursor guide is pure motion: never mounted for visitors who ask for reduced motion.
+  React.useEffect(()=>{if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;const timer=setTimeout(()=>setGuideReady(true),900);return()=>clearTimeout(timer);},[]);
   const section = (DATA.sections as Record<string, typeof DATA.sections.academy>)[page];
   React.useEffect(() => { window.scrollTo(0, 0); }, [theme, page]);
   const validPage = section || STATIC_PAGES.includes(page);
@@ -36,19 +39,18 @@ function Site({ theme, page, detail }: { theme: 'trust' | 'neo'; page: string; d
   return (
     <div className={className}>
       <a className="skip-link" href="#main">Skip to content</a>
-      <Nav theme={theme} page={page} detail={detail} />
-      <BreadcrumbBar page={page} detail={detail} />
+      <SiteNav theme={theme} page={page} detail={detail} />
       <div id="main">
         {page === "home" && <Home theme={theme} />}
-        {section && <SectionPage theme={theme} section={section} detail={detail} />}
-        {page === "customers" && <Customers theme={theme} detail={detail} />}
-        {page === "company" && <Company theme={theme} />}
+        {section && (page === 'marketing' ? <MarketingPage theme={theme} /> : <SectionPage theme={theme} section={section} detail={detail} />)}
+        {page === "customers" && <Proof theme={theme} detail={detail} />}
+        {page === "company" && <About theme={theme} />}
         {page === "contact" && <Contact theme={theme} detail={detail} />}
         {!validPage && <NotFound theme={theme} page={page} />}
       </div>
-      {guideReady && isNeo && HAS_SCROLL_ANIMATION && <NeoGuide key={`${page}-${detail || "root"}`} />}
-      <LocalContext theme={theme} page={page} detail={detail} />
-      <Footer theme={theme} />
+      {/* Key by page only — tab (detail) switches must not remount the guide or jolt scroll. */}
+      {guideReady && isNeo && HAS_SCROLL_ANIMATION && <NeoGuide key={page} />}
+      <SiteFooter theme={theme} />
     </div>
   );
 }

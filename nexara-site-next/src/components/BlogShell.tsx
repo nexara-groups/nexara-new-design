@@ -1,18 +1,24 @@
 'use client';
-// Neo chrome (Nav + Footer) around server-rendered blog content, wired like NeoSiteClient's Site.
+// Theme chrome (Nav + Footer) around server-rendered blog content. The posts are the same in both themes.
 import React from 'react';
-import { Nav } from './neo/Nav';
-import { Footer } from './neo/Footer';
+import { useRouter } from 'next/navigation';
+import { SiteNav } from './shared/SiteNav';
+import { SiteFooter } from './shared/SiteFooter';
+import { setNeoRouter } from '@/lib/neo-router';
+import { setTrustRouter } from '@/lib/trust-router';
+import type { Theme } from '@/lib/site';
 import { useSmoothScroll } from './useSmoothScroll';
 
-export function BlogShell({ children }: { children: React.ReactNode }) {
+export function BlogShell({ theme, detail = null, children }: { theme: Theme; detail?: string | null; children: React.ReactNode }) {
+  const router = useRouter();
+  React.useEffect(() => { (theme === 'trust' ? setTrustRouter : setNeoRouter)(router); }, [router, theme]);
   useSmoothScroll();
   return (
-    <div className="site neo">
+    <div className={`site ${theme}${theme === 'trust' ? ' tsx-site' : ''}`}>
       <a className="skip-link" href="#main">Skip to content</a>
-      <Nav theme="neo" page="blog" detail={null} />
-      <div id="main">{children}</div>
-      <Footer theme="neo" />
+      <SiteNav theme={theme} page="blog" detail={detail} />
+      <div id="main" className="nx-light">{children}</div>
+      <SiteFooter theme={theme} />
     </div>
   );
 }

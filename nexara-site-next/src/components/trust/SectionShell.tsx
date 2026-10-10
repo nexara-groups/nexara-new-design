@@ -6,9 +6,15 @@ import { DATA } from '@/lib/data';
 import { SECTION_HERO_WORDS, HAS_SCROLL_ANIMATION } from '@/lib/shared';
 import { routeTo } from '@/lib/trust-router';
 import { NotFound } from '../NotFound';
-import { AcademyDepthStory } from './Academy';
-import { TrustSubpageBand, TrustSubpageDetailPage } from './Subpage';
+import { AcademyDepthStory, AcademyWhoLane, AcademyPathLinks } from './Academy';
+import { TrustSubpageBand, TrustSubpagePanel } from './Subpage';
+import { SubNav } from '../neo/Nav';
+import { useSectionTabs } from '../useSectionTabs';
 import { CyclingWord, TrustHeroParticles, TrustHeroEnergyLoop } from './Hero';
+import { LabsProblemTable, LabsLayerMap, LabsModuleMeta, LabsStages, LabsProofMap } from '../shared/LabsMap';
+import { LabsProducts, LabsSpecialisms } from '../shared/LabsShowcase';
+import { COPY } from '@/lib/copy';
+import { LABS_FLOW, voiced, type LabsBlock } from '@/lib/site';
 import { getTrustSectionLabel, TRUST_SECTION_CTA, TRUST_ACCENT } from './shared';
 import {
   TrustModuleCards,
@@ -19,7 +25,6 @@ import {
   TrustLedgerRows,
   TRUST_RUNLOG,
   TrustRunLog,
-  TrustSignalLine,
   TrustIntakeBand,
   TrustSignatureModule,
 } from './Cards';
@@ -29,7 +34,7 @@ import {
 // into a shared types file.
 type TrustSection = (typeof DATA.sections)[keyof typeof DATA.sections];
 
-export function TrustSectionHeader({ section }: { section: TrustSection }) {
+function TrustSectionHeader({ section }: { section: TrustSection }) {
   const copy = section.hero.trust;
   return (
     <div className="tsx-sec-header">
@@ -40,7 +45,7 @@ export function TrustSectionHeader({ section }: { section: TrustSection }) {
           <p className="tsx-sec-body">{copy.body}</p>
           <div className="tsx-sec-actions">
             <button className="tsx-sec-btn-primary" onClick={() => routeTo('trust', 'contact')}>{copy.primary}</button>
-            <button className="tsx-sec-btn-ghost" onClick={() => routeTo('trust', section.id, section.subpages[0]?.slug)}>{copy.secondary}</button>
+            <button className="tsx-sec-btn-ghost" onClick={() => routeTo('trust', section.id, section.subpages[0]?.slug, { scroll: false })}>{copy.secondary}</button>
           </div>
         </div>
         <div className="tsx-spec-panel">
@@ -57,22 +62,7 @@ export function TrustSectionHeader({ section }: { section: TrustSection }) {
   );
 }
 
-// No call sites remain in TrustSiteClient.tsx (dead code as of the verbatim
-// port), but it is named in this group's extraction list, so it is preserved
-// and exported as-is.
-export function TrustSectionBlock({ eyebrow, children }: { eyebrow: React.ReactNode; children?: React.ReactNode }) {
-  return (
-    <div className="tsx-section-block">
-      <div className="tsx-section-block-header">
-        <span className="tsx-section-block-eyebrow">{eyebrow}</span>
-        <div className="tsx-section-block-rule" aria-hidden="true" />
-      </div>
-      {children}
-    </div>
-  );
-}
-
-export function TrustStatement({ section }: { section: TrustSection }) {
+function TrustStatement({ section }: { section: TrustSection }) {
   if (!section.statement) return null;
   return (
     <figure className="tsx-statement tsx-fade">
@@ -103,12 +93,23 @@ export function TrustChapter({ eyebrow, title, sub, children }: {
 
 /* The section page told as one story. phase="intro" runs before the mechanism,
    phase="depth" after it — so the page reads who -> why -> what -> how -> proof -> ask. */
-export function TrustSectionStory({ section, phase }: { section: TrustSection; phase: 'intro' | 'depth' }) {
+function TrustSectionStory({ section, phase }: { section: TrustSection; phase: 'intro' | 'depth' }) {
   const whatWeDoTitle = section.id === 'academy' ? 'How we build a cohort'
     : section.id === 'labs' ? 'How we scope a build'
     : 'How we build a market system';
 
   if (phase === 'intro') {
+    // Academy: students-first who lane only. Path + packages carry the rest.
+    if (section.id === 'academy') {
+      return (
+        <div className="tsx-overview tsx-story tsx-story-light-band">
+          <div className="tsx-section-inner">
+            <AcademyWhoLane section={section as typeof DATA.sections.academy} />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="tsx-overview tsx-story tsx-story-light-band">
         <div className="tsx-section-inner">
@@ -116,7 +117,12 @@ export function TrustSectionStory({ section, phase }: { section: TrustSection; p
             eyebrow="Who this serves"
             title="Who this is for"
             sub="The people and teams an engagement is built around, and the outcome each one is after.">
-            <TrustLedgerRows framed items={section.audiences} titleKey="title" bodyKey="trust" />
+            <TrustLedgerRows
+              framed
+              items={section.audiences.map((a) => ({ title: a.title, trust: a.trust }))}
+              titleKey="title"
+              bodyKey="trust"
+            />
           </TrustChapter>
 
           {section.statement && (
@@ -139,7 +145,7 @@ export function TrustSectionStory({ section, phase }: { section: TrustSection; p
     );
   }
 
-  if (section.id === 'academy') return <AcademyDepthStory section={section} />;
+  if (section.id === 'academy') return <AcademyDepthStory section={section as typeof DATA.sections.academy} />;
 
   return (
     <>
@@ -169,7 +175,6 @@ export function TrustSectionStory({ section, phase }: { section: TrustSection; p
                   <TrustRunLog config={TRUST_RUNLOG[section.id]!} />
                 </div>
               )}
-              {section.id === 'marketing' && <TrustSignalLine />}
             </TrustChapter>
           </div>
         </section>
@@ -196,7 +201,7 @@ export function TrustSectionStory({ section, phase }: { section: TrustSection; p
   );
 }
 
-export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof TrustSection['hero']; section: TrustSection }) {
+function TrustSectionHeroUnravel({ theme, section }: { theme: keyof TrustSection['hero']; section: TrustSection }) {
   const wrapRef = React.useRef<HTMLDivElement | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   const heroTitleRef = React.useRef<HTMLHeadingElement | null>(null);
@@ -211,7 +216,7 @@ export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof Trust
 
     const shape = section.id === "academy" ? "spiral" : section.id === "labs" ? "sphere" : "signal";
     // Ink-on-paper strands matching the section
-    const rgb = section.id === "labs" ? [11, 31, 51] : [102, 160, 204];
+    const rgb = section.id === "labs" ? [21, 32, 26] : [30, 122, 77];
 
     const makeSprite = (cRgb: number[]) => {
       const s = document.createElement("canvas");
@@ -367,20 +372,20 @@ export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof Trust
         <TrustHeroEnergyLoop sectionId={section.id} targetRef={heroTitleRef} />
         <div className="tsx-hero-chapter" style={{ opacity: 1, pointerEvents: 'auto' }}>
           <p className="tsx-section-eyebrow">{section.id === "academy" ? "01" : section.id === "marketing" ? "02" : "03"} / {getTrustSectionLabel(section).toUpperCase()}</p>
-          <h1 ref={heroTitleRef} className="tsx-section-heading" style={{ color: '#F4F8FF', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 700 }}>
+          <h1 ref={heroTitleRef} className="tsx-section-heading" style={{ color: '#F6F8F4', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 700 }}>
             {copy.title}<br />
-            <span className="serif" style={{ color: '#8FBBDD' }}>
+            <span className="serif" style={{ color: '#A9DBBD' }}>
               <CyclingWord words={(SECTION_HERO_WORDS.trust as Record<string, string[]>)[section.id] || [copy.accent]} />
             </span>
           </h1>
-          <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'rgba(220,232,248,.66)', marginInline: 'auto' }}>{copy.body}</p>
+          <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'rgba(234,238,230,.66)', marginInline: 'auto' }}>{copy.body}</p>
           <div className="tsx-sec-actions" style={{ marginTop: '24px', display: 'flex', gap: '16px', justifyContent: 'center' }}>
             <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact', section.id)}>{copy.primary}</button>
             <button className="tsx-sec-btn-ghost" onClick={() => {
               const target = section.id === 'academy'
                 ? section.subpages.find((item) => item.slug === 'placements')
                 : section.subpages[0];
-              routeTo('trust', section.id, target?.slug);
+              routeTo('trust', section.id, target?.slug, { scroll: false });
             }}>{copy.secondary}</button>
           </div>
         </div>
@@ -389,46 +394,93 @@ export function TrustSectionHeroUnravel({ theme, section }: { theme: keyof Trust
   );
 }
 
+/* Labs overview: LABS_FLOW is shared with Neo (neo/SectionShell.tsx). Same blocks, same order. */
+function TrustLabsOverview({ onOpen }: { onOpen: (slug: string | null) => void }) {
+  const labs = DATA.sections.labs;
+  const chapter = (block: Exclude<LabsBlock, 'map' | 'cta'>, children: React.ReactNode) => (
+    <div className="tsx-overview tsx-story tsx-story-light-band">
+      <div className="tsx-section-inner">
+        <TrustChapter eyebrow={voiced(COPY.labs[block].kicker, 'trust')} title={voiced(COPY.labs[block].title, 'trust')}>
+          {children}
+        </TrustChapter>
+      </div>
+    </div>
+  );
+  const BLOCKS: Record<LabsBlock, () => React.ReactNode> = {
+    problems: () => chapter('problems', <LabsProblemTable theme="trust" />),
+    map: () => <LabsLayerMap theme="trust" />,
+    modules: () => chapter('modules', (
+      <TrustModuleCards
+        rows={labs.modules.map((m) => ({ title: m.title, trust: m.problem.trust }))}
+        meta={(_row, i) => <LabsModuleMeta theme="trust" moduleId={labs.modules[i]!.id} onOpen={onOpen} />}
+      />
+    )),
+    specialisms: () => chapter('specialisms', <LabsSpecialisms theme="trust" />),
+    stages: () => chapter('stages', <LabsStages theme="trust" />),
+    proof: () => chapter('proof', <LabsProofMap theme="trust" />),
+    products: () => chapter('products', <LabsProducts theme="trust" />),
+    engage: () => chapter('engage', <div id="labs-engage"><TrustPackageCards packages={labs.packages} /></div>),
+    faqs: () => chapter('faqs', <TrustFaqAccordion faqs={labs.faqs as [string, string][]} />),
+    cta: () => (
+      <section className="tsx-section-inner">
+        <TrustIntakeBand
+          spaced
+          heading={labs.intake.primary}
+          sub={labs.intake.secondary}
+          cta={voiced(COPY.labs.cta.cta, 'trust')}
+          onClick={() => routeTo('trust', 'contact', 'labs')}
+        />
+      </section>
+    ),
+  };
+  return <>{LABS_FLOW.map((block) => <React.Fragment key={block}>{BLOCKS[block]()}</React.Fragment>)}</>;
+}
+
 export function TrustSectionPage({ section, detail }: { section: TrustSection; detail?: string | null }) {
-  const activeSubpageIndex = detail ? section.subpages.findIndex((page) => page.slug === detail) : -1;
-  if (detail && activeSubpageIndex === -1) return <NotFound theme="trust" page={`${section.id}/${detail}`} />;
-  if (activeSubpageIndex >= 0) {
-    return <TrustSubpageDetailPage section={section} page={section.subpages[activeSubpageIndex]!} index={activeSubpageIndex} />;
-  }
+  const detailKnown = !detail || section.subpages.some((page) => page.slug === detail);
+  const { active, selectTab } = useSectionTabs('trust', section, detailKnown ? detail ?? null : null);
+  if (detail && !detailKnown) return <NotFound theme="trust" page={`${section.id}/${detail}`} />;
 
   return (
     <main className={`tsx-section-page tsx-section-page--${section.id}`} style={{ '--sec-accent': TRUST_ACCENT[section.id] || 'var(--accent)' } as React.CSSProperties}>
-      {/* Hook */}
       {HAS_SCROLL_ANIMATION ? (
         <TrustSectionHeroUnravel theme="trust" section={section} />
       ) : (
         <TrustSectionHeader section={section} />
       )}
-      {/* Who this is for -> Why it matters -> What we do */}
-      <TrustSectionStory section={section} phase="intro" />
-      {/* How it works - the one mechanism, full-width centerpiece */}
-      <section className="tsx-parent-dark-band tsx-parent-mechanism-band" data-story-step="02 / Mechanism">
-        <div className="tsx-section-inner tsx-parent-band-marker">
-          <span className="tsx-story-step-pill">Mechanism</span>
-        </div>
-        <TrustSignatureModule section={section} />
-      </section>
-      {/* What you get -> Proof -> Packages -> Questions */}
-      <TrustSectionStory section={section} phase="depth" />
-      {/* Go deeper */}
-      {section.subpages.map(sp => (
-        <TrustSubpageBand key={sp.slug} section={section} page={sp} />
-      ))}
-      {/* Invitation - one clear close */}
-      <section className="tsx-section-inner">
-        <TrustIntakeBand
-          spaced
-          heading={section.intake.primary}
-          sub={section.intake.secondary}
-          cta={TRUST_SECTION_CTA[section.id] || 'Start a Project'}
-          onClick={() => routeTo('trust', 'contact', section.id)}
-        />
-      </section>
+      <SubNav section={section} active={active} onSelect={selectTab} />
+      {active ? (
+        <TrustSubpagePanel section={section} page={active} />
+      ) : section.id === 'labs' ? (
+        <TrustLabsOverview onOpen={selectTab} />
+      ) : (
+        <>
+          <TrustSectionStory section={section} phase="intro" />
+          <section className="tsx-parent-dark-band tsx-parent-mechanism-band" data-story-step="02 / Mechanism">
+            <div className="tsx-section-inner tsx-parent-band-marker">
+              <span className="tsx-story-step-pill">{section.id === 'academy' ? 'The path' : 'Mechanism'}</span>
+            </div>
+            <TrustSignatureModule section={section} />
+          </section>
+          <TrustSectionStory section={section} phase="depth" />
+          {section.id === 'academy' ? (
+            <AcademyPathLinks section={section as typeof DATA.sections.academy} onOpen={(slug) => selectTab(slug)} />
+          ) : (
+            section.subpages.map(sp => (
+              <TrustSubpageBand key={sp.slug} section={section} page={sp} onOpen={() => selectTab(sp.slug)} />
+            ))
+          )}
+          <section className="tsx-section-inner">
+            <TrustIntakeBand
+              spaced
+              heading={section.intake.primary}
+              sub={section.intake.secondary}
+              cta={section.id === 'academy' ? 'Plan a student cohort' : (TRUST_SECTION_CTA[section.id] || 'Start a Project')}
+              onClick={() => routeTo('trust', 'contact', section.id)}
+            />
+          </section>
+        </>
+      )}
     </main>
   );
 }
@@ -457,13 +509,13 @@ export function TrustPageHero({ eyebrow, title, accentWords, body, children, pri
         <TrustHeroEnergyLoop sectionId="academy" targetRef={titleRef} />
         <div className="tsx-hero-chapter" style={{ opacity: 1, pointerEvents: 'auto' }}>
           {eyebrow && <p className="tsx-section-eyebrow">{eyebrow}</p>}
-          <h1 ref={titleRef} className="tsx-section-heading" style={{ color: '#F4F8FF', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 700 }}>
+          <h1 ref={titleRef} className="tsx-section-heading" style={{ color: '#F6F8F4', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 700 }}>
             {title}<br />
-            <span className="serif" style={{ color: '#8FBBDD' }}>
+            <span className="serif" style={{ color: '#A9DBBD' }}>
               <CyclingWord words={accentWords} />
             </span>
           </h1>
-          {body && <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'rgba(220,232,248,.66)', marginInline: 'auto' }}>{body}</p>}
+          {body && <p className="tsx-sec-body" style={{ marginTop: '14px', maxWidth: '34em', color: 'rgba(234,238,230,.66)', marginInline: 'auto' }}>{body}</p>}
           {children}
           {primaryLabel && (
             <div className="tsx-sec-actions" style={{ marginTop: '24px', display: 'flex', gap: '16px', justifyContent: 'center' }}>

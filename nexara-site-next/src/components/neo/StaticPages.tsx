@@ -4,8 +4,6 @@ import { DATA, neoSectionName, neoLabel } from '@/lib/data';
 import { useBriefForm } from '@/lib/shared';
 import { NotFound } from '../NotFound';
 import { HeroBanner } from './SectionShell';
-import { ClientCases, ClientLogoWall } from '../ClientCases';
-import { NeoAbout } from './About';
 
 type Theme = 'trust' | 'neo';
 
@@ -25,91 +23,6 @@ interface ContactHeroProps {
 
 interface SectionSummary {
   name: string;
-}
-
-function Customers({ theme, detail }: DetailPageProps) {
-  const activeSection = detail ? (DATA.sections as Record<string, SectionSummary | undefined>)[detail] : null;
-  if (detail && !activeSection) return <NotFound theme={theme} page={`customers/${detail}`} />;
-  const proofItems = activeSection ? DATA.customers.filter((customer) => customer.id === detail) : DATA.customers;
-  const copy = activeSection
-    ? { title: `${neoSectionName(activeSection)}, by the receipts.`, accent: "What this division produces.", body: "The operating proof this division is built to deliver, engagement after engagement." }
-    : { title: "Real clients. Live work.", accent: "Click any of it.", body: "A SaaS platform, an e-commerce site, a medical library, sales calculators and websites that sell — shipped for businesses in Visakhapatnam and across Andhra Pradesh." };
-  return (
-    <main>
-      <HeroBanner compact theme={theme} eyebrow={activeSection ? `${neoSectionName(activeSection)} proof` : "Proof"} title={copy.title} accent={copy.accent} body={copy.body} />
-      {!activeSection && (
-        <section className="nx-proof-section">
-          <ClientLogoWall />
-          <ClientCases theme={theme} />
-        </section>
-      )}
-      {!activeSection && (
-        <div className="section-head nx-proof-divisions-head">
-          <div>
-            <p className="eyebrow">By division</p>
-            <h2>What each division delivers.</h2>
-          </div>
-        </div>
-      )}
-      <section className="module-grid">
-        {proofItems.map((customer) => (
-          <article className="module-card" key={customer.company}>
-            <span>{neoLabel(customer.section)}</span>
-            <h3>{customer.company}</h3>
-            <p>{customer[theme]}</p>
-          </article>
-        ))}
-      </section>
-    </main>
-  );
-}
-
-// Neo gets the full About page; the Trust company page below is unchanged.
-function Company({ theme }: ThemeOnlyProps) {
-  return theme === "neo" ? <NeoAbout /> : <TrustCompany theme={theme} />;
-}
-
-function TrustCompany({ theme }: ThemeOnlyProps) {
-  const company = DATA.company[theme];
-  return (
-    <main>
-      <HeroBanner compact theme={theme} eyebrow={theme === "neo" ? "About Nexara" : "Company"} title={theme === "neo" ? "Incorporated, then built to move." : "The operating idea is simple."} accent="Capability compounds." body={company.manifesto} />
-      <section className="fact-strip">
-        {(theme === "neo" ? DATA.company.neo.facts : DATA.company.facts).map(([label, value]) => (
-          <article key={label}>
-            <span>{label}</span>
-            <strong>{value}</strong>
-          </article>
-        ))}
-      </section>
-      <section className="module-grid compact">
-        {company.principles.map((principle) => (
-          <article className="module-card" key={principle.title}>
-            <span>Principle</span>
-            <h3>{principle.title}</h3>
-            <p>{principle.body}</p>
-          </article>
-        ))}
-      </section>
-      <section className="content-band">
-        <div className="section-head">
-          <div>
-            <p className="eyebrow">{theme === "neo" ? "Operating standards" : "Delivery governance"}</p>
-            <h2>{theme === "neo" ? "The standards that keep the site honest." : "Public claims and delivery promises stay evidence-led."}</h2>
-          </div>
-        </div>
-        <div className="module-grid compact">
-          {(theme === "neo" ? DATA.company.neo.standards : DATA.company.standards).map((item) => (
-            <article className="module-card" key={item.title}>
-              <span>Standard</span>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-    </main>
-  );
 }
 
 function ContactHero({ theme, onStartBrief }: ContactHeroProps) {
@@ -324,4 +237,4 @@ function Contact({ theme, detail }: DetailPageProps) {
   );
 }
 
-export { Customers, Company, ContactHero, Contact };
+export { Contact };
