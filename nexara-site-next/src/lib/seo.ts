@@ -8,7 +8,6 @@ export const INDEX_ROBOTS = 'index, follow, max-snippet:-1, max-image-preview:la
 
 // One content registry drives build metadata, client navigation and the sitemap.
 const pages: Record<string, [string, string, string, string]> = {
-  gateway: ['Nexara | Software Company in Visakhapatnam (Vizag)', 'Nexara is a software company in Visakhapatnam. We build custom software and websites, run digital marketing, and train the next batch of tech talent.', 'Software and website development in Visakhapatnam', 'Nexara Private Limited builds software and websites, runs digital marketing and trains tech talent, all in Visakhapatnam (Vizag). Software, digital marketing and training are three teams under one roof. Pick the one that fits your project.'],
   home: ['Nexara | Software Company in Vizag & Website Development', 'Nexara Private Limited builds software, websites, SaaS and digital marketing from MVP Colony, Visakhapatnam (Vizag). Call 9257535757.', 'Software company in Vizag for websites, products and growth', 'From our office in MVP Colony, Visakhapatnam, we help businesses build software, launch websites and connect their tools. We prepare technical talent through training programmes, build market presence through digital marketing, and deliver software and automation.'],
   academy: ['Software Training in Visakhapatnam | Nexara', 'Software training in Visakhapatnam: full-stack, AI, design and cloud tracks, with real projects, mentor reviews, internships and placement prep.', 'Technology training in Visakhapatnam', 'Nexara works with learners, colleges and employers in Visakhapatnam through structured training, real projects and mentor reviews. Pick a technical track, talk to us about a managed internship, or plan placement prep for a specific role.'],
   'academy/tracks': ['Full Stack & AI Courses in Visakhapatnam | Nexara', 'Compare Nexara training tracks in full-stack development, AI and data, design and cloud operations. Project-led tech training in Visakhapatnam.', 'Choose a software training track in Vizag', 'Our tracks cover full-stack development, AI and data, product design and cloud operations. Tell Nexara your current skills, the role you’re aiming for and what you want to build, and we’ll work out the right learning scope.'],
@@ -124,10 +123,9 @@ export const LOCAL_FAQS: Record<string, [string, string][]> = {
   ],
 };
 
-// Neo is the primary presentation: its home page is '/', the Neo/Trust chooser lives at /gateway,
+// Neo is the primary presentation: its home page is '/',
 // and every other page's canonical URL is its /neo/... path (Trust pages are alternates).
 export function routePath(theme: Theme | null, page = 'home', detail: string | null = null) {
-  if (page === 'gateway') return '/gateway';
   if (!theme) theme = 'neo';
   // Blog is shared content: Neo's URL is the canonical /blog, Trust renders the same posts under /trust/blog.
   if (page === 'blog') return (theme === 'trust' ? '/trust' : '') + '/blog' + (detail ? '/' + detail : '');
@@ -151,16 +149,14 @@ export function getSeo(route: Pick<Route, 'theme' | 'page' | 'detail'>) {
     body = `${svc} engagements are framed around written requirements, the work delivered and operational readiness. Discuss the applicable delivery model and evidence requirements with Nexara before agreeing your project scope.`;
   }
   // Trust is an alternate presentation of the same pages; every theme canonicalises to Neo.
-  // The /gateway chooser is a utility page and stays out of the index.
-  const isGateway = page === 'gateway';
   const canonicalDetail = page === 'contact' ? null : detail;
   const canonical = SITE_URL + routePath('neo', page, canonicalDetail);
   const keywords = PAGE_KEYWORDS[key] || PAGE_KEYWORDS[page] || DEFAULT_KEYWORDS;
-  return { valid: true, key, title, description, heading, body, canonical, robots: isGateway ? 'noindex, follow' : INDEX_ROBOTS, faqs: LOCAL_FAQS[key] || [], keywords };
+  return { valid: true, key, title, description, heading, body, canonical, robots: INDEX_ROBOTS, faqs: LOCAL_FAQS[key] || [], keywords };
 }
 
 export function getRoutes() {
-  const routes: Route[] = [{ theme: null, page: 'gateway', detail: null, path: 'gateway' }];
+  const routes: Route[] = [];
   for (const theme of ['trust', 'neo'] as const) {
     for (const page of ['home', ...Object.keys(sections), 'customers', 'company', 'contact']) {
       routes.push({ theme, page, detail: null, path: routePath(theme, page).slice(1) });

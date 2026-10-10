@@ -13,11 +13,7 @@ export function NotFound({ theme, page }: { theme: 'trust' | 'neo' | null; page?
     }
     let path = "/";
     if (theme) {
-      if (page === "gateway") {
-        path = "/";
-      } else {
-        path = "/" + [theme, page, detail].filter(Boolean).join("/");
-      }
+      path = "/" + [theme, page, detail].filter(Boolean).join("/");
     }
     window.scrollTo(0, 0);
     // base.css declares `@view-transition { navigation: auto; }`, which already

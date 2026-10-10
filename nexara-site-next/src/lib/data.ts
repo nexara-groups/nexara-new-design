@@ -1,20 +1,4 @@
 export const DATA = {
-  gateway: {
-    neo: {
-      kicker: "For teams that move before the market catches up.",
-      title: "Loud, fast and a little unhinged. The Nexara you'd screenshot.",
-      body: "Live cohorts, campaigns that land and software that ships. One team, and every brief gets launch-week energy.",
-      chips: ["no cap", "shipping daily", "vibes reserved"],
-      cta: "Enter the Chaos",
-    },
-    trust: {
-      kicker: "Three specialist teams. One way of working.",
-      title: "Work you can put your name to.",
-      body: "Academy trains talent, Digital builds your market presence, Product Studio builds software. Every project has a named owner, a written scope, regular reports and clear rules on data.",
-      chips: ["Named owner", "Written scope", "Reported cadence"],
-      cta: "Enter the Firm",
-    },
-  },
   home: {
     neo: {
       eyebrow: "🚀 NEXARA",

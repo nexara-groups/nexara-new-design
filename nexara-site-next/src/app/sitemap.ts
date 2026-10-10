@@ -3,7 +3,7 @@ import { ROUTES } from '@/lib/routes';
 import { getSeo, SITE_URL, blogUrl } from '@/lib/seo';
 import { BLOG_POSTS } from '@/lib/blog';
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ROUTES.filter((route) => route.page !== 'gateway');
+  const routes = ROUTES;
   const canonicalMap = new Map<string, { page: string; detail: string | null }>();
   for (const r of routes) {
     const canonical = getSeo(r).canonical;

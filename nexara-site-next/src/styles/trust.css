@@ -4,7 +4,7 @@
 .trust .nav nav button{color:var(--muted);font-weight:600;border-bottom:2px solid transparent;transition:color .15s ease,border-color .15s ease}.trust .nav nav button.active{color:var(--text);font-weight:700;border-bottom-color:var(--accent)}.trust .nav nav button:hover:not(.active){color:var(--text)}
 .trust .switch{background:var(--accent);color:#fff;padding:11px 16px;border-radius:9px;box-shadow:0 14px 30px rgba(47,74,58,.22)}
 .trust .hero-banner{background:linear-gradient(180deg,#fff,var(--bg));border-bottom:1px solid var(--line)}
-.trust .orb{position:absolute;border-radius:999px;opacity:.35;filter:blur(20px)}.trust .orb.one{width:420px;height:420px;right:5%;top:12%;background:#cdf0de;animation:trustDrift 14s ease-in-out infinite}.trust .orb.two{width:280px;height:280px;right:36%;bottom:18%;background:#F3F1EC;animation:trustDrift 18s ease-in-out infinite reverse}
+.trust .orb{position:absolute;border-radius:999px;opacity:.35;filter:blur(20px)}.trust .orb.one{width:420px;height:420px;right:5%;top:12%;background:#cdf0de;animation:trustDrift 14s ease-in-out infinite}.trust .orb.two{width:280px;height:280px;right:36%;bottom:18%;background:var(--tr-mist);animation:trustDrift 18s ease-in-out infinite reverse}
 .trust .scanlines{position:absolute;inset:0;background:linear-gradient(90deg,transparent 0 94%,rgba(47,74,58,.06) 94% 95%,transparent 95%);background-size:120px 100%;animation:trustGrid 18s linear infinite}
 @keyframes trustDrift{50%{transform:translate3d(18px,12px,0)}}@keyframes trustGrid{to{background-position:240px 0}}
 .trust .eyebrow{color:var(--accent)}
@@ -13,7 +13,7 @@
 .trust .hero-actions button{background:var(--accent);color:#fff;border-radius:9px;box-shadow:0 16px 34px rgba(47,74,58,.22)}.trust .hero-actions .secondary{background:#fff;color:var(--text);border:1px solid var(--line);box-shadow:none}
 .trust .hero-dashboard{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 24px 70px rgba(22,35,28,.08)}.trust .hero-dashboard div{background:#fff;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.trust .hero-dashboard strong{color:var(--accent)}.trust .hero-dashboard span{color:#7d7a6b}
 .trust .section-card,.trust .module-card,.trust .proof-cards article,.trust .stack-detail-card,.trust .package-card,.trust .process-grid article{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 46px rgba(22,35,28,.06);transition:transform .2s,box-shadow .2s}.trust .section-card:hover,.trust .module-card:hover,.trust .stack-detail-card:hover,.trust .package-card:hover{transform:translateY(-3px);box-shadow:0 22px 60px rgba(22,35,28,.1)}
-.trust .super-skills{background:linear-gradient(180deg,#faf9f6,#effaf4);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.trust .super-skills{background:linear-gradient(180deg,#fafafa,#effaf4);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .trust .super-play-feature{background:#fff;border:1px solid rgba(47,74,58,.12);border-radius:18px;box-shadow:0 20px 48px rgba(22,35,28,.04);transition:all 0.4s cubic-bezier(0.16, 1, 0.3, 1)}
 .trust .super-play-feature:hover{border-color:rgba(47,74,58,.28);box-shadow:0 24px 60px rgba(47,74,58,.08), 0 16px 40px rgba(22,35,28,.06);transform:translateY(-4px)}
 .trust .super-play-feature h3{color:var(--text)}
@@ -28,7 +28,7 @@
 .trust .super-skill-card h3{color:var(--text)}
 .trust .super-skill-card p{color:var(--muted)}
 .trust .chip-stack span{color:var(--muted);background:transparent;border-radius:4px;border:1px solid var(--line);transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1)}
-.trust .super-skill-card:hover .chip-stack span{border-color:rgba(47,74,58,.18);background:#faf9f6}
+.trust .super-skill-card:hover .chip-stack span{border-color:rgba(47,74,58,.18);background:#fafafa}
 .trust .section-card span,.trust .module-card span,.trust .proof-cards span,.trust .stack-detail-card span,.trust .package-card span,.trust .process-grid span{color:var(--accent)}.trust .section-card h3,.trust .module-card h3,.trust .proof-cards h3,.trust .section-head h2,.trust .callout h2,.trust .detail-hero h2,.trust .stack-detail-card h3,.trust .package-card h3,.trust .process-grid h3,.trust .intake-cta h2,.trust .contact-layout h2{color:var(--text)}.trust .section-card p,.trust .module-card p,.trust .proof-cards p,.trust .callout p,.trust .process-grid p,.trust .faq-band p,.trust .intake-cta p,.trust .contact-layout p{color:var(--muted)}
 .trust .module-card button{background:var(--accent);color:#fff;border-radius:9px}
 .trust .module-card.is-active{border-color:var(--accent);box-shadow:0 22px 60px rgba(47,74,58,.16)}
@@ -213,7 +213,7 @@
   --unbox-card-meta:#817d6e;
   --interactive-fill:linear-gradient(90deg,#155C39,#1E7A4D,#A9DBBD);
 }
-.trust .unbox-sticky{background:linear-gradient(180deg,#fff,#faf9f6)}
+.trust .unbox-sticky{background:linear-gradient(180deg,#fff,#fafafa)}
 .trust .unbox-title{color:var(--text)}
 .trust .unbox-copy p:not(.eyebrow){color:var(--muted)}
 .trust .unbox-face{border-radius:8px}
@@ -237,7 +237,7 @@
 }
 .trust .brief-select-btn {
   border-radius: 6px;
-  background: #faf9f6;
+  background: #fafafa;
   color: #5f5c51;
   font-weight: 600;
 }
@@ -270,7 +270,7 @@
 .trust .brief-preview-container {
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #faf9f6;
+  background: #fafafa;
 }
 .trust .brief-preview-text {
   color: var(--text);
@@ -314,7 +314,7 @@
   color: var(--text);
 }
 .trust .reactor-card .card-details span {
-  background: #faf9f6;
+  background: #fafafa;
   color: var(--muted);
   border: 1px solid var(--line);
   border-radius: 4px;
@@ -325,7 +325,7 @@
   color: var(--text);
 }
 .trust .reactor-caption {
-  background: #faf9f6;
+  background: #fafafa;
   border: 1px solid var(--line);
 }
 .trust .reactor-caption strong {
@@ -547,7 +547,7 @@
 .trust .tsx-faq-item.open{border-color:rgba(47,74,58,.28)}
 .trust .tsx-faq-trigger{width:100%;padding:14px 18px;display:flex;align-items:center;gap:12px;background:#fff;border:none;cursor:pointer;font-family:inherit;text-align:left;transition:background .15s}
 .trust .tsx-faq-item.open .tsx-faq-trigger{background:#fafbff}
-.trust .tsx-faq-trigger:hover{background:#faf9f6}
+.trust .tsx-faq-trigger:hover{background:#fafafa}
 .trust .tsx-faq-counter{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--tr-faint);flex-shrink:0;width:22px}
 .trust .tsx-faq-item.open .tsx-faq-counter{color:var(--tsx-accent)}
 .trust .tsx-faq-q{flex:1;font-size:13px;font-weight:700;color:var(--text);line-height:1.4}
@@ -748,7 +748,7 @@
 .trust.tsx-site .tsx-gov-card:hover,
 .trust.tsx-site .tsx-matrix-row:hover,
 .trust.tsx-site .tsx-channel-card:hover {
-  background: #F7F6F2;
+  background: var(--tr-paper);
 }
 
 .trust.tsx-site .tsx-sec-header {
@@ -1024,7 +1024,7 @@
   --panel: var(--paper);
   --text: var(--ink);
   --muted: var(--ink-2);
-  background: #F7F6F2;
+  background: var(--tr-paper);
 }
 
 /* Transparent nav at top — all pages open on dark hero content */
@@ -1051,7 +1051,7 @@
 .trust.tsx-site .tsx-overview,
 .trust.tsx-site .tsx-channel-section,
 .trust.tsx-site .tsx-brief-section {
-  background: #F7F6F2;
+  background: var(--tr-paper);
 }
 
 .trust.tsx-site .tsx-sol-card,
@@ -1127,10 +1127,10 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   --shad-muted-fg:    #817d6e;
   --shad-primary:     var(--accent);       /* navy var(--accent)          */
   --shad-primary-fg:  #ffffff;
-  --shad-secondary:   #faf9f6;
+  --shad-secondary:   #fafafa;
   --shad-accent-bg:   var(--tr-mist);
   --shad-radius:      6px;
-  --shad-badge-bg:    #faf9f6;
+  --shad-badge-bg:    #fafafa;
   --shad-badge-border:rgba(22, 35, 28, .14);
   --shad-badge-fg:    #5f5c51;
 }
@@ -1435,7 +1435,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust .tsx-darkrail-title {
   font-size: clamp(1.6rem, 3vw, 2.4rem);
   font-weight: 500; letter-spacing: -0.02em;
-  color: #F3F1EC;
+  color: var(--tr-mist);
   line-height: 1.1; margin: 0 0 12px;
 }
 .trust .tsx-darkrail-sub {
@@ -2165,7 +2165,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 
 /* ── Neo import: Academy/Labs run-log (terminal → light command ledger) ── */
 .trust .tsx-runlog-wrap { margin-top: clamp(20px,4vw,40px); }
-.trust .tsx-runlog { position: relative; background: #F7F6F2; border: 1px solid var(--line); border-top: 2px solid var(--blueprint); border-radius: 12px; box-shadow: var(--shadow-sheet); overflow: hidden; }
+.trust .tsx-runlog { position: relative; background: var(--tr-paper); border: 1px solid var(--line); border-top: 2px solid var(--blueprint); border-radius: 12px; box-shadow: var(--shadow-sheet); overflow: hidden; }
 .trust .tsx-runlog-bar { display: flex; align-items: center; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--blueprint) 4%, var(--panel)); }
 .trust .tsx-runlog-bar::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--vermilion); box-shadow: 16px 0 0 color-mix(in srgb, var(--blueprint) 40%, transparent), 32px 0 0 color-mix(in srgb, var(--ink) 22%, transparent); margin-right: 34px; flex-shrink: 0; }
 .trust .tsx-runlog-label { font-family: var(--font-body); font-size: 0.66rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--blueprint); }
@@ -3409,7 +3409,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust.tsx-site .tsx-subpage-light-section,
 .trust.tsx-site .tsx-story-light-band,
 .trust .hero-banner {
-  background: linear-gradient(180deg, #F7F6F2 0%, #F3F1EC 100%) !important;
+  background: linear-gradient(180deg, var(--tr-paper) 0%, var(--tr-mist) 100%) !important;
 }
 
 .trust.tsx-site .tsx-hero-particles::before {
@@ -3420,7 +3420,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 }
 
 .trust.tsx-site .tsx-hero-particle {
-  background: #F3F1EC !important;
+  background: var(--tr-mist) !important;
   box-shadow:
     0 0 10px rgba(239, 250, 244, .95),
     0 0 24px rgba(169, 219, 189, .74),
@@ -3437,7 +3437,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 }
 
 .trust.tsx-site .tsx-hero-energy-comet {
-  background: #F7F6F2;
+  background: var(--tr-paper);
   box-shadow:
     0 0 12px rgba(248, 251, 255, .98),
     0 0 32px rgba(169, 219, 189, .88),
@@ -3445,7 +3445,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 }
 
 .trust.tsx-site .tsx-hero-energy-digit {
-  color: #F3F1EC;
+  color: var(--tr-mist);
   border-color: rgba(169, 219, 189, .52);
   background: rgba(30, 122, 77, .2);
 }
@@ -3481,7 +3481,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 /* tsx-darkrail (the missing one — parent-dark-band & subpage-dark already fixed above) */
 .trust .tsx-darkrail .tsx-chapter-title,
 .trust .tsx-darkrail .tsx-section-heading {
-  color: #F3F1EC !important;
+  color: var(--tr-mist) !important;
 }
 .trust .tsx-darkrail .tsx-chapter-sub,
 .trust .tsx-darkrail .tsx-sec-body {
@@ -3512,7 +3512,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
   padding-block: clamp(56px, 10vh, 96px);
 }
 .trust.tsx-site .tsx-intake-band--plate .tsx-intake-heading {
-  color: #F3F1EC;
+  color: var(--tr-mist);
 }
 .trust.tsx-site .tsx-intake-band--plate .tsx-intake-sub {
   color: rgba(232, 248, 240, .65);
@@ -3976,7 +3976,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
    tsx-parent-dark-band overrides (which only hit tsx-signature-head).
    ─────────────────────────────────────────────────────────────────── */
 .trust.tsx-site .tsx-parent-dark-band .tsx-apt-title {
-  color: #f3f1ec;
+  color: var(--tr-mist);
 }
 .trust.tsx-site .tsx-parent-dark-band .tsx-apt-timing {
   color: rgba(232, 248, 240, .52);
@@ -4114,17 +4114,17 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 }
 
 .trust.tsx-site .tsx-section-page--academy {
-  background: linear-gradient(180deg, #F7F6F2 0%, #F3F1EC 100%);
+  background: linear-gradient(180deg, var(--tr-paper) 0%, var(--tr-mist) 100%);
 }
 
 .trust.tsx-site .tsx-section-page--labs {
-  background: linear-gradient(180deg, #F7F6F2 0%, #F3F1EC 100%);
+  background: linear-gradient(180deg, var(--tr-paper) 0%, var(--tr-mist) 100%);
 }
 
 .trust.tsx-site .tsx-section-page--academy .tsx-story-tail,
 .trust.tsx-site .tsx-section-page--academy .tsx-subpage-band,
 .trust.tsx-site .tsx-section-page--labs .tsx-subpage-band {
-  background: linear-gradient(180deg, #F7F6F2 0%, #F3F1EC 100%);
+  background: linear-gradient(180deg, var(--tr-paper) 0%, var(--tr-mist) 100%);
 }
 
 /* ── Enquiry: scroll target lands below the fixed nav (scroll fix) ── */
@@ -4511,7 +4511,7 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 }
 .trust.tsx-site .tsx-hero-handoff {
   position: absolute; inset: auto 0 0; height: 34%; z-index: 1; pointer-events: none;
-  background: linear-gradient(180deg, transparent, var(--tsx-handoff-bg, #f3f1ec) 96%);
+  background: linear-gradient(180deg, transparent, var(--tsx-handoff-bg, var(--tr-mist)) 96%);
   opacity: var(--tsx-exit, 0);
   transform: translate3d(0, calc((1 - var(--tsx-exit, 0)) * 30%), 0);
 }

@@ -12,7 +12,7 @@ const nextConfig = {
     // Marketing / Academy are one scrolling page each: every old detail URL lands on its in-page anchor.
     const marketingMoves = [['brand', 'presence'], ['web', 'visibility'], ['growth', 'performance'], ['presence', 'presence'], ['visibility', 'visibility'], ['performance', 'performance']];
     const academyMoves = [['tracks', 'tracks'], ['internships', 'internships'], ['placements', 'placements']];
-    return [{source:'/trust/home',destination:'/trust',permanent:true},{source:'/neo',destination:'/',permanent:true},{source:'/neo/home',destination:'/',permanent:true},{source:'/about',destination:'/neo/company',permanent:true},
+    return [{source:'/gateway',destination:'/',permanent:true},{source:'/trust/home',destination:'/trust',permanent:true},{source:'/neo',destination:'/',permanent:true},{source:'/neo/home',destination:'/',permanent:true},{source:'/about',destination:'/neo/company',permanent:true},
       ...marketingMoves.flatMap(([from, to]) => [
         { source: `/neo/marketing/${from}`, destination: `/neo/marketing#${to}`, permanent: true },
         { source: `/trust/marketing/${from}`, destination: `/trust/marketing#${to}`, permanent: true },

@@ -284,7 +284,7 @@ export function AcademyPage({ theme }: { theme: Theme }) {
             {LANES.map((lane, i) => (
               <article
                 key={lane.slug}
-                className={`nx-ac-lane${i === 0 ? ' nx-ac-lane--primary' : ''}`}
+                className={`nx-ac-lane${lane.slug === 'placements' ? ' nx-ac-lane--place' : ''}`}
                 id={lane.slug}
                 data-track={lane.role}
                 aria-labelledby={`nx-ac-${lane.slug}-h`}

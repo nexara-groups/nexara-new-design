@@ -7,7 +7,7 @@ const { DATA } = await moduleOf(fs.readFileSync(new URL('../src/lib/data.ts', im
 const source = fs.readFileSync(new URL('../src/lib/seo.ts', import.meta.url), 'utf8').replace("import { DATA } from './data';", 'const DATA = ' + JSON.stringify(DATA) + ';').replace(/import \{ BLOG_POSTS[^\n]*\n/, "const BLOG_POSTS = [], BLOG_DESCRIPTION = '';\n");
 const { getSeo, getRoutes, getStructuredData } = await moduleOf(source);
 test('all existing detail pages and intake links have valid metadata', () => {
- const routes = getRoutes(); assert.equal(routes.length, 53); // +8 labs products × 2 themes; academy-sports merged into forms
+ const routes = getRoutes(); assert.equal(routes.length, 52); // +8 labs products × 2 themes; academy-sports merged into forms
  for (const route of routes) { const seo=getSeo(route); assert.equal(seo.valid,true,route.path); assert.ok(seo.title.includes('Nexara')); assert.ok(seo.description.length>80); }
  for(const theme of ['trust','neo']) assert.equal(routes.some(r=>r.path===theme+'/academy/internships'), false);
  for(const theme of ['trust','neo']) for (const slug of ['voice','agency','grow','forms','lms','hr','billing','workflows']) {
@@ -18,7 +18,7 @@ test('Trust duplicates consolidate to Neo and contact intents consolidate to con
  assert.equal(getSeo({theme:'trust',page:'academy',detail:null}).canonical,'https://nexaragroups.com/neo/academy');
  assert.equal(getSeo({theme:'trust',page:'contact',detail:'academy'}).canonical,'https://nexaragroups.com/neo/contact');
  assert.equal(getSeo({theme:'neo',page:'home',detail:null}).canonical,'https://nexaragroups.com/');
- assert.equal(new Set(getRoutes().map(r=>getSeo(r).canonical)).size,23);
+ assert.equal(new Set(getRoutes().map(r=>getSeo(r).canonical)).size,22);
 });
 test('invalid service and detail routes cannot be indexed', () => {
  for(const route of [{theme:'trust',page:'made-up',detail:null},{theme:'neo',page:'academy',detail:'made-up'}]) assert.equal(getSeo(route).valid,false);

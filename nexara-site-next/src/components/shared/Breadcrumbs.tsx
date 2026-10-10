@@ -15,7 +15,7 @@ export function Breadcrumbs({
   detail?: string | null;
   currentLabel?: string;
 }) {
-  if (page === 'home' || page === 'gateway') return null;
+  if (page === 'home') return null;
   const crumbs = getBreadcrumbs(theme, page, detail, currentLabel);
   if (crumbs.length < 2) return null; // Home-only trails stay hidden
 

@@ -37,7 +37,7 @@ export function getBreadcrumbs(
   detail: string | null = null,
   currentLabel?: string,
 ): Crumb[] {
-  if (page === 'home' || page === 'gateway') {
+  if (page === 'home') {
     return [{ label: homeLabel(theme), href: null }];
   }
 

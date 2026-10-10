@@ -61,10 +61,10 @@ Defined once in the `.trust { … }` block at the top of `src/styles/shared.css`
 | Token | Hex | Role / usage |
 |-------|-----|--------------|
 | `--tr-white` | `#ffffff` | Default page surface, cards, record, rows. |
-| `--tr-paper` | `#f7f6f2` | Alternate band (story band, footer), warm off-white. |
-| `--tr-mist` | `#f3f1ec` | Soft band / legacy `--paper-0`, `--soft`. |
-| `--tr-line` | `#e3e0d8` | Hairlines, card borders, dividers, outline buttons. |
-| `--tr-line-2` | `#eeece6` | Quieter internal rules (inside cards, progress tracks). |
+| `--tr-paper` | `#ffffff` | Page ground and alternate bands (story band, footer). Pure white: no warm off-white on subpages. Home overrides to cool `#f5f7fa` via `.trust-home`. |
+| `--tr-mist` | `#f5f5f5` | Neutral soft fill: logo plates, legacy `--paper-0`, `--soft`, Labs closing band. |
+| `--tr-line` | `#e5e5e5` | Hairlines, card borders, dividers, outline buttons. Bands separate by these lines, not by tint. |
+| `--tr-line-2` | `#efefef` | Quieter internal rules (inside cards, progress tracks). |
 | `--tr-ink` | `#15201a` | Headings, primary text, dark grounds (hero, strip). |
 | `--tr-ink-2` | `#3a4038` | Body copy, lead paragraphs. |
 | `--tr-muted` | `#5f6359` | Secondary text, captions, inactive tabs. |
