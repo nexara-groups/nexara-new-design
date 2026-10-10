@@ -370,10 +370,10 @@ export function TrustModuleCards({ rows, meta }: { rows: ModuleRow[]; meta?: (ro
 }
 
 export function TrustSignatureModule({ section }: { section: SignatureSection }) {
-  if (section.id === 'academy') return <AcademyProcessTimeline section={section} />;
+  if (section.id === 'academy') return <AcademyProcessTimeline section={section as AcademySection} />;
   if (section.id === 'labs') return (
     <TrustCohortLadder
-      section={section}
+      section={section as AcademySection}
       ariaLabel="How we build"
       eyebrow="How we build"
       title={<>From problem<br /><span className="serif">to shipped product.</span></>}

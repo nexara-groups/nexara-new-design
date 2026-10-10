@@ -6,6 +6,7 @@ import { COPY } from '@/lib/copy';
 import { routePath, marketingFaqs } from '@/lib/seo';
 import { MARKETING_FLOW, MARKETING_TRACKS, voiced, type MarketingBlock, type Theme } from '@/lib/site';
 import { getLenis } from '../useSmoothScroll';
+import { PageFinder } from './PageFinder';
 
 // The marketing page: one scroll, shared by Neo and Trust. Order comes from MARKETING_FLOW, wording from
 // COPY.marketing + DATA.sections.marketing (voiced pairs), skin from the --nx-mk-* tokens in shared.css.
@@ -14,8 +15,6 @@ import { getLenis } from '../useSmoothScroll';
 const MARKETING = DATA.sections.marketing;
 const PAGE = MARKETING.page;
 const TRACKS = MARKETING_TRACKS.map((slug) => MARKETING.subpages.find((p) => p.slug === slug)!);
-const TAB_IDS = ['overview', ...MARKETING_TRACKS] as const;
-
 const Arrow = ({ size = 18 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 18 18" aria-hidden="true">
     <path d="M3 9h11M10 4.5L14.5 9 10 13.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -28,20 +27,15 @@ export function MarketingPage({ theme }: { theme: Theme }) {
   const faqs = marketingFaqs(theme);
 
   const root = React.useRef<HTMLElement>(null);
-  const subnav = React.useRef<HTMLDivElement>(null);
-  const tabs = React.useRef<HTMLElement>(null);
-  const pill = React.useRef<HTMLSpanElement>(null);
-  const progress = React.useRef<HTMLSpanElement>(null);
   const [reached, setReached] = React.useState(0);
-  const [current, setCurrent] = React.useState<string>('overview');
   const [dock, setDock] = React.useState(false);
   const [open, setOpen] = React.useState<number[]>([0]);
 
-  // Distance from the viewport top to the bottom of the stuck sub-nav: where an anchor should land.
+
+  // Nothing is stuck to the top any more, so anchors land just under the SiteNav.
   const anchorOffset = React.useCallback(() => {
-    const bar = subnav.current;
-    if (!bar) return 0;
-    return (parseFloat(getComputedStyle(bar).top) || 0) + bar.offsetHeight + 8;
+    const chrome = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nx-chrome-top')) || 72;
+    return chrome + 16;
   }, []);
 
   const go = React.useCallback((id: string, instant = false) => {
@@ -53,46 +47,10 @@ export function MarketingPage({ theme }: { theme: Theme }) {
     if (lenis) lenis.scrollTo(target, { immediate: instant || reduced });
     else window.scrollTo({ top: target, behavior: instant || reduced ? 'auto' : 'smooth' });
     history.replaceState(null, '', '#' + id);
+    requestAnimationFrame(() => window.dispatchEvent(new Event('scroll')));
   }, [anchorOffset]);
 
   const onAnchor = (id: string) => (event: React.MouseEvent) => { event.preventDefault(); go(id); };
-
-  // Scrollspy, page progress and the sub-nav's sliding pill.
-  React.useEffect(() => {
-    const el = root.current;
-    if (!el) return;
-    const band = el.querySelector('[data-spy-end]');
-    const spy = () => {
-      const line = anchorOffset() + 52;
-      let id = 'overview';
-      for (const slug of MARKETING_TRACKS) if ((document.getElementById(slug)?.getBoundingClientRect().top ?? Infinity) <= line) id = slug;
-      if (band && band.getBoundingClientRect().top <= line) id = '';
-      setCurrent(id);
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      if (progress.current) progress.current.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;
-    };
-    spy();
-    window.addEventListener('scroll', spy, { passive: true });
-    window.addEventListener('resize', spy);
-    return () => { window.removeEventListener('scroll', spy); window.removeEventListener('resize', spy); };
-  }, [anchorOffset]);
-
-  React.useEffect(() => {
-    const movePill = () => {
-      const bar = tabs.current, mark = pill.current;
-      if (!bar || !mark) return;
-      const link = bar.querySelector<HTMLElement>(`[data-tab="${current}"]`);
-      if (!link) { mark.style.opacity = '0'; return; }
-      mark.style.opacity = '1';
-      mark.style.width = link.offsetWidth + 'px';
-      mark.style.transform = `translateX(${link.offsetLeft}px)`;
-      mark.dataset.track = current;
-      if (bar.scrollWidth > bar.clientWidth) bar.scrollTo({ left: link.offsetLeft - 20, behavior: 'smooth' });
-    };
-    movePill();
-    window.addEventListener('resize', movePill);
-    return () => window.removeEventListener('resize', movePill);
-  }, [current]);
 
   // Mobile progress dock: visible while the phases are on screen.
   React.useEffect(() => {
@@ -334,21 +292,15 @@ export function MarketingPage({ theme }: { theme: Theme }) {
 
   return (
     <main className="nx-mk" ref={root}>
-      <div className="nx-mk-subnav" ref={subnav}>
-        <div className="nx-mk-subnav-inner">
-          <nav className="nx-mk-tabs" ref={tabs} aria-label={t(copy.nav.label)}>
-            <span className="nx-mk-pill" ref={pill} aria-hidden="true" />
-            {TAB_IDS.map((id) => (
-              <a key={id} href={'#' + id} data-tab={id} className={current === id ? 'is-current' : undefined} aria-current={current === id ? 'location' : undefined} onClick={onAnchor(id)}>
-                {id === 'overview' ? t(copy.nav.overview) : TRACKS.find((tr) => tr.slug === id)!.title}
-              </a>
-            ))}
-          </nav>
-          <a className="nx-mk-cta nx-mk-subnav-cta" href="#ask" onClick={onAnchor('ask')}>{t(copy.nav.cta)}</a>
-          <span className="nx-mk-progress" ref={progress} aria-hidden="true" />
-        </div>
-      </div>
       {MARKETING_FLOW.map((block) => <React.Fragment key={block}>{BLOCKS[block]()}</React.Fragment>)}
+      <PageFinder
+        label={t(copy.nav.label)}
+        overview={t(copy.nav.overview)}
+        items={TRACKS.map((track) => ({ id: track.slug, label: track.title, track: track.slug }))}
+        cta={{ label: t(copy.nav.cta), href: '#ask' }}
+        spyEnd="[data-spy-end]"
+        yieldTo={dock}
+      />
       <div className={`nx-mk-dock${dock ? ' is-shown' : ''}`} aria-hidden="true">
         <span className="nx-mk-bars">{PAGE.record.map((r, i) => <i key={r.label} data-track={PAGE.phases[i]!.track} className={i < reached ? 'is-on' : undefined} />)}</span>
         <span className="nx-mk-count"><b>{reached}</b><small>/{PAGE.record.length}</small></span>

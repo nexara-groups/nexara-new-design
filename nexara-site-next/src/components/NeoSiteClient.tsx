@@ -15,12 +15,15 @@ import { setNeoRouter } from '@/lib/neo-router';
 import { NotFound } from './NotFound';
 import { SiteNav } from './shared/SiteNav';
 import { SiteFooter } from './shared/SiteFooter';
+import { Breadcrumbs } from './shared/Breadcrumbs';
 import { Home } from './shared/Home';
 import { SectionPage } from './neo/SectionShell';
-import { Contact } from './neo/StaticPages';
+import { ContactPage } from './shared/ContactPage';
 import { Proof } from './shared/Proof';
 import { About } from './shared/About';
 import { MarketingPage } from './shared/MarketingPage';
+import { AcademyPage } from './shared/AcademyPage';
+import { LabsPage } from './shared/LabsPage';
 const NeoGuide = dynamic(()=>import('./neo/Guide').then(module=>module.NeoGuide),{ssr:false});
 import { useSmoothScroll } from './useSmoothScroll';
 
@@ -32,8 +35,8 @@ function Site({ theme, page, detail }: { theme: 'trust' | 'neo'; page: string; d
   const [guideReady,setGuideReady]=React.useState(false);
   // The cursor guide is pure motion: never mounted for visitors who ask for reduced motion.
   React.useEffect(()=>{if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;const timer=setTimeout(()=>setGuideReady(true),900);return()=>clearTimeout(timer);},[]);
-  const section = (DATA.sections as Record<string, typeof DATA.sections.academy>)[page];
-  React.useEffect(() => { window.scrollTo(0, 0); }, [theme, page]);
+  const section = (DATA.sections as Record<string, (typeof DATA.sections)[keyof typeof DATA.sections]>)[page];
+  React.useEffect(() => { window.scrollTo(0, 0); }, [theme, page, detail]);
   const validPage = section || STATIC_PAGES.includes(page);
   const className = isNeo ? "site neo" : "site trust";
   return (
@@ -41,11 +44,19 @@ function Site({ theme, page, detail }: { theme: 'trust' | 'neo'; page: string; d
       <a className="skip-link" href="#main">Skip to content</a>
       <SiteNav theme={theme} page={page} detail={detail} />
       <div id="main">
+        {(page !== 'home' || !validPage) && (
+          <Breadcrumbs
+            theme={theme}
+            page={validPage ? page : 'notfound'}
+            detail={validPage ? detail : null}
+            currentLabel={validPage ? undefined : 'Not found'}
+          />
+        )}
         {page === "home" && <Home theme={theme} />}
-        {section && (page === 'marketing' ? <MarketingPage theme={theme} /> : <SectionPage theme={theme} section={section} detail={detail} />)}
+        {section && (page === 'marketing' ? <MarketingPage theme={theme} /> : page === 'academy' ? <AcademyPage theme={theme} /> : page === 'labs' ? <LabsPage theme={theme} detail={detail} /> : <SectionPage theme={theme} section={section} detail={detail} />)}
         {page === "customers" && <Proof theme={theme} detail={detail} />}
         {page === "company" && <About theme={theme} />}
-        {page === "contact" && <Contact theme={theme} detail={detail} />}
+        {page === "contact" && <ContactPage theme={theme} detail={detail} />}
         {!validPage && <NotFound theme={theme} page={page} />}
       </div>
       {/* Key by page only — tab (detail) switches must not remount the guide or jolt scroll. */}

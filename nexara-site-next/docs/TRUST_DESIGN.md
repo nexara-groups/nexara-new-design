@@ -36,7 +36,7 @@ goes through tokens, so Neo keeps its own values.
 | # | Rule | How to check |
 |---|------|--------------|
 | 1 | **Light / white dominant.** Content bands are `--tr-white`, `--tr-paper` or a track wash. Dark grounds are allowed only for an existing hero or one deliberate band per page, never as the page default. | Scroll the page: most of it should read white/paper. |
-| 2 | **No blue. Anywhere in Trust.** No navy, steel, sky, cyan, teal-blue, blue links, blue focus rings, blue gradients or blue-cast greys (roughly hue 185-265 in HSL). | `python3` grep in §6.4; browser audit in §6.4. |
+| 2 | **No blue. Anywhere in Trust** (Field pages). No navy, steel, sky, cyan, teal-blue, blue links, blue focus rings, blue gradients or blue-cast greys (roughly hue 185-265 in HSL). **Exceptions:** Academy (`.nx-ac`) and Home (`.trust-home` on the site root, `/trust`) use the logo brand kit blues/navy by design; see §8. Home re-points the `--tr-green-*` tokens to action `#215F94` / deep `#184A75` / wash `#EDF3F9` / light `#9FC4E6` and cools the neutrals (block at the end of `trust.css`); the hero canvas in `trust/Hero.tsx` uses the same blues. Labs (`.trust-labs` on the site root, `/trust/labs/*`) re-points the same `--tr-green-*` tokens to the Product Studio amber ramp (`#8A4B12` / deep `#6E3B0D` / wash `#FBF5EE` / light `#F0B47A`), so no green shows on Labs; the one blue there is the Academy segment of the footer stripe. | `python3` grep in §6.4; browser audit in §6.4; ignore `.nx-ac`, `.trust-home` and `trust/Hero.tsx` brand-kit colours. |
 | 3 | **Shared structure.** Never add a page, block or section to one theme only. Structure lives in `src/lib/site.ts` flows; both themes render the same blocks through one shared component. | `npm test` (site.test.mjs). |
 | 4 | **Tokens, not theme checks.** A component never asks `theme === 'trust'` to change looks. Skin differences go through `--nx-*` / `--tr-*` tokens set on `.trust` / `.neo`. | `grep -n "theme === '" src/components/shared/` should only show wording selection via `voiced()`. |
 | 5 | **Copy is voiced.** Every visible string is a `{ neo, trust }` pair (`Voiced`) in `src/lib/copy.ts` (chrome) or `src/lib/data.ts` (content). Facts identical in both voices. | Tests walk the pairs. |
@@ -120,7 +120,7 @@ Shared components only reference these roles. Trust values (from the `.trust` bl
 | `--nx-footer-ink` / `-copy` / `-muted` / `-line` / `-label` | ink / ink-2 / muted / line / green-deep | white set | SiteFooter. |
 | `--nx-float-clear` | `84px` | `12px` | Bottom offset for fixed bars so they clear Trust's "Talk to us" pill. |
 | `--nx-strip-bg` / `--nx-strip-ink-rgb` | `--tr-ink` / `243, 241, 236` | near-black / `233, 238, 245` | Dark proof/capability strips. |
-| `--nx-lab-*` / `--nx-lab-ink-rgb` | dark green set | dark blue/cyan set | Labs architecture visual. |
+| `--nx-lab-*` / `--nx-lab-ink-rgb` | dark green set (warm amber `#17130E` / `#F0B47A` / `#F3DCC3` under `.trust-labs`) | dark blue/cyan set | Labs architecture visual. |
 | `--accent` (legacy) | `--tr-green` | `#ccff00` | Older components; prefer the roles above. |
 
 Legacy Trust layer (trust.css) maps: `--ink`/`--text`/`--dark` → `--tr-ink`, `--muted`/`--ink-2` → `--tr-muted`,
@@ -196,7 +196,7 @@ loaded after shared.css). New heading rules must be at least `main.nx-xx .nx-xx-
 
 Breakpoints (max-width unless noted): `1100px` (hero to one column, site nav to burger), `1000px` (two-column
 grids collapse, sticky headings go static), `800px` (mobile layout: smaller type, record above phases,
-mobile dock, stacked rows), `640px` (sub-nav fills width, its CTA hides), `min-width: 801px` (designed hero lines never wrap).
+mobile dock, stacked rows, search dock goes full width and drops its CTA), `min-width: 801px` (designed hero lines never wrap).
 
 ### 2.6 Radii, shadows, borders, rules
 
@@ -205,7 +205,7 @@ mobile dock, stacked rows), `640px` (sub-nav fills width, its CTA hides), `min-w
 | `--radius-sm` | 8px | Small chips. |
 | `--radius-md` | 14px | Default card (`--nx-radius`). Goal box uses 14px. |
 | `--radius-lg` | 22px | Large card; record uses 22px. |
-| Pill | `999px` | Buttons, tabs, kicker chips, nav, sub-nav. |
+| Pill | `999px` | Buttons, tabs, kicker chips, nav, search dock. |
 | Big card | 18px rows, 20px proof, 24px engine, 32px ask card (24px ≤800px) | |
 | `--shadow-1` | `0 1px 2px rgba(var(--tr-shadow-rgb), .06)` | Hairline lift. |
 | `--shadow-2` | `0 18px 36px -24px rgba(var(--tr-shadow-rgb), .35)` | Hover lift. |
@@ -225,14 +225,14 @@ Dashed 1px for "missing" things only (search results, unfilled record ticks).
 | Layer | z-index |
 |---|---|
 | Site nav (`.nx-nav`) | 100 |
-| Sub-nav (`.nx-mk-subnav`) | 90 |
 | "Talk to us" pill (`.tsx-concierge`) | 90 |
+| Search dock (`.nx-mk-finder`) | 88 |
 | Mobile progress dock (`.nx-mk-dock`) | 85 |
 | Cookie banner (`.cc-banner`) | 1800 |
 
 - Tap targets: every link/button `min-height: 44px` (tabs, CTA, footer links, accordion buttons, start rows). Icon circles 44px on mobile (`.nx-mk-go`).
 - Focus: `.nx-mk :focus-visible { outline: 2.5px solid var(--nx-mk-cta); outline-offset: 3px; border-radius: 6px; }`; chrome uses `--nx-focus`. Never remove outlines without a replacement.
-- Sticky offsets: `--nx-chrome-top` (72px, set on `.site`) is the SiteNav height; `--nx-mk-sub-h` (70px) the sub-nav; `--nx-mk-stick = chrome-top + sub-h`. Anything sticky inside a page uses `top: calc(var(--nx-mk-stick) + 20px…40px)`, and every `[id]` has `scroll-margin-top: calc(var(--nx-mk-stick) + 8px)`.
+- Sticky offsets: `--nx-chrome-top` (72px, set on `.site`) is the SiteNav height; nothing else sticks to the top, so `--nx-mk-stick = chrome-top`. Anything sticky inside a page uses `top: calc(var(--nx-mk-stick) + 20px…40px)`, and every `[id]` has `scroll-margin-top: calc(var(--nx-mk-stick) + 8px)`.
 
 ---
 
@@ -251,28 +251,36 @@ Reference: `NAV` + CSS `═══ Nav (SiteNav) ═══`. Do not duplicate it 
 - Theme switch `.nx-switch a.active` (ink fill, `--nx-nav-active-ink` text).
 - ≤1100px links collapse into the burger sheet `.nx-nav-sheet`.
 
-### 3.2 In-page sub-nav with sliding pill
+### 3.2 In-page section nav
 
-Reference: `MP` (top of the returned JSX) + CSS `/* sub-nav */`.
+No page puts a second bar under the SiteNav: it covered content. Each page gets a section nav shaped by
+its own story, so pages don't look alike.
+
+**Marketing: search dock.** Reference: `MP` (end of the returned JSX) + CSS `/* Search dock */`.
+The page's hero is a search box with empty results, so the nav is a search bar floating at the bottom:
+the query is the section you're in, the three service lines are results that fill as you read them.
 
 ```html
-<div class="nx-mk-subnav">                      <!-- sticky, top: var(--nx-chrome-top) -->
-  <div class="nx-mk-subnav-inner">               <!-- glass pill, overflow hidden -->
-    <nav class="nx-mk-tabs" aria-label="Sections">
-      <span class="nx-mk-pill" data-track="overview|presence|…" aria-hidden="true"></span>
-      <a href="#overview" data-tab="overview" class="is-current" aria-current="location">Overview</a>
-      <a href="#presence" data-tab="presence">Presence</a> …
-    </nav>
-    <a class="nx-mk-cta nx-mk-subnav-cta" href="#ask">Scope a project</a>
-    <span class="nx-mk-progress" aria-hidden="true"></span>   <!-- 2px three-track progress -->
-  </div>
-</div>
+<nav class="nx-mk-finder is-shown" aria-label="Sections" data-track="visibility">   <!-- fixed, bottom-centre -->
+  <a class="nx-mk-finder-q" href="#overview">🔍 <strong>Visibility</strong><i class="nx-mk-caret"></i></a>
+  <span class="nx-mk-finder-segs">
+    <a href="#presence" data-track="presence" class="is-done"><span class="nx-mk-finder-n">01</span><span class="nx-mk-finder-l">Presence</span><i></i></a>
+    <a href="#visibility" data-track="visibility" class="is-current" aria-current="location" style="--p: .4">…</a> …
+  </span>
+  <a class="nx-mk-cta nx-mk-finder-cta" href="#ask">Scope a project</a>
+</nav>
 ```
-- Tokens: `--nx-mk-glass`, `--nx-mk-line`, `--nx-mk-muted`, `--nx-mk-ink`, `--nx-mk-on-c`, `--c`, `--nx-mk-cta`.
-- States: hover tab → ink; current tab → `--nx-mk-on-c` over the pill; pill colour = the section's track (`overview` = ink).
-- Mobile (≤640px): inner fills width, tabs `flex: 1 1 auto` at 13.5px, CTA hidden (site nav keeps Contact).
-- Behaviour: links are real `href="#id"` anchors (work without JS); JS scrolls with Lenis using the stuck sub-nav height as offset, updates `history.replaceState`.
-- Max 4–5 tabs. Tabs name *places on the page*, not pages.
+- Shows once the hero has scrolled away (the hero has its own search box) and hides when the ask card is on screen.
+- Query retypes (`clip-path` steps) when the section changes; caret takes the current track colour.
+- Segment bar fill = `--p`, the share of that section read; passed sections are full; numbers take the track colour.
+- ≤1100px segment labels hide (numbers + bars stay). ≤800px the dock goes full width above the "Talk to us" pill
+  (`--nx-float-clear`), drops its CTA, and yields to the phase dock (`.is-yield`) while the phases are on screen.
+- Links are real `href="#id"` anchors; JS scrolls with Lenis to just under the SiteNav and updates `history.replaceState`.
+
+**Academy: left rail.** Reference: `AcademyPage.tsx` + CSS `.nx-ac-spine`. Numbered steps with labels in a
+168px left lane (content starts after it), vertically centred under the SiteNav; the line fills dot to dot.
+
+- Max 4–5 entries. Entries name *places on the page*, not pages.
 
 ### 3.3 Hero ("enact the problem")
 
@@ -468,8 +476,7 @@ Global for the page: `.nx-mk :focus-visible { outline: 2.5px solid var(--nx-mk-c
 | Scroll-inked statement | `.nx-mk-w` opacity .16 → 1, `stagger: .05`, `scrollTrigger: { start: 'top 70%', end: 'bottom 55%', scrub: .6 }`. |
 | Scroll-scrubbed line fill | `.nx-mk-rail i` `scaleY 0 → 1`, `scrub: .4` over the phases. Rail colour = last reached phase's track. |
 | Record fill / empty | `ScrollTrigger.create({ trigger: phase, start: 'top 55%', onEnter: reach(i+1), onLeaveBack: setReached(i) })`; CSS handles flash, tick draw and text swap. |
-| Sliding nav pill | Scroll listener computes the current section (`top <= stuckSubnavBottom + 52`); pill `transform/width/background` transition .45s. |
-| Progress bar | Scroll listener sets `.nx-mk-progress` `scaleX(scrollY / maxScroll)`; no GSAP needed. |
+| Section nav state | Scroll listener computes the current section (`top <= chromeTop + 68`) and each section's read share (`--p`); a `ResizeObserver` re-runs it after hash jumps and pin refreshes. No GSAP needed. |
 | Section rule draw | `fromTo(track, { '--rule': 0 }, { '--rule': 1, duration: 1.2 })` at `top 85%`. |
 | Fade-lift reveal | `gsap.from(els, { opacity: 0, y: 22–40, duration: .8–.9, stagger, ease: 'power3.out', scrollTrigger: { start: 'top 80%' } })`. Rows slide from `x: 40` (track band has `overflow-x: clip`). |
 
@@ -542,8 +549,8 @@ so a block cannot be added without implementing it, and both themes get the same
   colours are the only colour, and each means something; one device (the record) ties the page together;
   left-aligned type with designed line breaks and big confident headings; only two floating objects carry
   shadows; different layouts for different content shapes (5.3); motion that only shows state changes.
-- **Sub-nav, not a second header.** The prototype had its own logo bar. In the site, the real SiteNav stays
-  and a compact sticky sub-nav sits under it (no second logo).
+- **No second header.** The prototype had its own logo bar. In the site, the real SiteNav stays alone at the
+  top; section navigation lives in the bottom search dock (3.2).
 - **Old URLs kept.** `/trust/marketing/presence|visibility|performance` (and older `brand|web|growth`)
   301 to the in-page anchors (`next.config.mjs`); the routes left the sitemap (`IN_PAGE_SECTIONS` in seo.ts).
 - **Fonts.** The prototype used Bricolage Grotesque + Instrument Sans; the site maps them to `--font-display`
@@ -672,7 +679,7 @@ const m={r:f.r*f.a+b.r*(1-f.a),g:f.g*f.a+b.g*(1-f.a),b:f.b*f.a+b.b*(1-f.a)};cons
 const big=parseFloat(cs.fontSize)>=24||(parseFloat(cs.fontSize)>=18.6&&+cs.fontWeight>=700);if(cr<(big?3:4.5))low.push(cr.toFixed(2)+' '+el.className+' "'+el.textContent.trim().slice(0,30)+'"')});
 return{low,blue:[...bl]};})()
 ```
-Known false positive: the current sub-nav tab (its background is the sibling pill).
+Known false positive: text over the glass search dock (its background is translucent).
 
 ---
 
@@ -688,7 +695,7 @@ Known false positive: the current sub-nav tab (its background is the sibling pil
 | Routes, SEO, JSON-LD, FAQs | `src/lib/seo.ts` (`pages`, `LOCAL_FAQS`, `getRoutes`, `getSeo`, `getStructuredData`, `marketingFaqs`, `IN_PAGE_SECTIONS`) ; `src/lib/routes.ts` |
 | Redirects | `next.config.mjs` (`redirects()`) |
 | Site clients (mount pages) | `src/components/NeoSiteClient.tsx`, `src/components/TrustSiteClient.tsx` |
-| Shared renderers | `src/components/shared/*` (`MarketingPage.tsx`, `Home.tsx` + `HomeBlocks.tsx`, `About.tsx`, `Proof.tsx`, `Blog.tsx`, `SiteNav.tsx`, `SiteFooter.tsx`, `ThemeSwitch.tsx`, `ClientCard.tsx`, `LabsMap.tsx`, `LabsShowcase.tsx`, `FaqBand.tsx`, `PageHeader.tsx`) |
+| Shared renderers | `src/components/shared/*` (`MarketingPage.tsx`, `AcademyPage.tsx`, `Home.tsx` + `HomeBlocks.tsx`, `About.tsx`, `Proof.tsx`, `Blog.tsx`, `SiteNav.tsx`, `SiteFooter.tsx`, `ThemeSwitch.tsx`, `ClientCard.tsx`, `LabsMap.tsx`, `LabsShowcase.tsx`, `FaqBand.tsx`, `PageHeader.tsx`) |
 | Legacy Trust-only renderers (to be converted) | `src/components/trust/*` (`SectionShell.tsx`, `Academy.tsx`, `Cards.tsx`, `Subpage.tsx`, `StaticPages.tsx`, `Hero.tsx`, `Canvas.tsx`) |
 | Legacy Neo-only renderers | `src/components/neo/*` |
 | Tokens + shared CSS | `src/styles/shared.css` (`.trust` palette block at top; Marketing page section at the end) |
@@ -710,7 +717,7 @@ Known false positive: the current sub-nav tab (its background is the sibling pil
 ### 7.3 Tests that guard this
 
 - `site.test.mjs`: nav parity, flows, footer links resolve (`FOOTER_COLUMNS.length === 2`), blog routes, theme switch equivalence, Voiced copy has both voices and no em dash, client cards, Labs map integrity, **marketing page** (every `MARKETING_FLOW` block implemented, no theme checks in the renderer, both clients mount it, tracks = subpages, voiced copy, AI disclaimer present).
-- `seo.test.mjs`: route count (43) and canonical count (18), valid metadata, canonicals to Neo, FAQ JSON-LD, marketing anchors not routed, redirects present, FAQ schema matches the visible voice.
+- `seo.test.mjs`: route count (37) and canonical count (15), valid metadata, canonicals to Neo, FAQ JSON-LD, marketing and academy anchors not routed, redirects present, FAQ schema matches the visible voice.
 
 ### 7.4 Common pitfalls
 
@@ -731,20 +738,20 @@ Known false positive: the current sub-nav tab (its background is the sibling pil
 
 ## 8. Page conversion queue
 
-Real Trust routes (from `getRoutes()` in `src/lib/seo.ts` and `src/app/trust/*`). Done: **Marketing** (`/trust/marketing`).
+Real Trust routes (from `getRoutes()` in `src/lib/seo.ts` and `src/app/trust/*`). Done: **Marketing**, **Academy**, **Labs**, **About**, **Proof**, **Blog**, **Contact**. Home keeps theme-specific animated heroes (no brief-routing card).
 Each item lists the concept hint, the record/artefact, and the recipes to use. Convert Neo at the same time (same shared renderer).
 
 | # | Page (routes) | Current renderer | Concept hint ("the page enacts…") | Record / artefact | Recipes |
 |---|---|---|---|---|---|
-| 1 | **Home** `/trust` (Neo `/`) | `shared/Home.tsx` + `HomeBlocks.tsx`, Trust hero `trust/Hero.tsx` (dark particle hero) | "One firm, three teams, one standard": a brief comes in and is routed to the right team. | A routing card: Brief → Team → Owner → Scope → Handover, filling as you scroll the divisions. | Hero 3.3 (light, replace dark hero skin), story 3.4, divisions as track bands 3.6 (one fixed track colour per division, see the assignment under this table), work 3.9 + client cards, standards as ruled columns 3.8, FAQ 3.10, CTA 3.11. Keep `HOME_FLOW` order (tests). |
-| 2 | **About** `/trust/company` | `shared/About.tsx` (`ABOUT_FLOW`) | "A company you can verify": legal facts and people shown as a dossier. | A dossier/register: CIN, GSTIN, address, directors, incorporated, ticking "verified" as facts are read. | Hero 3.3 (dossier artefact), story 3.4, how/steps as timeline 3.5, milestones timeline, people as ruled columns, facts table, principles/standards columns 3.8, FAQ 3.10, CTA 3.11. Page head currently a dark band: make it light. |
-| 3 | **Academy** `/trust/academy` | `trust/SectionShell.tsx` + `trust/Academy.tsx` (Neo: `neo/Academy.tsx`) | "A learner goes from course to placement-ready, with proof at every step." | A learner record: Skills mapped → Project built → Reviewed → Demo → Report → Placement prep, filling per stage. | Hero 3.3, story 3.4, path as timeline + record 3.5, the three subpages (tracks / internships / placements) as track bands 3.6 with anchors, start rows 3.7, who 3.8, proof 3.9, FAQ 3.10, CTA 3.11 (`contact/academy`). Decide with the user whether subpages become anchors (like marketing) before removing routes. |
-| 3a | Academy subpages `/trust/academy/tracks`, `/internships`, `/placements` | `trust/Subpage.tsx` | Same as parent, deep-dive on one track. | Same record, pre-filled up to that track. | Either anchors on Academy (redirect like marketing) or a light subpage: hero + track band + FAQ + CTA. Internships has `LOCAL_FAQS` in seo.ts; keep them visible. |
-| 4 | **Labs** `/trust/labs` | `trust/SectionShell.tsx` `TrustLabsOverview` (`LABS_FLOW`), shared `LabsMap.tsx`, `LabsShowcase.tsx` | "A business problem becomes a running system, layer by layer." | The layer map (data / services / interface / live) as the record, filling as modules are read. | Problems as start rows 3.7, map as the sticky record 3.5, modules as track bands 3.6 (data/services/interface map to the three tracks), stages timeline 3.5, proof map 3.9, products, packages, FAQ 3.10, CTA. Keep `LABS_FLOW` (tests check the mapping). Labs visual uses `--nx-lab-*` tokens. |
-| 4a | Labs subpages `/trust/labs/products`, `/ai-automation`, `/ecommerce`, `/delivery` | `trust/Subpage.tsx` | One capability in depth. | The module's slice of the layer map. | Light subpage: hero 3.3, track band 3.6, stages 3.5, FAQ (ecommerce has `LOCAL_FAQS`), CTA. |
-| 5 | **Proof / Delivery Proof** `/trust/customers` (+ `/customers/academy|marketing|labs`) | `shared/Proof.tsx` (`PROOF_FLOW`), `ClientCard.tsx` | "Live work you can click." | A client index that ticks scope items as each case is read. | Hero 3.3 (artefact: list of live URLs), builds as track bands or staggered cards 3.9 (one track per team), filters as sub-nav 3.2, CTA 3.11. Only real outcomes (`result` only when approved). |
-| 6 | **Blog** `/trust/blog`, `/trust/blog/[slug]` | `shared/Blog.tsx`, `BlogShell.tsx`, `BlogContent.tsx` | "Notes from the team that builds." | None (reading page). | Index: hero 3.3 without artefact, post list as start rows 3.7 (title + summary + arrow). Post: reading column 60–68ch, H2/H3 scale from §2.4, links `--nx-link`, CTA 3.11. Trust canonicalises to Neo `/blog`. |
-| 7 | **Contact** `/trust/contact` (+ `/contact/home|academy|marketing|labs`) | `trust/StaticPages.tsx` `TrustContact`, `ContactDetails.tsx` | "Send a scoped brief and see exactly what you will get back." | The brief preview (`useBriefForm` `briefText`) filling as fields are completed. | Hero 3.3 (artefact = brief preview), form fields in a white card, contact details card (currently dark ink surface: make it light), FAQ, no concierge (already hidden). |
+| 1 | **Home** `/trust` (Neo `/`) | `shared/Home.tsx` + `HomeBlocks.tsx` — Neo/Trust animated heroes retained; Trust division track colours | "One firm, three teams, one standard." | Theme-specific hero animations (SITE_STRUCTURE exception). No brief-routing card. | Keep animated heroes. `HOME_FLOW` order locked. Trust rail tracks: Academy brand blue / Marketing plum / Labs amber. **Trust colour exception:** brand-kit blues via `.trust-home` (see §1 rule 2). |
+| 2 | **About** `/trust/company` | **Done:** `shared/About.tsx` (`ABOUT_FLOW`, `nx-ab-*`) | "A company you can verify": legal facts and people shown as a dossier. | A dossier/register: CIN, GSTIN, address, directors, incorporated, ticking "verified" as facts are read. | Hero 3.3 (dossier artefact), story 3.4, how/steps as timeline 3.5, milestones timeline, people as ruled columns, facts table, principles/standards columns 3.8, FAQ 3.10, CTA 3.11. Light hero (no dark page head). |
+| 3 | **Academy** `/trust/academy` | **Done:** `shared/AcademyPage.tsx` Proof Portfolio (`ACADEMY_FLOW`: hero → thesis → runway → lanes → fit → proof → faqs → ask) | "A learner goes from course to placement-ready, with proof at every step." | Portfolio dossier (hero) + sticky stamp sheet (6 stamps) filling as Map → Cohort → Proof → Place runway nodes are reached. | Distinct `nx-ac-*` recipes (not Marketing). Hero portfolio cover opens to empty slots; horizontal runway + dossier; asymmetric lane panels; fit chips + rows; receipt strip; FAQ; ask. Anchors `#tracks|#internships|#placements`. **Trust colour exception:** logo brand kit on `.nx-ac` (action `#215F94`, accent `#66A0CC`, navy `#2C3F5E`). |
+| 3a | Academy anchors `#tracks`, `#internships`, `#placements` | In-page on Academy (old detail URLs 301) | Same as parent. | Same record, filled as stages are read. | Anchors like marketing. Internship FAQs from `LOCAL_FAQS` are merged into the visible Academy FAQ list. |
+| 4 | **Labs** `/trust/labs` | **Done:** `shared/LabsPage.tsx` (`LABS_FLOW` + grouped SubNav), `LabsMap.tsx`, `LabsShowcase.tsx` | "A business problem becomes a running system, layer by layer." | The layer map (data / services / interface / live) as the record band. | `LABS_FLOW`: proof (Websites banner + four software cards), products (4-up, live/demo then in build), map as dark record (deliverables only), five capabilities, four stage gates in one row (pipeline lives in the hero only), packages, FAQ, CTA. Each client or product is listed once; no specialisms or audience table on the overview. Finder: Proof / Products / Capabilities / Engagement. Skin `--nx-lp-*` / `--nx-lab-*`, amber via `.trust-labs`. |
+| 4a | Labs details `/trust/labs/products|ai-automation|ecommerce|delivery` + product routes (`/voice`, `/agency`, …) | **Done:** `LabsPage` capability + product panels | One capability or product in depth. | Capability cards + stages, or product covers + status. | Light detail bands, FAQ (ecommerce merges `LOCAL_FAQS`), CTA. Product routes are SEO pages. |
+| 5 | **Proof / Delivery Proof** `/trust/customers` (+ `/customers/academy|marketing|labs`) | **Done:** `shared/Proof.tsx` (`PROOF_FLOW`, `nx-pf-*`), `ClientCard.tsx` | "Live work you can click." | A client index that ticks scope items as each case is read. | Hero 3.3 (artefact: list of live URLs), builds + Link filters as sub-nav 3.2, CTA 3.11. Only real outcomes (`result` only when approved). |
+| 6 | **Blog** `/trust/blog`, `/trust/blog/[slug]` | **Done:** `shared/Blog.tsx` (`nx-bl-*`), `BlogShell.tsx`, `BlogContent.tsx` | "Notes from the team that builds." | None (reading page). | Index: hero 3.3 without artefact, post list as start rows 3.7. Post: reading column 60–68ch, CTA 3.11. Trust canonicalises to Neo `/blog`. |
+| 7 | **Contact** `/trust/contact` (+ `/contact/home|academy|marketing|labs`) | **Done:** `shared/ContactPage.tsx` (`nx-ct-*`), `ContactDetails.tsx` | "Send a scoped brief and see exactly what you will get back." | The brief preview (`useBriefForm` `briefText`) filling as fields are completed. | Hero 3.3 (artefact = brief preview), form in white card, light contact details, FAQ, no concierge. |
 | 8 | **Legal** `/privacy-policy.html`, `/terms-of-service.html`, `/cookie-policy.html`, `/data-deletion.html` | static files in `public/` | Plain reading pages. | None. | Out of the token system; if converted, use the blog post reading recipe and the Field palette by value. |
 | 9 | **Gateway** `/gateway` (noindex chooser) | `GatewayClient.tsx`, `Gateway3D.tsx`, `gateway-cinematic.css` | Not a Trust page (it presents both themes). Its Trust side may still show blue light in the 3D scene. | — | Only touch if the user asks; if so, Trust side uses Field palette by value. |
 | 10 | **Not found** (any unknown `/trust/*`) | `NotFound.tsx` | — | — | Light, hero-style message + links to NAV pages. |

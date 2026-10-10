@@ -263,8 +263,19 @@ function CaseView({ client, theme }: { client: ClientWork; theme: Theme }) {
   );
 }
 
-export function Builds({ theme, divisionId }: { theme: Theme; divisionId?: string }) {
-  const showFilters = !divisionId;
+export function Builds({
+  theme,
+  divisionId,
+  onViewed,
+  hideFilters = false,
+}: {
+  theme: Theme;
+  divisionId?: string;
+  onViewed?: (url: string) => void;
+  hideFilters?: boolean;
+}) {
+  // Proof owns Link filters in its Field shell; hide chip filters there.
+  const showFilters = !divisionId && !hideFilters && !onViewed;
   const [activeFilter, setActiveFilter] = React.useState<BuildFilter>('all');
   const filter: BuildFilter =
     divisionId === 'marketing' || divisionId === 'labs' ? divisionId : activeFilter;
@@ -283,6 +294,10 @@ export function Builds({ theme, divisionId }: { theme: Theme; divisionId?: strin
 
   const selected = clients.find((client) => client.url === selectedUrl) ?? defaultCase(clients);
   const filters: BuildFilter[] = ['all', 'marketing', 'labs'];
+
+  React.useEffect(() => {
+    if (selected?.url) onViewed?.(selected.url);
+  }, [selected?.url, onViewed]);
 
   return (
     <section className="nx-section nx-builds" id="builds" aria-labelledby="nx-builds-h">
@@ -390,7 +405,7 @@ export function HomeCta({ theme }: { theme: Theme }) {
       <p className="nx-final-lede">{voiced(COPY.home.cta.body, theme)}</p>
       <div className="nx-final-actions">
         <a className="nx-final-secondary" href={phone.href}>
-          {theme === 'neo' ? 'Call' : 'Telephone'} {phone.display}
+          {voiced({ neo: 'Call', trust: 'Telephone' }, theme)} {phone.display}
         </a>
         <Link prefetch={false} className="nx-btn nx-final-primary" href={routePath(theme, 'contact')}>
           {voiced(COPY.home.cta.primary, theme)} <span aria-hidden="true">→</span>

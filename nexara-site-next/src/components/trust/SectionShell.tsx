@@ -11,10 +11,6 @@ import { TrustSubpageBand, TrustSubpagePanel } from './Subpage';
 import { SubNav } from '../neo/Nav';
 import { useSectionTabs } from '../useSectionTabs';
 import { CyclingWord, TrustHeroParticles, TrustHeroEnergyLoop } from './Hero';
-import { LabsProblemTable, LabsLayerMap, LabsModuleMeta, LabsStages, LabsProofMap } from '../shared/LabsMap';
-import { LabsProducts, LabsSpecialisms } from '../shared/LabsShowcase';
-import { COPY } from '@/lib/copy';
-import { LABS_FLOW, voiced, type LabsBlock } from '@/lib/site';
 import { getTrustSectionLabel, TRUST_SECTION_CTA, TRUST_ACCENT } from './shared';
 import {
   TrustModuleCards,
@@ -395,47 +391,6 @@ function TrustSectionHeroUnravel({ theme, section }: { theme: keyof TrustSection
 }
 
 /* Labs overview: LABS_FLOW is shared with Neo (neo/SectionShell.tsx). Same blocks, same order. */
-function TrustLabsOverview({ onOpen }: { onOpen: (slug: string | null) => void }) {
-  const labs = DATA.sections.labs;
-  const chapter = (block: Exclude<LabsBlock, 'map' | 'cta'>, children: React.ReactNode) => (
-    <div className="tsx-overview tsx-story tsx-story-light-band">
-      <div className="tsx-section-inner">
-        <TrustChapter eyebrow={voiced(COPY.labs[block].kicker, 'trust')} title={voiced(COPY.labs[block].title, 'trust')}>
-          {children}
-        </TrustChapter>
-      </div>
-    </div>
-  );
-  const BLOCKS: Record<LabsBlock, () => React.ReactNode> = {
-    problems: () => chapter('problems', <LabsProblemTable theme="trust" />),
-    map: () => <LabsLayerMap theme="trust" />,
-    modules: () => chapter('modules', (
-      <TrustModuleCards
-        rows={labs.modules.map((m) => ({ title: m.title, trust: m.problem.trust }))}
-        meta={(_row, i) => <LabsModuleMeta theme="trust" moduleId={labs.modules[i]!.id} onOpen={onOpen} />}
-      />
-    )),
-    specialisms: () => chapter('specialisms', <LabsSpecialisms theme="trust" />),
-    stages: () => chapter('stages', <LabsStages theme="trust" />),
-    proof: () => chapter('proof', <LabsProofMap theme="trust" />),
-    products: () => chapter('products', <LabsProducts theme="trust" />),
-    engage: () => chapter('engage', <div id="labs-engage"><TrustPackageCards packages={labs.packages} /></div>),
-    faqs: () => chapter('faqs', <TrustFaqAccordion faqs={labs.faqs as [string, string][]} />),
-    cta: () => (
-      <section className="tsx-section-inner">
-        <TrustIntakeBand
-          spaced
-          heading={labs.intake.primary}
-          sub={labs.intake.secondary}
-          cta={voiced(COPY.labs.cta.cta, 'trust')}
-          onClick={() => routeTo('trust', 'contact', 'labs')}
-        />
-      </section>
-    ),
-  };
-  return <>{LABS_FLOW.map((block) => <React.Fragment key={block}>{BLOCKS[block]()}</React.Fragment>)}</>;
-}
-
 export function TrustSectionPage({ section, detail }: { section: TrustSection; detail?: string | null }) {
   const detailKnown = !detail || section.subpages.some((page) => page.slug === detail);
   const { active, selectTab } = useSectionTabs('trust', section, detailKnown ? detail ?? null : null);
@@ -448,11 +403,9 @@ export function TrustSectionPage({ section, detail }: { section: TrustSection; d
       ) : (
         <TrustSectionHeader section={section} />
       )}
-      <SubNav section={section} active={active} onSelect={selectTab} />
+      <SubNav theme="trust" section={section} active={active} onSelect={selectTab} />
       {active ? (
         <TrustSubpagePanel section={section} page={active} />
-      ) : section.id === 'labs' ? (
-        <TrustLabsOverview onOpen={selectTab} />
       ) : (
         <>
           <TrustSectionStory section={section} phase="intro" />

@@ -31,28 +31,36 @@ import '@/styles/consent.css';
 import '@/styles/shared.css';
 
 export const metadata: Metadata = {
-  title: 'Nexara | Software Company in Visakhapatnam (Vizag)',
-  description: "Nexara Private Limited: tech training, digital marketing and custom software. Named owners, written scope, claims we can verify. Based in Visakhapatnam, India.",
-  keywords: 'Nexara, Nexara Private Limited, Nexara Academy, Nexara Digital Marketing, Nexara Labs, talent development, AI development India, digital marketing agency, tech training Visakhapatnam, software development India',
-  authors: [{ name: 'Nexara Private Limited' }],
+  metadataBase: new URL('https://nexaragroups.com'),
+  title: 'Nexara | Software Company in Vizag & Website Development',
+  description: 'Nexara Private Limited builds software, websites, SaaS and digital marketing from MVP Colony, Visakhapatnam (Vizag). Call 9257535757.',
+  keywords: 'Nexara, Nexera, Nexera Vizag, Nexara Vizag, Nexara Groups, Nexara Private Limited, software company in Vizag, websites in vizag, best websites contacts in Vizag, web development Visakhapatnam, IT company in Vizag, Next.js React developers Vizag, Nexara Voice, Agency OS, HappyGrow, MVP Colony software company, Sai Nirmaan Architects, Sri Engineering Works, Happy Farms, Rise Medical Hub, Qualigene',
+  authors: [{ name: 'Nexara Private Limited', url: 'https://nexaragroups.com' }],
+  category: 'Technology',
   robots: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1',
   openGraph: {
     type: 'website',
     siteName: 'Nexara',
-    title: 'Nexara | Tech Training, Digital Marketing & Software',
-    description: 'Three teams, one standard. Nexara Private Limited builds careers, grows brands and ships production software, all from one house.',
+    title: 'Nexara | Software Company in Vizag & Website Development',
+    description: 'Custom software, websites, AI products, and tech talent training from MVP Colony, Visakhapatnam. Shipped for real clients.',
     url: 'https://nexaragroups.com/',
-    images: [{ url: 'https://nexaragroups.com/brand/og-image.png', width: 1200, height: 630, alt: 'Nexara | Tech Training, Digital Marketing & Software' }],
+    images: [{ url: 'https://nexaragroups.com/brand/og-image.png', width: 1200, height: 630, alt: 'Nexara - Software, Websites & Digital Growth in Visakhapatnam' }],
     locale: 'en_IN',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Nexara | Tech Training, Digital Marketing & Software',
-    description: 'Three teams, one standard. Nexara builds careers, grows brands and ships production software, all from one house.',
+    title: 'Nexara | Software Company in Vizag & Website Development',
+    description: 'Custom software, websites, AI products, and tech talent training from MVP Colony, Visakhapatnam. Shipped for real clients.',
     images: ['https://nexaragroups.com/brand/og-image.png'],
   },
   icons: { icon: '/brand/nexara-mark.svg' },
   verification: { google: 'fLwXJBPqsWL-8uTW8q2DDuRbOJnOY0WPe3xABNY4ftc' },
+  other: {
+    'geo.region': 'IN-AP',
+    'geo.placename': 'Visakhapatnam',
+    'geo.position': '17.738047;83.341405',
+    'ICBM': '17.738047, 83.341405',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -21,7 +21,7 @@ export function SiteFooter({ theme }: { theme: Theme }) {
         {FOOTER_COLUMNS.map((col) => (
           <nav className="nx-footer-col" aria-label={voiced(col.label, theme)} key={col.label.neo}>
             <span className="nx-footer-label">{voiced(col.label, theme)}</span>
-            {col.links.map((l) => <Link prefetch={false} key={l.label.neo} href={routePath(theme, l.page, l.detail ?? null) + (l.anchor ? '#' + l.anchor : '')}>{voiced(l.label, theme)}</Link>)}
+            {col.links.map((l) => <Link prefetch={false} key={l.label.neo} className={l.sub ? 'is-sub' : undefined} href={routePath(theme, l.page, l.detail ?? null) + (l.anchor ? '#' + l.anchor : '')}>{voiced(l.label, theme)}</Link>)}
           </nav>
         ))}
         <nav className="nx-footer-col" aria-label="Legal">

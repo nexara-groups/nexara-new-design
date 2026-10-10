@@ -19,10 +19,12 @@ Neo and Trust are the same site. Structure is shared; only the **voice** (copy) 
 
 ## How the structure stays identical
 
-- `NAV` (Academy, Marketing, Labs, Proof, Blog, About) plus the always-visible `CONTACT_ENTRY` feed both navs, both mobile menus and both footers.
+- `NAV` (Home, Academy, Marketing, Labs, Proof, Blog, About) plus the always-visible `CONTACT_ENTRY` feed both navs, both mobile menus and both footers.
 - `HOME_FLOW`, `ABOUT_FLOW` and `PROOF_FLOW` are ordered lists. Each page renders them through one `Record<Block, ...>` shared by both themes, so adding a block fails to compile until it is implemented, and Neo and Trust cannot drift.
 - `SiteNav`, `SiteFooter` and `ThemeSwitch` are single components. The switch keeps the visitor on the equivalent page (`/neo/labs` <-> `/trust/labs`).
 - Marketing is one scrolling page (`shared/MarketingPage.tsx`), ordered by `MARKETING_FLOW`. Its service lines (`MARKETING_TRACKS`) are in-page anchors (`#presence`, `#visibility`, `#performance`); old `/marketing/<line>` URLs 301 to the anchor in `next.config.mjs`. Content is `DATA.sections.marketing.page` + `subpages`, chrome copy `COPY.marketing`, skin the `--nx-mk-*` tokens.
+- Academy is one scrolling page (`shared/AcademyPage.tsx`), ordered by `ACADEMY_FLOW`. Tracks are in-page anchors; old detail URLs 301 to the anchor.
+- Labs is the flagship build surface (`shared/LabsPage.tsx`), ordered by `LABS_FLOW` on overview. SubNav groups **Capabilities** (four subpages) and **Products** (product ids as detail routes). Both are real SEO routes (`/labs/products`, `/labs/voice`, …), not anchors. Content is `DATA.sections.labs`, chrome `COPY.labs`, helpers `labsTabs()` in `site.ts`, skin `--nx-lab-*` / `.nx-lab`.
 - Blog posts live in `src/lib/blog.ts`. Neo serves `/blog`, Trust serves `/trust/blog`; Trust canonicalises to the Neo URL.
 - **SEO** lives in `src/lib/seo.ts` + `PageSchema` (title, description, canonical, Open Graph, JSON-LD including BreadcrumbList, Service, FAQPage). Do not add a forced “SEO content” band above the footer. Footer stays brand + 2 link columns (`FOOTER_COLUMNS.length === 2`) + Legal.
 

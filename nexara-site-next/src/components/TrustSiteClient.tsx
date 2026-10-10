@@ -7,12 +7,16 @@ import { setTrustRouter } from '@/lib/trust-router';
 import { NotFound } from './NotFound';
 import { SiteNav } from './shared/SiteNav';
 import { SiteFooter } from './shared/SiteFooter';
+import { Breadcrumbs } from './shared/Breadcrumbs';
 import { Home } from './shared/Home';
 import { TrustSectionPage } from './trust/SectionShell';
-import { TrustContact, TrustConcierge } from './trust/StaticPages';
+import { TrustConcierge } from './trust/StaticPages';
+import { ContactPage } from './shared/ContactPage';
 import { Proof } from './shared/Proof';
 import { About } from './shared/About';
 import { MarketingPage } from './shared/MarketingPage';
+import { AcademyPage } from './shared/AcademyPage';
+import { LabsPage } from './shared/LabsPage';
 import { useSmoothScroll } from './useSmoothScroll';
 
 function setupTsxFade() {
@@ -43,8 +47,8 @@ function TrustSite({ page, detail }: { page: string; detail: string | null }) {
   const router = useRouter();
   React.useEffect(() => { setTrustRouter(router); }, [router]);
   useSmoothScroll();
-  const section = (DATA.sections as Record<string, typeof DATA.sections.academy>)[page];
-  React.useEffect(() => { window.scrollTo(0, 0); }, [page]);
+  const section = (DATA.sections as Record<string, (typeof DATA.sections)[keyof typeof DATA.sections]>)[page];
+  React.useEffect(() => { window.scrollTo(0, 0); }, [page, detail]);
   React.useEffect(() => setupTsxFade(), [page, detail]);
   React.useEffect(() => {
     const sel = '.tsx-sol-card,.tsx-gov-card,.tsx-proof-case-card,.tsx-pkg-card,.tsx-subpage-icon-card,.tsx-matrix-row,.tsx-channel-card,.tsx-deliver-card';
@@ -67,15 +71,23 @@ function TrustSite({ page, detail }: { page: string; detail: string | null }) {
   }, []);
   const validPage = section || STATIC_PAGES.includes(page);
   return (
-    <div className="site trust tsx-site">
+    <div className={`site trust tsx-site${page === 'home' ? ' trust-home' : page === 'labs' ? ' trust-labs' : ''}`}>
       <a className="skip-link" href="#main">Skip to content</a>
       <SiteNav theme="trust" page={page} detail={detail} />
       <div id="main">
+        {(page !== 'home' || !validPage) && (
+          <Breadcrumbs
+            theme="trust"
+            page={validPage ? page : 'notfound'}
+            detail={validPage ? detail : null}
+            currentLabel={validPage ? undefined : 'Not found'}
+          />
+        )}
         {page === 'home'      && <Home theme="trust" />}
-        {section              && (page === 'marketing' ? <MarketingPage theme="trust" /> : <TrustSectionPage section={section} detail={detail} />)}
+        {section && (page === 'marketing' ? <MarketingPage theme="trust" /> : page === 'academy' ? <AcademyPage theme="trust" /> : page === 'labs' ? <LabsPage theme="trust" detail={detail} /> : <TrustSectionPage section={section} detail={detail} />)}
         {page === 'customers' && <Proof theme="trust" detail={detail} />}
         {page === 'company'   && <About theme="trust" />}
-        {page === 'contact'   && <TrustContact detail={detail} />}
+        {page === 'contact'   && <ContactPage theme="trust" detail={detail} />}
         {!validPage           && <NotFound theme="trust" page={page} />}
       </div>
       <TrustConcierge page={page} />

@@ -15,12 +15,6 @@ import { SubNav } from './Nav';
 import { useSectionTabs } from '../useSectionTabs';
 import { CyclingWord } from './Hero';
 import { AcademyHero, AcademyOverview } from './Academy';
-import { LabsHero } from './MarketingLabs';
-import { LabsProblemTable, LabsLayerMap, LabsModuleMeta, LabsStages, LabsProofMap } from '../shared/LabsMap';
-import { LabsProducts, LabsSpecialisms } from '../shared/LabsShowcase';
-import { PackageGrid } from '../ui/package-card';
-import { COPY } from '@/lib/copy';
-import { LABS_FLOW, voiced, type LabsBlock } from '@/lib/site';
 import { ModuleCard, CARD_MOTION } from './Cards';
 
 // See trust/Hero.tsx for why this is repeated per-file rather than centralized.
@@ -495,12 +489,10 @@ function SectionPage({ theme, section, detail }: SectionPageProps) {
         <NeoSectionHeroUnravel theme={theme} section={section} />
       ) : section.id === "academy" ? (
         <AcademyHero theme={theme} section={section} />
-      ) : section.id === "labs" ? (
-        <LabsHero theme={theme} section={section} />
       ) : (
         <HeroBanner compact theme={theme} section={section} eyebrow={section.hero[theme].eyebrow} title={section.hero[theme].title} accent={section.hero[theme].accent} body={section.hero[theme].body} />
       )}
-      <SubNav section={section} active={active} onSelect={selectTab} />
+      <SubNav theme={theme} section={section} active={active} onSelect={selectTab} />
       <div key={active?.slug || "overview"} className="section-content-enter" id="section-panel" role="tabpanel">
         {active ? (
           <>
@@ -508,66 +500,13 @@ function SectionPage({ theme, section, detail }: SectionPageProps) {
             <SubpageDetail theme={theme} section={section} page={active} />
           </>
         ) : (
-          <>
-            {section.id === 'academy' ? (
-              <AcademyOverview theme={theme} section={section as typeof DATA.sections.academy} />
-            ) : section.id === 'labs' ? (
-              <LabsOverview theme={theme} onOpen={selectTab} />
-            ) : null}
-          </>
+          section.id === 'academy' ? (
+            <AcademyOverview theme={theme} section={section as typeof DATA.sections.academy} />
+          ) : null
         )}
       </div>
     </main>
   );
-}
-
-/* Labs overview: LABS_FLOW is shared with Trust (trust/SectionShell.tsx). Same blocks, same order. */
-function LabsOverview({ theme, onOpen }: { theme: Theme; onOpen: (slug: string | null) => void }) {
-  const labs = DATA.sections.labs;
-  const head = (block: Exclude<LabsBlock, 'map' | 'cta'>) => (
-    <div className="section-head">
-      <div>
-        <p className="eyebrow">{voiced(COPY.labs[block].kicker, theme)}</p>
-        <h2>{voiced(COPY.labs[block].title, theme)}</h2>
-      </div>
-    </div>
-  );
-  const BLOCKS: Record<LabsBlock, () => React.ReactNode> = {
-    problems: () => <section className="content-band">{head('problems')}<LabsProblemTable theme={theme} /></section>,
-    map: () => <LabsLayerMap theme={theme} />,
-    modules: () => (
-      <section className="modules-band">
-        {head('modules')}
-        <div className="module-grid nx-bento">
-          {labs.modules.map((m, i) => (
-            <ModuleCard
-              key={m.id}
-              theme={theme}
-              eyebrow={`Module 0${i + 1}`}
-              title={m.title}
-              visualTitle={m.title}
-              footer={<LabsModuleMeta theme={theme} moduleId={m.id} onOpen={onOpen} />}
-            >
-              {voiced(m.problem, theme)}
-            </ModuleCard>
-          ))}
-        </div>
-      </section>
-    ),
-    specialisms: () => <section className="content-band">{head('specialisms')}<LabsSpecialisms theme={theme} /></section>,
-    stages: () => <section className="content-band">{head('stages')}<LabsStages theme={theme} /></section>,
-    proof: () => <section className="content-band">{head('proof')}<LabsProofMap theme={theme} /></section>,
-    products: () => <section className="content-band">{head('products')}<LabsProducts theme={theme} /></section>,
-    engage: () => (
-      <section className="content-band" id="labs-engage">
-        {head('engage')}
-        <PackageGrid packages={labs.packages} ctaLabel={voiced(COPY.labs.engage.cta, theme)} onSelect={() => routeTo(theme, 'contact', 'labs')} />
-      </section>
-    ),
-    faqs: () => <><div className="content-band">{head('faqs')}</div><FAQ section={labs} bare /></>,
-    cta: () => <IntakeCTA theme={theme} section={labs} />,
-  };
-  return <>{LABS_FLOW.map((block) => <React.Fragment key={block}>{BLOCKS[block]()}</React.Fragment>)}</>;
 }
 
 interface SubpageDetailProps {

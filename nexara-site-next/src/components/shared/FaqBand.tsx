@@ -12,15 +12,17 @@ export function FaqBand({
   copy,
   faqs,
   id = 'nx-faq-h',
+  sectionId,
 }: {
   theme: Theme;
   copy: FaqCopy;
   faqs: [string, string][];
   id?: string;
+  sectionId?: string;
 }) {
   if (!faqs.length) return null;
   return (
-    <section className="nx-section nx-faq" aria-labelledby={id}>
+    <section className="nx-section nx-faq" id={sectionId} aria-labelledby={id}>
       <div className="nx-inner">
         <p className="nx-kicker">{voiced(copy.kicker, theme)}</p>
         <h2 className="nx-h2" id={id}>{voiced(copy.title, theme)}</h2>

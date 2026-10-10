@@ -4,20 +4,20 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DATA } from '@/lib/data';
 import { COPY } from '@/lib/copy';
+import Link from 'next/link';
 import { CLIENTS } from '@/lib/clients';
+import { routePath } from '@/lib/seo';
 import { voiced, type Theme } from '@/lib/site';
-import { ClientCard } from './ClientCard';
 
 // Other code (MarketingLabs funnel) relies on window.gsap being set.
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 if (typeof window !== 'undefined') Object.assign(window, { gsap, ScrollTrigger });
 
-// Every Labs block reads the one Labs record, so the mappings (problem -> package, layer -> module ->
-// deliverable, stage -> output, client -> layer) cannot drift between Neo and Trust.
+// Every Labs block reads the one Labs record, so the mappings (layer -> deliverable, stage -> output,
+// client -> module) cannot drift between Neo and Trust.
 const LABS = DATA.sections.labs;
 type LayerId = (typeof LABS.layers)[number]['id'];
 
-const layerLabel = (id: string) => LABS.layers.find((l) => l.id === id)?.label ?? id;
 const stackOf = (title: string) => LABS.stackDetails.find((d) => d.title === title);
 const moduleOf = (id: string) => LABS.modules.find((m) => m.id === id);
 
@@ -45,62 +45,24 @@ export function labsAnchor(kind: 'proof' | 'product', id: string) {
   return `labs-${kind}-${slug}`;
 }
 
-function scrollToId(id: string) {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-/* ── 1. Problems: who | pain | start with ─────────────────────────── */
-export function LabsProblemTable({ theme }: { theme: Theme }) {
-  const c = COPY.labs.problems;
-  return (
-    <div className="nx-labs-table" role="table">
-      <div className="nx-labs-row is-head" role="row">
-        <span role="columnheader">{voiced(c.who, theme)}</span>
-        <span role="columnheader">{voiced(c.pain, theme)}</span>
-        <span role="columnheader">{voiced(c.start, theme)}</span>
-      </div>
-      {LABS.audiences.map((a) => (
-        <div className="nx-labs-row" role="row" key={a.id}>
-          <span className="nx-labs-who" role="cell">{a.title}</span>
-          <span className="nx-labs-pain" role="cell">{voiced(a.pain, theme)}</span>
-          <span role="cell">
-            <a
-              className="nx-labs-chip is-link"
-              href="#labs-engage"
-              onClick={(e) => { e.preventDefault(); scrollToId('labs-engage'); }}
-            >
-              {a.package} <span aria-hidden="true">→</span>
-            </a>
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/* ── 2. Layer map: all four layers visible, no scroll pin ───────── */
-export function LabsLayerMap({ theme }: { theme: Theme }) {
+/* ── Layer map: all four layers visible, no scroll pin ───────── */
+export function LabsLayerMap({ theme, id }: { theme: Theme; id?: string }) {
   const c = COPY.labs.map;
 
   return (
-    <section className="nx-labs-build is-static" aria-label={voiced(c.title, theme)}>
+    <section className="nx-labs-build is-static" id={id} aria-label={voiced(c.title, theme)}>
       <div className="nx-labs-split">
         <div className="nx-labs-copy">
           <p className="nx-labs-kicker">{voiced(c.kicker, theme)}</p>
           <h2 className="nx-labs-title">{voiced(c.title, theme)}</h2>
           <div className="nx-labs-caps">
             {LABS.layers.map((layer, i) => {
-              const mods = LABS.modules.filter((m) => (m.layers as readonly string[]).includes(layer.id));
               const ships = pickDeliverables(layer.id);
-              const clients = LABS.proofMap.filter((p) => (p.layers as readonly string[]).includes(layer.id));
               return (
                 <div className="nx-build-cap" data-layer={layer.id} key={layer.id}>
                   <h3><span className="nx-labs-n">{String(i + 1).padStart(2, '0')}</span> {layer.label}</h3>
                   <p className="nx-labs-line">{voiced(layer.line, theme)}</p>
-                  {mods.length > 0 && <Chips label={voiced(c.modules, theme)}>{mods.map((m) => <span className="nx-labs-chip" key={m.id}>{m.title}</span>)}</Chips>}
                   {ships.length > 0 && <Chips label={voiced(c.ships, theme)}>{ships.map((d) => <span className="nx-labs-chip is-soft" key={d}>{d}</span>)}</Chips>}
-                  {clients.length > 0 && <Chips label={voiced(c.clients, theme)}>{clients.map((p) => <span className="nx-labs-chip is-client" key={p.client}>{p.client}</span>)}</Chips>}
                 </div>
               );
             })}
@@ -146,26 +108,13 @@ export function LabsLayerMap({ theme }: { theme: Theme }) {
   );
 }
 
-/* ── 3. Module meta: layers, deliverables, client, Open ──────────── */
+/* ── Module meta: Open (clients are already in the proof band) ───────── */
 export function LabsModuleMeta({ theme, moduleId, onOpen }: { theme: Theme; moduleId: string; onOpen: (slug: string) => void }) {
   const m = moduleOf(moduleId);
   if (!m) return null;
   const c = COPY.labs.modules;
-  const ships = stackOf(m.stack)?.deliverables ?? [];
-  const clients = LABS.proofMap.filter((p) => p.module === m.id);
   return (
     <span className="nx-labs-meta">
-      <Chips label={voiced(c.layers, theme)}>
-        {m.layers.map((id) => <span className="nx-labs-chip" data-layer={id} key={id}>{layerLabel(id)}</span>)}
-      </Chips>
-      <Chips label={voiced(c.ships, theme)}>
-        {ships.map((d) => <span className="nx-labs-chip is-soft" key={d}>{d}</span>)}
-      </Chips>
-      {clients.length > 0 && (
-        <Chips label={voiced(c.seen, theme)}>
-          {clients.map((p) => <span className="nx-labs-chip is-client" key={p.client}>{p.client}</span>)}
-        </Chips>
-      )}
       <button type="button" className="nx-labs-open" onClick={() => onOpen(m.subpage)}>
         {voiced(c.open, theme)} <span aria-hidden="true">→</span>
       </button>
@@ -173,7 +122,7 @@ export function LabsModuleMeta({ theme, moduleId, onOpen }: { theme: Theme; modu
   );
 }
 
-/* ── 4. Stages: pipeline + gate + outputs ────────────────────────── */
+/* ── Stages: gate + outputs (the pipeline itself is in the hero) ───── */
 export function LabsPipeline({ nodes }: { nodes: { n: string; label: string }[] }) {
   return (
     <div className="neo-pipe" aria-hidden="true">
@@ -195,7 +144,6 @@ export function LabsStages({ theme }: { theme: Theme }) {
   const c = COPY.labs.stages;
   return (
     <div className="nx-labs-stages">
-      <LabsPipeline nodes={LABS_PIPE_NODES} />
       <ol className="nx-labs-stagelist">
         {LABS.process.map((p) => (
           <li key={p.step}>
@@ -213,21 +161,66 @@ export function LabsStages({ theme }: { theme: Theme }) {
   );
 }
 
-/* ── 5. Proof: real clients, each tagged with layers and module ──── */
+/* ── Proof: Websites (Marketing) banner + equal software cards ───────── */
 export function LabsProofMap({ theme }: { theme: Theme }) {
+  const c = COPY.labs.proof;
+  const websiteLogos = LABS.websites
+    .map((w) => CLIENTS.find((x) => x.name === w.name))
+    .filter((x): x is NonNullable<typeof x> => !!x);
+
   return (
     <div className="nx-labs-proof">
-      {LABS.proofMap.map((p, i) => {
+      <article className="nx-labs-proof-card is-wide" id={labsAnchor('proof', 'websites')}>
+        <span className="nx-labs-proof-logos" aria-hidden="true">
+          {websiteLogos.map((client) => (
+            <img key={client.name} src={client.logo} alt="" loading="lazy" decoding="async" />
+          ))}
+        </span>
+        <h3>{voiced(c.websitesTitle, theme)}</h3>
+        <p>
+          <b>{voiced(c.built, theme)}</b>
+          {voiced(c.websitesBuilt, theme)}
+        </p>
+        <span className="nx-labs-proof-actions">
+          <Link prefetch={false} className="nx-labs-open" href={routePath(theme, 'marketing')}>
+            {voiced(c.websitesCta, theme)} <span aria-hidden="true">→</span>
+          </Link>
+        </span>
+      </article>
+      {LABS.proofMap.map((p) => {
         const client = CLIENTS.find((x) => x.name === p.client);
-        if (!client) return null;
+        const mod = moduleOf(p.module);
+        const record = LABS.proof.find((x) => x.name === p.client);
+        const product = 'product' in p && p.product
+          ? LABS.products.find((x) => x.id === p.product)
+          : undefined;
+        if (!client || !mod) return null;
+        const built = record ? voiced(record.result, theme) : client.scope.slice(0, 3).join(' · ');
         return (
-          <div className="nx-labs-proof-item" id={labsAnchor('proof', p.client)} key={p.client}>
-            <ClientCard client={client} index={i} theme={theme} />
-            <Chips>
-              {p.layers.map((id) => <span className="nx-labs-chip" data-layer={id} key={id}>{layerLabel(id)}</span>)}
-              <span className="nx-labs-chip is-soft">{moduleOf(p.module)?.title}</span>
-            </Chips>
-          </div>
+          <article className="nx-labs-proof-card" id={labsAnchor('proof', p.client)} key={p.client}>
+            <span className="nx-labs-proof-logo" aria-hidden="true">
+              <img src={client.logo} alt="" loading="lazy" decoding="async" />
+            </span>
+            <h3>{client.name}</h3>
+            <p>
+              <b>{voiced(c.built, theme)}</b>
+              {built}
+            </p>
+            <span className="nx-labs-proof-actions">
+              {product ? (
+                <Link prefetch={false} className="nx-labs-open" href={routePath(theme, 'labs', product.id)}>
+                  {voiced(c.product, theme)}: {product.name} <span aria-hidden="true">→</span>
+                </Link>
+              ) : (
+                <Link prefetch={false} className="nx-labs-open" href={routePath(theme, 'labs', mod.subpage)}>
+                  {voiced(c.capability, theme)}: {mod.title} <span aria-hidden="true">→</span>
+                </Link>
+              )}
+              <a className="nx-labs-open is-ext" href={client.url} target="_blank" rel="noopener noreferrer">
+                {voiced(c.site, theme)} <span aria-hidden="true">↗</span>
+              </a>
+            </span>
+          </article>
         );
       })}
     </div>

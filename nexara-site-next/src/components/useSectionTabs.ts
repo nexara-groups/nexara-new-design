@@ -3,10 +3,11 @@
 import React from 'react';
 import { getLenis } from './useSmoothScroll';
 
-function restoreScroll(y: number) {
-  const pin = Math.max(0, y);
-  window.scrollTo(0, pin);
-  getLenis()?.scrollTo(pin, { immediate: true });
+function scrollToTop() {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lenis = getLenis();
+  if (lenis) lenis.scrollTo(0, { immediate: reduced });
+  else window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
 }
 
 /**
@@ -14,12 +15,14 @@ function restoreScroll(y: number) {
  * Overview ↔ detail used to remount the RSC/client tree (different page files,
  * or soft-nav still resetting Lenis) and jump to top. Tab switches stay on the
  * mounted Site shell; URL updates via history for shareable deep links + Back.
+ * Detail panels are short — always land at top so content is visible.
  */
-export function useSectionTabs<T extends { slug: string; title: string }>(
-  theme: string,
-  section: { id: string; subpages: readonly T[] },
-  detail: string | null | undefined,
-) {
+// Constrain on the section object (not a single subpage element type) so
+// academy/marketing (with heading) and labs (with seenIn, no heading) can
+// share this hook without forcing a common subpage shape.
+export function useSectionTabs<
+  S extends { id: string; subpages: readonly { slug: string; title: string }[] },
+>(theme: string, section: S, detail: string | null | undefined) {
   const [tabSlug, setTabSlug] = React.useState<string | null>(detail ?? null);
 
   React.useEffect(() => {
@@ -32,6 +35,7 @@ export function useSectionTabs<T extends { slug: string; title: string }>(
       const idx = parts.indexOf(section.id);
       const next = idx >= 0 ? (parts[idx + 1] ?? null) : null;
       setTabSlug(next && section.subpages.some((p) => p.slug === next) ? next : null);
+      scrollToTop();
     };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
@@ -39,23 +43,22 @@ export function useSectionTabs<T extends { slug: string; title: string }>(
 
   const selectTab = React.useCallback(
     (slug: string | null) => {
-      const y = window.scrollY;
       setTabSlug(slug);
       const href = slug ? `/${theme}/${section.id}/${slug}` : `/${theme}/${section.id}`;
       if (location.pathname !== href) {
         window.history.pushState({ sectionTab: slug }, '', href);
       }
-      restoreScroll(y);
+      scrollToTop();
       requestAnimationFrame(() => {
-        restoreScroll(y);
-        requestAnimationFrame(() => restoreScroll(y));
+        scrollToTop();
+        requestAnimationFrame(() => scrollToTop());
       });
     },
     [theme, section.id],
   );
 
   const active = React.useMemo(
-    () => (tabSlug ? section.subpages.find((p) => p.slug === tabSlug) ?? null : null),
+    () => (tabSlug ? section.subpages.find((p) => p.slug === tabSlug) ?? null : null) as S['subpages'][number] | null,
     [section.subpages, tabSlug],
   );
 

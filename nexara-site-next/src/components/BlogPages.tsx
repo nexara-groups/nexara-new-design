@@ -32,7 +32,9 @@ export async function BlogPostPage({ theme, params }: { theme: Theme; params: Pr
   return (
     <>
       <BlogSchema data={getBlogPostStructuredData(post)} />
-      <BlogShell theme={theme} detail={post.slug}><BlogPostView post={post} theme={theme} /></BlogShell>
+      <BlogShell theme={theme} detail={post.slug} currentLabel={post.title}>
+        <BlogPostView post={post} theme={theme} />
+      </BlogShell>
     </>
   );
 }

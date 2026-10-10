@@ -4558,3 +4558,134 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust.tsx-site :is(.tsx-story-light-band, .tsx-overview, .tsx-acad-who-card) :is(.tsx-btn-ghost, .tsx-sec-btn-ghost):hover {
   border-color: var(--tr-green); color: var(--tr-green-deep); background: var(--tr-green-wash);
 }
+
+/* ═══ Home: logo brand-kit blues (action #215F94, accent #66A0CC, navy) ═══
+   The --tr-green-* names are kept so every token consumer follows; only the values change.
+   Must stay on the same element as .trust so derived tokens resolve against these values. */
+.trust.tsx-site.trust-home {
+  --tr-paper: #f5f7fa; --tr-mist: #f1f4f8;
+  --tr-line: #dde3eb; --tr-line-2: #e9edf2;
+  --tr-ink: #131c2a; --tr-ink-2: #364154; --tr-muted: #586274; --tr-faint: #636d7e;
+  --tr-green: #215f94; --tr-green-deep: #184a75; --tr-green-wash: #edf3f9; --tr-green-light: #9fc4e6;
+  --tr-shadow-rgb: 19, 28, 42;
+  --muted: #5a6475; --ink-2: #5a6475; --ink-3: #7c8595;
+  --line: rgba(19, 28, 42, .13); --line-2: rgba(19, 28, 42, .18);
+  --blueprint: #66a0cc; --vermilion: #66a0cc; --accent: #66a0cc; --accent-2: #3f7fb5;
+  --accent-fg: #eaf2fa; --ring: rgba(33, 95, 148, .26);
+  --dark: #0d1522; --tsx-hero-bg: #0d1522; --tsx-handoff-bg: var(--tr-paper);
+  --nx-wash-line: rgba(33, 95, 148, .3); --nx-dot-ring: rgba(33, 95, 148, .16);
+  --nx-card-line: rgba(19, 28, 42, .12); --nx-card-ink: #131c2a; --nx-card-muted: #586274; --nx-card-accent: #131c2a;
+  --nx-card-glow: rgba(33, 95, 148, .75); --nx-card-wash: rgba(33, 95, 148, .08);
+  --depth-ink: #131c2a; --depth-accent: #215f94;
+  --nx-bl-ask-line: #d4e2f0; --nx-bl-dots: rgba(33, 95, 148, .18);
+  --nx-lab-bg: #0d1522; --nx-lab-ui: #c6daee;
+  --shadow-sheet: 0 6px 14px rgba(19, 28, 42, .06), 0 20px 42px -12px rgba(19, 28, 42, .18);
+  background: var(--tr-paper);
+}
+.trust.trust-home .tsx-hero-chapter::before {
+  background: radial-gradient(ellipse 60% 48% at 50% 46%, #101a29 42%, color-mix(in srgb, #101a29 62%, transparent) 64%, transparent 82%);
+}
+.trust.trust-home .nx-nav-cta,
+.trust.trust-home .nx-nav-sheet-cta { background: var(--tr-green); color: #fff; }
+.trust.trust-home .nx-nav-cta:hover,
+.trust.trust-home .nx-nav-sheet-cta:hover { background: var(--tr-green-deep); box-shadow: 0 10px 24px -10px rgba(33, 95, 148, .6); }
+.trust.tsx-site.trust-home .hero-intro > p { color: #f3f7fc; }
+.trust.tsx-site.trust-home .hero-intro > p span { color: #c9daec; }
+.trust.tsx-site.trust-home .hero-intro__links a:first-child {
+  background: #2b6ca6 !important; border-color: #2b6ca6;
+  box-shadow: 0 10px 28px -12px rgba(43, 108, 166, .7), inset 0 1px 0 rgba(255, 255, 255, .18) !important;
+}
+.trust.tsx-site.trust-home .hero-intro__links a:first-child:hover { background: #3779b3 !important; border-color: #3779b3; }
+.trust.tsx-site.trust-home .hero-intro__links a:not(:first-child) { border-color: rgba(201, 218, 236, .5) !important; }
+
+.trust.tsx-site.trust-home .tsx-hero-stage {
+  background:
+    linear-gradient(rgba(159, 196, 230, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(159, 196, 230, .04) 1px, transparent 1px),
+    radial-gradient(ellipse 54% 48% at 78% 12%, rgba(102, 160, 204, .30), transparent 58%),
+    radial-gradient(ellipse 58% 48% at 8% 88%, rgba(33, 95, 148, .40), transparent 62%),
+    radial-gradient(ellipse 38% 34% at 90% 78%, rgba(159, 196, 230, .14), transparent 58%),
+    linear-gradient(165deg, #182437 0%, #111a2a 54%, #0a101a 100%) !important;
+}
+.trust-home .hero-lighting__wash { background: radial-gradient(ellipse at 16% 5%, rgba(159, 196, 230, .22), transparent 50%), radial-gradient(ellipse at 85% 70%, rgba(33, 95, 148, .18), transparent 48%); }
+.trust-home .hero-lighting__lens { border-color: rgba(159, 196, 230, .18); box-shadow: 0 12px 90px rgba(33, 95, 148, .1), inset 0 -18px 70px rgba(33, 95, 148, .1); }
+.trust-home .hero-spotlight { background: radial-gradient(circle at center, rgba(159, 196, 230, .18), transparent 68%); }
+
+.trust.tsx-site.trust-home .tsx-hero-title--strike span { color: rgba(176, 206, 236, .68); text-shadow: 0 0 30px rgba(102, 160, 204, .22); }
+.trust.tsx-site.trust-home .tsx-wordmark-beam {
+  background: linear-gradient(90deg, transparent, rgba(176, 206, 236, .55) 30%, #f2f7fd 50%, rgba(176, 206, 236, .55) 70%, transparent);
+}
+.trust.tsx-site.trust-home .tsx-wordmark-beam::before { background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(176, 206, 236, .28), transparent 70%); }
+
+.trust.tsx-site.trust-home .tsx-hero-chapter .tsx-section-eyebrow,
+.trust.tsx-site.trust-home .tsx-hero-chapter .tsx-panel-idx,
+.trust.tsx-site.trust-home .tsx-hero-rail button.is-active::after,
+.trust.tsx-site.trust-home .tsx-hero-chapter .tsx-section-heading .serif { color: #a9c9e8 !important; }
+.trust.tsx-site.trust-home .tsx-hero-chapter .tsx-sec-body,
+.trust.tsx-site.trust-home .tsx-scroll-cue,
+.trust.tsx-site.trust-home .tsx-hero-counter { color: #dde8f3; }
+.trust.tsx-site.trust-home .tsx-hero-chapter .tsx-btn-cta {
+  background: #2b6ca6 !important; color: #fff !important; border: 1px solid #2b6ca6;
+  box-shadow: 0 10px 28px -12px rgba(43, 108, 166, .7) !important;
+  transition: background .2s, transform .2s, box-shadow .2s;
+}
+.trust.tsx-site.trust-home .tsx-hero-chapter .tsx-btn-cta:hover {
+  background: #3779b3 !important; border-color: #3779b3; transform: translateY(-1px);
+  box-shadow: 0 14px 34px -12px rgba(102, 160, 204, .75) !important;
+}
+.trust.tsx-site.trust-home .tsx-hero-chapter .tsx-sec-btn-ghost:hover { border-color: #a9c9e8 !important; color: #a9c9e8 !important; }
+
+.trust.tsx-site.trust-home .tsx-hero-particles::before {
+  background:
+    radial-gradient(circle at 22% 28%, rgba(33, 95, 148, .34), transparent 18%),
+    radial-gradient(circle at 76% 42%, rgba(159, 196, 230, .22), transparent 22%),
+    radial-gradient(circle at 54% 72%, rgba(33, 95, 148, .2), transparent 18%);
+}
+.trust.tsx-site.trust-home .tsx-hero-particle {
+  background: #eef4fb !important;
+  box-shadow: 0 0 10px rgba(238, 244, 251, .95), 0 0 24px rgba(159, 196, 230, .74), 0 0 48px rgba(33, 95, 148, .46);
+}
+.trust.tsx-site.trust-home .tsx-hero-particle:nth-child(3n) { background: #a9c9e8 !important; }
+.trust.tsx-site.trust-home .tsx-hero-energy-thread {
+  background: linear-gradient(90deg, transparent 0%, rgba(159, 196, 230, .32) 24%, rgba(238, 244, 251, .96) 100%);
+  box-shadow: 0 0 18px rgba(159, 196, 230, .74), 0 0 44px rgba(33, 95, 148, .42);
+}
+.trust.tsx-site.trust-home .tsx-hero-energy-comet {
+  background: #f5f8fc;
+  box-shadow: 0 0 12px rgba(248, 251, 255, .98), 0 0 32px rgba(159, 196, 230, .88), 0 0 68px rgba(33, 95, 148, .58);
+}
+.trust.tsx-site.trust-home .tsx-hero-energy-digit { color: #eef4fb; border-color: rgba(159, 196, 230, .52); background: rgba(33, 95, 148, .22); }
+.trust.tsx-site.trust-home .tsx-hero-energy-reflection {
+  background: linear-gradient(90deg, rgba(238, 244, 251, .92) 0%, rgba(159, 196, 230, .46) 44%, transparent 100%);
+  box-shadow: 0 0 18px rgba(159, 196, 230, .74);
+}
+@media (max-width: 760px) {
+  .trust.tsx-site.trust-home .tsx-hero-energy-comet { box-shadow: 0 0 18px rgba(159, 196, 230, .76) !important; }
+  .trust.tsx-site.trust-home .tsx-hero-energy-thread,
+  .trust.tsx-site.trust-home .tsx-hero-energy-reflection { filter: drop-shadow(0 0 5px rgba(159, 196, 230, .62)); }
+}
+
+.trust.trust-home :is(.nx-strip, .nx-cap-strip) .nx-text-link { color: #a9c9e8; }
+.trust.trust-home .nx-btn { box-shadow: 0 10px 26px -14px rgba(33, 95, 148, .65); transition: background .2s, transform .2s, box-shadow .2s; }
+.trust.trust-home .nx-btn:hover { background: var(--tr-green-deep); transform: translateY(-1px); box-shadow: 0 16px 32px -14px rgba(33, 95, 148, .7); }
+.trust.trust-home .tsx-concierge { box-shadow: 0 10px 30px -10px rgba(33, 95, 148, .55); }
+.trust.trust-home .tsx-concierge-dot { animation-name: tsxConciergePulseBlue; }
+@keyframes tsxConciergePulseBlue { 0% { box-shadow: 0 0 0 0 rgba(169, 201, 232, .6); } 70% { box-shadow: 0 0 0 7px rgba(169, 201, 232, 0); } 100% { box-shadow: 0 0 0 0 rgba(169, 201, 232, 0); } }
+
+/* ═══ Labs / Product Studio: amber is the team accent, so the green tokens point at the amber ramp ═══
+   Same mechanism as .trust-home. #8a4b12 is for light grounds only (6.2:1 on paper); on the dark
+   layer map and pipeline use #f0b47a. */
+.trust.tsx-site.trust-labs {
+  --tr-green: #8a4b12; --tr-green-deep: #6e3b0d; --tr-green-wash: #fbf5ee; --tr-green-light: #f0b47a;
+  --accent: #8a4b12; --blueprint: #8a4b12; --vermilion: #8a4b12; --accent-fg: #fbf5ee;
+  --ring: rgba(138, 75, 18, .26);
+  --nx-wash-line: rgba(138, 75, 18, .3); --nx-dot-ring: rgba(138, 75, 18, .16);
+  --nx-card-glow: rgba(138, 75, 18, .75); --nx-card-wash: rgba(138, 75, 18, .08);
+  --depth-accent: #8a4b12;
+  --nx-lab-bg: #17130e; --nx-lab-ui: #f3dcc3;
+}
+.trust.trust-labs .neo-pipe { --accent: #f0b47a; }
+.trust.trust-labs .nx-pkg-list svg { color: #8a4b12; }
+.trust.trust-labs .nx-footer::before { background: linear-gradient(90deg, #215f94 0 33.3%, var(--tr-plum) 33.3% 66.6%, #8a4b12 66.6%); }
+.trust.trust-labs .tsx-concierge-dot { animation-name: tsxConciergePulseAmber; }
+@keyframes tsxConciergePulseAmber { 0% { box-shadow: 0 0 0 0 rgba(240, 180, 122, .6); } 70% { box-shadow: 0 0 0 7px rgba(240, 180, 122, 0); } 100% { box-shadow: 0 0 0 0 rgba(240, 180, 122, 0); } }
