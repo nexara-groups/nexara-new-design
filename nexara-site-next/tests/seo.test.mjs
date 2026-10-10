@@ -141,6 +141,19 @@ test('titles and descriptions fit a search result', () => {
   }
 });
 
+test('brand domains redirect on the worker, including Slovenia', () => {
+  const hosts = ['nexaraprivatelimited.com', 'nexaraprivatelimited.in', 'nexaraprivatelimited.si'];
+  const middleware = fs.readFileSync(new URL('../src/middleware.ts', import.meta.url), 'utf8');
+  const wrangler = fs.readFileSync(new URL('../wrangler.toml', import.meta.url), 'utf8');
+  for (const host of hosts) {
+    assert.ok(middleware.includes(`'${host}'`), host);
+    assert.ok(wrangler.includes(`pattern = "${host}/*"`), `apex route ${host}`);
+    assert.ok(wrangler.includes(`pattern = "www.${host}/*"`), `www route ${host}`);
+  }
+  assert.ok(middleware.includes('301'));
+  assert.ok(middleware.includes('https://${CANONICAL_HOST}'));
+});
+
 test('all routes have targeted keywords populated', () => {
   const routes = getRoutes();
   for (const route of routes) {

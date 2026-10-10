@@ -9,9 +9,14 @@ routes = [
   # www is served by this Worker only to 301 it to the apex (see src/middleware.ts).
   { pattern = "www.nexaragroups.com/*", zone_name = "nexaragroups.com" },
   # Brand alias domains: served only to 301 to nexaragroups.com (see ALIAS_HOSTS in src/middleware.ts).
-  # The apex hostnames are already attached to this Worker in the dashboard.
+  # Apex and www both have to be routes. A hostname that misses this list never
+  # hits the middleware, which is why .si was still the Hostinger parking page.
+  { pattern = "nexaraprivatelimited.com/*", zone_name = "nexaraprivatelimited.com" },
+  { pattern = "www.nexaraprivatelimited.com/*", zone_name = "nexaraprivatelimited.com" },
+  { pattern = "nexaraprivatelimited.in/*", zone_name = "nexaraprivatelimited.in" },
   { pattern = "www.nexaraprivatelimited.in/*", zone_name = "nexaraprivatelimited.in" },
-  { pattern = "www.nexaraprivatelimited.com/*", zone_name = "nexaraprivatelimited.com" }
+  { pattern = "nexaraprivatelimited.si/*", zone_name = "nexaraprivatelimited.si" },
+  { pattern = "www.nexaraprivatelimited.si/*", zone_name = "nexaraprivatelimited.si" }
 ]
 
 [assets]
