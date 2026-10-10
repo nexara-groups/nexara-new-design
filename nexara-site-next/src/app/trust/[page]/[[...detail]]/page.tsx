@@ -12,9 +12,10 @@ function detailFromParams(detail?: string[]) {
 }
 
 export function generateStaticParams() {
-  return ROUTES.filter((r) => r.theme === 'trust' && r.page !== 'home').map((r) =>
-    r.detail ? { page: r.page, detail: [r.detail] } : { page: r.page },
-  );
+  return ROUTES.filter((r) => r.theme === 'trust' && r.page !== 'home').map((r) => ({
+    page: r.page,
+    detail: r.detail ? [r.detail] : [],
+  }));
 }
 
 export async function generateMetadata({

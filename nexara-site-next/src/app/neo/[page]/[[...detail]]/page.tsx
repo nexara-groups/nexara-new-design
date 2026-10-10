@@ -12,9 +12,12 @@ function detailFromParams(detail?: string[]) {
 }
 
 export function generateStaticParams() {
-  return ROUTES.filter((r) => r.theme === 'neo' && r.page !== 'home').map((r) =>
-    r.detail ? { page: r.page, detail: [r.detail] } : { page: r.page },
-  );
+  // Always include `detail`. Omitting it on some routes makes Next drop the whole set,
+  // so /neo/academy and the rest 404 in production while the sitemap still lists them.
+  return ROUTES.filter((r) => r.theme === 'neo' && r.page !== 'home').map((r) => ({
+    page: r.page,
+    detail: r.detail ? [r.detail] : [],
+  }));
 }
 
 export async function generateMetadata({
