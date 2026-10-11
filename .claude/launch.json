@@ -4,25 +4,49 @@
     {
       "name": "nexara-site-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "nexara-site", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "nexara-site",
+        "run",
+        "dev"
+      ],
       "port": 5173
     },
     {
       "name": "nexara-site-preview",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "nexara-site", "run", "preview"],
+      "runtimeArgs": [
+        "--prefix",
+        "nexara-site",
+        "run",
+        "preview"
+      ],
       "port": 4173
     },
     {
       "name": "nexara-site-next-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "nexara-site-next", "run", "dev"],
-      "port": 3000
+      "runtimeArgs": [
+        "--prefix",
+        "nexara-site-next",
+        "run",
+        "dev"
+      ],
+      "port": 3000,
+      "autoPort": true
     },
     {
       "name": "nexara-site-next-dev-3050",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "nexara-site-next", "run", "dev", "--", "-p", "3050"],
+      "runtimeArgs": [
+        "--prefix",
+        "nexara-site-next",
+        "run",
+        "dev",
+        "--",
+        "-p",
+        "3050"
+      ],
       "port": 3050
     }
   ]

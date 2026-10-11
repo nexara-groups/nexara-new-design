@@ -4723,3 +4723,11 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust.tsx-site.trust-labs { --tr-head-bg: #17130e; --tr-head-glow: rgba(138, 75, 18, .3); --tr-head-link: #f0b47a; }
 .trust.tsx-site.trust-home { --tr-head-bg: #0d1522; --tr-head-glow: rgba(33, 95, 148, .3); --tr-head-link: #a9c9e8; }
 .trust[data-accent="blue"] .nx-footer::before { background: linear-gradient(90deg, #215f94 0 33.3%, var(--tr-plum) 33.3% 66.6%, #8a4b12 66.6%); }
+
+/* Phones and small tablets: "Contact us" already sits in the top bar, so the floating
+   Talk-to-us pill is redundant and collides with the bottom docks. Hide it and let the
+   docks sit at the screen edge. */
+@media (max-width: 880px) {
+  .trust.tsx-site { --nx-float-clear: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .trust .tsx-concierge { display: none; }
+}
