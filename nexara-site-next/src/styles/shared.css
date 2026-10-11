@@ -2254,24 +2254,47 @@ main.nx-pf .nx-pf-result h3 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); font-weig
 
 /* ═══ Neo division colours ═══
    One colour per division, the same three the home divisions rail and hero threads use:
-   Academy violet, Marketing green, Labs pink. Each division page paints its buttons, the top-bar
-   pill and the bottom finder in its own colour. Everything else keeps the lime brand accent. */
+   Academy violet, Marketing green, Labs pink. A division page uses only its own hue: buttons, the
+   top-bar pill, the bottom finder, kickers, hero lines, track colours (shades of the same hue) and
+   check marks. Everything else keeps the lime brand accent. */
 .neo {
   --nx-div-academy: #7c5cff; --nx-div-academy-deep: #6a4de6; --nx-div-academy-on: #fff;
   --nx-div-marketing: #00e5a0; --nx-div-marketing-deep: #00c98c; --nx-div-marketing-on: #000;
   --nx-div-labs: #ff5c8a; --nx-div-labs-deep: #e8457a; --nx-div-labs-on: #000;
 }
+.neo[data-division] {
+  --nx-link: var(--accent); --nx-card-accent: var(--accent);
+  --nx-card-wash: color-mix(in srgb, var(--accent) 16%, transparent);
+  --nx-wash: color-mix(in srgb, var(--accent) 8%, transparent); --nx-wash-line: color-mix(in srgb, var(--accent) 30%, transparent); --nx-wash-ink: color-mix(in srgb, var(--accent) 55%, #fff);
+}
 .neo[data-division="academy"] { --accent: var(--nx-div-academy); --nx-on-accent: var(--nx-div-academy-on); }
 .neo[data-division="marketing"] { --accent: var(--nx-div-marketing); --nx-on-accent: var(--nx-div-marketing-on); }
 .neo[data-division="labs"] { --accent: var(--nx-div-labs); --nx-on-accent: var(--nx-div-labs-on); }
+
+/* Academy: three tracks are three shades of violet. */
+.neo[data-division="academy"] .nx-ac {
+  --nx-ac-learn: #7c5cff; --nx-ac-build: #a893ff; --nx-ac-place: #5a3fe0;
+  --nx-ac-wash-build: #0d0a1c; --nx-ac-wash-place: #0a0614;
+}
+.neo[data-division="academy"] .nx-ac-leave { color: var(--nx-ac-cta); }
+
+/* Marketing: three tracks are three shades of green. */
 .neo[data-division="marketing"] {
   --nx-mk-cta: var(--nx-div-marketing); --nx-mk-cta-deep: var(--nx-div-marketing-deep); --nx-mk-on-cta: var(--nx-div-marketing-on); --nx-mk-on-c: var(--nx-div-marketing-on);
-  --nx-mk-presence: var(--nx-div-marketing); --nx-mk-wash-presence: #021008;
+  --nx-mk-presence: #00e5a0; --nx-mk-visibility: #6bffd0; --nx-mk-performance: #00a876;
+  --nx-mk-wash-presence: #021008; --nx-mk-wash-visibility: #04140d; --nx-mk-wash-performance: #020d08;
   --nx-mk-ask: #021008; --nx-mk-ask-line: rgba(0,229,160,.32); --nx-mk-dots: rgba(0,229,160,.22);
 }
+.neo[data-division="marketing"] .nx-mk-leave { color: var(--nx-mk-cta); }
+
+/* Labs: pink, with a light pink for interface layers. */
 .neo[data-division="labs"] {
   --nx-lp-cta: var(--nx-div-labs); --nx-lp-cta-deep: var(--nx-div-labs-deep); --nx-lp-on-cta: var(--nx-div-labs-on);
+  --nx-lp-track: #ff5c8a; --nx-lp-track-3: #ffa3bd; --nx-lp-wash: #12060a;
+  --nx-lab-ui: #ffa3bd; --nx-lab-data: #ff5c8a;
 }
+
+/* Proof tags: team colours. */
 .neo .nx-pf {
   --nx-pf-presence: var(--nx-div-academy); --nx-pf-visibility: var(--nx-div-marketing); --nx-pf-performance: var(--nx-div-labs);
   --nx-pf-wash-presence: #0a0614; --nx-pf-wash-visibility: #021008; --nx-pf-wash-performance: #12060a;
