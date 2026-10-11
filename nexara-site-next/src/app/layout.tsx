@@ -78,7 +78,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}</Script>
 
       </head>
-      <body>
+      {/* Extensions (e.g. Grammarly) inject attributes on <body> before hydrate. */}
+      <body suppressHydrationWarning>
         <Script id="ga-consent" strategy="beforeInteractive">{`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}

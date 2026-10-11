@@ -654,11 +654,18 @@ export function useNeoHeroWebGL({
       lastDomProgress = -1;
     };
 
+    // Mobile URL-bar slides fire resize repeatedly mid-scroll with only the height changing;
+    // the wordmark spread depends on width alone, so skip its forced layout then.
+    let spreadWidth = -1;
     const resize = (): void => {
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
       if (width > 0 && height > 0) engine?.resize(width, height);
-      measureSpread();
+      const viewportWidth = document.documentElement.clientWidth;
+      if (viewportWidth !== spreadWidth) {
+        spreadWidth = viewportWidth;
+        measureSpread();
+      }
     };
 
     const ensureRender = (): void => {
@@ -695,7 +702,10 @@ export function useNeoHeroWebGL({
       // Low-power devices: throttle only the WebGL draw to 30fps. The chapter
       // copy above still tracks scroll every frame — capping the whole loop made
       // scroll-linked text step at half the scroll rate (visible jitter).
-      const skipDraw = frameCap > 0 && lastDraw && now - lastDraw < 1000 / frameCap - 1.5;
+      // Skip only when the display outpaces the cap (120Hz → every other frame). A
+      // near-exact threshold dropped random frames on 60Hz phones whose rAF timestamps
+      // arrive slightly early — a periodic hitch.
+      const skipDraw = frameCap > 0 && lastDraw && now - lastDraw < (1000 / frameCap) * 0.75;
       if (skipDraw) {
         canvas.dataset.renderMode = 'interactive';
         if (stillMoving || (!reducedMotion && !saveData && engine)) ensureRender();
@@ -723,11 +733,14 @@ export function useNeoHeroWebGL({
         frameEma = frameEma * 0.92 + deltaMs * 0.08;
         frameSamples += 1;
       }
-      if (frameSamples >= 24 && now - lastQualityChange > 1400) {
+      // A quality change reallocates the drawing buffer, a visible hitch. Apply it only
+      // while the scroll is at rest, and never step back up on phones: a busy 60Hz phone
+      // hovers around the thresholds, and oscillating down/up stuttered every few seconds.
+      if (frameSamples >= 24 && now - lastQualityChange > 1400 && !stillMoving) {
         canvas.dataset.frameMs = frameEma.toFixed(2);
         const previousQuality = quality;
         if (frameEma > 20.5) quality = Math.max(0.72, quality - 0.08);
-        else if (frameEma < 16.9 && now - lastQualityChange > 6000) quality = Math.min(1, quality + 0.04);
+        else if (tier === 'full' && frameEma < 16.9 && now - lastQualityChange > 6000) quality = Math.min(1, quality + 0.04);
         if (quality !== previousQuality) {
           engine?.setQuality(quality);
           lastQualityChange = now;

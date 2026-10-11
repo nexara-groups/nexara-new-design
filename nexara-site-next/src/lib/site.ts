@@ -50,7 +50,8 @@ export type HomeBlock = (typeof HOME_FLOW)[number];
 export const ABOUT_FLOW = ['hero', 'story', 'how', 'milestones', 'people', 'facts', 'principles', 'standards', 'faqs', 'cta'] as const;
 export type AboutBlock = (typeof ABOUT_FLOW)[number];
 
-export const PROOF_FLOW = ['hero', 'builds', 'cta'] as const;
+// Proof: hero → facts band → live builds → why us → how it runs → find-your-fit picker → CTA.
+export const PROOF_FLOW = ['hero', 'facts', 'builds', 'why', 'how', 'match', 'cta'] as const;
 export type ProofBlock = (typeof PROOF_FLOW)[number];
 
 // Labs overview: catalogue first (proof → products), then how we build (layers → capabilities → stages),
@@ -108,7 +109,7 @@ export type AcademyTrackRole = (typeof ACADEMY_TRACK_ROLES)[number];
 export const PAGE_FINDER = {
   home: ['divisions', 'work', 'insights', 'faqs'],
   company: ['story', 'how', 'people', 'faqs'],
-  customers: ['builds'],
+  customers: ['builds', 'why', 'how', 'match'],
   contact: ['details', 'channels', 'brief', 'faqs'],
   blog: ['posts'],
   post: ['article', 'more'],

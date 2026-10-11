@@ -14,6 +14,9 @@ export const getLenis = () => active;
 export function useSmoothScroll() {
   React.useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Touch scrolling stays native, so on phones Lenis only added work: it toggled a class on
+    // <html> at the start and end of every swipe, restyling the whole page mid-gesture.
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     // lerp (continuous follow) rather than duration+easing: a duration curve
     // restarts on every wheel event, so trackpad streams produced uneven
     // per-frame speed — read as jitter.

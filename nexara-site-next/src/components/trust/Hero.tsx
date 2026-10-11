@@ -285,9 +285,10 @@ export function TrustHeroUnravel() {
     //   p 0.86→1.00   re-conv    all three stream back into core
     //
     const DIVS = [
-      { label: 'Academy', r: 33, g: 95, b: 148 },
-      { label: 'Labs',    r: 140, g: 190, b: 230 },
-      { label: 'Digital', r: 79, g: 140, b: 196 },
+      // Light enough to read on the dark stage; the old deep blue (33,95,148) vanished into it.
+      { label: 'Talent',  r: 106, g: 164, b: 218 },
+      { label: 'Studio',  r: 180, g: 212, b: 240 },
+      { label: 'Digital', r: 127, g: 196, b: 192 },
     ];
 
     const makeSprite = (r, g, b) => {
@@ -335,7 +336,13 @@ export function TrustHeroUnravel() {
         { x: CX,      y: H * (W < 760 ? .76 : .86) }, // higher on mobile: label must clear the scroll cue
       ];
       const core  = { x: CX, y: CY };
-      const spots = [
+      // Phones centre the chapter copy, which covers the side spots, so each division
+      // lands in the open band below the copy instead.
+      const spots = W < 760 ? [
+        { x: W * .27, y: H * .79 },
+        { x: W * .73, y: H * .79 },
+        { x: CX,      y: H * .8 },
+      ] : [
         { x: W * .20, y: CY },
         { x: W * .80, y: CY },
         { x: CX,      y: H * .76 },
@@ -435,7 +442,7 @@ export function TrustHeroUnravel() {
       if (alpha < 0.02) return;
       const d = DIVS[si];
       const ph = si * 2.09 + time * 1.35;
-      const ringR = (isFocused ? W * .054 : W * .034) + Math.sin(ph) * W * .003;
+      const ringR = (isFocused ? U * .054 : U * .034) + Math.sin(ph) * U * .003;
 
       // Outer atmosphere
       const atm = ctx.createRadialGradient(bx, by, ringR * .5, bx, by, ringR * 2.6);
@@ -480,7 +487,7 @@ export function TrustHeroUnravel() {
       }
 
       // Center dot
-      const dotR = isFocused ? W * .013 : W * .009;
+      const dotR = isFocused ? U * .013 : U * .009;
       ctx.globalAlpha = alpha;
       ctx.fillStyle = `rgb(${d.r},${d.g},${d.b})`;
       ctx.beginPath(); ctx.arc(bx, by, dotR, 0, TAU); ctx.fill();
@@ -493,9 +500,9 @@ export function TrustHeroUnravel() {
         const labelA = cl((alpha - 0.20) / 0.32);
         ctx.globalAlpha = labelA;
         ctx.fillStyle = `rgb(${d.r},${d.g},${d.b})`;
-        ctx.font = `600 ${Math.round(W * (isFocused ? .022 : .018))}px Inter, system-ui, sans-serif`;
+        ctx.font = `600 ${Math.round(U * (isFocused ? .022 : .018))}px Inter, system-ui, sans-serif`;
         ctx.textAlign = 'center';
-        ctx.fillText(d.label.toUpperCase(), bx, by + ringR * 2.6 + W * .02);
+        ctx.fillText(d.label.toUpperCase(), bx, by + ringR * (W < 760 ? 2 : 2.6) + U * .02);
         ctx.textAlign = 'left';
         ctx.globalAlpha = 1;
       }
@@ -548,6 +555,9 @@ export function TrustHeroUnravel() {
     }
 
     let W = 0, H = 0, CX = 0, CY = 0, SCALE = 1;
+    // Size unit for blobs and labels. Width alone made them tiny on phones (a 20px ring,
+    // an 8px label), so narrow screens borrow from height.
+    let U = 1;
     let wordmarkGeometry = null;
 
     // Offscreen trail layer: particles + silk trails accumulate here so the
@@ -576,6 +586,7 @@ export function TrustHeroUnravel() {
       tctx.setTransform(tdpr, 0, 0, tdpr, 0, 0);
       CX = W / 2;
       CY = H * 0.48;
+      U = W < 760 ? Math.min(W * 1.8, H * 0.85) : W;
       SCALE = Math.min(W, H) * 0.305;
     }
 
@@ -601,7 +612,10 @@ export function TrustHeroUnravel() {
     const litArr = titleSpans.map(() => 0);
     function applyLit(el, lit, prox) {
       // Skip identical writes: text-shadow changes force a repaint of the glyph layer.
-      const key = lit.toFixed(2) + '|' + prox.toFixed(2);
+      // Quantised to 1/40 steps (below visible), so a slow strike repaints far less often.
+      lit = Math.round(lit * 40) / 40;
+      prox = Math.round(prox * 40) / 40;
+      const key = lit + '|' + prox;
       if (el.__lit === key) return;
       el.__lit = key;
       // Keep the unlit wordmark legible and premium. The strike still creates a
@@ -617,11 +631,13 @@ export function TrustHeroUnravel() {
     function strikeUpdate(bp, latch = true) {
       if (!beamEl || !titleRef.current) return;
       const leftPct = -14 + 118 * bp;
-      beamEl.style.left = leftPct + '%';
       beamEl.style.opacity = (bp > 0.002 && bp < 0.998) ? '0.95' : '0';
       if(!wordmarkGeometry)wordmarkGeometry={title:titleRef.current.getBoundingClientRect(),beamWidth:beamEl.offsetWidth,letters:titleSpans.map(el=>el.getBoundingClientRect())};
       const wmRect = wordmarkGeometry.title;
       if (!wmRect.width) return;
+      // Move the blade with a transform from its CSS `left: -14%`. Writing `left` every
+      // frame re-laid-out and repainted a blurred, screen-blended layer: phones stuttered.
+      beamEl.style.transform = `translate3d(${((leftPct + 14) / 100 * wmRect.width).toFixed(1)}px,0,0) skewX(-14deg)`;
       const halfPct = (wordmarkGeometry.beamWidth / 2) / wmRect.width * 100;
       const beamCx = wmRect.left + wmRect.width * (leftPct + halfPct) / 100;
       titleSpans.forEach((el, i) => {
@@ -634,7 +650,8 @@ export function TrustHeroUnravel() {
     }
 
     function chapterOpacity(p, a, b) {
-      const fade = Math.min(0.045, (b - a) * 0.4);
+      // Short fades so each chapter holds at full strength for most of its window.
+      const fade = Math.min(0.03, (b - a) * 0.3);
       const fin = Math.max(0, Math.min(1, (p - a) / fade));
       const finS = fin * fin * (3 - 2 * fin);
       const fout = b >= 0.999 ? 1 : 1 - Math.max(0, Math.min(1, (p - (b - fade)) / fade));
@@ -676,9 +693,11 @@ export function TrustHeroUnravel() {
     const isDesktop = window.innerWidth > 760;
     let heroVisible = true;
     let rafId = 0;
-    let t0 = performance.now();
+    // Scene clock that only advances while frames render. A wall clock jumped ahead after
+    // every idle pause, and phones (no mouse to keep the loop alive) idle each time the
+    // finger lifts — so rings, blobs and streams leapt at the start of every swipe.
+    let activeTime = 0;
     let lastFrame = 0;
-    let idleFrames = 0;
     let strikeComplete = false;
     // Entrance: one unhurried beam pass shortly after load.
     const INTRO_DELAY = 0.45, INTRO_DUR = 1.3;
@@ -688,6 +707,12 @@ export function TrustHeroUnravel() {
     let previousDraw = 0;
     let lastDraw = 0;
     const frameInterval = 1000 / (lowPower ? 30 : 60);
+    // Skip a paint only when the display runs faster than the cap (120Hz → every other
+    // frame). A near-exact threshold dropped random frames on 60Hz screens whose rAF
+    // timestamps arrive a little early, which read as a hitch.
+    const skipBelow = frameInterval * 0.75;
+    // Keep the scene alive while it is on screen, as Neo does; weak devices still idle.
+    const ambient = !prefersReducedMotion && !lowPower;
     let st;
 
     if (!prefersReducedMotion) {
@@ -723,9 +748,12 @@ export function TrustHeroUnravel() {
       rafId = 0;
       if (!heroVisible || document.hidden) return;
       lastFrame = now;
-      const delta = Math.min(50, now - (previousDraw || now - 16.7)) / 1000;
+      const gap = previousDraw ? now - previousDraw : 16.7;
+      // Resuming after an idle pause or a hidden tab: step one normal frame, never leap.
+      const delta = (gap > 100 ? 16.7 : Math.min(50, gap)) / 1000;
       previousDraw = now;
-      const time = prefersReducedMotion ? 0 : (now - t0) / 1000;
+      if (!prefersReducedMotion) activeTime += delta;
+      const time = activeTime;
       // Lenis already eases wheel input; a short follow here only de-quantises touch scroll.
       state.p += (state.target - state.p) * (1 - Math.exp(-32 * delta));
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
@@ -762,8 +790,11 @@ export function TrustHeroUnravel() {
       // Scroll-linked copy above updates every frame; on low-power devices only
       // the canvas paint below is throttled (to frameInterval). Capping the
       // whole loop made the chapter text step at half the scroll rate.
-      const skipDraw = lastDraw && now - lastDraw < frameInterval - 1.5;
+      const skipDraw = lastDraw && now - lastDraw < skipBelow;
       if (!skipDraw) {
+      // Particles advance by the time since the last paint: per-tick deltas undercounted
+      // on 120Hz screens, where every other tick is skipped, halving stream speed.
+      const drawDelta = lastDraw && now - lastDraw < 100 ? (now - lastDraw) / 1000 : delta;
       lastDraw = now;
       ctx.clearRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'source-over';
@@ -794,7 +825,7 @@ export function TrustHeroUnravel() {
           const dlen = Math.hypot(ddx, ddy) || 1;
           const nX = -ddy / dlen, nY = ddx / dlen;
           particles[si].forEach(pt => {
-            pt.t = (pt.t + delta * .348) % 1;
+            pt.t = (pt.t + drawDelta * .348) % 1;
             const e  = ss(pt.t);
             const mx = mouse.x * W * .032 * (1 - e);
             const my = mouse.y * H * .032 * (1 - e);
@@ -843,13 +874,7 @@ export function TrustHeroUnravel() {
         || Math.abs(state.target - state.p) > 0.0008
         || (!lowPower && Math.abs(mouse.tx - mouse.x) > 0.002)
         || (!lowPower && Math.abs(mouse.ty - mouse.y) > 0.002);
-      if (stillMoving) {
-        idleFrames = 0;
-        ensureRender();
-      } else if (idleFrames < 1) {
-        idleFrames += 1;
-        ensureRender();
-      }
+      if (stillMoving || ambient) ensureRender();
     }
 
     const io = new IntersectionObserver(([e]) => {
@@ -893,13 +918,13 @@ export function TrustHeroUnravel() {
   }, []);
 
   return (
-    <div ref={wrapRef} className="tsx-hero-runway" style={{ height: '600vh' }}>
+    <div ref={wrapRef} className="tsx-hero-runway" style={{ height: 'var(--tsx-runway, 600vh)' }}>
       <div className="tsx-hero-stage" data-hero-surface><HeroLighting />
         <canvas ref={canvasRef} className="tsx-hero-canvas" aria-hidden="true" />
         <div className="tsx-hero-handoff" aria-hidden="true" />
 
         <div className="tsx-hero-chapter" style={{ opacity: 1, pointerEvents: "auto" }} data-from="0" data-to="0.07">
-          <p className="tsx-section-eyebrow">Enterprise IT systems</p>
+          <p className="tsx-section-eyebrow">Nexara Private Limited · Visakhapatnam</p>
           <h1 ref={titleRef} className="tsx-hero-title tsx-hero-title--strike" aria-label="Nexara">
             <span>N</span><span>E</span><span>X</span><span>A</span><span>R</span><span>A</span>
             <i className="tsx-wordmark-beam" aria-hidden="true"></i>
@@ -907,53 +932,53 @@ export function TrustHeroUnravel() {
           <HeroIntro theme="trust" />
         </div>
 
-        <div className="tsx-hero-chapter" data-from="0.125" data-to="0.225" aria-hidden="true">
-          <p className="tsx-section-eyebrow">The premise</p>
-          <h2 className="tsx-section-heading">One core.<br /><span className="serif" style={{ color: '#66A0CC' }}>Three forces.</span></h2>
-          <p className="tsx-sec-body" style={{ maxWidth: '34em', marginInline: 'auto' }}>Every engagement runs through a single operating core, then unravels into three disciplined divisions.</p>
+        <div className="tsx-hero-chapter" data-from="0.08" data-to="0.265" aria-hidden="true">
+          <p className="tsx-section-eyebrow">How we are organised</p>
+          <h2 className="tsx-section-heading">One company.<br /><span className="serif" style={{ color: '#66A0CC' }}>Three specialist teams.</span></h2>
+          <p className="tsx-sec-body" style={{ maxWidth: '34em', marginInline: 'auto' }}>You work with one company and one delivery process. The work itself is done by the team that specialises in it.</p>
         </div>
 
-        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#66A0CC' } as React.CSSProperties} data-from="0.27" data-to="0.45" aria-hidden="true">
-          <p className="tsx-panel-idx">01 / DIVISION</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Academy<br /><span className="serif" style={{ color: '#66A0CC' }}>the talent engine.</span></h2>
-          <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Structured, cohort-based programmes that turn ambitious learners into capable engineers, sprint by sprint, review by review.</p>
-          <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'academy')} style={{ marginTop: '20px' }}>Enter Academy →</button>
+        <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#66A0CC' } as React.CSSProperties} data-from="0.265" data-to="0.45" aria-hidden="true">
+          <p className="tsx-panel-idx">01 / TEAM</p>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Talent Programmes<br /><span className="serif" style={{ color: '#66A0CC' }}>training and internships.</span></h2>
+          <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Cohort-based training in full-stack, AI, design and cloud. Learners build real projects, a mentor reviews their work every week, and colleges get a written completion report.</p>
+          <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'academy')} style={{ marginTop: '20px' }}>View Talent Programmes →</button>
         </div>
 
         <div className="tsx-hero-chapter ch-right" style={{ '--accent': '#3E6E9E' } as React.CSSProperties} data-from="0.45" data-to="0.63" aria-hidden="true">
-          <p className="tsx-panel-idx" style={{ right: 'max(9vw, 150px)', left: 'auto' }}>02 / DIVISION</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'right' }}>Labs<br /><span className="serif" style={{ color: '#3E6E9E' }}>the systems forge.</span></h2>
-          <p className="tsx-sec-body" style={{ textAlign: 'right' }}>Applied AI and automation systems, engineered from prototype to production with written specs and weekly demos.</p>
-          <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'labs')} style={{ marginTop: '20px' }}>Enter Labs →</button>
+          <p className="tsx-panel-idx" style={{ right: 'max(9vw, 150px)', left: 'auto' }}>02 / TEAM</p>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'right' }}>Product Studio<br /><span className="serif" style={{ color: '#3E6E9E' }}>custom software and SaaS.</span></h2>
+          <p className="tsx-sec-body" style={{ textAlign: 'right' }}>SaaS platforms, business portals, dashboards and integrations, with AI automation where it suits the problem. Each build has a written specification and a working demo every week.</p>
+          <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'labs')} style={{ marginTop: '20px' }}>View Product Studio →</button>
         </div>
 
         <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#6F6B5E' } as React.CSSProperties} data-from="0.63" data-to="0.81" aria-hidden="true">
-          <p className="tsx-panel-idx">03 / DIVISION</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Digital<br /><span className="serif" style={{ color: '#6F6B5E' }}>the growth signal.</span></h2>
-          <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Brand systems, web experiences and performance creative, built like software, measured like engineering.</p>
-          <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'marketing')} style={{ marginTop: '20px' }}>Enter Marketing →</button>
+          <p className="tsx-panel-idx">03 / TEAM</p>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Digital Solutions<br /><span className="serif" style={{ color: '#6F6B5E' }}>websites and marketing.</span></h2>
+          <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Brand identity, business websites, search visibility and campaigns for businesses that need to be found and contacted. Results are reported in plain language.</p>
+          <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'marketing')} style={{ marginTop: '20px' }}>View Digital Solutions →</button>
         </div>
 
-        <div className="tsx-hero-chapter" data-from="0.86" data-to="1" aria-hidden="true">
-          <p className="tsx-section-eyebrow">The weave</p>
-          <h2 className="tsx-section-heading">Three disciplines.<br /><span className="serif" style={{ color: '#66A0CC' }}>One standard.</span></h2>
+        <div className="tsx-hero-chapter" data-from="0.825" data-to="1" aria-hidden="true">
+          <p className="tsx-section-eyebrow">One way of working</p>
+          <h2 className="tsx-section-heading">Three teams.<br /><span className="serif" style={{ color: '#66A0CC' }}>One delivery standard.</span></h2>
           <div className="tsx-sec-actions" style={{ display: 'flex', gap: '16px', marginTop: '24px', justifyContent: 'center' }}>
-            <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>Start a request <span className="arr">→</span></button>
+            <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>Discuss a project <span className="arr">→</span></button>
             <button className="tsx-sec-btn-ghost" onClick={() => {
               const el = document.getElementById("divisions");
               el?.scrollIntoView({ behavior: "smooth" });
-            }}>Explore divisions</button>
+            }}>See the teams</button>
           </div>
         </div>
 
         {/* HUD */}
         <div className="tsx-hero-rail" aria-hidden="true">
           <button data-label="Nexara"></button>
-          <button data-label="Premise"></button>
-          <button data-label="Academy"></button>
-          <button data-label="Labs"></button>
-          <button data-label="Marketing"></button>
-          <button data-label="Begin"></button>
+          <button data-label="Teams"></button>
+          <button data-label="Talent"></button>
+          <button data-label="Studio"></button>
+          <button data-label="Digital"></button>
+          <button data-label="Standard"></button>
         </div>
         <div className="tsx-hero-counter" aria-hidden="true">
           <strong ref={counterNumRef}>01</strong> / 06

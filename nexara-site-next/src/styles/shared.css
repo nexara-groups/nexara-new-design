@@ -2004,24 +2004,24 @@ main.nx-pf h1.nx-pf-h1 { max-width: 12ch; margin: 0 0 24px; font-size: clamp(2.8
 .nx-pf-leave { max-width: 28ch; margin: 0 0 16px; color: var(--nx-pf-cta); font-size: clamp(1.1rem, 1.8vw, 1.35rem); font-weight: 500; }
 .nx-pf-lead { max-width: 52ch; color: var(--nx-pf-ink-2); font-size: 1.08rem; }
 .nx-pf-index { padding: 20px 20px 8px; background: var(--nx-pf-bg); border: 1px solid var(--nx-pf-line); border-radius: 22px; box-shadow: 0 30px 60px -36px var(--nx-pf-shadow); }
-.nx-pf-rec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.nx-pf-rec-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
 .nx-pf-rec-head p { font-family: var(--font-display); font-size: 1.1rem; font-weight: 650; letter-spacing: -0.02em; }
-.nx-pf-count { color: var(--nx-pf-presence); font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.nx-pf-count small { color: var(--nx-pf-muted); font-size: .85rem; font-weight: 500; }
-.nx-pf-index ol { list-style: none; margin: 0; padding: 0; }
-.nx-pf-index li { display: grid; grid-template-columns: 24px 1fr auto; column-gap: 12px; align-items: center; padding: 12px 4px; border-top: 1px dashed var(--nx-pf-line); }
-.nx-pf-index li.is-found { border-top-style: solid; animation: nx-pf-flash .9s var(--nx-pf-ease); }
-@keyframes nx-pf-flash { 0%, 40% { background: color-mix(in srgb, var(--nx-pf-presence) 10%, var(--nx-pf-bg)); } 100% { background: transparent; } }
-.nx-pf-index a { display: grid; gap: 2px; min-width: 0; color: inherit; text-decoration: none; }
-.nx-pf-index a:hover .nx-pf-host { color: var(--nx-pf-cta); }
+.nx-pf-count { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 8px; border-radius: 999px; background: color-mix(in srgb, var(--nx-pf-presence) 16%, transparent); color: var(--nx-pf-presence); font: 700 .85rem var(--font-display); font-variant-numeric: tabular-nums; }
 .nx-pf-label { font-weight: 600; }
 .nx-pf-host { color: var(--nx-pf-muted); font-size: 13px; overflow-wrap: anywhere; }
-.nx-pf-state { color: var(--nx-pf-lost); font-size: 12px; font-weight: 600; }
-.nx-pf-index li.is-found .nx-pf-state { color: var(--nx-pf-ink-2); }
-.nx-pf-tick { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1.5px dashed color-mix(in srgb, var(--nx-pf-lost) 55%, var(--nx-pf-bg)); color: var(--nx-pf-on-c); }
-.nx-pf-tick path { stroke-dasharray: 16; stroke-dashoffset: 16; transition: stroke-dashoffset .45s .1s var(--nx-pf-ease); }
-.nx-pf-index li.is-found .nx-pf-tick { background: var(--nx-pf-presence); border-color: var(--nx-pf-presence); border-style: solid; }
-.nx-pf-index li.is-found .nx-pf-tick path { stroke-dashoffset: 0; }
+.nx-pf-frames { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0 0 12px; }
+.nx-pf-frame { display: grid; gap: 2px; min-width: 0; padding: 8px; border: 1px solid var(--nx-pf-line-2); border-radius: 16px; color: inherit; text-decoration: none; transition: border-color .25s, transform .35s var(--nx-pf-ease), background .25s; }
+.nx-pf-frame:hover { border-color: var(--nx-pf-cta); transform: translateY(-3px); background: color-mix(in srgb, var(--nx-pf-cta) 6%, transparent); }
+.nx-pf-frame-logo { width: 100%; height: 76px; margin-bottom: 8px; }
+.nx-pf-frame .nx-pf-label { padding: 0 4px; font-size: .88rem; line-height: 1.2; }
+.nx-pf-frame .nx-pf-host { padding: 0 4px 2px; font-size: 11.5px; }
+.nx-pf-frame:hover .nx-pf-host { color: var(--nx-pf-cta); }
+.nx-pf-frame-you { grid-column: 1 / -1; }
+.nx-pf-frame-you a { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2px 16px; padding: 16px 18px; border: 1.5px dashed color-mix(in srgb, var(--nx-pf-cta) 60%, var(--nx-pf-line)); border-radius: 16px; color: inherit; text-decoration: none; transition: background .25s, border-color .25s; }
+.nx-pf-frame-you a:hover { background: color-mix(in srgb, var(--nx-pf-cta) 9%, transparent); border-color: var(--nx-pf-cta); }
+.nx-pf-frame-plus { grid-row: 1 / span 2; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--nx-pf-cta); color: var(--nx-pf-on-cta); font: 700 1.5rem/1 var(--font-display); }
+.nx-pf-frame-you b { font-family: var(--font-display); font-size: 1.1rem; font-weight: 650; letter-spacing: -0.02em; }
+.nx-pf-frame-you a > span:last-child { display: inline-flex; align-items: center; gap: 8px; color: var(--nx-pf-cta); font-size: .92rem; font-weight: 600; }
 .nx-pf-empty { padding: 16px 4px 20px; color: var(--nx-pf-muted); }
 html:not(.no-js) .nx-pf:not(.is-ready) :is(.nx-pf-ln > span, .nx-pf-leave, .nx-pf-index) { visibility: hidden; }
 
@@ -2059,6 +2059,115 @@ main.nx-pf .nx-text-link { color: var(--nx-link); }
 .nx-pf-ask-card::before { content: ""; position: absolute; z-index: -1; right: -80px; top: -100px; width: 320px; height: 320px; border-radius: 50%; border: 50px solid color-mix(in srgb, var(--nx-pf-presence) 10%, transparent); }
 main.nx-pf .nx-pf-ask-card h2 { max-width: 14ch; margin: 0 0 18px; font-size: clamp(2.4rem, 6vw, 4.6rem); font-weight: var(--nx-pf-display-weight); line-height: .95; letter-spacing: -0.05em; }
 .nx-pf-ask-card p { max-width: 48ch; margin: 0 0 28px; color: var(--nx-pf-ink-2); font-size: 1.08rem; }
+
+/* ── Proof: facts band, why us, how it runs, find your fit ─────────────────────────────── */
+.nx-pf-reach { margin: 22px 0 0; max-width: none; color: var(--nx-pf-muted); font-size: .95rem; }
+.nx-pf-reach a { color: var(--nx-pf-ink); font-weight: 600; text-underline-offset: 3px; }
+.nx-pf-reach a:hover { color: var(--nx-pf-cta); }
+
+.nx-pf-facts { border-block: 1px solid var(--nx-pf-line); background: var(--nx-pf-paper); }
+.nx-pf-facts-grid { display: grid; grid-template-columns: repeat(4, 1fr); margin-block: 0; padding: 0; }
+.nx-pf-fact { display: grid; align-content: center; gap: 6px; padding: 36px 28px; border-left: 1px solid var(--nx-pf-line); }
+.nx-pf-fact:first-child { padding-left: 0; border-left: 0; }
+.nx-pf-fact dt { margin: 0; }
+.nx-pf-fact b { display: block; color: var(--nx-pf-cta); font-family: var(--font-display); font-size: clamp(2.6rem, 5vw, 4.2rem); font-weight: var(--nx-pf-display-weight); line-height: 1; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+.nx-pf-fact dd { margin: 0; color: var(--nx-pf-ink-2); font-size: .98rem; max-width: 22ch; }
+
+.nx-pf-sec { padding: 104px 0; }
+.nx-pf-sec-head { max-width: 640px; margin: 0 0 48px; }
+main.nx-pf h2.nx-pf-h2 { margin: 0; font-size: clamp(2.2rem, 4.6vw, 3.8rem); font-weight: var(--nx-pf-display-weight); line-height: 1; letter-spacing: -0.045em; text-wrap: balance; }
+.nx-pf-sec-lede { margin-top: 16px; color: var(--nx-pf-ink-2); font-size: 1.1rem; max-width: 52ch; }
+
+/* Why us: bento. Cards take their colour from data-track so each row feels different. */
+.nx-pf-why-grid { list-style: none; display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin: 0; padding: 0; }
+.nx-pf-why-card { position: relative; isolation: isolate; overflow: hidden; display: grid; align-content: start; gap: 10px; padding: 30px 28px 32px; border: 1px solid var(--nx-pf-line); border-radius: 24px; background: var(--nx-pf-paper); transition: transform .45s var(--nx-pf-ease), border-color .3s, box-shadow .45s; }
+.nx-pf-why-card::before { content: ""; position: absolute; z-index: -1; right: -60px; top: -60px; width: 190px; height: 190px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 22%, transparent), transparent); opacity: .7; transition: opacity .4s, transform .6s var(--nx-pf-ease); }
+.nx-pf-why-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--c) 55%, var(--nx-pf-line)); box-shadow: 0 28px 50px -34px var(--nx-pf-shadow); }
+.nx-pf-why-card:hover::before { opacity: 1; transform: scale(1.25); }
+.nx-pf-why-card--1 { grid-column: span 7; }
+.nx-pf-why-card--2 { grid-column: span 5; }
+.nx-pf-why-card--3, .nx-pf-why-card--4, .nx-pf-why-card--5 { grid-column: span 4; }
+.nx-pf-why-card--6 { grid-column: span 12; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); column-gap: 40px; align-items: center; }
+.nx-pf-why-card--6 > :not(.nx-pf-why-logos) { grid-column: 1; }
+.nx-pf-why-card--6 .nx-pf-why-logos { grid-column: 2; grid-row: 1 / span 3; }
+.nx-pf-why-ico { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 10px; border-radius: 16px; background: color-mix(in srgb, var(--c) 14%, var(--nx-pf-bg)); color: var(--c); transition: background .3s, color .3s, transform .45s var(--nx-pf-ease); }
+.nx-pf-why-card:hover .nx-pf-why-ico { background: var(--c); color: var(--nx-pf-on-c); transform: rotate(-6deg) scale(1.06); }
+main.nx-pf .nx-pf-why-card h3 { font-size: clamp(1.35rem, 2.2vw, 1.7rem); font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; }
+.nx-pf-why-card p { color: var(--nx-pf-ink-2); font-size: 1.02rem; max-width: 46ch; }
+.nx-pf-why-logos { display: flex; flex-wrap: wrap; gap: 10px; }
+.nx-pf-why-logo { box-sizing: border-box; display: grid; place-items: center; flex: none; width: 92px; height: 64px; padding: 8px 12px; overflow: hidden; border-radius: 14px; background: var(--nx-pf-plate); box-shadow: inset 0 0 0 1px var(--nx-pf-line-2); }
+.nx-pf-why-logo img { display: block; width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+.nx-pf-why-logo--you { width: auto; padding: 0 18px; background: transparent; box-shadow: none; border: 1.5px dashed var(--c); color: var(--c); font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+
+/* How it runs: a rail of four checkpoints. */
+.nx-pf-how { background: var(--nx-pf-paper); border-block: 1px solid var(--nx-pf-line); }
+.nx-pf-steps { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; margin: 0; padding: 0; counter-reset: none; }
+.nx-pf-step { position: relative; display: grid; align-content: start; gap: 10px; }
+.nx-pf-step::before { content: ""; position: absolute; top: 25px; left: 66px; right: -14px; border-top: 2px dashed var(--nx-pf-line); }
+.nx-pf-step:last-child::before { display: none; }
+.nx-pf-step-n { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 14px; border-radius: 50%; background: var(--nx-pf-cta); color: var(--nx-pf-on-cta); font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; box-shadow: 0 0 0 6px color-mix(in srgb, var(--nx-pf-cta) 18%, transparent); }
+main.nx-pf .nx-pf-step h3 { font-size: 1.3rem; font-weight: 700; line-height: 1.12; letter-spacing: -0.03em; }
+.nx-pf-step p { color: var(--nx-pf-ink-2); font-size: 1rem; }
+.nx-pf-gate { display: inline-flex; align-items: center; gap: 10px; align-self: start; margin-top: 8px; padding: 10px 14px 10px 12px; border: 1px dashed color-mix(in srgb, var(--nx-pf-cta) 55%, var(--nx-pf-line)); border-radius: 14px; background: var(--nx-pf-bg); color: var(--nx-pf-cta); font-size: .92rem; font-weight: 600; line-height: 1.25; }
+.nx-pf-gate small { display: block; margin-bottom: 1px; color: var(--nx-pf-muted); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.nx-pf-gate > span { color: var(--nx-pf-ink); }
+.nx-pf-gate svg { flex: none; }
+
+/* Find your fit: pick a need, see the team and a build like it. */
+.nx-pf-match-grid { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 20px; align-items: start; }
+.nx-pf-pick { display: grid; gap: 10px; }
+.nx-pf-pick button { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; padding: 0 22px; border: 1px solid var(--nx-pf-line); border-radius: 20px; background: var(--nx-pf-bg); color: var(--nx-pf-ink); font: 650 1.12rem var(--font-display); letter-spacing: -0.02em; text-align: left; cursor: pointer; transition: border-color .25s, background .25s, transform .35s var(--nx-pf-ease); }
+.nx-pf-pick button svg { flex: none; opacity: .4; transition: transform .35s var(--nx-pf-ease), opacity .25s; }
+.nx-pf-pick button:hover { border-color: color-mix(in srgb, var(--c) 55%, var(--nx-pf-line)); transform: translateX(3px); }
+.nx-pf-pick button:hover svg { opacity: 1; transform: translateX(3px); }
+.nx-pf-pick button.is-active { border-color: var(--c); background: color-mix(in srgb, var(--c) 10%, var(--nx-pf-bg)); }
+.nx-pf-pick button.is-active svg { opacity: 1; color: var(--c); }
+.nx-pf-result { display: grid; gap: 12px; padding: 34px; border: 1px solid color-mix(in srgb, var(--c) 40%, var(--nx-pf-line)); border-radius: 26px; background: var(--nx-pf-paper); animation: nx-pf-swap .5s var(--nx-pf-ease); }
+@keyframes nx-pf-swap { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.nx-pf-result-k { color: var(--c); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+main.nx-pf .nx-pf-result h3 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); font-weight: var(--nx-pf-display-weight); line-height: 1; letter-spacing: -0.045em; }
+.nx-pf-result-line { color: var(--nx-pf-ink-2); font-size: 1.1rem; max-width: 44ch; }
+.nx-pf-result-proof { display: grid; gap: 10px; margin-top: 10px; padding-top: 20px; border-top: 1px dashed var(--nx-pf-line); }
+.nx-pf-result-client { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid var(--nx-pf-line); border-radius: 18px; background: var(--nx-pf-bg); color: inherit; text-decoration: none; transition: border-color .25s, transform .35s var(--nx-pf-ease); }
+.nx-pf-result-client:hover { border-color: var(--c); transform: translateY(-2px); }
+.nx-pf-result-client b { display: block; font-family: var(--font-display); font-size: 1.1rem; font-weight: 650; letter-spacing: -0.02em; }
+.nx-pf-result-client small { display: block; margin-top: 2px; color: var(--nx-pf-muted); font-size: .88rem; line-height: 1.35; }
+.nx-pf-result-open { color: var(--c); font-size: .9rem; font-weight: 700; white-space: nowrap; }
+.nx-pf-result-none { color: var(--nx-pf-muted); font-size: .98rem; }
+.nx-pf-result-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 14px; }
+
+@media (max-width: 1100px) {
+  .nx-pf-facts-grid { grid-template-columns: repeat(2, 1fr); }
+  .nx-pf-fact:nth-child(3) { padding-left: 0; border-left: 0; }
+  .nx-pf-fact:nth-child(n + 3) { border-top: 1px solid var(--nx-pf-line); }
+  .nx-pf-steps { grid-template-columns: repeat(2, 1fr); gap: 40px 28px; }
+  .nx-pf-step:nth-child(2)::before { display: none; }
+  .nx-pf-why-card--1, .nx-pf-why-card--2 { grid-column: span 6; }
+  .nx-pf-why-card--3, .nx-pf-why-card--4 { grid-column: span 6; }
+  .nx-pf-why-card--5 { grid-column: span 12; }
+}
+@media (max-width: 800px) {
+  .nx-pf-sec { padding: 64px 0; }
+  .nx-pf-sec-head { margin-bottom: 32px; }
+  .nx-pf-fact { padding: 24px 16px; }
+  .nx-pf-fact:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .nx-pf-why-grid { grid-template-columns: 1fr; }
+  .nx-pf-why-card { grid-column: 1 / -1; }
+  .nx-pf-why-card--6 { grid-template-columns: 1fr; }
+  .nx-pf-why-card--6 > :not(.nx-pf-why-logos), .nx-pf-why-card--6 .nx-pf-why-logos { grid-column: 1; grid-row: auto; }
+  .nx-pf-why-card--6 .nx-pf-why-logos { margin-top: 12px; }
+  .nx-pf-steps { grid-template-columns: 1fr; gap: 0; }
+  .nx-pf-step { padding: 0 0 36px 76px; }
+  .nx-pf-step:last-child { padding-bottom: 0; }
+  .nx-pf-step-n { position: absolute; left: 0; top: 0; margin: 0; }
+  .nx-pf-step::before, .nx-pf-step:nth-child(2)::before { display: block; top: 62px; bottom: 10px; left: 25px; right: auto; border-top: 0; border-left: 2px dashed var(--nx-pf-line); }
+  .nx-pf-step:last-child::before { display: none; }
+  .nx-pf-match-grid { grid-template-columns: 1fr; }
+  .nx-pf-result { padding: 24px 20px; }
+  .nx-pf-result-client { grid-template-columns: auto minmax(0, 1fr); }
+  .nx-pf-result-open { grid-column: 1 / -1; }
+  .nx-pf-result-actions .nx-pf-cta { width: 100%; }
+}
 
 @media (min-width: 801px) {
   main.nx-pf h1.nx-pf-h1 { max-width: none; font-size: min(5.8rem, var(--nx-pf-h1-fit)); }

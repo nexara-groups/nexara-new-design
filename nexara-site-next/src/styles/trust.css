@@ -4697,6 +4697,8 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust .tsx-hero-runway:not(.tsx-hero-runway--static) .tsx-hero-chapter { transition: none; }
 .trust.trust-home .tsx-hero-runway, .trust .tsx-hero-runway { background: #0a101a; }
 .trust .tsx-hero-runway--static { background: none; }
+/* Phones: a flick travels far, so a 600vh runway let each division pass in one swipe. */
+@media (max-width: 760px) { .trust .tsx-hero-runway { --tsx-runway: 760vh; } }
 .trust .tsx-hero-canvas { will-change: transform, opacity; contain: strict; }
 
 /* ═══ Page accent (one accent per page, set by data-accent on the Trust root) ═══

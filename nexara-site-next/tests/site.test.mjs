@@ -21,7 +21,7 @@ test('nav is one list: every entry is voiced for both themes and Blog, About and
 test('page flows are fixed lists shared by both themes', () => {
   assert.deepEqual([...site.HOME_FLOW], ['hero', 'divisions', 'manifesto', 'work', 'capabilities', 'standards', 'insights', 'faqs', 'cta']);
   assert.ok(site.ABOUT_FLOW.includes('people') && site.ABOUT_FLOW.includes('facts') && site.ABOUT_FLOW.includes('faqs'));
-  assert.deepEqual([...site.PROOF_FLOW], ['hero', 'builds', 'cta']);
+  assert.deepEqual([...site.PROOF_FLOW], ['hero', 'facts', 'builds', 'why', 'how', 'match', 'cta']);
 });
 
 test('footer links resolve to real pages in both themes', () => {

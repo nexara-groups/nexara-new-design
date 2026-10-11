@@ -147,20 +147,49 @@
   transform: translateY(-4px) rotate(45deg);
 }
 
+/* Cursor mode: bubble BELOW Neo (default). Sitting above covered the card/label
+   under the pointer — the thing the visitor was trying to read. */
 .neo-guide-overlay.is-cursor-guide .neo-guide-bubble {
-  bottom: calc(100% + 8px);
+  top: calc(100% + 8px);
+  bottom: auto;
   right: auto;
   left: 0;
   font-size: 8.5px;
   letter-spacing: 0.06em;
   padding: 6px 9px;
   max-width: 168px;
-  border-radius: 10px 10px 10px 2px;
+  border-radius: 2px 10px 10px 10px;
   box-shadow: 0 0 18px rgba(204,255,0,0.12);
 }
-.neo-guide-overlay.is-cursor-guide .neo-guide-bubble::after { right: auto; left: 12px; }
-.neo-guide-overlay.is-cursor-guide .neo-guide-char-wrap.is-flipped .neo-guide-bubble { border-radius: 10px 10px 2px 10px; }
-.neo-guide-overlay.is-cursor-guide .neo-guide-char-wrap.is-flipped .neo-guide-bubble::after { left: auto; right: 12px; }
+.neo-guide-overlay.is-cursor-guide .neo-guide-bubble::after {
+  top: auto;
+  bottom: 100%;
+  right: auto;
+  left: 12px;
+  transform: translateY(4px) rotate(45deg);
+}
+.neo-guide-overlay.is-cursor-guide .neo-guide-char-wrap.is-flipped .neo-guide-bubble {
+  border-radius: 10px 2px 10px 10px;
+}
+.neo-guide-overlay.is-cursor-guide .neo-guide-char-wrap.is-flipped .neo-guide-bubble::after {
+  left: auto;
+  right: 12px;
+}
+
+/* Near bottom of viewport: Neo parks above the cursor; bubble returns above him. */
+.neo-guide-overlay.is-cursor-guide.is-bubble-above .neo-guide-bubble {
+  top: auto;
+  bottom: calc(100% + 8px);
+  border-radius: 10px 10px 10px 2px;
+}
+.neo-guide-overlay.is-cursor-guide.is-bubble-above .neo-guide-bubble::after {
+  top: 100%;
+  bottom: auto;
+  transform: translateY(-4px) rotate(45deg);
+}
+.neo-guide-overlay.is-cursor-guide.is-bubble-above .neo-guide-char-wrap.is-flipped .neo-guide-bubble {
+  border-radius: 10px 10px 2px 10px;
+}
 
 /* Section tag — extends left from character */
 .neo-guide-tag {
@@ -180,10 +209,12 @@
   white-space: nowrap;
 }
 
+/* Cursor mode: tag sits above Neo so it doesn't collide with the below-bubble. */
 .neo-guide-overlay.is-cursor-guide .neo-guide-tag {
   right: auto;
   left: 0;
-  top: calc(100% + 7px);
+  top: auto;
+  bottom: calc(100% + 6px);
   transform: none;
   border-right: 1px solid rgba(204,255,0,0.28);
   border-left: none;
@@ -195,6 +226,10 @@
   max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.neo-guide-overlay.is-cursor-guide.is-bubble-above .neo-guide-tag {
+  bottom: auto;
+  top: calc(100% + 7px);
 }
 
 /* Pinned near the right edge: open bubble + tag leftward so they stay on-screen */
@@ -306,3 +341,212 @@
 .neo-guide-overlay.is-cursor-guide { transition: opacity .2s ease; }
 .neo-guide-overlay.is-cursor-guide.is-nav-hover { opacity: 0 !important; }
 
+
+/* ── Readable speech + shortcut menu + mood states ─────────────────────── */
+.neo-guide-bubble {
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  line-height: 1.45;
+  padding: 8px 11px;
+  max-width: min(236px, calc(100vw - 44px));
+  border-radius: 12px 12px 3px 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5), 0 0 18px rgba(204,255,0,0.1);
+}
+.neo-guide-overlay.is-cursor-guide .neo-guide-bubble {
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+  padding: 8px 12px;
+  max-width: 252px;
+  border-radius: 3px 12px 12px 12px;
+}
+.neo-guide-overlay.is-cursor-guide.is-bubble-above .neo-guide-bubble {
+  border-radius: 12px 12px 12px 3px;
+}
+.neo-guide-tag { font-size: 9px; }
+
+.neo-guide-chips {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px) scale(.96);
+  transform-origin: bottom right;
+  transition: opacity .2s ease, transform .25s cubic-bezier(.2,.9,.3,1.2), visibility 0s .25s;
+}
+.neo-guide-overlay.is-menu .neo-guide-chips {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+.neo-guide-overlay.is-menu .neo-guide-bubble { bottom: calc(100% + 214px); top: auto; }
+.neo-guide-overlay.is-cursor-guide.is-menu .neo-guide-bubble {
+  top: auto;
+  bottom: calc(100% + 214px);
+  border-radius: 12px 12px 12px 3px;
+}
+.neo-guide-chips button {
+  pointer-events: auto;
+  appearance: none;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(204,255,0,0.6);
+  background: rgba(0,0,0,0.92);
+  color: #ccff00;
+  font: 600 12px/1 var(--font-mono, monospace);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.45);
+  transition: background .15s, color .15s, transform .15s;
+}
+.neo-guide-chips button:active { background: #ccff00; color: #06060a; transform: scale(.97); }
+.neo-guide-chips button:focus-visible { outline: 2px solid #00f0ff; outline-offset: 2px; }
+
+/* Asleep: dimmed, drifting "z" */
+.neo-guide-overlay.is-asleep .neo-guide-char-svg { filter: drop-shadow(0 0 14px rgba(204,255,0,0.35)); animation-duration: 8s; }
+.neo-guide-overlay.is-asleep .neo-guide-body::after {
+  content: "z";
+  position: absolute;
+  right: -2px;
+  top: -6px;
+  font: 700 14px/1 var(--font-mono, monospace);
+  color: #00f0ff;
+  opacity: 0;
+  animation: neoGuideZ 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes neoGuideZ {
+  0%   { opacity: 0; transform: translate(0, 6px) scale(.7); }
+  30%  { opacity: .9; }
+  100% { opacity: 0; transform: translate(10px, -22px) scale(1.2); }
+}
+
+@media (max-width: 760px) {
+  .neo-guide-overlay { width: 96px; }
+  .neo-guide-char-wrap { width: 72px; right: 10px; }
+  .neo-guide-char-svg { width: 72px; }
+  .neo-guide-bubble { font-size: 11px; padding: 8px 10px; max-width: min(224px, calc(100vw - 36px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .neo-guide-overlay.is-asleep .neo-guide-body::after { animation: none; }
+}
+
+/* ── Ask Neo (outside the aria-hidden overlay so they are reachable) ── */
+.neo-guide-ui { position: fixed; inset: 0; z-index: 101; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility 0s .3s; }
+.neo-guide-ui.is-live { opacity: 1; visibility: visible; transition-delay: 0s; }
+.neo-guide-ui > * { pointer-events: auto; }
+.neo-guide-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.neo-guide-fabs { position: fixed; right: 20px; bottom: 20px; display: flex; gap: 8px; }
+.neo-guide-ui.is-touch .neo-guide-fabs { display: none; }
+.neo-guide-fab {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px;
+  border-radius: 999px; border: 1px solid rgba(204,255,0,.5); background: rgba(6,6,10,.92); color: #ccff00;
+  font: 600 12px/1 var(--font-mono, monospace); letter-spacing: .02em; cursor: pointer;
+  box-shadow: 0 6px 22px rgba(0,0,0,.45); transition: background .15s, color .15s, border-color .15s;
+}
+.neo-guide-fab:hover { background: rgba(204,255,0,.12); }
+.neo-guide-fab:focus-visible { outline: 2px solid #00f0ff; outline-offset: 2px; }
+.neo-guide-fab-ico { font-size: 14px; line-height: 1; }
+
+.neo-guide-ask {
+  position: fixed; right: 20px; bottom: 72px; width: min(360px, calc(100vw - 24px));
+  display: flex; flex-direction: column; gap: 10px; padding: 14px;
+  background: #06060a; border: 1px solid rgba(204,255,0,.5); border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.6), 0 0 28px rgba(204,255,0,.08);
+  color: #e8eaf0; font-family: var(--font-body, system-ui, sans-serif);
+}
+.neo-guide-ask[hidden] { display: none; }
+.neo-guide-ask-head { display: flex; align-items: center; justify-content: space-between; font: 600 11px/1 var(--font-mono, monospace); letter-spacing: .12em; text-transform: uppercase; color: #ccff00; }
+.neo-guide-ask-head button { appearance: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,.18); background: transparent; color: #fff; font-size: 18px; line-height: 1; cursor: pointer; }
+.neo-guide-ask-log { max-height: 34vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.neo-guide-ask-q { margin: 0; align-self: flex-end; max-width: 85%; padding: 7px 11px; border-radius: 12px 12px 3px 12px; background: rgba(204,255,0,.14); color: #ccff00; font-size: 13px; line-height: 1.4; }
+.neo-guide-ask-a { margin: 0; font-size: 14px; line-height: 1.5; color: #e8eaf0; }
+.neo-guide-ask-actions, .neo-guide-ask-sug { display: flex; flex-wrap: wrap; gap: 6px; }
+.neo-guide-ask-actions button, .neo-guide-ask-sug button {
+  appearance: none; min-height: 34px; padding: 0 12px; border-radius: 999px; cursor: pointer;
+  font: 600 12px/1 var(--font-mono, monospace); letter-spacing: .01em;
+}
+.neo-guide-ask-actions button { border: 1px solid #ccff00; background: #ccff00; color: #06060a; }
+.neo-guide-ask-sug button { border: 1px solid rgba(204,255,0,.4); background: transparent; color: #ccff00; }
+.neo-guide-ask-sug button:hover { background: rgba(204,255,0,.1); }
+.neo-guide-ask-form { display: flex; gap: 8px; }
+.neo-guide-ask-form input {
+  flex: 1; min-width: 0; min-height: 42px; padding: 0 12px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #fff; font-size: 16px;
+}
+.neo-guide-ask-form input::placeholder { color: rgba(255,255,255,.45); }
+.neo-guide-ask-form input:focus-visible { outline: 2px solid #00f0ff; outline-offset: 1px; }
+.neo-guide-ask-form button { appearance: none; min-height: 42px; padding: 0 16px; border-radius: 10px; border: 0; background: #ccff00; color: #06060a; font: 700 13px/1 var(--font-mono, monospace); cursor: pointer; }
+
+@media (max-width: 760px) {
+  .neo-guide-ask { left: 12px; right: 12px; width: auto; bottom: 92px; }
+  .neo-guide-ask-log { max-height: 28vh; }
+}
+
+.neo-guide-ask-summary {
+  margin: 0; padding: 10px 12px; border-radius: 10px; background: rgba(204,255,0,.07); border: 1px dashed rgba(204,255,0,.4);
+  color: #e8eaf0; font: 12px/1.55 var(--font-mono, monospace); white-space: pre-wrap; word-break: break-word;
+}
+
+/* Multi-select chips in the quick brief */
+.neo-guide-ask-sug button[aria-pressed="true"] { background: #ccff00; color: #06060a; border-color: #ccff00; }
+.neo-guide-ask-sug button[aria-pressed="true"]::before { content: "\2713\00a0"; }
+.neo-guide-ask-sug .neo-guide-ask-go { background: #ccff00; color: #06060a; border-color: #ccff00; }
+.neo-guide-ask-sug .neo-guide-ask-go[hidden] { display: none; }
+
+/* ── Energy: interaction speeds him up, stillness calms him ─────────────── */
+.neo-guide-char-svg { transition: filter .6s ease; }
+.neo-guide-overlay.is-hyped .neo-guide-char-svg {
+  animation-duration: 2.4s;
+  filter: drop-shadow(0 0 34px rgba(204,255,0,0.95)) drop-shadow(0 0 64px rgba(0,240,255,0.5));
+}
+.neo-guide-overlay.is-hyped .neo-sig-ring-1,
+.neo-guide-overlay.is-hyped .neo-sig-ring-2,
+.neo-guide-overlay.is-hyped .neo-sig-ring-3 { animation-duration: 1.8s; }
+.neo-guide-overlay.is-hyped .neo-led-inner,
+.neo-guide-overlay.is-hyped .neo-led-outer { animation-duration: .5s; }
+.neo-guide-overlay.is-calm .neo-guide-char-svg {
+  animation-duration: 7s;
+  filter: drop-shadow(0 0 18px rgba(204,255,0,0.45)) drop-shadow(0 0 34px rgba(0,240,255,0.2));
+}
+
+/* ── Phones and touch: small footprint, out of the reading line ─────────────
+   Resting: tucked half off the right edge, dim glow, tiny hit area (the wrapper
+   itself no longer swallows taps). He slides out only when he speaks, is
+   tapped, or the shortcut menu is open, and tucks away while content scrolls. */
+@media (max-width: 760px), (pointer: coarse) {
+  .neo-guide-spotlight { display: none; }
+  .neo-guide-overlay.is-scroll-guide .neo-guide-char-wrap { pointer-events: none; }
+  .neo-guide-overlay.is-scroll-guide .neo-guide-tuck {
+    pointer-events: auto;
+    transform-origin: 100% 100%;
+    transform: translateX(24px) scale(.8);
+    opacity: .85;
+    transition: transform .4s cubic-bezier(.2,.9,.3,1.1), opacity .3s ease;
+  }
+  .neo-guide-overlay.is-scroll-guide .neo-guide-char-svg {
+    filter: drop-shadow(0 0 8px rgba(204,255,0,0.4));
+  }
+  .neo-guide-overlay.is-scroll-guide.is-engaged .neo-guide-tuck,
+  .neo-guide-overlay.is-scroll-guide.is-menu .neo-guide-tuck { transform: none; opacity: 1; }
+  .neo-guide-overlay.is-scroll-guide.is-engaged .neo-guide-char-svg {
+    filter: drop-shadow(0 0 14px rgba(204,255,0,0.6));
+  }
+  /* while content is moving: tucked, bubble invisible (it returns when scroll settles) */
+  .neo-guide-overlay.is-scroll-guide.is-scrolling .neo-guide-tuck { transform: translateX(24px) scale(.8); opacity: .85; }
+  .neo-guide-overlay.is-scroll-guide.is-scrolling .neo-guide-bubble { opacity: 0 !important; }
+  .neo-guide-bubble { max-width: min(208px, calc(100vw - 96px)); }
+  .neo-guide-chips { margin-right: 4px; }
+}
+/* Keyboard up or Ask panel open on a phone: out of the way entirely */
+.neo-guide-overlay.is-away { opacity: 0 !important; transition: opacity .2s ease; }
+.neo-guide-overlay.is-away * { pointer-events: none !important; }

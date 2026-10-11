@@ -107,14 +107,17 @@ export const COPY = {
   proof: {
     hero: {
       kicker: v('Proof', 'Delivery proof'),
-      title: v('Real clients. Live work.', 'Clients and delivered work.'),
-      lines: { neo: ['Real clients.', 'Live work.'], trust: ['Clients and', 'delivered work.'] },
+      title: v('We shipped it. You can check.', 'We delivered it. You can inspect it.'),
+      lines: { neo: ['We shipped it.', 'You can check.'], trust: ['We delivered it.', 'You can inspect it.'] },
       accent: v('Open any of it.', 'Live and inspectable.'),
       body: v(
         'A SaaS platform, an e-commerce site, a medical library, sales calculators and websites that sell, shipped for businesses in Visakhapatnam and across Andhra Pradesh.',
         'Live client platforms you can inspect today: a SaaS product, an e-commerce site, a medical library, sales calculators and websites, for businesses in Visakhapatnam and across Andhra Pradesh.',
       ),
       leave: v('Every link opens a live site.', 'Each address opens a production site.'),
+      wall: v('Wall of fame', 'Client roster'),
+      yours: v('Happy to frame yours here.', 'We would be glad to add yours.'),
+      yoursCta: v('Start a project', 'Contact us'),
       record: v('Live now', 'Live addresses'),
       pending: v('Unopened', 'Not viewed'),
       done: v('Opened', 'Viewed'),
@@ -140,7 +143,63 @@ export const COPY = {
       build: v('Build', 'Build'),
       shipped: v('What shipped', 'What shipped'),
     },
-    cta: { kicker: v('Next move', 'Next step'), title: v('Want your name on this list?', 'Add your organisation to this record.'), body: v('Tell us what you need and we’ll map the next step.', 'Describe what you need and we will recommend a scoped next step.'), primary: v('Start a project', 'Contact us') },
+    facts: {
+      label: v('Nexara at a glance', 'Nexara at a glance'),
+      // Numbers are set in Proof.tsx: client count is computed from DATA.work.live, the rest are fixed facts.
+      items: [
+        { label: v('clients, every one live', 'client platforms in production') },
+        { label: v('teams, one house', 'specialist teams, one standard') },
+        { label: v('named owner per project', 'named owner per engagement') },
+        { label: v('made-up numbers', 'unverified claims published') },
+      ],
+    },
+    why: {
+      kicker: v('Why us', 'Why Nexara'),
+      title: v('Why people like working with us.', 'Why clients work with Nexara.'),
+      lede: v(
+        'Plain talk, a plan on paper and work you can open. That is the whole pitch.',
+        'A written scope, a named owner and work that can be inspected. That is the standard on every engagement.',
+      ),
+      cards: [
+        { title: v('One owner. One thread.', 'A named owner.'), body: v('A named person runs your project and answers you. No ticket queue, no baton passing.', 'One accountable person runs each engagement and is your point of contact throughout.') },
+        { title: v('Scope in writing.', 'A written scope.'), body: v('Audience, goals, deliverables, timeline and success criteria go on paper before we build anything.', 'Every engagement opens with audience, goals, deliverables, timeline and success criteria, agreed in writing.') },
+        { title: v('Everything is live.', 'Work you can verify.'), body: v('Every client above is a real site. Open it and poke around. If we can’t show it, we don’t claim it.', 'Each client platform listed above is in production and can be inspected. We publish no claim we cannot evidence.') },
+        { title: v('Three teams, one house.', 'Three teams, one standard.'), body: v('Site, marketing, software and training under one roof. No ping-pong between agencies.', 'Websites, marketing, software and training are delivered by specialist teams working to a single standard.') },
+        { title: v('Straight talk.', 'Honest limits.'), body: v('We won’t promise a ChatGPT mention or a guaranteed placement. We tell you what we can back up.', 'We do not guarantee placement in AI products or hiring outcomes. We state what can be evidenced.') },
+        { title: v('Never the generic version.', 'Specific to your business.'), body: v('If it could carry anyone else’s logo, it’s not done.', 'Work is specific to the client. A page that could carry another organisation’s logo is not finished.') },
+      ],
+      yours: v('Yours next', 'Your organisation'),
+    },
+    how: {
+      kicker: v('How it runs', 'How it runs'),
+      title: v('Four steps. No mystery.', 'How an engagement runs.'),
+      lede: v('You always know what happens next and who owns it.', 'Each stage has an owner, a checkpoint and a written outcome.'),
+      gate: v('Checkpoint', 'Checkpoint'),
+      steps: [
+        { title: v('Tell us the business first.', 'Brief.'), body: v('We ask before we pitch: who it is for, what it should do, what good looks like.', 'A conversation about the business, its audience and the outcome required.'), gate: v('Problem and outcome agreed', 'Problem and outcome agreed') },
+        { title: v('Put it on paper.', 'Agree the scope.'), body: v('Goals, deliverables, timeline and a named owner, in writing. You sign off before anything is built.', 'Goals, deliverables, timeline and owner are documented and approved before work begins.'), gate: v('Scope signed off', 'Scope approved') },
+        { title: v('Build in the open.', 'Build in increments.'), body: v('Shipped in pieces you can see and test, not one big reveal at the end.', 'Work is delivered in stages that can be reviewed and tested against real use.'), gate: v('Tested on real use', 'Tested against real use') },
+        { title: v('Launch and hand over.', 'Launch and hand over.'), body: v('Live, monitored and handed over. Then support or hands-off, your call.', 'Deployment with monitoring, a clear handover and optional ongoing support.'), gate: v('Live and handed over', 'Live with handover complete') },
+      ],
+    },
+    match: {
+      kicker: v('Find your fit', 'Find the right team'),
+      title: v('What are you here for?', 'Which service do you need?'),
+      lede: v('Pick one. We show who handles it and a build like it.', 'Select a requirement to see the responsible team and a comparable delivery.'),
+      handled: v('Handled by', 'Handled by'),
+      proof: v('A build like it', 'Comparable delivery'),
+      noProof: v('Training is not a client site, so there is nothing to open. See how the programmes run.', 'Training is not a client deliverable. See how the programmes run.'),
+      open: v('Open it', 'View live site'),
+      team: v('See the team', 'View the team'),
+      cta: v('Start with this', 'Discuss this requirement'),
+      options: [
+        { id: 'site', team: 'marketing', client: 'Sri Engineering Works', label: v('A site that sells', 'A website or online store'), line: v('Websites, catalogues and e-commerce that turn visits into enquiries.', 'Websites, catalogues and e-commerce built to generate enquiries.') },
+        { id: 'found', team: 'marketing', client: 'Rise Medical Hub', label: v('To get found online', 'Search and social visibility'), line: v('Search, content and social set up properly, then reported on.', 'Search, content and social presence established, then reported on.') },
+        { id: 'software', team: 'labs', client: 'Happy Farms', label: v('Custom software or SaaS', 'Custom software or a SaaS product'), line: v('We design it, build it, test it on real use and launch it.', 'Designed, built, tested against real use and launched in production.') },
+        { id: 'people', team: 'academy', client: '', label: v('To train my team', 'Training and internships'), line: v('Projects, mentor reviews and portfolios instead of a syllabus finish line.', 'Applied projects, mentor reviews and portfolios in place of a syllabus-only course.') },
+      ] as { id: string; team: 'academy' | 'marketing' | 'labs'; client: string; label: Voiced; line: Voiced }[],
+    },
+    cta: { kicker: v('Next move', 'Next step'), title: v('Want your name on this list?', 'Add your organisation to this record.'), body: v('Tell us what you need and we’ll map the next step.', 'Describe what you need and we will recommend a scoped next step.'), primary: v('Start a project', 'Contact us'), call: v('Prefer a call?', 'Prefer to call?'), visit: v('Or drop by:', 'Or visit:') },
   },
   clients: {
     stripLabel: v('Live for', 'Delivered for'),
@@ -151,24 +210,24 @@ export const COPY = {
     built: v('What we built', 'What Nexara delivered'),
     result: v('Result:', 'Outcome:'),
     bench: v('On the bench', 'In delivery'),
-    more: v('+ more in the pipeline', '+ further engagements in the pipeline'),
+    more: v('+ more in the pipeline', '+ more projects in progress'),
   },
   home: {
     manifesto: {
       kicker: v('Why Nexara', 'Why Nexara'),
       text: v(
         'Three engines, one standard. No shortcuts, no gap years, no vibes without receipts. We build people, software and brands, all from one house.',
-        'We are one engineering company that grows talent, builds software and builds market presence. One standard across three disciplines, and no shortcuts.',
+        'Nexara is one company in Visakhapatnam with three teams. We train engineers, build software and run digital marketing, and every project follows the same written process from brief to handover.',
       ),
     },
     divisions: {
       kicker: v('The divisions', 'Service lines'),
-      title: v('Choose your force.', 'Three practice areas. One operating standard.'),
+      title: v('Choose your force.', 'Three teams under one delivery standard.'),
       enter: v('Enter', 'Enter'),
       tagline: {
-        academy: v('We grow engineers.', 'The talent engine.'),
-        marketing: v('We make brands move.', 'The growth signal.'),
-        labs: v('We build intelligence.', 'The build studio.'),
+        academy: v('We grow engineers.', 'Training and internships.'),
+        marketing: v('We make brands move.', 'Websites and marketing.'),
+        labs: v('We build intelligence.', 'Custom software and SaaS.'),
       } as Record<string, Voiced>,
       // What each team does in Visakhapatnam. Shown on the home rail panels.
       local: {
@@ -208,9 +267,9 @@ export const COPY = {
       ],
     },
     cta: {
-      kicker: v('Ready when you are', 'Ready when you are'),
-      title: v('Begin.', 'Start the request.'),
-      body: v('Tell us which team you need, or let the brief decide.', 'Tell us which team you need, or let the brief decide. Scoped response within two working days.'),
+      kicker: v('Ready when you are', 'Next step'),
+      title: v('Begin.', 'Tell us about your project.'),
+      body: v('Tell us which team you need, or let the brief decide.', 'If you are not sure which team fits, describe the problem and we will route it. You will receive a scoped reply within two working days.'),
       primary: v('Start a project', 'Start a project'),
     },
   },
@@ -273,6 +332,7 @@ export const COPY = {
     customers: {
       label: v('Proof sections', 'Proof sections'), cta: v('Let’s talk', 'Start a project'),
       builds: v('Live builds', 'Delivered work'),
+      why: v('Why us', 'Why Nexara'), how: v('How it runs', 'How it runs'), match: v('Find your fit', 'Find a fit'),
     },
     contact: {
       label: v('Contact sections', 'Contact sections'),
@@ -384,10 +444,10 @@ export const COPY = {
 
 // "Every division runs on the same spine." Same four standards in both themes, worded per voice.
 export const OPERATING_STANDARD: { title: string; body: Voiced }[] = [
-  { title: 'Written before built', body: v('Every project starts with a written brief and scope. If it’s not written down, it’s not agreed.', 'Every engagement begins with a written brief and scope. Anything not documented is not agreed.') },
-  { title: 'Demo every week', body: v('Working software, live cohorts, running campaigns. We show it weekly instead of pitching it in decks.', 'Working software, live cohorts and running campaigns are demonstrated weekly rather than described in presentations.') },
-  { title: 'One accountable lead', body: v('Every cohort, system and campaign has one named owner, kickoff to handover.', 'Every cohort, system and campaign has a single named owner from kickoff to handover.') },
-  { title: 'Handover by design', body: v('Docs, access and training ship with the work. Never an afterthought.', 'Documentation, access and training are part of the deliverable and are handed over with it.') },
+  { title: 'Written before built', body: v('Every project starts with a written brief and scope. If it’s not written down, it’s not agreed.', 'Every engagement starts with a written brief and scope. If it is not in writing, it has not been agreed.') },
+  { title: 'Demo every week', body: v('Working software, live cohorts, running campaigns. We show it weekly instead of pitching it in decks.', 'We show working software, live cohorts and running campaigns every week, instead of reporting progress in slides.') },
+  { title: 'One accountable lead', body: v('Every cohort, system and campaign has one named owner, kickoff to handover.', 'Each cohort, system and campaign has one named owner, from kickoff to handover.') },
+  { title: 'Handover by design', body: v('Docs, access and training ship with the work. Never an afterthought.', 'Documentation, account access and training are part of every deliverable, handed over with the work.') },
 ];
 
 export const HOME_STANDARDS = {
