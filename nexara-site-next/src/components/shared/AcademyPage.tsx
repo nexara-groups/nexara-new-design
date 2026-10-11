@@ -23,6 +23,9 @@ const Arrow = ({ size = 18 }: { size?: number }) => (
   </svg>
 );
 
+// Key words in the thesis line get the division colour (Neo skin only, see shared.css), like the home manifesto.
+const HL = /^(placement-ready|proof|receipts|evidence)\W*$/i;
+
 export function AcademyPage({ theme }: { theme: Theme }) {
   const t = <T,>(value: { neo: T; trust: T }) => voiced(value, theme);
   const copy = COPY.academy;
@@ -209,7 +212,7 @@ export function AcademyPage({ theme }: { theme: Theme }) {
         <div className="nx-ac-wrap">
           <p>
             {t(PAGE.thesis).split(' ').map((word, i) => (
-              <React.Fragment key={i}>{i > 0 && ' '}<span className="nx-ac-w">{word}</span></React.Fragment>
+              <React.Fragment key={i}>{i > 0 && ' '}<span className={`nx-ac-w${HL.test(word) ? ' nx-hl' : ''}`}>{word}</span></React.Fragment>
             ))}
           </p>
         </div>

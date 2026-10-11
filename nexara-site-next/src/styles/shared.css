@@ -2299,3 +2299,7 @@ main.nx-pf .nx-pf-result h3 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); font-weig
   --nx-pf-presence: var(--nx-div-academy); --nx-pf-visibility: var(--nx-div-marketing); --nx-pf-performance: var(--nx-div-labs);
   --nx-pf-wash-presence: #0a0614; --nx-pf-wash-visibility: #021008; --nx-pf-wash-performance: #12060a;
 }
+
+/* Key words in the story and thesis lines take the division colour, as on the home manifesto. */
+.neo[data-division="marketing"] .nx-mk-w.nx-hl { color: var(--nx-mk-cta); }
+.neo[data-division="academy"] .nx-ac-w.nx-hl { color: var(--nx-ac-cta); }

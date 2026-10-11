@@ -21,6 +21,9 @@ const Arrow = ({ size = 18 }: { size?: number }) => (
   </svg>
 );
 
+// Key words in the story line get the division colour (Neo skin only, see shared.css), like the home manifesto.
+const HL = /^(find|trust|reach)\W*$/i;
+
 export function MarketingPage({ theme }: { theme: Theme }) {
   const t = <T,>(value: { neo: T; trust: T }) => voiced(value, theme);
   const copy = COPY.marketing;
@@ -172,7 +175,7 @@ export function MarketingPage({ theme }: { theme: Theme }) {
     story: () => (
       <section className="nx-mk-story">
         <div className="nx-mk-wrap">
-          <p>{t(PAGE.story).split(' ').map((word, i) => <React.Fragment key={i}>{i > 0 && ' '}<span className="nx-mk-w">{word}</span></React.Fragment>)}</p>
+          <p>{t(PAGE.story).split(' ').map((word, i) => <React.Fragment key={i}>{i > 0 && ' '}<span className={`nx-mk-w${HL.test(word) ? ' nx-hl' : ''}`}>{word}</span></React.Fragment>)}</p>
         </div>
       </section>
     ),
