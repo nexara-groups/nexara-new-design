@@ -1334,6 +1334,12 @@ function NeoGuide() {
       else { scheduleIdleSass(); }
       scheduleAntic();
 
+      // Surfaces whose copy must stay readable: park Neo outside their rect.
+      const READ_SURFACE = ".nx-rail-panel, .nx-card, .nx-client-card, article, h1, h2, h3, h4, p, li, blockquote, .nx-lab-card, .nx-pf-frame";
+      const CHAR_W = 88;
+      const STACK_H = 210; // face (~88) + below-bubble (~252px / 11.5px type) + gap
+      const SIDE_GAP = 18;
+
       const onMove = (event) => {
         if (!guideLive) return;
         // Cursor speed leans him into the move and feeds his energy; he settles
@@ -1346,34 +1352,77 @@ function NeoGuide() {
           bump(Math.min(0.03, Math.abs(vx) * 0.02));
         }
         lastMX = event.clientX; lastMoveT = nowM;
-        // Trail BELOW-RIGHT of the cursor. Bubble sits under Neo in cursor mode
-        // so it never covers the label/card the pointer is trying to read.
-        // Near the right edge he pins and opens leftward. Near the bottom he
-        // flips above the cursor instead of stacking off-screen.
-        const x = clamp(event.clientX + 80, 12, window.innerWidth - 100);
-        charWrap.classList.toggle("is-flipped", x > window.innerWidth - 340);
-        const navBottom = document.querySelector(".nav")?.getBoundingClientRect().bottom ?? 74;
+
+        const navEl = document.querySelector(".nx-nav") || document.querySelector(".nav");
+        const navBottom = navEl?.getBoundingClientRect().bottom ?? 74;
         guide.classList.toggle("is-nav-hover", event.clientY < navBottom);
-        const stackH = 150; // face + below-bubble clearance
-        const preferBelow = event.clientY + 36;
-        const canSitBelow = preferBelow + stackH < window.innerHeight - 12;
-        guide.classList.toggle("is-bubble-above", !canSitBelow);
-        const y = canSitBelow
-          ? clamp(preferBelow, navBottom + 16, window.innerHeight - stackH)
-          : clamp(event.clientY - 110, navBottom + 96, window.innerHeight - 108);
+
+        const dock = document.querySelector(".nx-finder.is-shown");
+        const floorY = dock
+          ? Math.min(window.innerHeight - 12, dock.getBoundingClientRect().top - 12)
+          : window.innerHeight - 12;
+
+        const hit = document.elementFromPoint(event.clientX, event.clientY);
+        const surface = hit?.closest?.(READ_SURFACE);
+        let x;
+        let y;
+        let bubbleAbove = false;
+
+        if (surface) {
+          // Park beside (or fully below/above) the read rect so avatar + bubble
+          // never cover the copy under the pointer.
+          const r = surface.getBoundingClientRect();
+          const spaceRight = window.innerWidth - r.right - SIDE_GAP;
+          const spaceLeft = r.left - SIDE_GAP;
+          const midY = r.top + r.height * 0.58;
+
+          if (spaceRight >= CHAR_W) {
+            x = clamp(r.right + SIDE_GAP, 12, window.innerWidth - 100);
+            charWrap.classList.toggle("is-flipped", false);
+            y = clamp(midY - 40, navBottom + 16, floorY - STACK_H);
+            bubbleAbove = y + STACK_H > floorY - 8;
+          } else if (spaceLeft >= CHAR_W) {
+            x = clamp(r.left - CHAR_W - SIDE_GAP, 12, window.innerWidth - 100);
+            charWrap.classList.toggle("is-flipped", true);
+            y = clamp(midY - 40, navBottom + 16, floorY - STACK_H);
+            bubbleAbove = y + STACK_H > floorY - 8;
+          } else if (r.bottom + SIDE_GAP + STACK_H <= floorY) {
+            x = clamp(event.clientX + 80, 12, window.innerWidth - 100);
+            charWrap.classList.toggle("is-flipped", x > window.innerWidth - 340);
+            y = r.bottom + SIDE_GAP;
+            bubbleAbove = false;
+          } else {
+            x = clamp(event.clientX + 80, 12, window.innerWidth - 100);
+            charWrap.classList.toggle("is-flipped", x > window.innerWidth - 340);
+            y = clamp(r.top - STACK_H - SIDE_GAP, navBottom + 16, floorY - STACK_H);
+            bubbleAbove = true;
+          }
+        } else {
+          // Default trail below-right of the cursor; flip above near the floor.
+          x = clamp(event.clientX + 80, 12, window.innerWidth - 100);
+          charWrap.classList.toggle("is-flipped", x > window.innerWidth - 340);
+          const preferBelow = event.clientY + 36;
+          const canSitBelow = preferBelow + STACK_H < floorY;
+          bubbleAbove = !canSitBelow;
+          y = canSitBelow
+            ? clamp(preferBelow, navBottom + 16, floorY - STACK_H)
+            : clamp(event.clientY - 110, navBottom + 96, floorY - 108);
+        }
+
+        guide.classList.toggle("is-bubble-above", bubbleAbove);
         gsap.to(charWrap, { x, y, duration: 0.2, ease: "power3.out", overwrite: "auto" });
         gsap.to(spotlight, { autoAlpha: 1, top: y + 38, duration: 0.18, overwrite: "auto" });
 
         // pupils watch the actual cursor → side-eye sass (never let face code break the voice)
         try {
           if (hasFace && faceSvg) {
-            const r = faceSvg.getBoundingClientRect();
-            look(clamp((event.clientX - (r.left + r.width / 2)) / 130, -1, 1),
-                 clamp((event.clientY - (r.top + r.height * 0.34)) / 130, -1, 1));
+            const fr = faceSvg.getBoundingClientRect();
+            look(clamp((event.clientX - (fr.left + fr.width / 2)) / 130, -1, 1),
+                 clamp((event.clientY - (fr.top + fr.height * 0.34)) / 130, -1, 1));
           }
         } catch (_) {}
 
-        const info = classifyTarget(document.elementFromPoint(event.clientX, event.clientY));
+        const info = classifyTarget(hit);
         if (info.key !== lastKey) {
           lastKey = info.key;
           activeInfo = info;
