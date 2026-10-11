@@ -23,9 +23,14 @@ export function BlogShell({
 }) {
   const router = useRouter();
   React.useEffect(() => { (theme === 'trust' ? setTrustRouter : setNeoRouter)(router); }, [router, theme]);
+  React.useEffect(() => {
+    if (theme !== 'trust') return;
+    document.body.dataset.trustAccent = 'blue';
+    return () => { delete document.body.dataset.trustAccent; };
+  }, [theme]);
   useSmoothScroll();
   return (
-    <div className={`site ${theme}${theme === 'trust' ? ' tsx-site' : ''}`}>
+    <div className={`site ${theme}${theme === 'trust' ? ' tsx-site' : ''}`} data-accent={theme === 'trust' ? 'blue' : undefined}>
       <a className="skip-link" href="#main">Skip to content</a>
       <SiteNav theme={theme} page="blog" detail={detail} />
       <div id="main" className="nx-light">

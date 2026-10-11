@@ -208,7 +208,7 @@
 /* ── Trust surfaces: dark page header, light content bands (matches Trust's own section rhythm) ── */
 .trust .nx-section, .trust .nx-light { background: var(--bg); }
 .trust .nx-page > .nx-section:nth-of-type(even) { background: var(--soft); }
-.trust .nx-page-head { --nx-ink: #F6F8F4; --muted: rgba(234,238,230,.72); --nx-link: #A9DBBD; background: radial-gradient(60% 100% at 85% 0%, rgba(30,122,77,.22), transparent 70%), #0d140f; }
+.trust .nx-page-head { --nx-ink: #F6F8F4; --muted: rgba(234,238,230,.72); --nx-link: var(--tr-head-link, #A9DBBD); background: radial-gradient(60% 100% at 85% 0%, var(--tr-head-glow, rgba(30,122,77,.22)), transparent 70%), var(--tr-head-bg, #0d140f); }
 .trust .nx-page-head h1 { color: #F6F8F4; }
 
 /* ═══ Nav (SiteNav) ═══ */

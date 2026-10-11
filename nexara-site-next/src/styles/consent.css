@@ -150,3 +150,8 @@
   .cc-banner-actions { flex-wrap: nowrap; gap: .4rem; }
   .cc-banner-actions .cc-btn { padding: .72rem .35rem; font-size: .62rem; letter-spacing: .04em; min-height: 44px; }
 }
+
+/* Banner and modal live outside .trust (portal), so they follow the page accent via <body>. */
+body[data-trust-accent="blue"] :is(.cc-banner.cc-theme-trust, .cc-modal.cc-theme-trust),
+body[data-trust-accent="home"] :is(.cc-banner.cc-theme-trust, .cc-modal.cc-theme-trust) { --cc-accent: #215f94; --cc-accent-dark: #184a75; }
+body[data-trust-accent="amber"] :is(.cc-banner.cc-theme-trust, .cc-modal.cc-theme-trust) { --cc-accent: #8a4b12; --cc-accent-dark: #6e3b0d; }

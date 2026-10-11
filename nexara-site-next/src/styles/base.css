@@ -2133,7 +2133,7 @@ h1, h2 { text-wrap: balance; }
 /* Trust contrast (WCAG AA): accent text on light surfaces uses brand action blue; muted/ghost text uses a darker slate.
    Tokens are untouched, so fills, borders and dark sections keep the light-blue accent. */
 .trust.tsx-site :is(.tsx-manifesto, .tsx-rail-stage, .tsx-standard-head, .tsx-enterprise-stacks, .tsx-work, .tsx-market-context, .tsx-final-cta, .tsx-ledger-plate) .tsx-section-eyebrow, .trust.tsx-site .tsx-section-heading .serif, .trust.tsx-site .tsx-ledger-plate :is(.tsx-ledger-plate-label, .tsx-ledger-rownum) { color: #1E7A4D !important; }
-.cc-banner.cc-theme-trust .cc-btn-solid { background: #1E7A4D; }
+.cc-banner.cc-theme-trust .cc-btn-solid { background: var(--cc-accent, #1E7A4D); }
 
 /* Home close: FAQs beside the related-service links. */
 .local-context--home .local-context__inner { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 8px 64px; align-items: start; }

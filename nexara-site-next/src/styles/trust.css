@@ -4698,3 +4698,28 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust.trust-home .tsx-hero-runway, .trust .tsx-hero-runway { background: #0a101a; }
 .trust .tsx-hero-runway--static { background: none; }
 .trust .tsx-hero-canvas { will-change: transform, opacity; contain: strict; }
+
+/* ═══ Page accent (one accent per page, set by data-accent on the Trust root) ═══
+   Tracks: Digital Solutions = green (default), Talent Programmes + umbrella pages = brand blue,
+   Product Studio = amber (.trust-labs), Home = blue with its own hero skin (.trust-home).
+   Accent drives the chrome only: nav, CTAs, links, focus, page header, footer label. Modules keep
+   their own multi-colour palettes (status ticks, track chips). Same element as .trust, so derived
+   tokens (--nx-focus, --nx-nav-hot, --nx-link) resolve against these values. */
+.trust.tsx-site[data-accent="blue"] {
+  --tr-paper: #f5f7fa; --tr-mist: #f1f4f8;
+  --tr-line: #dde3eb; --tr-line-2: #e9edf2;
+  --tr-ink: #131c2a; --tr-ink-2: #364154; --tr-muted: #586274; --tr-faint: #636d7e;
+  --tr-green: #215f94; --tr-green-deep: #184a75; --tr-green-wash: #edf3f9; --tr-green-light: #9fc4e6;
+  --tr-shadow-rgb: 19, 28, 42;
+  --accent: #215f94; --blueprint: #215f94; --vermilion: #215f94; --accent-fg: #edf3f9;
+  --ring: rgba(33, 95, 148, .26);
+  --nx-wash-line: rgba(33, 95, 148, .3); --nx-dot-ring: rgba(33, 95, 148, .16);
+  --nx-card-glow: rgba(33, 95, 148, .75); --nx-card-wash: rgba(33, 95, 148, .08);
+  --depth-accent: #215f94;
+  --nx-mk-dots: rgba(33, 95, 148, .22); --nx-bl-dots: rgba(33, 95, 148, .18); --nx-ct-dots: rgba(33, 95, 148, .2);
+  --nx-lab-bg: #0d1522; --nx-lab-ui: #c6daee;
+  --tr-head-bg: #0d1522; --tr-head-glow: rgba(33, 95, 148, .3); --tr-head-link: #a9c9e8;
+}
+.trust.tsx-site.trust-labs { --tr-head-bg: #17130e; --tr-head-glow: rgba(138, 75, 18, .3); --tr-head-link: #f0b47a; }
+.trust.tsx-site.trust-home { --tr-head-bg: #0d1522; --tr-head-glow: rgba(33, 95, 148, .3); --tr-head-link: #a9c9e8; }
+.trust[data-accent="blue"] .nx-footer::before { background: linear-gradient(90deg, #215f94 0 33.3%, var(--tr-plum) 33.3% 66.6%, #8a4b12 66.6%); }

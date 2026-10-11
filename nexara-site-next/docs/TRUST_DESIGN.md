@@ -1,5 +1,7 @@
 # Trust design handbook
 
+> **Page accent system (supersedes the "no blue" wording in §1 rule 2).** Every Trust page sets one accent on the site root via `data-accent` (`TrustSiteClient.tsx`, `BlogShell.tsx`): `green` = Digital Solutions (`/trust/marketing`, default tokens); `blue` = Talent Programmes and all umbrella pages (Delivery Proof, Blog, About, Contact, 404); `amber` = Product Studio (`.trust-labs`); `home` = Home's own blue hero skin (`.trust-home`). The accent drives chrome only: nav CTA and hover, links, focus rings, page header band (`--tr-head-*`), footer label, cookie banner (via `body[data-trust-accent]`). Modules keep their own multi-colour palettes (status ticks, track chips, tri-colour footer stripe). New page = pick an accent, never hard-code a green or blue in chrome. Blocks live at the end of `trust.css` ("Page accent").
+
 The single source of truth for how Trust looks, moves and reads, and how to convert a Trust page to it.
 Written so an agent who has never seen this repo can convert a page using only this file.
 
