@@ -387,21 +387,22 @@ class NeoHeroRenderer {
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
-    private readonly lowPower: boolean,
+    private readonly tier: HeroTier,
   ) {
+    const weak = tier === 'weak';
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
       antialias: false,
       depth: false,
       stencil: false,
-      powerPreference: lowPower ? 'low-power' : 'high-performance',
+      powerPreference: weak ? 'low-power' : 'high-performance',
       premultipliedAlpha: true,
     });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.setClearColor(0x000000, 0);
 
-    const countPerStrand = lowPower ? 84 : 240;
+    const countPerStrand = weak ? 84 : tier === 'phone' ? 160 : 240;
     const seeds = createSeeds(countPerStrand);
     this.pointGeometry = geometryFromSeeds(seeds);
     this.lineGeometry = geometryFromSeeds(lineSeeds(seeds, countPerStrand));
@@ -411,7 +412,7 @@ class NeoHeroRenderer {
       uMouseX: { value: 0 },
       uMouseY: { value: 0 },
       uPixelRatio: { value: 1 },
-      uPointScale: { value: lowPower ? 6.7 : 7.2 },
+      uPointScale: { value: weak ? 6.7 : tier === 'phone' ? 7 : 7.2 },
       uNdcScale: { value: new THREE.Vector2(1, 1) },
     };
 
@@ -434,7 +435,7 @@ class NeoHeroRenderer {
       blending: THREE.AdditiveBlending,
     });
 
-    this.dustGeometry = createDustGeometry(lowPower ? 110 : 320);
+    this.dustGeometry = createDustGeometry(weak ? 110 : tier === 'phone' ? 220 : 320);
     this.dustMaterial = new THREE.ShaderMaterial({
       uniforms: this.uniforms,
       vertexShader: DUST_VERTEX_SHADER,
@@ -466,8 +467,8 @@ class NeoHeroRenderer {
     this.width = Math.max(1, Math.round(width));
     this.height = Math.max(1, Math.round(height));
     const nativeDpr = window.devicePixelRatio || 1;
-    const dprCap = this.lowPower ? 1 : 1.5;
-    const pixelBudget = this.lowPower ? 1_600_000 : 3_600_000;
+    const dprCap = this.tier === 'weak' ? 1 : this.tier === 'phone' ? 2 : 1.5;
+    const pixelBudget = this.tier === 'weak' ? 1_600_000 : this.tier === 'phone' ? 2_400_000 : 3_600_000;
     const budgetDpr = Math.sqrt(pixelBudget / Math.max(1, this.width * this.height));
     const effectiveDpr = Math.max(0.7, Math.min(nativeDpr, dprCap, budgetDpr)) * this.quality;
     const scale = Math.min(this.width, this.height) * 0.305;
@@ -518,6 +519,11 @@ class NeoHeroRenderer {
   }
 }
 
+// weak: data-saver / genuinely constrained devices. phone: current phones, which are not
+// low-power (a 120Hz Pro iPhone out-draws most laptops) but get a pixel budget and a 60fps
+// draw cap. full: desktop.
+type HeroTier = 'weak' | 'phone' | 'full';
+
 type ChapterState = {
   el: HTMLElement;
   from: number;
@@ -542,9 +548,15 @@ export function useNeoHeroWebGL({
     const originalHeight = wrap.style.height;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const saveData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
-    const lowPower = window.matchMedia('(max-width: 760px)').matches
-      || saveData
-      || (navigator.hardwareConcurrency || 8) <= 4;
+    const isPhone = window.matchMedia('(max-width: 760px)').matches;
+    const cores = navigator.hardwareConcurrency || 8;
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    // iOS Safari reports few cores even on Pro phones, so cores only gate non-phones.
+    const tier: HeroTier = saveData || memory <= 2 || cores <= 2 || (!isPhone && cores <= 4)
+      ? 'weak'
+      : isPhone ? 'phone' : 'full';
+    const lowPower = tier === 'weak';
+    const frameCap = tier === 'weak' ? 30 : tier === 'phone' ? 60 : 0;
 
     const chapters: ChapterState[] = Array.from(wrap.querySelectorAll<HTMLElement>('.neo-hero-chapter')).map((el) => ({
       el,
@@ -567,6 +579,7 @@ export function useNeoHeroWebGL({
     const mouse = { currentX: 0, currentY: 0, targetX: 0, targetY: 0 };
     let activeChapter = -1;
     let lastDomProgress = -1;
+    let spreadPx = 14;
     let engine: NeoHeroRenderer | null = null;
     let rafId = 0;
     let heroVisible = true;
@@ -623,14 +636,29 @@ export function useNeoHeroWebGL({
       const spread = THREE.MathUtils.smoothstep(progress, 0, 0.07);
       titleSpans.forEach((span, index) => {
         const direction = index - (titleSpans.length - 1) / 2;
-        span.style.transform = `translate3d(${(direction * spread * 14).toFixed(1)}px, 0, 0)`;
+        span.style.transform = `translate3d(${(direction * spread * spreadPx).toFixed(1)}px, 0, 0)`;
       });
+    };
+
+    // The wordmark fills most of a phone's width, so a fixed 14px-per-letter spread pushed the
+    // outer letters off-screen. Cap it to the room that actually exists on each side.
+    const measureSpread = (): void => {
+      if (titleSpans.length < 2) return;
+      const previous = titleSpans.map((span) => span.style.transform);
+      titleSpans.forEach((span) => { span.style.transform = 'none'; });
+      const first = titleSpans[0]!.getBoundingClientRect();
+      const last = titleSpans[titleSpans.length - 1]!.getBoundingClientRect();
+      titleSpans.forEach((span, index) => { span.style.transform = previous[index] ?? ''; });
+      const room = Math.min(first.left, document.documentElement.clientWidth - last.right) - 8;
+      spreadPx = Math.max(0, Math.min(14, room / ((titleSpans.length - 1) / 2)));
+      lastDomProgress = -1;
     };
 
     const resize = (): void => {
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
       if (width > 0 && height > 0) engine?.resize(width, height);
+      measureSpread();
     };
 
     const ensureRender = (): void => {
@@ -667,7 +695,7 @@ export function useNeoHeroWebGL({
       // Low-power devices: throttle only the WebGL draw to 30fps. The chapter
       // copy above still tracks scroll every frame — capping the whole loop made
       // scroll-linked text step at half the scroll rate (visible jitter).
-      const skipDraw = lowPower && lastDraw && now - lastDraw < 1000 / 30 - 1;
+      const skipDraw = frameCap > 0 && lastDraw && now - lastDraw < 1000 / frameCap - 1.5;
       if (skipDraw) {
         canvas.dataset.renderMode = 'interactive';
         if (stillMoving || (!reducedMotion && !saveData && engine)) ensureRender();
@@ -729,7 +757,7 @@ export function useNeoHeroWebGL({
     canvas.addEventListener('webglcontextrestored', onContextRestored, false);
 
     try {
-      if (!reducedMotion) engine = new NeoHeroRenderer(canvas, lowPower);
+      if (!reducedMotion) engine = new NeoHeroRenderer(canvas, tier);
       wrap.classList.add(engine ? 'neo-webgl-ready' : 'neo-webgl-fallback');
       resize();
     } catch (error) {
@@ -738,6 +766,8 @@ export function useNeoHeroWebGL({
     }
 
     updateChapters(0);
+    measureSpread();
+    void document.fonts?.ready.then(measureSpread);
     let scrollTrigger: ScrollTrigger | null = null;
     if (reducedMotion || !engine) {
       state.target = 0;
@@ -764,7 +794,7 @@ export function useNeoHeroWebGL({
       mouse.targetY = (event.clientY - window.innerHeight / 2) / Math.max(1, window.innerHeight / 2);
       ensureRender();
     };
-    if (!lowPower && !reducedMotion) window.addEventListener('mousemove', onMouseMove, { passive: true });
+    if (tier === 'full' && !reducedMotion) window.addEventListener('mousemove', onMouseMove, { passive: true });
 
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       heroVisible = Boolean(entry?.isIntersecting);

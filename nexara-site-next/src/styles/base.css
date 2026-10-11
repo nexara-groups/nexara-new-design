@@ -2326,3 +2326,7 @@ h1, h2 { text-wrap: balance; }
   50%  { transform: translate3d(6%, -8%, 0) scale(1.12); }
   100% { transform: translate3d(-7%, 6%, 0) scale(.94); }
 }
+
+/* iOS Safari: rubber-banding at the top of the page drags the sticky nav and hero away from the
+   screen edge and shows a black gap. */
+html { overscroll-behavior-y: none; }

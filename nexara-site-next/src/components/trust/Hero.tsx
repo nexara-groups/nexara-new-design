@@ -265,7 +265,12 @@ export function TrustHeroUnravel() {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isMobile = window.matchMedia("(max-width: 760px)").matches;
     const saveData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
-    const lowPower = isMobile || saveData || (navigator.hardwareConcurrency || 8) <= 4;
+    // Phones are not low-power: a Pro-class iPhone out-draws most laptops. Only data-saver and
+    // genuinely constrained devices take the weak path. iOS reports few cores, so cores only
+    // gate non-phones.
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    const cores = navigator.hardwareConcurrency || 8;
+    const lowPower = saveData || memory <= 2 || cores <= 2 || (!isMobile && cores <= 4);
 
     // ── Three divisions: blob + particle stream system ────────────────────────
     //
@@ -304,7 +309,7 @@ export function TrustHeroUnravel() {
     // The previous 270–420 moving sprites plus a DPR-2 trail buffer kept the
     // main thread/GPU busy even while idle. This is visually equivalent at
     // normal viewing distance, but leaves enough frame budget for scrolling.
-    const COUNT = lowPower ? 18 : 64;
+    const COUNT = lowPower ? 18 : isMobile ? 40 : 64;
     const particles = DIVS.map(() =>
       Array.from({ length: COUNT }, (_, i) => ({
         t:  i / COUNT,
@@ -552,7 +557,7 @@ export function TrustHeroUnravel() {
 
     let lastDpr = 0;
     function measure() {
-      const dpr = lowPower ? 1 : Math.min(window.devicePixelRatio || 1, 1.35);
+      const dpr = lowPower ? 1 : Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 1.35);
       const nextW = canvas.clientWidth, nextH = canvas.clientHeight;
       // Mobile browsers fire resize while the URL bar slides; resetting canvas.width
       // clears the bitmap and reads as a flash. Only rebuild on a real size change.
@@ -757,7 +762,7 @@ export function TrustHeroUnravel() {
       // Scroll-linked copy above updates every frame; on low-power devices only
       // the canvas paint below is throttled (to frameInterval). Capping the
       // whole loop made the chapter text step at half the scroll rate.
-      const skipDraw = lowPower && lastDraw && now - lastDraw < frameInterval - 1;
+      const skipDraw = lastDraw && now - lastDraw < frameInterval - 1.5;
       if (!skipDraw) {
       lastDraw = now;
       ctx.clearRect(0, 0, W, H);
