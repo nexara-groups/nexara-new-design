@@ -1105,3 +1105,6 @@ html:has(.site.neo) { scroll-padding-top: 100px; }
 }
 .neo .neo-hero-runway--detail .neo-atmos { display: none; }
 
+
+/* Mobile URL-bar collapse: stage is svh, so keep the runway the same colour as the stage. */
+.neo-hero-runway { background: #06060a; }

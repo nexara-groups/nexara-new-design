@@ -120,8 +120,6 @@
   background: rgba(255, 255, 255, 0.96);
   border-top: 1px solid rgba(28, 30, 24, 0.12);
   box-shadow: 0 -12px 34px rgba(21, 32, 26, 0.10);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
 }
 .cc-banner.cc-theme-trust .cc-banner-text strong { color: #15201A; font-family: var(--font-body); font-weight: 600; font-size: 1.02rem; }
 .cc-banner.cc-theme-trust .cc-banner-text p { color: #5F6359; }
@@ -143,3 +141,12 @@
 .cc-modal.cc-theme-trust .cc-btn-solid { color: #fff; }
 .cc-modal.cc-theme-trust .cc-btn-ghost { color: #15201A; border-color: rgba(28, 30, 24, 0.22); }
 .cc-modal.cc-theme-trust .cc-btn-ghost:hover { border-color: #15201A; color: #15201A; }
+
+/* Phones: keep the first-visit banner to ~130px so the hero stays the first thing seen. */
+@media (max-width: 560px) {
+  .cc-banner-inner { gap: .65rem; padding: .85rem 1rem calc(.85rem + env(safe-area-inset-bottom)); }
+  .cc-banner-text strong { font-size: .88rem; margin-bottom: .15rem; }
+  .cc-banner-text p { font-size: .74rem; line-height: 1.45; }
+  .cc-banner-actions { flex-wrap: nowrap; gap: .4rem; }
+  .cc-banner-actions .cc-btn { padding: .72rem .35rem; font-size: .62rem; letter-spacing: .04em; min-height: 44px; }
+}

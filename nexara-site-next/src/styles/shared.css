@@ -2086,3 +2086,14 @@ main.nx-pf .nx-pf-ask-card h2 { max-width: 14ch; margin: 0 0 18px; font-size: cl
   .cc-banner-text a { display: inline-block; padding: 14px 0; margin: -14px 0; }
   input, select, textarea { font-size: max(16px, 1em); }
 }
+
+/* Hero pages: a live backdrop blur over the animating hero re-blurs the canvas every
+   frame (the main cause of scroll lag on mid-range GPUs and phones). The pill gets a
+   denser fill instead, which reads the same without the per-frame cost. Same on touch. */
+.neo:has(.neo-hero-stage) .nx-nav-inner,
+.trust:has(.tsx-hero-stage) .nx-nav-inner { backdrop-filter: none; -webkit-backdrop-filter: none; }
+.neo:has(.neo-hero-stage) .nx-nav-inner { --nx-nav-bg: rgba(8,9,6,.9); }
+.trust:has(.tsx-hero-stage) .nx-nav-inner { --nx-nav-bg: rgba(255,255,255,.95); }
+@media (pointer: coarse) {
+  .nx-nav-inner, .nx-mk-dock, .cc-banner { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}

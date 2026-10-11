@@ -550,16 +550,25 @@ export function TrustHeroUnravel() {
     const trailCanvas = document.createElement('canvas');
     const tctx = trailCanvas.getContext('2d');
 
+    let lastDpr = 0;
     function measure() {
-      wordmarkGeometry = null;
       const dpr = lowPower ? 1 : Math.min(window.devicePixelRatio || 1, 1.35);
-      W = canvas.clientWidth; H = canvas.clientHeight;
+      const nextW = canvas.clientWidth, nextH = canvas.clientHeight;
+      // Mobile browsers fire resize while the URL bar slides; resetting canvas.width
+      // clears the bitmap and reads as a flash. Only rebuild on a real size change.
+      if (nextW === W && nextH === H && dpr === lastDpr) return;
+      lastDpr = dpr;
+      wordmarkGeometry = null;
+      W = nextW; H = nextH;
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      trailCanvas.width = canvas.width;
-      trailCanvas.height = canvas.height;
-      tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // Trails are soft glows: half resolution looks identical and cuts the two
+      // full-screen passes per frame (fade + composite) to a quarter of the fill.
+      const tdpr = dpr * 0.5;
+      trailCanvas.width = Math.max(1, Math.round(W * tdpr));
+      trailCanvas.height = Math.max(1, Math.round(H * tdpr));
+      tctx.setTransform(tdpr, 0, 0, tdpr, 0, 0);
       CX = W / 2;
       CY = H * 0.48;
       SCALE = Math.min(W, H) * 0.305;
@@ -586,6 +595,10 @@ export function TrustHeroUnravel() {
     const beamEl = titleRef.current ? titleRef.current.querySelector('.tsx-wordmark-beam') : null;
     const litArr = titleSpans.map(() => 0);
     function applyLit(el, lit, prox) {
+      // Skip identical writes: text-shadow changes force a repaint of the glyph layer.
+      const key = lit.toFixed(2) + '|' + prox.toFixed(2);
+      if (el.__lit === key) return;
+      el.__lit = key;
       // Keep the unlit wordmark legible and premium. The strike still creates a
       // clear lift to white, but the resting state no longer reads as disabled.
       const r = Math.round(208 + 38 * lit), g = Math.round(220 + 29 * lit), b = Math.round(236 + 19 * lit);
@@ -708,7 +721,8 @@ export function TrustHeroUnravel() {
       const delta = Math.min(50, now - (previousDraw || now - 16.7)) / 1000;
       previousDraw = now;
       const time = prefersReducedMotion ? 0 : (now - t0) / 1000;
-      state.p += (state.target - state.p) * (1 - Math.exp(-18 * delta));
+      // Lenis already eases wheel input; a short follow here only de-quantises touch scroll.
+      state.p += (state.target - state.p) * (1 - Math.exp(-32 * delta));
       if (Math.abs(state.target - state.p) < 0.0004) state.p = state.target;
       mouse.x += (mouse.tx - mouse.x) * (1 - Math.exp(-10 * delta));
       mouse.y += (mouse.ty - mouse.y) * (1 - Math.exp(-10 * delta));

@@ -4689,3 +4689,12 @@ html.js-reveal-ready .trust .tsx-fade.visible {
 .trust.trust-labs .nx-footer::before { background: linear-gradient(90deg, #215f94 0 33.3%, var(--tr-plum) 33.3% 66.6%, #8a4b12 66.6%); }
 .trust.trust-labs .tsx-concierge-dot { animation-name: tsxConciergePulseAmber; }
 @keyframes tsxConciergePulseAmber { 0% { box-shadow: 0 0 0 0 rgba(240, 180, 122, .6); } 70% { box-shadow: 0 0 0 7px rgba(240, 180, 122, 0); } 100% { box-shadow: 0 0 0 0 rgba(240, 180, 122, 0); } }
+
+/* Hero scroll smoothness: chapter opacity/transform are written every frame by JS,
+   so a CSS transition on top restarts each frame and trails the scroll. The runway
+   also carries the stage colour so the strip revealed when a mobile URL bar
+   collapses (stage is svh, viewport grows to lvh) is never the page background. */
+.trust .tsx-hero-runway:not(.tsx-hero-runway--static) .tsx-hero-chapter { transition: none; }
+.trust.trust-home .tsx-hero-runway, .trust .tsx-hero-runway { background: #0a101a; }
+.trust .tsx-hero-runway--static { background: none; }
+.trust .tsx-hero-canvas { will-change: transform, opacity; contain: strict; }

@@ -380,6 +380,10 @@ class NeoHeroRenderer {
   private width = 1;
   private height = 1;
   private quality = 1;
+  private appliedWidth = 0;
+  private appliedHeight = 0;
+  private appliedDpr = 0;
+  private lastFrame: FrameState | null = null;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -453,6 +457,9 @@ class NeoHeroRenderer {
   setQuality(quality: number): void {
     this.quality = THREE.MathUtils.clamp(quality, 0.72, 1);
     this.resize(this.width, this.height);
+    // setSize cleared the buffer; repaint in this same task so the compositor
+    // never presents a blank frame (visible as a flash mid-scroll).
+    if (this.lastFrame) this.render(this.lastFrame);
   }
 
   resize(width: number, height: number): void {
@@ -464,6 +471,17 @@ class NeoHeroRenderer {
     const budgetDpr = Math.sqrt(pixelBudget / Math.max(1, this.width * this.height));
     const effectiveDpr = Math.max(0.7, Math.min(nativeDpr, dprCap, budgetDpr)) * this.quality;
     const scale = Math.min(this.width, this.height) * 0.305;
+
+    // Resize events fire for URL-bar slides and quality probes; reallocating the
+    // drawing buffer clears it, so skip when nothing actually changed.
+    if (
+      this.width === this.appliedWidth
+      && this.height === this.appliedHeight
+      && Math.abs(effectiveDpr - this.appliedDpr) < 0.001
+    ) return;
+    this.appliedWidth = this.width;
+    this.appliedHeight = this.height;
+    this.appliedDpr = effectiveDpr;
 
     this.renderer.setPixelRatio(effectiveDpr);
     this.renderer.setSize(this.width, this.height, false);
@@ -477,6 +495,7 @@ class NeoHeroRenderer {
   }
 
   render(frame: FrameState): void {
+    this.lastFrame = frame;
     this.uniforms.uProgress!.value = frame.progress;
     this.uniforms.uTime!.value = frame.time;
     this.uniforms.uMouseX!.value = frame.mouseX;
@@ -630,7 +649,7 @@ export function useNeoHeroWebGL({
       lastFrame = now;
       activeTime += deltaSeconds;
 
-      const progressFollow = 1 - Math.exp(-24 * deltaSeconds);
+      const progressFollow = 1 - Math.exp(-32 * deltaSeconds);
       const pointerFollow = 1 - Math.exp(-16 * deltaSeconds);
       state.current += (state.target - state.current) * progressFollow;
       mouse.currentX += (mouse.targetX - mouse.currentX) * pointerFollow;
@@ -680,7 +699,7 @@ export function useNeoHeroWebGL({
         canvas.dataset.frameMs = frameEma.toFixed(2);
         const previousQuality = quality;
         if (frameEma > 20.5) quality = Math.max(0.72, quality - 0.08);
-        else if (frameEma < 17.25) quality = Math.min(1, quality + 0.04);
+        else if (frameEma < 16.9 && now - lastQualityChange > 6000) quality = Math.min(1, quality + 0.04);
         if (quality !== previousQuality) {
           engine?.setQuality(quality);
           lastQualityChange = now;
