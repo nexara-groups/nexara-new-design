@@ -39,8 +39,10 @@ function Site({ theme, page, detail }: { theme: 'trust' | 'neo'; page: string; d
   React.useEffect(() => { window.scrollTo(0, 0); }, [theme, page, detail]);
   const validPage = section || STATIC_PAGES.includes(page);
   const className = isNeo ? "site neo" : "site trust";
+  // Neo division pages carry one colour (Academy violet, Marketing pink, Labs green), see shared.css.
+  const division = isNeo && (page === 'academy' || page === 'marketing' || page === 'labs') ? page : undefined;
   return (
-    <div className={className}>
+    <div className={className} data-division={division}>
       <a className="skip-link" href="#main">Skip to content</a>
       <SiteNav theme={theme} page={page} detail={detail} />
       <div id="main">

@@ -2251,3 +2251,28 @@ main.nx-pf .nx-pf-result h3 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); font-weig
   /* Trust home alternates dark hero and light sections, so no single scrim colour fits. */
   .trust:has(.tsx-hero-stage) .nx-nav::before { display: none; }
 }
+
+/* ═══ Neo division colours ═══
+   One colour per division, the same three the home divisions rail and hero threads use:
+   Academy violet, Marketing green, Labs pink. Each division page paints its buttons, the top-bar
+   pill and the bottom finder in its own colour. Everything else keeps the lime brand accent. */
+.neo {
+  --nx-div-academy: #7c5cff; --nx-div-academy-deep: #6a4de6; --nx-div-academy-on: #fff;
+  --nx-div-marketing: #00e5a0; --nx-div-marketing-deep: #00c98c; --nx-div-marketing-on: #000;
+  --nx-div-labs: #ff5c8a; --nx-div-labs-deep: #e8457a; --nx-div-labs-on: #000;
+}
+.neo[data-division="academy"] { --accent: var(--nx-div-academy); --nx-on-accent: var(--nx-div-academy-on); }
+.neo[data-division="marketing"] { --accent: var(--nx-div-marketing); --nx-on-accent: var(--nx-div-marketing-on); }
+.neo[data-division="labs"] { --accent: var(--nx-div-labs); --nx-on-accent: var(--nx-div-labs-on); }
+.neo[data-division="marketing"] {
+  --nx-mk-cta: var(--nx-div-marketing); --nx-mk-cta-deep: var(--nx-div-marketing-deep); --nx-mk-on-cta: var(--nx-div-marketing-on); --nx-mk-on-c: var(--nx-div-marketing-on);
+  --nx-mk-presence: var(--nx-div-marketing); --nx-mk-wash-presence: #021008;
+  --nx-mk-ask: #021008; --nx-mk-ask-line: rgba(0,229,160,.32); --nx-mk-dots: rgba(0,229,160,.22);
+}
+.neo[data-division="labs"] {
+  --nx-lp-cta: var(--nx-div-labs); --nx-lp-cta-deep: var(--nx-div-labs-deep); --nx-lp-on-cta: var(--nx-div-labs-on);
+}
+.neo .nx-pf {
+  --nx-pf-presence: var(--nx-div-academy); --nx-pf-visibility: var(--nx-div-marketing); --nx-pf-performance: var(--nx-div-labs);
+  --nx-pf-wash-presence: #0a0614; --nx-pf-wash-visibility: #021008; --nx-pf-wash-performance: #12060a;
+}
