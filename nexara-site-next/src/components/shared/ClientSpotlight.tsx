@@ -13,6 +13,7 @@ export function ClientSpotlight({ theme }: { theme: Theme }) {
   const [paused, setPaused] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const reduceRef = React.useRef(false);
+  const thumbsRef = React.useRef<HTMLDivElement>(null);
   const client = CLIENTS[active]!;
 
   React.useEffect(() => {
@@ -35,6 +36,15 @@ export function ClientSpotlight({ theme }: { theme: Theme }) {
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
   }, [active, paused]);
+
+  // Phones show the thumbs as one swipeable row: keep the active one centred in that row
+  // (scroll the row only, never the page).
+  React.useEffect(() => {
+    const row = thumbsRef.current;
+    const thumb = row?.children[active] as HTMLElement | undefined;
+    if (!row || !thumb || row.scrollWidth <= row.clientWidth) return;
+    row.scrollTo({ left: thumb.offsetLeft - (row.clientWidth - thumb.offsetWidth) / 2, behavior: 'smooth' });
+  }, [active]);
 
   const go = (i: number) => {
     setActive(i);
@@ -82,7 +92,7 @@ export function ClientSpotlight({ theme }: { theme: Theme }) {
           ))}
         </div>
 
-        <div className="nx-spot-thumbs">
+        <div className="nx-spot-thumbs" ref={thumbsRef} data-finder-yield>
           {CLIENTS.map((c, i) => (
             <button
               key={c.url}

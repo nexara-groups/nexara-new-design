@@ -31,7 +31,7 @@ See `nexara-site-next/docs/DEPLOY_RUNBOOK.md` for full details.
 
 - `nexara-site-next/wrangler.toml` — Worker config, has `account_id` set
 - `nexara-site-next/src/app/layout.tsx` — root metadata (OG, SEO, Google verification)
-- `nexara-site-next/docs/TRUST_DESIGN.md` — Trust design handbook: Field palette (no blue), tokens, component recipes, motion, page-conversion method and queue
+- `nexara-site-next/docs/TRUST_DESIGN.md` — Trust design handbook: brand blue accent on every Trust page, tokens, component recipes, motion, page-conversion method and queue
 - `.github/workflows/deploy-nexara-site-next.yml` — CI deploy workflow (Node 22, uses `CLOUDFLARE_API_TOKEN` secret)
 
 ## Site structure (Neo + Trust)

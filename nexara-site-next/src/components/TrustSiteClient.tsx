@@ -70,14 +70,14 @@ function TrustSite({ page, detail }: { page: string; detail: string | null }) {
     return () => { window.removeEventListener('mousemove', move); cancelAnimationFrame(moveRaf); };
   }, []);
   const validPage = section || STATIC_PAGES.includes(page);
-  // Digital Solutions keeps green, Labs amber, Home its own blue skin; everything else is brand blue.
-  const accent = page === 'marketing' ? 'green' : page === 'labs' ? 'amber' : page === 'home' ? 'home' : 'blue';
+  // Trust is brand blue on every page; Home keeps its own blue hero skin.
+  const accent = page === 'home' ? 'home' : 'blue';
   React.useEffect(() => {
     document.body.dataset.trustAccent = accent;
     return () => { delete document.body.dataset.trustAccent; };
   }, [accent]);
   return (
-    <div className={`site trust tsx-site${page === 'home' ? ' trust-home' : page === 'labs' ? ' trust-labs' : ''}`} data-accent={accent}>
+    <div className={`site trust tsx-site${page === 'home' ? ' trust-home' : ''}`} data-accent={accent}>
       <a className="skip-link" href="#main">Skip to content</a>
       <SiteNav theme="trust" page={page} detail={detail} />
       <div id="main">

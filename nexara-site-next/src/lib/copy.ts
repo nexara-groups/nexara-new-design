@@ -216,7 +216,7 @@ export const COPY = {
     manifesto: {
       kicker: v('Why Nexara', 'Why Nexara'),
       text: v(
-        'Three engines, one standard. No shortcuts, no gap years, no vibes without receipts. We build people, software and brands, all from one house.',
+        'One house in Vizag. We train people, build systems and make brands move. Every project has a named owner, a written scope and a live link you can open.',
         'Nexara is one company in Visakhapatnam with three teams. We train engineers, build software and run digital marketing, and every project follows the same written process from brief to handover.',
       ),
     },

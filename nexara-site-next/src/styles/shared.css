@@ -471,7 +471,7 @@
   .nx-rail-head .nx-lede { margin-top: 4px; font-size: 0.92rem; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .nx-rail-panel { padding: clamp(18px, 2.4vw, 32px); }
   .nx-rail-panel h3 { margin-bottom: 8px; font-size: clamp(1.5rem, 3vw, 2.4rem); }
-  .nx-rail-panel p { margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .nx-rail-panel p { margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
   .nx-rail-idx { padding-bottom: 12px; }
   .nx-rail-tags { margin-bottom: 10px; }
 }
@@ -606,10 +606,10 @@
 }
 @keyframes nx-spot-drift { to { transform: translate(-10%, 12%) scale(1.1); } }
 @keyframes nx-spot-spin { to { transform: rotate(360deg); } }
-.nx-spot-slide { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.2fr); gap: clamp(18px, 3.5vw, 40px); align-items: center; padding: clamp(20px, 3.5vw, 48px); }
+.nx-spot-slide { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.2fr); gap: clamp(18px, 3.5vw, 40px); align-items: center; padding: clamp(16px, 4.5vh, 48px) clamp(20px, 3.5vw, 48px); }
 @media (max-width: 760px) { .nx-spot-slide { grid-template-columns: 1fr; gap: 18px; } .nx-spot-ring { top: auto; bottom: 12%; right: 6%; opacity: .7; } }
 /* Clean logo plate — no accent colour inside. */
-.nx-spot-visual { position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: 420px; margin-inline: auto; border-radius: 16px; background: #f5f5f5; box-shadow: inset 0 0 0 1px rgba(21, 32, 26, .08); overflow: hidden; isolation: isolate; }
+.nx-spot-visual { position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: min(420px, 46vh); margin-inline: auto; border-radius: 16px; background: #f5f5f5; box-shadow: inset 0 0 0 1px rgba(21, 32, 26, .08); overflow: hidden; isolation: isolate; }
 @media (max-width: 760px) { .nx-spot-visual { aspect-ratio: 16 / 10; max-width: none; } }
 .nx-spot-logo { position: absolute; inset: clamp(16px, 7%, 44px); z-index: 1; }
 .nx-spot-logo img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; animation: nx-spot-pop .7s cubic-bezier(.2,.8,.2,1) both; }
@@ -638,9 +638,9 @@
 .trust .nx-spot-dot[aria-selected="true"] { background: var(--nx-link); }
 .trust .nx-spot-thumb:hover, .trust .nx-spot-thumb.is-on { border-color: var(--nx-link); }
 .trust .nx-spot-thumb:focus-visible { outline-color: var(--nx-link); }
-.nx-spot-thumbs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; padding: 16px 0 4px; }
+.nx-spot-thumbs { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 10px; padding: 12px 0 4px; }
 @media (max-width: 960px) { .nx-spot-thumbs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 560px) { .nx-spot-thumbs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 961px) and (max-height: 820px) { .nx-spot-dots { display: none; } .nx-spot-thumb { padding: 6px; } .nx-spot-thumb-logo { aspect-ratio: 16 / 9; margin-bottom: 6px; } .nx-spot-thumb span { display: none; } .nx-spot-stage { margin-top: var(--space-4); } }
 .nx-spot-thumb { min-width: 0; padding: 10px; border-radius: 12px; border: 1px solid var(--line); background: transparent; color: inherit; text-align: left; cursor: pointer; transition: border-color .25s, transform .25s cubic-bezier(.2,.8,.2,1), background .25s; }
 .nx-spot-thumb:hover, .nx-spot-thumb.is-on { border-color: var(--accent); transform: translateY(-2px); background: var(--panel); }
 .nx-spot-thumb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -648,6 +648,30 @@
 .nx-spot-thumb-logo img { position: absolute; inset: 8px 10px; width: calc(100% - 20px); height: calc(100% - 16px); object-fit: contain; object-position: center; }
 .nx-spot-thumb b { display: block; font-size: clamp(.65rem, 1.4vw, .75rem); line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .nx-spot-thumb span { display: block; margin-top: 2px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 760px) {
+  /* Phones: slide + client row must fit one screen (~560px under the nav). Compact banner logo,
+     three-line summary, no bullet list (the summary already says it), one swipeable client row. */
+  .nx-spot-stage { margin-top: var(--space-4); }
+  .nx-spot-ring { display: none; }
+  .nx-spot-slide { padding: 18px; gap: 16px; }
+  .nx-spot-visual { aspect-ratio: auto; height: clamp(120px, 34vw, 160px); max-width: none; border-radius: 14px; }
+  .nx-spot-logo { inset: 16px 22px; }
+  .nx-spot-copy { gap: 10px; }
+  .nx-spot-name { font-size: clamp(1.45rem, 6.6vw, 1.85rem); }
+  .nx-spot-line { font-size: 14.5px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .nx-spot-built { display: none; }
+  .nx-spot-scope { flex-wrap: nowrap; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+  .nx-spot-scope span { flex: none; font-size: 10px; padding: 3px 9px; }
+  .nx-spot-open { margin-top: 0; }
+  .nx-spot-dots { display: none; }
+  .nx-spot-thumbs { display: flex; gap: 8px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: none; margin-inline: calc(-1 * clamp(20px, 6vw, 80px)); padding: 14px clamp(20px, 6vw, 80px) 4px; }
+  .nx-spot-thumbs::-webkit-scrollbar { display: none; }
+  .nx-spot-thumb { flex: 0 0 clamp(150px, 42vw, 190px); scroll-snap-align: center; padding: 8px; }
+  .nx-spot-thumb-logo { aspect-ratio: 16 / 10; margin-bottom: 8px; }
+  .nx-spot-thumb b { font-size: .85rem; }
+  .nx-spot-thumb:hover, .nx-spot-thumb.is-on { transform: none; }
+  .nx-spot-thumb span:not(.nx-spot-thumb-logo) { display: none; }
+}
 
 /* ═══ Capabilities strip (home) ═══ */
 .nx-cap-strip { background: var(--nx-strip-bg); color: rgb(var(--nx-strip-ink-rgb)); border-block: 1px solid var(--nx-nav-line); padding: var(--space-5) clamp(20px, 6vw, 80px); }
@@ -967,12 +991,12 @@
 }
 
 /* ═══ Labs flagship page (shared/LabsPage.tsx) ═══
-   Field-light on Trust (amber = Product Studio track). Neo keeps dark skin. Layer map stays the dark record band. */
+   Field-light on Trust (brand blue, like every Trust page). Neo keeps dark skin. Layer map stays the dark record band. */
 .trust {
   --nx-lp-bg: var(--tr-white); --nx-lp-paper: var(--tr-paper);
   --nx-lp-ink: var(--tr-ink); --nx-lp-ink-2: var(--tr-ink-2); --nx-lp-muted: var(--tr-muted);
-  --nx-lp-line: var(--tr-line); --nx-lp-cta: var(--tr-amber); --nx-lp-cta-deep: #6e3b0d; --nx-lp-on-cta: #fff;
-  --nx-lp-wash: var(--tr-amber-wash); --nx-lp-track: #8a4b12; --nx-lp-track-2: #b0702c; --nx-lp-track-3: #d9a66b;
+  --nx-lp-line: var(--tr-line); --nx-lp-cta: var(--tr-green); --nx-lp-cta-deep: var(--tr-green-deep); --nx-lp-on-cta: #fff;
+  --nx-lp-wash: var(--tr-green-wash); --nx-lp-track: var(--tr-green); --nx-lp-track-2: #3f7fb8; --nx-lp-track-3: #7fb0da;
 }
 .neo {
   --nx-lp-bg: #000; --nx-lp-paper: #0b0b0d;
@@ -2051,7 +2075,8 @@ main.nx-pf h1.nx-pf-h1 { max-width: 12ch; margin: 0 0 24px; font-size: clamp(2.8
 .nx-pf-frames { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0 0 12px; }
 .nx-pf-frame { display: grid; gap: 2px; min-width: 0; padding: 8px; border: 1px solid var(--nx-pf-line-2); border-radius: 16px; color: inherit; text-decoration: none; transition: border-color .25s, transform .35s var(--nx-pf-ease), background .25s; }
 .nx-pf-frame:hover { border-color: var(--nx-pf-cta); transform: translateY(-3px); background: color-mix(in srgb, var(--nx-pf-cta) 6%, transparent); }
-.nx-pf-frame-logo { width: 100%; height: 76px; margin-bottom: 8px; }
+.nx-pf-frame .nx-pf-frame-logo { width: 100%; height: 76px; margin-bottom: 8px; }
+@media (max-width: 480px) { .nx-pf-frames { grid-template-columns: repeat(2, minmax(0, 1fr)); } .nx-pf-frame .nx-pf-frame-logo { height: 64px; } .nx-pf-index { padding: 16px 14px 6px; } }
 .nx-pf-frame .nx-pf-label { padding: 0 4px; font-size: .88rem; line-height: 1.2; }
 .nx-pf-frame .nx-pf-host { padding: 0 4px 2px; font-size: 11.5px; }
 .nx-pf-frame:hover .nx-pf-host { color: var(--nx-pf-cta); }
@@ -2303,3 +2328,14 @@ main.nx-pf .nx-pf-result h3 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); font-weig
 /* Key words in the story and thesis lines take the division colour, as on the home manifesto. */
 .neo[data-division="marketing"] .nx-mk-w.nx-hl { color: var(--nx-mk-cta); }
 .neo[data-division="academy"] .nx-ac-w.nx-hl { color: var(--nx-ac-cta); }
+
+/* Phones: the floating finder dock sits low and tight, drops its live blur (it re-blurred the page
+   on every scroll frame) and leaves room under the work section so the client row is never hidden. */
+@media (max-width: 760px) {
+  .nx-finder { bottom: max(10px, env(safe-area-inset-bottom, 0px)); padding: 4px; max-width: calc(100vw - 20px); backdrop-filter: none; -webkit-backdrop-filter: none; background: color-mix(in srgb, var(--fd-paper) 94%, transparent); }
+}
+
+/* Small phones: long brand names and URLs wrap instead of pushing the page sideways. */
+@media (max-width: 480px) {
+  :is(.neo, .trust) :is(h1, h2, h3, .nx-text-link, .nx-spot-open) { overflow-wrap: break-word; }
+}

@@ -3,12 +3,11 @@ function smoothstep(value: number, min: number, max: number): number {
   return t * t * (3 - 2 * t);
 }
 
-export function opacityForAnchoredChapter(progress: number, index: number, anchors: number[]): number {
+export function opacityForAnchoredChapter(progress: number, index: number, anchors: number[], fade = 0.032): number {
   // Fade through the scene: the outgoing heading finishes leaving before the
   // next one starts arriving, so two full-screen headings never overlap. Each
   // half is long enough (~100px of scroll on desktop) to read as motion rather
   // than a pop.
-  const fade = 0.032;
   const gap = 0.002;
   const isFirst = index === 0;
   const isLast = index === anchors.length - 1;

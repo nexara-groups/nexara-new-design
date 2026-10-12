@@ -84,7 +84,14 @@ export function PageFinder({
       const heroGone = heroBox ? heroBox.bottom < vh * 0.35 : window.scrollY > vh * 0.6;
       const footerTop = document.querySelector('.nx-footer')?.getBoundingClientRect().top ?? Infinity;
       const endHere = (!!endBox && endBox.top < vh * 0.8) || footerTop < vh;
-      setShown(heroGone && !endHere);
+      // Controls marked data-finder-yield (e.g. the client row) must stay tappable: slide the dock
+      // away while any of them sits in the strip it covers.
+      const zoneTop = vh - (ref.current?.offsetHeight ?? 64) - 32;
+      const covering = Array.from(document.querySelectorAll('[data-finder-yield]')).some((el) => {
+        const box = el.getBoundingClientRect();
+        return box.top < vh && box.bottom > zoneTop;
+      });
+      setShown(heroGone && !endHere && !covering);
     };
     spy();
     // Hash jumps, accordions and GSAP pins move content without a native scroll event.

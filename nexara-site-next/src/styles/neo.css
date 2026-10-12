@@ -983,7 +983,7 @@ html:has(.site.neo) { scroll-padding-top: 100px; }
   from { opacity: .2; transform: scale(1.12); }
   to { opacity: 1; transform: scale(1); }
 }
-@media (max-width: 760px) { .neo .neo-hero-runway { height: 380svh; } }
+@media (max-width: 760px) { .neo .neo-hero-runway { height: 560svh; } }
 
 .neo .neo-hero-rail { gap: 0; }
 .neo .neo-hero-rail button { width: 100px; min-height: 44px; }
@@ -1108,3 +1108,15 @@ html:has(.site.neo) { scroll-padding-top: 100px; }
 
 /* Mobile URL-bar collapse: stage is svh, so keep the runway the same colour as the stage. */
 .neo-hero-runway { background: #06060a; }
+
+/* Phones: large translucent layers (the per-chapter scrims, 30px-blur text shadows) sit above a
+   canvas that redraws every frame, so the compositor re-blends them each frame. Measured in
+   Chrome with touch scrolling at 2x CPU slowdown, they were the cause of the hero's dropped
+   frames. Keep legibility with tight shadows instead. */
+@media (max-width: 760px) {
+  .neo-hero-chapter::before,
+  .neo-hero-chapter.ch-left::before,
+  .neo-hero-chapter.ch-right::before { display: none; }
+  .neo-hero-chapter .ch-name, .neo-hero-chapter .h-display, .neo-hero-chapter .serif,
+  .neo-hero-chapter .lede, .neo-hero-chapter .kicker, .neo-hero-chapter .ch-num { text-shadow: 0 1px 3px rgba(0, 0, 0, .75); }
+}

@@ -529,6 +529,7 @@ type ChapterState = {
   from: number;
   to: number;
   visible: boolean | null;
+  op: number;
 };
 
 
@@ -556,6 +557,12 @@ export function useNeoHeroWebGL({
       ? 'weak'
       : isPhone ? 'phone' : 'full';
     const lowPower = tier === 'weak';
+    // Phones: copy moves on the main thread while the sticky stage scrolls natively, so any
+    // 1:1 tracking reads as shake. A longer ease, wider fades and a shorter lift make each
+    // change glide instead of snapping with every touch-scroll sample.
+    const chapterFade = isPhone ? 0.06 : 0.032;
+    const chapterLift = isPhone ? 20 : 34;
+    const progressRate = isPhone ? 8 : 32;
     const frameCap = tier === 'weak' ? 30 : tier === 'phone' ? 60 : 0;
 
     const chapters: ChapterState[] = Array.from(wrap.querySelectorAll<HTMLElement>('.neo-hero-chapter')).map((el) => ({
@@ -563,6 +570,7 @@ export function useNeoHeroWebGL({
       from: Number.parseFloat(el.dataset.from || '0'),
       to: Number.parseFloat(el.dataset.to || '1'),
       visible: null,
+      op: 0,
     }));
     const chapterAnchors = chapters.map((chapter) => (
       chapter.from === 0 ? 0 : (chapter.from + chapter.to) / 2
@@ -594,16 +602,35 @@ export function useNeoHeroWebGL({
     let renderSampleStarted = 0;
     let renderSampleCount = 0;
 
-    const updateChapters = (progress: number): void => {
-      if(Math.abs(progress-lastDomProgress)<0.0001)return;
+    // Phones: a flick can cross a whole chapter in a handful of frames, so scroll-scrubbed fades
+    // became pops. Opacity instead chases its scroll target at a fixed time rate: the outgoing
+    // heading clears first, the incoming one rises into the room it leaves (never two at once),
+    // and the speed of the swipe no longer changes how a heading arrives.
+    let slewing = false;
+    const SLEW_IN_MS = 420;
+    const SLEW_OUT_MS = 220;
+    const updateChapters = (progress: number, dtMs = 0): void => {
+      if (!slewing && Math.abs(progress-lastDomProgress)<0.0001)return;
       lastDomProgress=progress;
+      slewing = false;
       chapters.forEach((chapter, index) => {
-        const opacity = opacityForAnchoredChapter(progress, index, chapterAnchors);
+        let opacity = opacityForAnchoredChapter(progress, index, chapterAnchors, chapterFade);
+        if (isPhone && dtMs > 0) {
+          const target = opacity;
+          const current = chapter.op;
+          if (target < current) opacity = Math.max(target, current - dtMs / SLEW_OUT_MS);
+          else if (target > current) {
+            const others = chapters.reduce((sum, other, j) => (j === index ? sum : sum + other.op), 0);
+            opacity = Math.min(target, current + dtMs / SLEW_IN_MS, Math.max(current, 1 - others));
+          }
+          if (Math.abs(opacity - target) > 0.002) slewing = true;
+        }
+        chapter.op = opacity;
         const visible = opacity > 0.01;
         // Arriving copy rises from below; leaving copy lifts away, so the
         // sequence reads as one continuous upward drift.
         const hidden = 1 - opacity;
-        const lift = -chapterDirection(progress, index, chapterAnchors) * hidden * hidden * 34;
+        const lift = -chapterDirection(progress, index, chapterAnchors) * hidden * hidden * chapterLift;
         chapter.el.style.opacity = opacity.toFixed(3);
         chapter.el.style.transform = `translate3d(0, ${lift.toFixed(1)}px, 0)`;
         if (visible !== chapter.visible) {
@@ -684,20 +711,21 @@ export function useNeoHeroWebGL({
       lastFrame = now;
       activeTime += deltaSeconds;
 
-      const progressFollow = 1 - Math.exp(-32 * deltaSeconds);
+      const progressFollow = 1 - Math.exp(-progressRate * deltaSeconds);
       const pointerFollow = 1 - Math.exp(-16 * deltaSeconds);
       state.current += (state.target - state.current) * progressFollow;
       mouse.currentX += (mouse.targetX - mouse.currentX) * pointerFollow;
       mouse.currentY += (mouse.targetY - mouse.currentY) * pointerFollow;
       if (Math.abs(state.target - state.current) < 0.00025) state.current = state.target;
-      const stillMoving = Math.abs(state.target - state.current) > 0.0005
+      const stillMoving = slewing
+        || Math.abs(state.target - state.current) > 0.0005
         || Math.abs(mouse.targetX - mouse.currentX) > 0.0015
         || Math.abs(mouse.targetY - mouse.currentY) > 0.0015;
 
       // DOM and WebGL share one smoothed visual clock. Previously the copy
       // followed raw scroll while particles followed this value, allowing the
       // two layers to stop in visibly different states.
-      updateChapters(state.current);
+      updateChapters(state.current, deltaMs);
 
       // Low-power devices: throttle only the WebGL draw to 30fps. The chapter
       // copy above still tracks scroll every frame — capping the whole loop made
