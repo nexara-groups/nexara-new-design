@@ -95,20 +95,34 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           } catch (e) {}
           gtag('config', 'G-BPYYD3KQ99');
         `}</Script>
-        {/* gtag.js (180 KB) loads after first interaction or 3 s post-load, so it never competes with first paint.
+        {/* gtag.js (180 KB) runs only while the page is at rest. It used to load on the first
+            touch/scroll, and its ~75-100 ms evaluation froze the hero mid-swipe on every first
+            scroll. Now it is fetched into the HTTP cache in the background, then executed only
+            after 1.2 s without scrolling, so the blocking run never overlaps a gesture.
             Queued dataLayer events and the consent default above are replayed when it arrives. */}
         <Script id="ga-loader" strategy="afterInteractive">{`
           (function () {
-            var done = false, evs = ['pointerdown', 'keydown', 'scroll', 'touchstart'];
-            function load() {
-              if (done) return; done = true;
-              evs.forEach(function (e) { removeEventListener(e, load); });
+            var src = 'https://www.googletagmanager.com/gtag/js?id=G-BPYYD3KQ99';
+            var done = false, lastScroll = 0, QUIET = 1200;
+            function onScroll() { lastScroll = Date.now(); }
+            addEventListener('scroll', onScroll, { passive: true });
+            addEventListener('touchmove', onScroll, { passive: true });
+            function run() {
+              if (done) return;
+              var wait = QUIET - (Date.now() - lastScroll);
+              if (wait > 0) { setTimeout(run, wait + 50); return; }
+              done = true;
+              removeEventListener('scroll', onScroll);
+              removeEventListener('touchmove', onScroll);
               var s = document.createElement('script');
-              s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-BPYYD3KQ99';
+              s.async = true; s.src = src;
               document.head.appendChild(s);
             }
-            evs.forEach(function (e) { addEventListener(e, load, { passive: true, once: true }); });
-            function later() { setTimeout(load, 3000); }
+            function start() {
+              var warm = window.fetch ? fetch(src, { mode: 'no-cors' }).catch(function () {}) : Promise.resolve();
+              warm.then(function () { setTimeout(run, 0); });
+            }
+            function later() { setTimeout(start, 3000); }
             if (document.readyState === 'complete') later(); else addEventListener('load', later);
           })();
         `}</Script>

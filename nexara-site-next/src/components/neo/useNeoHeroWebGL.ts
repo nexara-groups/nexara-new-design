@@ -557,12 +557,13 @@ export function useNeoHeroWebGL({
       ? 'weak'
       : isPhone ? 'phone' : 'full';
     const lowPower = tier === 'weak';
-    // Phones: copy moves on the main thread while the sticky stage scrolls natively, so any
-    // 1:1 tracking reads as shake. A longer ease, wider fades and a shorter lift make each
-    // change glide instead of snapping with every touch-scroll sample.
+    // Phones: wider fades and a shorter lift keep each change gliding with touch-scroll
+    // samples. The scene follows scroll at rate 22 (~45ms time constant): rate 8 trailed the
+    // finger by ~150px and kept drifting half a second after it lifted, read as sluggish.
+    // Chapter opacity has its own time-based slew below, so this no longer needs to be slow.
     const chapterFade = isPhone ? 0.06 : 0.032;
     const chapterLift = isPhone ? 20 : 34;
-    const progressRate = isPhone ? 8 : 32;
+    const progressRate = isPhone ? 22 : 32;
     const frameCap = tier === 'weak' ? 30 : tier === 'phone' ? 60 : 0;
 
     const chapters: ChapterState[] = Array.from(wrap.querySelectorAll<HTMLElement>('.neo-hero-chapter')).map((el) => ({

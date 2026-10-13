@@ -139,6 +139,17 @@ function NeoGuide() {
 
     guide.classList.toggle("is-cursor-guide", isDesktopFollower);
     guide.classList.toggle("is-scroll-guide", !isDesktopFollower);
+
+    // Phones: while the home hero owns the screen he stays small and silent (CSS: .is-in-hero),
+    // so the chapters keep the full width. Any greeting is held until the hero is behind us.
+    let inHero = false, heldHi = null;
+    const heroRunway = isDesktopFollower ? null : document.querySelector(".neo-hero-runway:not(.neo-hero-runway--detail)");
+    const heroIo = heroRunway ? new IntersectionObserver(([entry]) => {
+      inHero = Boolean(entry?.isIntersecting);
+      guide.classList.toggle("is-in-hero", inHero);
+      if (!inHero && heldHi) { const hi = heldHi; heldHi = null; hi(); }
+    }, { rootMargin: "0px 0px -60% 0px" }) : null;
+    heroIo?.observe(heroRunway);
     gsap.set(guide,     { autoAlpha: 0 });
     gsap.set(charWrap,  { y: "58vh", x: 0 });
     gsap.set(bubble,    { autoAlpha: 0, y: 10 });
@@ -880,7 +891,10 @@ function NeoGuide() {
         if (greeted) return;
         greeted = true;
         gsap.delayedCall(0.7, () => { wave(); bump(0.3); });
-        if (!isDesktopFollower) gsap.delayedCall(1.3, () => say("hi", "hi, i'm neo. tap me for shortcuts. i stay quiet while you scroll.", { hold: 4200 }));
+        if (!isDesktopFollower) {
+          const hi = () => gsap.delayedCall(1.3, () => say("hi", "hi, i'm neo. tap me for shortcuts. i stay quiet while you scroll.", { hold: 4200 }));
+          if (inHero) heldHi = hi; else hi();
+        }
       };
 
       // Phones: he tucks half off the right edge and only slides out when he has
@@ -1657,6 +1671,8 @@ function NeoGuide() {
       window.removeEventListener("pointerdown", onGaze);
       charWrap.removeEventListener("pointerdown", onTapSelf);
       document.removeEventListener("visibilitychange", onVisibility);
+      heroIo?.disconnect();
+      guide.classList.remove("is-in-hero");
       gsap.killTweensOf([charWrap, bubble, tag, spotlight, burst]);
     };
   }, []);

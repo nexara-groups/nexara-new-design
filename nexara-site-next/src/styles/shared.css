@@ -220,6 +220,9 @@
 /* Chrome height for sticky section tabs (siblings under SiteNav — set on .site). */
 .site { --nx-chrome-top: 72px; }
 .nx-nav { position: sticky; top: 0; z-index: 100; padding: var(--space-3) clamp(12px, 3vw, 40px); pointer-events: none; }
+/* Home heroes start under the floating nav: the pinned stage fills the first screen and
+   scroll progress starts at 0 on landing (it used to sit 90px down, cutting off its foot). */
+.neo-hero-runway:not(.neo-hero-runway--detail), .tsx-hero-runway:not(.tsx-hero-runway--static) { margin-top: calc(-1 * var(--nx-nav-h, 0px)); }
 .nx-nav-inner { pointer-events: auto; display: flex; align-items: center; gap: clamp(8px, 1.4vw, 20px); max-width: 1320px; margin: 0 auto; min-height: 56px; padding: 6px 8px 6px 18px; background: var(--nx-nav-bg); color: var(--nx-nav-ink); border: 1px solid var(--nx-nav-line); border-radius: var(--radius-pill); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3); box-shadow: var(--shadow-2); }
 .nx-nav-logo { display: inline-flex; align-items: center; gap: var(--space-2); flex-shrink: 0; min-height: 44px; color: inherit; text-decoration: none; font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: -.01em; }
 .nx-nav-logo img { display: block; width: 28px; height: 28px; }
@@ -2338,4 +2341,20 @@ main.nx-pf .nx-pf-result h3 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); font-weig
 /* Small phones: long brand names and URLs wrap instead of pushing the page sideways. */
 @media (max-width: 480px) {
   :is(.neo, .trust) :is(h1, h2, h3, .nx-text-link, .nx-spot-open) { overflow-wrap: break-word; }
+}
+
+/* ═══ Phone heading fit ═══
+   Display faces are wide, so a single long word ("Someone", "Visakhapatnam") outgrew its box
+   at phone widths and split mid-word. Each cap below is the measured width of that heading's
+   longest word, as em-per-px of the available line, with ~4% slack: the type shrinks only when
+   the word would not fit, and never on wider screens. Scoped per theme because the copy differs. */
+@media (max-width: 800px) {
+  .neo main.nx-mk .nx-mk-h1 { font-size: min(clamp(2.7rem, 12.5vw, 4rem), calc((100vw - 32px) * .128)); }
+  .neo main.nx-pf h1.nx-pf-h1 { font-size: min(clamp(2.5rem, 11vw, 3.6rem), calc((100vw - 32px) * .124)); }
+  .trust main.nx-ab h1.nx-ab-h1 { font-size: min(clamp(2.5rem, 11vw, 3.6rem), calc((100vw - 32px) * .13)); }
+  .trust main.nx-ct .nx-ct-h1 { font-size: min(clamp(2.8rem, 6.4vw, 5.6rem), calc((100vw - 32px) * .146)); }
+  .neo main.nx-ac .nx-ac-ask-card h2 { font-size: min(clamp(2.4rem, 6vw, 4.6rem), calc((100vw - 82px) * .107)); }
+  .neo main.nx-ab .nx-ab-ask-card h2 { font-size: min(clamp(2.4rem, 6vw, 4.6rem), calc((100vw - 82px) * .122)); }
+  main.nx-bl .nx-bl-prose h2 { font-size: min(clamp(1.8rem, 3vw, 2.55rem), calc((100vw - 32px) * .077)); }
+  .nx-rail-panel h3 { font-size: min(2rem, calc((100vw - 98px) * .123)); }
 }

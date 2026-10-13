@@ -546,6 +546,22 @@
   .neo-guide-overlay.is-scroll-guide.is-scrolling .neo-guide-bubble { opacity: 0 !important; }
   .neo-guide-bubble { max-width: min(208px, calc(100vw - 96px)); }
   .neo-guide-chips { margin-right: 4px; }
+  /* Home hero on screen: small, dim and silent so the chapters keep the room. Still tappable;
+     opening his menu restores full size. Beats .is-engaged/.is-scrolling on purpose. */
+  .neo-guide-overlay.is-scroll-guide.is-in-hero:not(.is-menu) .neo-guide-tuck { transform: translateX(-6px) scale(.6); opacity: .8; }
+  .neo-guide-overlay.is-scroll-guide.is-in-hero:not(.is-menu) :is(.neo-guide-bubble, .neo-guide-tag) { opacity: 0 !important; visibility: hidden !important; }
+  /* After the hero he keeps talking, in proportion: the line sits BESIDE him, bottom-aligned with
+     his face in the strip above the finder dock, instead of a tall bubble stacked over the reading
+     column. Capped at 3 short lines; the shortcut menu keeps its own layout. */
+  .neo-guide-overlay.is-scroll-guide:not(.is-menu) .neo-guide-tag { display: none; }
+  .neo-guide-overlay.is-scroll-guide:not(.is-menu) .neo-guide-bubble {
+    top: auto; bottom: 14px; right: calc(100% + 4px);
+    width: max-content; max-width: min(210px, calc(100vw - 112px));
+    padding: 7px 10px; font-size: 11px; line-height: 1.35;
+    border-radius: 12px 12px 3px 12px;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
+  }
+  .neo-guide-overlay.is-scroll-guide:not(.is-menu) .neo-guide-bubble::after { display: none; }
 }
 /* Keyboard up or Ask panel open on a phone: out of the way entirely */
 .neo-guide-overlay.is-away { opacity: 0 !important; transition: opacity .2s ease; }

@@ -24,7 +24,18 @@ export function SiteNav({ theme, page, detail }: { theme: Theme; page: string; d
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    // The home hero tucks under the floating nav (CSS reads --nx-nav-h) so its stage fills the
+    // screen on landing and the very first scroll drives the animation, not a 90px slide.
+    const root = document.documentElement;
+    const syncHeight = () => root.style.setProperty('--nx-nav-h', `${nav.offsetHeight}px`);
+    syncHeight();
+    const sizes = new ResizeObserver(syncHeight);
+    sizes.observe(nav);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      sizes.disconnect();
+      root.style.removeProperty('--nx-nav-h');
+    };
   }, []);
 
   React.useEffect(() => { setMenuOpen(false); }, [page, detail]);
