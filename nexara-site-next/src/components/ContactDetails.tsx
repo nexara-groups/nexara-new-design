@@ -34,7 +34,7 @@ export default function ContactDetails({
       </div>
       <div className="contact-details__office">
         <span className="contact-details__label"><MapPin size={17} aria-hidden="true" /> {label.office}</span>
-        <address>{address.street}<br />{address.city}</address>
+        <address>{address.street}{' '}<br />{address.city}</address>
         <a className="contact-details__directions" href={address.mapsHref} target="_blank" rel="noopener noreferrer">
           {label.directions} <ArrowUpRight size={16} aria-hidden="true" />
         </a>

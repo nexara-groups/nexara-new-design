@@ -5,10 +5,10 @@ import ts from 'typescript';
 // Structure tests: Neo and Trust must stay one site with two voices.
 const moduleOf = source => import('data:text/javascript;base64,' + Buffer.from(ts.transpileModule(source, {compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText).toString('base64'));
 const read = file => fs.readFileSync(new URL('../src/' + file, import.meta.url), 'utf8');
-const { DATA } = await moduleOf(read('lib/data.ts'));
+const { DATA, GOOGLE_ENTITY_URL, GOOGLE_KGMID } = await moduleOf(read('lib/data.ts'));
 const site = await moduleOf(read('lib/site.ts').replace("import { DATA } from './data';", 'const DATA = ' + JSON.stringify(DATA) + ';'));
 const copy = await moduleOf(read('lib/copy.ts'));
-const seo = await moduleOf(read('lib/seo.ts').replace("import { DATA } from './data';", 'const DATA = ' + JSON.stringify(DATA) + ';').replace(/import \{ BLOG_POSTS[^\n]*\n/, "const BLOG_POSTS = [], BLOG_DESCRIPTION = '';\n"));
+const seo = await moduleOf(read('lib/seo.ts').replace("import { DATA, GOOGLE_ENTITY_URL, GOOGLE_KGMID } from './data';", 'const DATA = ' + JSON.stringify(DATA) + '; const GOOGLE_ENTITY_URL = ' + JSON.stringify(GOOGLE_ENTITY_URL) + '; const GOOGLE_KGMID = ' + JSON.stringify(GOOGLE_KGMID) + ';').replace(/import \{ BLOG_POSTS[^\n]*\n/, "const BLOG_POSTS = [], BLOG_DESCRIPTION = '';\n"));
 
 test('nav is one list: every entry is voiced for both themes and Blog, About and Contact are always present', () => {
   const pages = site.NAV.map(e => e.page);

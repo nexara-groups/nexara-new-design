@@ -1,3 +1,12 @@
+// The only postal address. MCA master data and the GST certificate. Do not shorten or reorder it.
+export const OFFICE_STREET = 'No. 1-83-14, MIG-IV, Sector 3, 1st Floor, M.V.P. Colony';
+export const OFFICE_CITY = 'Visakhapatnam, Andhra Pradesh 530017';
+export const OFFICE_ADDRESS = `${OFFICE_STREET}, ${OFFICE_CITY}`;
+// Google entity for kgmid /g/11zf6hqkp8. Used in the footer, Organization.sameAs and hasMap.
+export const GOOGLE_ENTITY_URL = 'https://share.google/w7ULtMwd5konwhZuP';
+export const GOOGLE_KGMID = '/g/11zf6hqkp8';
+export const INSTAGRAM_URL = 'https://www.instagram.com/builtbynexara';
+
 export const DATA = {
   home: {
     neo: {
@@ -1040,15 +1049,16 @@ export const DATA = {
     legal: { name: 'Nexara Private Limited', domain: 'nexaragroups.com', cin: 'U62012AP2026PTC126146', gstin: '37AALCN7053N1ZR', incorporated: '2026-05-31' },
     phone: { display: '9257535757', href: 'tel:+919257535757' },
     address: {
-      street: 'No. 1-83-14, MIG-IV, Sector 3, 1st Floor, M.V.P. Colony',
-      city: 'Visakhapatnam, Andhra Pradesh 530017',
+      street: OFFICE_STREET,
+      city: OFFICE_CITY,
+      full: OFFICE_ADDRESS,
       mapsHref: 'https://www.google.com/maps/search/?api=1&query=Nexara+Private+Limited+1-83-14+MVP+Colony+Visakhapatnam+530017',
     },
     // Official profiles. Also emitted as Organization.sameAs so search engines tie them to this site.
     social: [
       { label: 'LinkedIn', href: 'https://www.linkedin.com/company/nexara-private-limited/' },
-      { label: 'Instagram', href: 'https://www.instagram.com/nexaraprivatelimited/' },
-      { label: 'Google', href: 'https://www.google.com/search?kgmid=/g/11zf6hqkp8' },
+      { label: 'Instagram', href: INSTAGRAM_URL },
+      { label: 'Google', href: GOOGLE_ENTITY_URL },
     ],
     neo: {
       eyebrow: "LET'S BUILD",

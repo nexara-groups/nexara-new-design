@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     siteName: 'Nexara',
     title: 'Nexara | Software Company in Vizag & Website Development',
     description: 'Custom software, websites, AI products, and tech talent training from MVP Colony, Visakhapatnam. Shipped for real clients.',
-    url: 'https://nexaragroups.com/',
+    url: 'https://nexaragroups.com',
     images: [{ url: 'https://nexaragroups.com/brand/og-image.png', width: 1200, height: 630, alt: 'Nexara - Software, Websites & Digital Growth in Visakhapatnam' }],
     locale: 'en_IN',
   },

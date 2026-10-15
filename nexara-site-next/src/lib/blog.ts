@@ -1,4 +1,5 @@
 // Blog content. Plain typed data: no MDX, no extra dependencies.
+import { OFFICE_ADDRESS } from './data';
 // Inline links inside p / ul text use [label](/path) and are rendered by the blog page.
 export type Block =
   | { type: 'p'; text: string }
@@ -205,7 +206,7 @@ export const BLOG_POSTS: BlogPost[] = [
       { type: 'ul', items: [
         'Phone: +91 9257535757',
         'Email: info@nexaragroups.com',
-        'Office Address: No. 1-83-14, MIG-IV, Sector 3, 1st Floor, M.V.P. Colony, Visakhapatnam, Andhra Pradesh 530017',
+        `Office Address: ${OFFICE_ADDRESS}`,
         'Web: nexaragroups.com',
       ] },
       { type: 'p', text: 'You can explore our [live client work](/neo/customers), view our [software products](/neo/labs), or [reach out to scope your project](/neo/contact). We start with a clear written brief and a named project owner before any work begins.' },

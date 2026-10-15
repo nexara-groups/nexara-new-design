@@ -33,6 +33,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entries.push({ url, changeFrequency, priority });
   }
 
+  // /trust is a live page. Its canonical is the homepage, so the loop above does not list it.
+  entries.push({
+    url: `${SITE_URL}/trust`,
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  });
+
   // Legal / compliance documents
   for (const path of ['privacy-policy.html', 'terms-of-service.html', 'cookie-policy.html', 'data-deletion.html']) {
     entries.push({
