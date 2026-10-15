@@ -2153,9 +2153,6 @@ h1, h2 { text-wrap: balance; }
 :is(.tsx-hero-chapter, .neo-hero-chapter) { z-index: 2; }
 .trust.tsx-site .tsx-subpage-modern-hero-inner { position: relative; z-index: 2; }
 .trust.tsx-site .tsx-hero-title--strike span { color: rgba(120,198,159,.82); }
-.hero-seo-h1 { margin: 16px 0 0; max-width: 18em; font-family: var(--font-body); font-size: clamp(1.2rem, 2.4vw, 1.75rem); font-weight: 650; line-height: 1.25; letter-spacing: -0.02em; text-wrap: balance; color: #f4f8ff; }
-.neo .hero-seo-h1 { color: #f2f1ec; text-shadow: 0 1px 12px rgba(0,0,0,.85); }
-.trust .hero-seo-h1, .trust.tsx-site .hero-seo-h1 { color: #f3f7fc; }
 .hero-intro { margin-top: 28px; max-width: 560px; text-align: center; }
 .hero-intro > p { color: #eff5ff; font: 500 clamp(17px,1.6vw,23px)/1.6 var(--font-body); letter-spacing: -.01em; }
 .hero-intro > p span { color: #b7cdeb; }
@@ -2163,7 +2160,7 @@ h1, h2 { text-wrap: balance; }
 .neo .hero-intro > p span { color: #c7d4b2; }
 .hero-intro__links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 24px; }
 .hero-intro__links a { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 46px; padding: 12px 20px; border-radius: 12px; font: 600 13px/1.4 var(--font-body); text-decoration: none; color: #f4f8ff; background: rgba(100,169,255,.12); box-shadow: 0 4px 10px rgba(0,0,0,.16), inset 0 1px 0 rgba(216,234,255,.18); }
-.hero-intro__links a:first-child { max-width: 22em; line-height: 1.35; text-align: center; white-space: normal; background: #1a6dff; box-shadow: 0 8px 20px rgba(0,5,20,.28), inset 0 1px 0 rgba(255,255,255,.24); }
+.hero-intro__links a:first-child { background: #1a6dff; box-shadow: 0 8px 20px rgba(0,5,20,.28), inset 0 1px 0 rgba(255,255,255,.24); }
 .neo .hero-intro__links a { color: #f2f1ec; background: rgba(242,241,236,.08); }
 .neo .hero-intro__links a:first-child { color: #101505; background: #ccff00; }
 .hero-intro__links a:hover { box-shadow: 0 10px 24px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4); }

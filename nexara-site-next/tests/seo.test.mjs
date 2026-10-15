@@ -166,19 +166,15 @@ test('brand domains redirect on the worker, including Slovenia', () => {
   assert.ok(middleware.includes('https://${CANONICAL_HOST}'));
 });
 
-test('homepage headings, estimate offer, llms.txt and trust sitemap entry', () => {
-  const neo = fs.readFileSync(new URL('../src/components/neo/Hero.tsx', import.meta.url), 'utf8');
-  const trust = fs.readFileSync(new URL('../src/components/trust/Hero.tsx', import.meta.url), 'utf8');
-  const home = fs.readFileSync(new URL('../src/components/shared/HomeBlocks.tsx', import.meta.url), 'utf8');
+test('llms.txt and trust sitemap entry', () => {
   const llms = fs.readFileSync(new URL('../public/llms.txt', import.meta.url), 'utf8');
   const sitemap = fs.readFileSync(new URL('../src/app/sitemap.ts', import.meta.url), 'utf8');
-  for (const source of [neo, trust]) {
-    assert.match(source, /<h1 className="hero-seo-h1">Website & Web App Development Company in Vizag<\/h1>/);
-    assert.doesNotMatch(source, /<h1[^>]*>[\s\S]*N<\/span>/);
-  }
-  assert.match(neo, /Academy\{' '\}<br \/>/);
-  assert.match(trust, /Talent Programmes\{' '\}<br \/>/);
-  assert.match(home, /\{label\}\{' '\}/);
+  const neo = fs.readFileSync(new URL('../src/components/neo/Hero.tsx', import.meta.url), 'utf8');
+  const trust = fs.readFileSync(new URL('../src/components/trust/Hero.tsx', import.meta.url), 'utf8');
+  assert.match(neo, /<h1[^>]*aria-label="Nexara">/);
+  assert.match(trust, /<h1[^>]*aria-label="Nexara">/);
+  assert.doesNotMatch(neo, /Website & Web App Development Company in Vizag/);
+  assert.doesNotMatch(trust, /Website & Web App Development Company in Vizag/);
   assert.match(llms, new RegExp(OFFICE_ADDRESS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.match(llms, /\+919257535757/);
   assert.match(llms, /Free cost estimate for your website or app/);

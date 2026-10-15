@@ -17,7 +17,7 @@ import { About } from './shared/About';
 import { MarketingPage } from './shared/MarketingPage';
 import { AcademyPage } from './shared/AcademyPage';
 import { LabsPage } from './shared/LabsPage';
-import { scrollToHashOrTop, useSmoothScroll } from './useSmoothScroll';
+import { useSmoothScroll } from './useSmoothScroll';
 
 function setupTsxFade() {
   document.documentElement.classList.add('js-reveal-ready');
@@ -48,11 +48,7 @@ function TrustSite({ page, detail }: { page: string; detail: string | null }) {
   React.useEffect(() => { setTrustRouter(router); }, [router]);
   useSmoothScroll();
   const section = (DATA.sections as Record<string, (typeof DATA.sections)[keyof typeof DATA.sections]>)[page];
-  React.useEffect(() => {
-    scrollToHashOrTop();
-    const later = window.setTimeout(scrollToHashOrTop, 80);
-    return () => window.clearTimeout(later);
-  }, [page, detail]);
+  React.useEffect(() => { window.scrollTo(0, 0); }, [page, detail]);
   React.useEffect(() => setupTsxFade(), [page, detail]);
   React.useEffect(() => {
     const sel = '.tsx-sol-card,.tsx-gov-card,.tsx-proof-case-card,.tsx-pkg-card,.tsx-subpage-icon-card,.tsx-matrix-row,.tsx-channel-card,.tsx-deliver-card';

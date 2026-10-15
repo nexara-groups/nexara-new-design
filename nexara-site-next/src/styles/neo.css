@@ -573,7 +573,6 @@
 .neo-hero-chapter .btn { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 14px 26px; border-radius: 999px; border: 1px solid rgba(242, 241, 236, 0.3); background: transparent; color: inherit; cursor: pointer; transition: border-color .2s, background .2s, color .2s; }
 .neo-hero-chapter .btn:hover { border-color: #fff; }
 .neo-hero-chapter .btn-solid { background: #ccff00; border-color: #ccff00; color: #06060a; font-weight: 700; }
-.neo-hero-chapter .btn-estimate { font-family: var(--font-body); font-size: 0.95rem; letter-spacing: 0; line-height: 1.3; text-transform: none; white-space: normal; max-width: 16em; }
 .neo-hero-chapter .btn-solid:hover { border-color: #ccff00; filter: brightness(1.08); }
 .neo-hero-rail { position: absolute; right: clamp(14px, 2vw, 28px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 32px; z-index: 5; align-items: flex-end; }
 .neo-hero-rail button { width: auto; height: auto; min-height: 0; border-radius: 0; border: 0; background: transparent; cursor: pointer; transition: none; position: relative; flex-shrink: 0; padding: 4px 0; }

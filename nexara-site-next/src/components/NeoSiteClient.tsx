@@ -25,7 +25,7 @@ import { MarketingPage } from './shared/MarketingPage';
 import { AcademyPage } from './shared/AcademyPage';
 import { LabsPage } from './shared/LabsPage';
 const NeoGuide = dynamic(()=>import('./neo/Guide').then(module=>module.NeoGuide),{ssr:false});
-import { scrollToHashOrTop, useSmoothScroll } from './useSmoothScroll';
+import { useSmoothScroll } from './useSmoothScroll';
 
 function Site({ theme, page, detail }: { theme: 'trust' | 'neo'; page: string; detail: string | null }) {
   const router = useRouter();
@@ -36,11 +36,7 @@ function Site({ theme, page, detail }: { theme: 'trust' | 'neo'; page: string; d
   // The cursor guide is pure motion: never mounted for visitors who ask for reduced motion.
   React.useEffect(()=>{if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;const timer=setTimeout(()=>setGuideReady(true),900);return()=>clearTimeout(timer);},[]);
   const section = (DATA.sections as Record<string, (typeof DATA.sections)[keyof typeof DATA.sections]>)[page];
-  React.useEffect(() => {
-    scrollToHashOrTop();
-    const later = window.setTimeout(scrollToHashOrTop, 80);
-    return () => window.clearTimeout(later);
-  }, [theme, page, detail]);
+  React.useEffect(() => { window.scrollTo(0, 0); }, [theme, page, detail]);
   const validPage = section || STATIC_PAGES.includes(page);
   const className = isNeo ? "site neo" : "site trust";
   // Neo division pages carry one colour (Academy violet, Marketing pink, Labs green), see shared.css.

@@ -5,9 +5,6 @@ import type { Voiced } from './site';
 
 const v = (neo: string, trust: string): Voiced => ({ neo, trust });
 
-// Same offer on both themes. The contact page brief is the estimate flow.
-export const ESTIMATE_OFFER = 'Free cost estimate for your website or app';
-
 export const COPY = {
   labs: {
     nav: {
@@ -273,7 +270,7 @@ export const COPY = {
       kicker: v('Ready when you are', 'Next step'),
       title: v('Begin.', 'Tell us about your project.'),
       body: v('Tell us which team you need, or let the brief decide.', 'If you are not sure which team fits, describe the problem and we will route it. You will receive a scoped reply within two working days.'),
-      primary: v(ESTIMATE_OFFER, ESTIMATE_OFFER),
+      primary: v('Start a project', 'Start a project'),
     },
   },
   // Marketing page chrome (structure: MARKETING_FLOW in site.ts, content: DATA.sections.marketing.page).
