@@ -11,7 +11,7 @@ export default function FooterContact() {
     </div>
     <div className="footer-contact-block__office">
       <span className="footer-contact-block__label"><MapPin size={16} aria-hidden="true" /> Our office</span>
-      <address>{address.street}<br />{address.city}</address>
+      <address>{address.street}{' '}<br />{address.city}</address>
       <a href={address.mapsHref} target="_blank" rel="noopener noreferrer">Get directions <ArrowUpRight size={15} aria-hidden="true" /></a>
     </div>
     <div className="footer-contact-block__social">

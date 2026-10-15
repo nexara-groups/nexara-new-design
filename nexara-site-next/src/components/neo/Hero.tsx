@@ -5,6 +5,7 @@
 'use client';
 import HeroIntro from '../HeroIntro';
 import React from 'react';
+import { ESTIMATE_OFFER } from '@/lib/copy';
 import { routeTo } from '@/lib/neo-router';
 import dynamic from 'next/dynamic';
 const NeoHeroController=dynamic(()=>import('./NeoHeroController'),{ssr:false});
@@ -72,44 +73,45 @@ function NeoHeroUnravel({ copy, theme }: NeoHeroUnravelProps) {
         {/* Chapters Overlays */}
         <div className="neo-hero-chapter" style={{opacity:1,pointerEvents:"auto"}} data-from="0" data-to="0.07">
           <p className="kicker">An engineering company</p>
-          <h1 ref={titleRef} className="neo-hero-title" aria-label="Nexara">
+          <p ref={titleRef} className="neo-hero-title" aria-hidden="true">
             <span>N</span><span>E</span><span>X</span><span>A</span><span>R</span><span>A</span>
-          </h1>
+          </p>
+          <h1 className="hero-seo-h1">Website & Web App Development Company in Vizag</h1>
           <HeroIntro theme="neo" />
         </div>
 
         <div className="neo-hero-chapter" data-from="0.125" data-to="0.225" aria-hidden="true">
           <p className="kicker">The premise</p>
-          <h2 className="h-display">One core.<br /><span className="serif">Three forces.</span></h2>
+          <h2 className="h-display">One core.{' '}<br /><span className="serif">Three forces.</span></h2>
           <p className="lede">Three directions. All pointing at your problem.</p>
         </div>
 
         <div className="neo-hero-chapter ch-left" style={{ '--accent': '#7c5cff' }} data-from="0.27" data-to="0.45" aria-hidden="true">
           <p className="ch-num">01 / DIVISION</p>
-          <h2 className="ch-name">Academy<br /><span className="serif">we grow engineers.</span></h2>
+          <h2 className="ch-name">Academy{' '}<br /><span className="serif">we grow engineers.</span></h2>
           <p className="lede">Cohort-based programmes that turn ambitious learners into working engineers, sprint by sprint, review by review.</p>
           <button className="ch-link" onClick={() => routeTo('neo', 'academy')}>Enter Academy →</button>
         </div>
 
         <div className="neo-hero-chapter ch-right" style={{ '--accent': '#ff5c8a' }} data-from="0.45" data-to="0.63" aria-hidden="true">
           <p className="ch-num">02 / DIVISION</p>
-          <h2 className="ch-name">Labs<br /><span className="serif">we build intelligence.</span></h2>
+          <h2 className="ch-name">Labs{' '}<br /><span className="serif">we build intelligence.</span></h2>
           <p className="lede">Applied AI and automation systems, engineered from prototype to production with written specs and weekly demos.</p>
           <button className="ch-link" onClick={() => routeTo('neo', 'labs')}>Enter Labs →</button>
         </div>
 
         <div className="neo-hero-chapter ch-left" style={{ '--accent': '#00e5a0' }} data-from="0.63" data-to="0.81" aria-hidden="true">
           <p className="ch-num">03 / DIVISION</p>
-          <h2 className="ch-name">Marketing<br /><span className="serif">we make brands move.</span></h2>
+          <h2 className="ch-name">Marketing{' '}<br /><span className="serif">we make brands move.</span></h2>
           <p className="lede">Brand systems, web experiences and performance creative, built like software and measured like engineering.</p>
           <button className="ch-link" onClick={() => routeTo('neo', 'marketing')}>Enter Marketing →</button>
         </div>
 
         <div className="neo-hero-chapter" data-from="0.86" data-to="1" aria-hidden="true">
           <p className="kicker">The weave</p>
-          <h2 className="h-display">Three disciplines.<br /><span className="serif">One standard.</span></h2>
+          <h2 className="h-display">Three disciplines.{' '}<br /><span className="serif">One standard.</span></h2>
           <div className="hero-actions">
-            <button className="btn btn-solid" onClick={() => routeTo('neo', 'contact')}>Start a brief <span className="arr">→</span></button>
+            <button className="btn btn-solid btn-estimate" onClick={() => routeTo('neo', 'contact')}>{ESTIMATE_OFFER} <span className="arr">→</span></button>
             <button className="btn" onClick={() => {
               const el = document.getElementById("divisions");
               el?.scrollIntoView({ behavior: "smooth" });

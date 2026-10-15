@@ -143,7 +143,7 @@ export function Divisions({ theme }: { theme: Theme }) {
                 <span className="nx-rail-orb" aria-hidden="true" />
                 <span className="nx-rail-ring" aria-hidden="true" />
                 <h3>
-                  {label}
+                  {label}{' '}
                   {tagline && <><br /><em>{voiced(tagline, theme)}</em></>}
                 </h3>
                 <p>{local ? voiced(local, theme) : sec.short[theme]}</p>

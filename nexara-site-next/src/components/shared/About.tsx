@@ -51,7 +51,7 @@ export function About({ theme }: { theme: Theme }) {
     { key: 'incorporated', label: t(copy.legal.incorporated), value: incorporated },
     { key: 'cin', label: t(copy.legal.cin), value: legal.cin },
     { key: 'gstin', label: t(copy.legal.gstin), value: legal.gstin },
-    { key: 'address', label: t(copy.legal.address), value: `${address.street}, ${address.city}` },
+    { key: 'address', label: t(copy.legal.address), value: address.full },
     { key: 'directors', label: t(copy.people.kicker), value: founders.map((f) => f.name).join(', ') },
   ];
 
@@ -275,7 +275,7 @@ export function About({ theme }: { theme: Theme }) {
             <div><dt>{t(copy.legal.incorporated)}</dt><dd>{incorporated}</dd></div>
             <div><dt>{t(copy.legal.cin)}</dt><dd>{legal.cin}</dd></div>
             <div><dt>{t(copy.legal.gstin)}</dt><dd>{legal.gstin}</dd></div>
-            <div className="nx-ab-wide"><dt>{t(copy.legal.address)}</dt><dd>{address.street}, {address.city}</dd></div>
+            <div className="nx-ab-wide"><dt>{t(copy.legal.address)}</dt><dd>{address.full}</dd></div>
           </dl>
         </div>
       </section>

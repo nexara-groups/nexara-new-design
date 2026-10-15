@@ -11,6 +11,21 @@ let active: Lenis | null = null;
 // Lets overlays (e.g. the mobile menu) pause wheel scrolling underneath them.
 export const getLenis = () => active;
 
+// Route changes reset scroll to the top. A hash (the estimate form is #brief) should win.
+export function scrollToHashOrTop() {
+  const id = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+  const target = id ? document.getElementById(id) : null;
+  if (!target) {
+    window.scrollTo(0, 0);
+    active?.scrollTo(0, { immediate: true });
+    return;
+  }
+  const chrome = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nx-chrome-top')) || 72;
+  const top = Math.max(0, target.getBoundingClientRect().top + window.scrollY - chrome - 16);
+  window.scrollTo(0, top);
+  active?.scrollTo(top, { immediate: true });
+}
+
 export function useSmoothScroll() {
   React.useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;

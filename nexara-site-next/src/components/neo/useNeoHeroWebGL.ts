@@ -11,7 +11,7 @@ if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 export type HeroRefs = {
   wrapRef: RefObject<HTMLDivElement | null>;
   canvasRef: RefObject<HTMLCanvasElement | null>;
-  titleRef: RefObject<HTMLHeadingElement | null>;
+  titleRef: RefObject<HTMLElement | null>;
   counterNumRef: RefObject<HTMLElement | null>;
   counterBarRef: RefObject<HTMLElement | null>;
   scrollCueRef: RefObject<HTMLDivElement | null>;

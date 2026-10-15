@@ -10,6 +10,7 @@ import React from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, useReducedMotion } from 'framer-motion';
+import { ESTIMATE_OFFER } from '@/lib/copy';
 import { DATA } from '@/lib/data';
 import { routeTo } from '@/lib/trust-router';
 import { TrustParticleCanvas } from './Canvas';
@@ -251,7 +252,7 @@ export function TrustHeroEnergyLoop({ sectionId = 'academy', targetRef }: {
 export function TrustHeroUnravel() {
   const wrapRef = React.useRef<HTMLDivElement | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
-  const titleRef = React.useRef<HTMLHeadingElement | null>(null);
+  const titleRef = React.useRef<HTMLElement | null>(null);
   const counterNumRef = React.useRef<HTMLElement | null>(null);
   const counterBarRef = React.useRef<HTMLElement | null>(null);
   const scrollCueRef = React.useRef<HTMLDivElement | null>(null);
@@ -925,45 +926,46 @@ export function TrustHeroUnravel() {
 
         <div className="tsx-hero-chapter" style={{ opacity: 1, pointerEvents: "auto" }} data-from="0" data-to="0.07">
           <p className="tsx-section-eyebrow">Nexara Private Limited · Visakhapatnam</p>
-          <h1 ref={titleRef} className="tsx-hero-title tsx-hero-title--strike" aria-label="Nexara">
+          <p ref={titleRef} className="tsx-hero-title tsx-hero-title--strike" aria-hidden="true">
             <span>N</span><span>E</span><span>X</span><span>A</span><span>R</span><span>A</span>
             <i className="tsx-wordmark-beam" aria-hidden="true"></i>
-          </h1>
+          </p>
+          <h1 className="hero-seo-h1">Website & Web App Development Company in Vizag</h1>
           <HeroIntro theme="trust" />
         </div>
 
         <div className="tsx-hero-chapter" data-from="0.08" data-to="0.265" aria-hidden="true">
           <p className="tsx-section-eyebrow">How we are organised</p>
-          <h2 className="tsx-section-heading">One company.<br /><span className="serif" style={{ color: '#66A0CC' }}>Three specialist teams.</span></h2>
+          <h2 className="tsx-section-heading">One company.{' '}<br /><span className="serif" style={{ color: '#66A0CC' }}>Three specialist teams.</span></h2>
           <p className="tsx-sec-body" style={{ maxWidth: '34em', marginInline: 'auto' }}>You work with one company and one delivery process. The work itself is done by the team that specialises in it.</p>
         </div>
 
         <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#66A0CC' } as React.CSSProperties} data-from="0.265" data-to="0.45" aria-hidden="true">
           <p className="tsx-panel-idx">01 / TEAM</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Talent Programmes<br /><span className="serif" style={{ color: '#66A0CC' }}>training and internships.</span></h2>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Talent Programmes{' '}<br /><span className="serif" style={{ color: '#66A0CC' }}>training and internships.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Cohort-based training in full-stack, AI, design and cloud. Learners build real projects, a mentor reviews their work every week, and colleges get a written completion report.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'academy')} style={{ marginTop: '20px' }}>View Talent Programmes →</button>
         </div>
 
         <div className="tsx-hero-chapter ch-right" style={{ '--accent': '#3E6E9E' } as React.CSSProperties} data-from="0.45" data-to="0.63" aria-hidden="true">
           <p className="tsx-panel-idx" style={{ right: 'max(9vw, 150px)', left: 'auto' }}>02 / TEAM</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'right' }}>Product Studio<br /><span className="serif" style={{ color: '#3E6E9E' }}>custom software and SaaS.</span></h2>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'right' }}>Product Studio{' '}<br /><span className="serif" style={{ color: '#3E6E9E' }}>custom software and SaaS.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'right' }}>SaaS platforms, business portals, dashboards and integrations, with AI automation where it suits the problem. Each build has a written specification and a working demo every week.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'labs')} style={{ marginTop: '20px' }}>View Product Studio →</button>
         </div>
 
         <div className="tsx-hero-chapter ch-left" style={{ '--accent': '#6F6B5E' } as React.CSSProperties} data-from="0.63" data-to="0.81" aria-hidden="true">
           <p className="tsx-panel-idx">03 / TEAM</p>
-          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Digital Solutions<br /><span className="serif" style={{ color: '#6F6B5E' }}>websites and marketing.</span></h2>
+          <h2 className="tsx-section-heading" style={{ textAlign: 'left' }}>Digital Solutions{' '}<br /><span className="serif" style={{ color: '#6F6B5E' }}>websites and marketing.</span></h2>
           <p className="tsx-sec-body" style={{ textAlign: 'left' }}>Brand identity, business websites, search visibility and campaigns for businesses that need to be found and contacted. Results are reported in plain language.</p>
           <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'marketing')} style={{ marginTop: '20px' }}>View Digital Solutions →</button>
         </div>
 
         <div className="tsx-hero-chapter" data-from="0.825" data-to="1" aria-hidden="true">
           <p className="tsx-section-eyebrow">One way of working</p>
-          <h2 className="tsx-section-heading">Three teams.<br /><span className="serif" style={{ color: '#66A0CC' }}>One delivery standard.</span></h2>
+          <h2 className="tsx-section-heading">Three teams.{' '}<br /><span className="serif" style={{ color: '#66A0CC' }}>One delivery standard.</span></h2>
           <div className="tsx-sec-actions" style={{ display: 'flex', gap: '16px', marginTop: '24px', justifyContent: 'center' }}>
-            <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>Discuss a project <span className="arr">→</span></button>
+            <button className="tsx-btn-cta" onClick={() => routeTo('trust', 'contact')}>{ESTIMATE_OFFER} <span className="arr">→</span></button>
             <button className="tsx-sec-btn-ghost" onClick={() => {
               const el = document.getElementById("divisions");
               el?.scrollIntoView({ behavior: "smooth" });

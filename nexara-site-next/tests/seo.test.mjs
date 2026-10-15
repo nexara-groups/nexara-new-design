@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ts from 'typescript';
 const moduleOf = source => import('data:text/javascript;base64,' + Buffer.from(ts.transpileModule(source, {compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText).toString('base64'));
-const { DATA } = await moduleOf(fs.readFileSync(new URL('../src/lib/data.ts', import.meta.url), 'utf8'));
-const source = fs.readFileSync(new URL('../src/lib/seo.ts', import.meta.url), 'utf8').replace("import { DATA } from './data';", 'const DATA = ' + JSON.stringify(DATA) + ';').replace(/import \{ BLOG_POSTS[^\n]*\n/, "const BLOG_POSTS = [], BLOG_DESCRIPTION = '';\n");
-const { getSeo, getRoutes, getStructuredData } = await moduleOf(source);
+const { DATA, GOOGLE_ENTITY_URL, GOOGLE_KGMID, INSTAGRAM_URL, OFFICE_ADDRESS } = await moduleOf(fs.readFileSync(new URL('../src/lib/data.ts', import.meta.url), 'utf8'));
+const source = fs.readFileSync(new URL('../src/lib/seo.ts', import.meta.url), 'utf8').replace("import { DATA, GOOGLE_ENTITY_URL, GOOGLE_KGMID } from './data';", 'const DATA = ' + JSON.stringify(DATA) + '; const GOOGLE_ENTITY_URL = ' + JSON.stringify(GOOGLE_ENTITY_URL) + '; const GOOGLE_KGMID = ' + JSON.stringify(GOOGLE_KGMID) + ';').replace(/import \{ BLOG_POSTS[^\n]*\n/, "const BLOG_POSTS = [], BLOG_DESCRIPTION = '';\n");
+const { getSeo, getRoutes, getStructuredData, pageUrl } = await moduleOf(source);
 test('all existing detail pages and intake links have valid metadata', () => {
  const routes = getRoutes(); assert.equal(routes.length, 52); // +8 labs products × 2 themes; academy-sports merged into forms
  for (const route of routes) { const seo=getSeo(route); assert.equal(seo.valid,true,route.path); assert.ok(seo.title.includes('Nexara')); assert.ok(seo.description.length>80); }
@@ -17,8 +17,13 @@ test('all existing detail pages and intake links have valid metadata', () => {
 test('Trust duplicates consolidate to Neo and contact intents consolidate to contact', () => {
  assert.equal(getSeo({theme:'trust',page:'academy',detail:null}).canonical,'https://nexaragroups.com/neo/academy');
  assert.equal(getSeo({theme:'trust',page:'contact',detail:'academy'}).canonical,'https://nexaragroups.com/neo/contact');
- assert.equal(getSeo({theme:'neo',page:'home',detail:null}).canonical,'https://nexaragroups.com/');
+ assert.equal(getSeo({theme:'neo',page:'home',detail:null}).canonical,'https://nexaragroups.com');
  assert.equal(new Set(getRoutes().map(r=>getSeo(r).canonical)).size,22);
+ for (const route of getRoutes()) {
+   const canonical = getSeo(route).canonical;
+   assert.equal(canonical, pageUrl(new URL(canonical).pathname), canonical);
+   assert.equal(canonical.endsWith('/'), false, canonical);
+ }
 });
 test('invalid service and detail routes cannot be indexed', () => {
  for(const route of [{theme:'trust',page:'made-up',detail:null},{theme:'neo',page:'academy',detail:'made-up'}]) assert.equal(getSeo(route).valid,false);
@@ -28,6 +33,13 @@ test('local business schema has the exact supplied phone and address', () => {
  const org=graph.find(x=>x['@type']?.includes('LocalBusiness'));
  assert.equal(org.telephone,'+919257535757'); assert.equal(org.address.postalCode,'530017');
  assert.equal(org.address.streetAddress,DATA.contact.address.street);
+ assert.equal(`${org.address.streetAddress}, ${org.address.addressLocality}, ${org.address.addressRegion} ${org.address.postalCode}`, OFFICE_ADDRESS);
+ assert.equal(org.url, 'https://nexaragroups.com');
+ assert.equal(org.hasMap, GOOGLE_ENTITY_URL);
+ assert.ok(org.sameAs.includes(INSTAGRAM_URL));
+ assert.ok(org.sameAs.includes(GOOGLE_ENTITY_URL));
+ assert.equal(org.sameAs.some(href => href.includes('nexaraprivatelimited')), false);
+ assert.ok(org.identifier.some(item => item.propertyID === 'kgmid' && item.value === GOOGLE_KGMID));
 });
 
 test('pages with FAQs emit FAQPage JSON-LD instead of a visible SEO dump', () => {
@@ -152,6 +164,28 @@ test('brand domains redirect on the worker, including Slovenia', () => {
   }
   assert.ok(middleware.includes('301'));
   assert.ok(middleware.includes('https://${CANONICAL_HOST}'));
+});
+
+test('homepage headings, estimate offer, llms.txt and trust sitemap entry', () => {
+  const neo = fs.readFileSync(new URL('../src/components/neo/Hero.tsx', import.meta.url), 'utf8');
+  const trust = fs.readFileSync(new URL('../src/components/trust/Hero.tsx', import.meta.url), 'utf8');
+  const home = fs.readFileSync(new URL('../src/components/shared/HomeBlocks.tsx', import.meta.url), 'utf8');
+  const llms = fs.readFileSync(new URL('../public/llms.txt', import.meta.url), 'utf8');
+  const sitemap = fs.readFileSync(new URL('../src/app/sitemap.ts', import.meta.url), 'utf8');
+  for (const source of [neo, trust]) {
+    assert.match(source, /<h1 className="hero-seo-h1">Website & Web App Development Company in Vizag<\/h1>/);
+    assert.doesNotMatch(source, /<h1[^>]*>[\s\S]*N<\/span>/);
+  }
+  assert.match(neo, /Academy\{' '\}<br \/>/);
+  assert.match(trust, /Talent Programmes\{' '\}<br \/>/);
+  assert.match(home, /\{label\}\{' '\}/);
+  assert.match(llms, new RegExp(OFFICE_ADDRESS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.match(llms, /\+919257535757/);
+  assert.match(llms, /Free cost estimate for your website or app/);
+  assert.match(llms, /https:\/\/www\.instagram\.com\/builtbynexara/);
+  assert.match(llms, /https:\/\/nexaragroups\.com\/trust/);
+  assert.match(sitemap, /\$\{SITE_URL\}\/trust/);
+  assert.equal(fs.readFileSync(new URL('../src/lib/data.ts', import.meta.url), 'utf8').includes('Sector 4'), false);
 });
 
 test('all routes have targeted keywords populated', () => {
