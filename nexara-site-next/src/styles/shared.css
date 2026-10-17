@@ -2387,3 +2387,11 @@ main.nx-pf .nx-pf-result h3 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); font-weig
   .nx-news { grid-template-columns: 1fr; }
   .nx-news-row { flex-direction: column; }
 }
+
+/* Newsletter confirmation page (utility page on the .site-loading shell) */
+.nx-confirm { padding: 24px; text-align: center; font-size: 16px; }
+.nx-confirm h1 { margin: 0; font-size: clamp(1.5rem, 4vw, 2rem); color: #fff; }
+.nx-confirm p { margin: 0; max-width: 42ch; }
+.nx-confirm a { color: #dce8f8; text-underline-offset: 4px; }
+.nx-confirm-btn { min-height: 50px; padding: 0 28px; border: 0; border-radius: 999px; background: #215f94; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.nx-confirm-btn:disabled { opacity: .6; cursor: progress; }

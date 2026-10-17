@@ -27,7 +27,7 @@ html_handling = "none"
 
 # Rate limit for /api/submit (contact brief + newsletter): 5 submissions per IP per form per minute.
 # Secrets the route reads (set once in the Cloudflare dashboard → Worker → Settings → Variables, type Secret):
-#   TURNSTILE_SECRET_KEY, RESEND_API_KEY. Optional plain var: FORMS_FROM.
+#   TURNSTILE_SECRET_KEY, RESEND_API_KEY, FORMS_SIGNING_SECRET (newsletter confirm links). Optional plain var: FORMS_FROM.
 [[ratelimits]]
 name = "FORM_LIMITER"
 namespace_id = "1001"

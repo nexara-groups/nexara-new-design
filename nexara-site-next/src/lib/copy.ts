@@ -451,7 +451,7 @@ export const COPY = {
       placeholder: v('Your email', 'Email address'),
       submit: v('Subscribe', 'Subscribe'),
       consent: v('I consent to receiving this newsletter. Unsubscribe anytime by replying to it.', 'I consent to receiving this newsletter and can unsubscribe at any time by replying to it.'),
-      done: v("You're on the list. First one lands next month.", 'Thank you. You are subscribed.'),
+      done: v('Almost there. Check your inbox and tap the link to confirm.', 'Please check your inbox and confirm your subscription using the link we sent.'),
       failed: v('Could not subscribe. Email info@nexaragroups.com instead.', 'Subscription failed. Please email info@nexaragroups.com.'),
     },
     checklistTitle: v('What makes a good request', 'What makes a good request'),

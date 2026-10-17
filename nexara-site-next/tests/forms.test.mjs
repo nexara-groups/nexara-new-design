@@ -36,14 +36,40 @@ test('enquiry keeps the brief, trims and caps long fields', () => {
   assert.equal('unknown' in r.value.brief, false);
 });
 
-test('inbox email: reply-to is the visitor and consent version is recorded', () => {
+test('enquiry inbox email: reply-to is the visitor and consent version is recorded', () => {
   const meta = { at: '2026-10-17T10:00:00Z', ip: '1.2.3.4', country: 'IN' };
-  const news = buildInboxEmail(validateSubmission(base).value, meta);
-  assert.equal(news.replyTo, 'asha@example.in');
-  assert.match(news.subject, /^Newsletter signup: asha@example\.in$/);
-  assert.match(news.text, new RegExp(`version ${CONSENT_VERSION}`));
-  const enq = buildInboxEmail(validateSubmission({ kind: 'enquiry', email: 'r@x.com', name: 'Ravi', consent: true, token: 't', briefText: 'THE BRIEF', brief: { section: 'labs' } }).value, meta);
+  const enq =buildInboxEmail(validateSubmission({ kind: 'enquiry', email: 'r@x.com', name: 'Ravi', consent: true, token: 't', briefText: 'THE BRIEF', brief: { section: 'labs' } }).value, meta);
   assert.equal(enq.subject, 'Project enquiry (labs): Ravi');
   assert.match(enq.text, /THE BRIEF/);
+  assert.equal(enq.replyTo, 'r@x.com');
+  assert.match(enq.text, new RegExp(`version ${CONSENT_VERSION}`));
   assert.equal(INBOX, 'info@nexaragroups.com');
+});
+
+const { signConfirmation, verifyConfirmation, confirmUrl, buildConfirmationEmail, buildSubscribedEmail, CONFIRM_TTL_SECONDS } = await moduleOf(fs.readFileSync(new URL('../src/lib/forms.ts', import.meta.url), 'utf8'));
+
+test('double opt-in: a signed link round-trips to the same email', async () => {
+  const tok = await signConfirmation('secret-a', 'asha+news@example.in', 1_000_000);
+  assert.equal(await verifyConfirmation('secret-a', tok, 1_000_000 + 60), 'asha+news@example.in');
+  assert.match(confirmUrl('https://nexaragroups.com', tok), /^https:\/\/nexaragroups\.com\/newsletter\/confirm\?e=[\w-]+&t=1000000&s=[\w-]+$/);
+});
+
+test('double opt-in: wrong secret, tampered email, expired or future links are refused', async () => {
+  const tok = await signConfirmation('secret-a', 'asha@example.in', 1_000_000);
+  const other = await signConfirmation('secret-a', 'victim@example.in', 1_000_000);
+  assert.equal(await verifyConfirmation('secret-b', tok, 1_000_000), null);
+  assert.equal(await verifyConfirmation('secret-a', { ...tok, e: other.e }, 1_000_000), null);
+  assert.equal(await verifyConfirmation('secret-a', tok, 1_000_000 + CONFIRM_TTL_SECONDS + 1), null);
+  assert.equal(await verifyConfirmation('secret-a', tok, 1_000_000 - 3600), null);
+  assert.equal(await verifyConfirmation('secret-a', { e: tok.e, t: 'x', s: tok.s }, 1_000_000), null);
+  assert.equal(await verifyConfirmation('secret-a', null, 1_000_000), null);
+});
+
+test('double opt-in emails: confirmation carries only the link; inbox notice records double opt-in', () => {
+  const c = buildConfirmationEmail('https://nexaragroups.com/newsletter/confirm?e=a&t=1&s=b');
+  assert.match(c.text, /newsletter\/confirm\?e=a&t=1&s=b/);
+  assert.match(c.text, /ignore this email/);
+  const s = buildSubscribedEmail('asha@example.in', { at: 'now', ip: '', country: 'IN' });
+  assert.equal(s.replyTo, 'asha@example.in');
+  assert.match(s.text, /double opt-in/);
 });

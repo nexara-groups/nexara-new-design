@@ -66,7 +66,87 @@ export function validateSubmission(input: unknown): Validated {
   return { ok: true, value: { kind, email, token, page, name, brief, briefText: str(body.briefText, 6000) } };
 }
 
-/** The message that lands in INBOX. Reply-To is the visitor, so replying in Outlook answers them directly. */
+// ── Newsletter double opt-in ──
+// Signup only emails the subscriber a signed link. INBOX hears about them once they confirm, so consent is proven
+// by the owner of the address, not by whoever typed it. The link opens a page with a Confirm button (a POST), because
+// mail scanners such as Outlook Safe Links fetch links in emails and would otherwise confirm on the owner's behalf.
+
+export const CONFIRM_TTL_SECONDS = 48 * 60 * 60;
+
+const b64url = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const fromB64url = (s: string) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0));
+
+async function hmac(secret: string, message: string): Promise<string> {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return b64url(new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message))));
+}
+
+export interface ConfirmToken { e: string; t: number; s: string }
+
+/** Signs email + issue time. `e` is the email, base64url so it survives the query string untouched. */
+export async function signConfirmation(secret: string, email: string, issuedAt = Math.floor(Date.now() / 1000)): Promise<ConfirmToken> {
+  const e = b64url(new TextEncoder().encode(email));
+  return { e, t: issuedAt, s: await hmac(secret, `newsletter:${e}:${issuedAt}`) };
+}
+
+/** Returns the confirmed email, or null when the signature is wrong, the link expired, or the input is malformed. */
+export async function verifyConfirmation(secret: string, input: unknown, now = Math.floor(Date.now() / 1000)): Promise<string | null> {
+  if (!input || typeof input !== 'object') return null;
+  const { e, t, s } = input as Record<string, unknown>;
+  const issued = Number(t);
+  if (typeof e !== 'string' || typeof s !== 'string' || !Number.isInteger(issued) || e.length > 400) return null;
+  if (issued > now + 60 || now - issued > CONFIRM_TTL_SECONDS) return null;
+  const expected = await hmac(secret, `newsletter:${e}:${issued}`);
+  if (expected.length !== s.length) return null;
+  let diff = 0;
+  for (let i = 0; i < s.length; i++) diff |= expected.charCodeAt(i) ^ s.charCodeAt(i);
+  if (diff !== 0) return null;
+  try {
+    const email = new TextDecoder().decode(fromB64url(e));
+    return EMAIL.test(email) ? email : null;
+  } catch {
+    return null;
+  }
+}
+
+export const confirmUrl = (origin: string, token: ConfirmToken) => `${origin}/newsletter/confirm?e=${token.e}&t=${token.t}&s=${token.s}`;
+
+/** The one email a signup sends to the address typed in. Fixed text: nothing the visitor typed appears in it. */
+export function buildConfirmationEmail(link: string) {
+  return {
+    subject: 'Confirm your Nexara newsletter subscription',
+    text: [
+      'Someone, hopefully you, asked to receive the Nexara newsletter at this address.',
+      '',
+      `To confirm, open this link and press Confirm (valid for 48 hours):`,
+      link,
+      '',
+      'If you did not ask for this, ignore this email. You will not be added.',
+      '',
+      'Nexara Private Limited · nexaragroups.com',
+    ].join('\n'),
+  };
+}
+
+/** Sent to INBOX after the owner of the address confirms. */
+export function buildSubscribedEmail(email: string, meta: { at: string; ip: string; country: string }) {
+  return {
+    subject: `Newsletter subscriber confirmed: ${email}`,
+    replyTo: email,
+    text: [
+      `${email} confirmed their subscription to the Nexara newsletter from a link sent to that address.`,
+      '',
+      'Add them to the mailing list. To honour an unsubscribe, remove them and reply to confirm.',
+      '',
+      '---',
+      `Confirmed: ${meta.at}`,
+      `Consent: double opt-in (version ${CONSENT_VERSION})`,
+      `Network: ${meta.country || '??'} · ${meta.ip || 'unknown IP'}`,
+    ].join('\n'),
+  };
+}
+
+/** The enquiry message that lands in INBOX. Reply-To is the visitor, so replying in Outlook answers them directly. */
 export function buildInboxEmail(value: Extract<Validated, { ok: true }>['value'], meta: { at: string; ip: string; country: string }) {
   const footer = [
     '',
@@ -76,18 +156,6 @@ export function buildInboxEmail(value: Extract<Validated, { ok: true }>['value']
     `Consent: given (version ${CONSENT_VERSION})`,
     `Network: ${meta.country || '??'} · ${meta.ip || 'unknown IP'}`,
   ];
-  if (value.kind === 'newsletter') {
-    return {
-      subject: `Newsletter signup: ${value.email}`,
-      replyTo: value.email,
-      text: [
-        `${value.email} subscribed to the Nexara newsletter.`,
-        '',
-        'Add them to the mailing list. To honour an unsubscribe, remove them and reply to confirm.',
-        ...footer,
-      ].join('\n'),
-    };
-  }
   const who = value.name ? `${value.name} <${value.email}>` : value.email;
   return {
     subject: `Project enquiry${value.brief?.section ? ` (${value.brief.section})` : ''}: ${value.name || value.email}`,
