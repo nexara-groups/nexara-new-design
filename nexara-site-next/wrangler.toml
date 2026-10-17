@@ -24,3 +24,11 @@ directory = ".open-next/assets"
 binding = "ASSETS"
 # Next.js owns redirects; keep public legal files at their declared canonical URLs.
 html_handling = "none"
+
+# Rate limit for /api/submit (contact brief + newsletter): 5 submissions per IP per form per minute.
+# Secrets the route reads (set once in the Cloudflare dashboard → Worker → Settings → Variables, type Secret):
+#   TURNSTILE_SECRET_KEY, RESEND_API_KEY. Optional plain var: FORMS_FROM.
+[[ratelimits]]
+name = "FORM_LIMITER"
+namespace_id = "1001"
+simple = { limit = 5, period = 60 }

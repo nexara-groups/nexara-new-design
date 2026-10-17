@@ -8,6 +8,7 @@ import { useBriefForm } from '@/lib/shared';
 import { divisionLabel, voiced, type Theme } from '@/lib/site';
 import { PageFinder } from './PageFinder';
 import { finderItems } from '@/lib/finder';
+import { FORMS_ENABLED, TurnstileWidget, WIDGET_THEME, submitForm } from '../TurnstileWidget';
 
 const CHANNEL_TRACK: Record<string, 'presence' | 'visibility' | 'performance'> = {
   academy: 'presence',
@@ -26,10 +27,33 @@ export function ContactPage({ theme, detail }: { theme: Theme; detail: string | 
     formData,
     handleChange,
     handleLaneSelect,
-    handleSubmit,
+    handleSubmit: openMailClient,
     briefText,
     showSuccess,
   } = useBriefForm(detail, { scrollSelector: '.nx-ct-form-card' });
+
+  // Server send (Turnstile + consent) when the keys are configured; the mail client is the fallback.
+  const [consent, setConsent] = React.useState(false);
+  const [token, setToken] = React.useState('');
+  const [resetKey, setResetKey] = React.useState(0);
+  const [status, setStatus] = React.useState<'idle' | 'sending' | 'sent'>('idle');
+  const [error, setError] = React.useState('');
+  const honeypot = React.useRef<HTMLInputElement>(null);
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    if (!FORMS_ENABLED) return openMailClient(event);
+    event.preventDefault();
+    if (!consent) return setError(t(copy.errors.consent));
+    if (!token) return setError(t(copy.errors.captcha));
+    setStatus('sending');
+    setError('');
+    const failure = await submitForm({ kind: 'enquiry', email: formData.email, name: formData.name, brief: formData, briefText, consent, token, website: honeypot.current?.value || '' });
+    if (!failure) return setStatus('sent');
+    setStatus('idle');
+    setResetKey((n) => n + 1);
+    if (failure === 'consent' || failure === 'email' || failure === 'captcha' || failure === 'rate') return setError(t(copy.errors[failure]));
+    setError(t(copy.errors.fallback));
+    openMailClient(event);
+  };
 
   React.useEffect(() => {
     const el = root.current;
@@ -108,7 +132,13 @@ export function ContactPage({ theme, detail }: { theme: Theme; detail: string | 
       </section>
 
       <section className="nx-ct-wrap nx-ct-block" id="brief">
-        {showSuccess ? (
+        {status === 'sent' ? (
+          <div className="nx-ct-success" role="status">
+            <h2 className="nx-ct-sec-h">{t(copy.sent)}</h2>
+            <p>{t(copy.sentHint)}</p>
+            <pre className="nx-ct-preview">{briefText}</pre>
+          </div>
+        ) : showSuccess ? (
           <div className="nx-ct-success">
             <h2 className="nx-ct-sec-h">{t(copy.success)}</h2>
             <p>{t(copy.successHint)}</p>
@@ -147,7 +177,7 @@ export function ContactPage({ theme, detail }: { theme: Theme; detail: string | 
                 <label>
                   <span>{t(copy.fields.email)}</span>
                   <small>{t(copy.hints.email)}</small>
-                  <input type="email" value={formData.email} placeholder={t(copy.placeholders.email)} onChange={(e) => handleChange('email', e.target.value)} />
+                  <input type="email" required={FORMS_ENABLED} value={formData.email} placeholder={t(copy.placeholders.email)} onChange={(e) => handleChange('email', e.target.value)} />
                 </label>
               </div>
 
@@ -186,7 +216,18 @@ export function ContactPage({ theme, detail }: { theme: Theme; detail: string | 
                 <input type="text" value={formData.successMetric} placeholder={t(copy.placeholders.success)} onChange={(e) => handleChange('successMetric', e.target.value)} />
               </label>
 
-              <button className="nx-ct-cta nx-ct-cta--lg" type="submit">{t(copy.submit)}</button>
+              {FORMS_ENABLED && (
+                <>
+                  <input ref={honeypot} className="nx-hp" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+                  <label className="nx-ct-consent">
+                    <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} required />
+                    <span>{t(copy.consent)} <a href="/privacy-policy.html">{t(copy.privacy)}</a>.</span>
+                  </label>
+                  <TurnstileWidget action="enquiry" onToken={setToken} resetKey={resetKey} className="nx-ts" theme={t(WIDGET_THEME)} />
+                </>
+              )}
+              {error && <p className="nx-form-error" role="alert">{error}</p>}
+              <button className="nx-ct-cta nx-ct-cta--lg" type="submit" disabled={status === 'sending'}>{status === 'sending' ? t(copy.sending) : t(copy.submit)}</button>
             </form>
 
             <aside className="nx-ct-check">

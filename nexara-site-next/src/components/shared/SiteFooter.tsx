@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import FooterContact from '../FooterContact';
+import { NewsletterSignup } from './NewsletterSignup';
 import { routePath } from '@/lib/seo';
 import { FOOTER_BLURB, FOOTER_COLUMNS, LEGAL_LINKS, voiced, type Theme } from '@/lib/site';
 import { openCookiePreferences } from '../CookieConsent';
@@ -9,6 +10,7 @@ import { openCookiePreferences } from '../CookieConsent';
 export function SiteFooter({ theme }: { theme: Theme }) {
   return (
     <footer className="nx-footer">
+      <NewsletterSignup theme={theme} />
       <div className="nx-footer-grid">
         <div className="nx-footer-brand">
           <Link prefetch={false} className="nx-nav-logo" href={routePath(theme, 'home')} aria-label="Nexara home">
