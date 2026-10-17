@@ -53,7 +53,15 @@ export const metadata: Metadata = {
     description: 'Custom software, websites, AI products, and tech talent training from MVP Colony, Visakhapatnam. Shipped for real clients.',
     images: ['https://nexaragroups.com/brand/og-image.png'],
   },
-  icons: { icon: '/brand/nexara-mark.svg' },
+  // SVG for modern browsers; PNG and /favicon.ico (48px) for Google's result favicon and older clients.
+  icons: {
+    icon: [
+      { url: '/brand/nexara-mark.svg', type: 'image/svg+xml' },
+      { url: '/brand/nexara-mark-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/favicon.ico', sizes: '48x48 32x32' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
   verification: { google: 'fLwXJBPqsWL-8uTW8q2DDuRbOJnOY0WPe3xABNY4ftc' },
   other: {
     'geo.region': 'IN-AP',

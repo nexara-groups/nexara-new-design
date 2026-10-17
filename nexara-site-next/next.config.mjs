@@ -6,7 +6,15 @@ const nextConfig = {
   // Inline the (small) stylesheets so they stop blocking first paint and the font chain starts immediately.
   experimental: { inlineCss: true },
   async headers() {
-    return [{ source: '/:path*', headers: [{ key: 'Strict-Transport-Security', value: 'max-age=31536000' }] }];
+    // Baseline hardening, as on Happy Farms. No CSP yet: gtag, inline JSON-LD and the WebGL hero need an allowlist first.
+    // The site uses no camera, mic, location or payments, so Permissions-Policy switches them off.
+    return [{ source: '/:path*', headers: [
+      { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+      { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=()' },
+    ] }];
   },
   async redirects() {
     // Marketing / Academy are one scrolling page each: every old detail URL lands on its in-page anchor.

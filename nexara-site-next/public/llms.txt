@@ -9,6 +9,26 @@ Nexara Private Limited is a software studio in Visakhapatnam (Vizag), Andhra Pra
 - Digital marketing, SEO and Google Business listings
 - Software training, internships and placement prep (Academy)
 
+## Products
+
+- Nexara Voice, AI voice agents for calls in Telugu and English: https://nexaragroups.com/neo/labs/voice
+- Agency OS, the portal Nexara clients use for project updates, approvals and support: https://nexaragroups.com/neo/labs/agency
+- HappyGrow, software for farmer producer organisations (FPOs): https://nexaragroups.com/neo/labs/grow
+- Academy & Sports apps (Happy Forms registrations): https://nexaragroups.com/neo/labs/forms
+
+## Company facts
+
+- Legal name: Nexara Private Limited (also known as Nexara, Nexara Groups)
+- CIN: U62012AP2026PTC126146
+- GSTIN: 37AALCN7053N1ZR
+- Incorporated: 31 May 2026, Andhra Pradesh, India
+- Directors: Seshu Kumar Puvvala, Pala Raju Garigipati
+- Website: https://nexaragroups.com
+
+## Not to be confused with
+
+Nexara Private Limited (nexaragroups.com, Visakhapatnam) has no connection with other businesses that use the name Nexara, including nexara.ru (speech API), nexara.in, nexara.ai and Nexara Soft Private Limited (Hyderabad). The name is sometimes misspelled Nexera or Nexora.
+
 ## Location
 
 No. 1-83-14, MIG-IV, Sector 3, 1st Floor, M.V.P. Colony, Visakhapatnam, Andhra Pradesh 530017
@@ -33,3 +53,5 @@ Free cost estimate for your website or app: https://nexaragroups.com/neo/contact
 - Company: https://nexaragroups.com/neo/company
 - Contact: https://nexaragroups.com/neo/contact
 - Instagram: https://www.instagram.com/builtbynexara
+- LinkedIn: https://www.linkedin.com/company/nexara-private-limited/
+- Google Maps: https://maps.google.com/?cid=5722580193382104004

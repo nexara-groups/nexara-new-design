@@ -2,8 +2,9 @@
 export const OFFICE_STREET = 'No. 1-83-14, MIG-IV, Sector 3, 1st Floor, M.V.P. Colony';
 export const OFFICE_CITY = 'Visakhapatnam, Andhra Pradesh 530017';
 export const OFFICE_ADDRESS = `${OFFICE_STREET}, ${OFFICE_CITY}`;
-// Google entity for kgmid /g/11zf6hqkp8. Used in the footer, Organization.sameAs and hasMap.
-export const GOOGLE_ENTITY_URL = 'https://share.google/w7ULtMwd5konwhZuP';
+// Google Business Profile on Maps (CID 0x4f6ab05dc939fbc4, kgmid /g/11zf6hqkp8). Stable URL, not a share redirect.
+// Used in the footer, Organization.sameAs and hasMap.
+export const GOOGLE_ENTITY_URL = 'https://maps.google.com/?cid=5722580193382104004';
 export const GOOGLE_KGMID = '/g/11zf6hqkp8';
 export const INSTAGRAM_URL = 'https://www.instagram.com/builtbynexara';
 

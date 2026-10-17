@@ -299,10 +299,60 @@ export function getStructuredData(route: Pick<Route, 'theme' | 'page' | 'detail'
         operatingSystem: 'Web-based',
         description: seo.description,
         url: product.url || seo.canonical,
+        ...(product.shot ? { image: SITE_URL + product.shot } : {}),
+        mainEntityOfPage: { '@id': webPageId },
         author: { '@id': organizationId },
         publisher: { '@id': organizationId },
       });
     }
+  }
+
+  // Product list on the Labs products page: shipped products only (live or demo), each pointing at its own page.
+  if (route.page === 'labs' && route.detail === 'products') {
+    const shipped = DATA.sections.labs.products.filter(p => p.status === 'live' || p.status === 'demo');
+    graph.push({
+      '@type': 'ItemList',
+      '@id': `${seo.canonical}#products`,
+      name: 'Nexara Labs products',
+      itemListElement: shipped.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: SITE_URL + routePath('neo', 'labs', p.id),
+        item: { '@type': 'SoftwareApplication', '@id': `${SITE_URL}${routePath('neo', 'labs', p.id)}#software`, name: p.name, applicationCategory: 'BusinessApplication', operatingSystem: 'Web-based', publisher: { '@id': organizationId } },
+      })),
+    });
+  }
+
+  // Academy is paid training, not hiring: Course and EducationalOccupationalProgram, never JobPosting
+  // (Google treats JobPosting on non-job pages as spam).
+  if (route.page === 'academy' && !route.detail) {
+    const academy = DATA.sections.academy;
+    graph.push({
+      '@type': 'ItemList',
+      '@id': `${seo.canonical}#tracks`,
+      name: 'Nexara Academy training tracks',
+      itemListElement: academy.stackDetails.map((track, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'Course',
+          name: `${track.title} (Nexara Academy, Visakhapatnam)`,
+          description: `${track.title} track at Nexara Academy, Visakhapatnam. Outcome: ${track.outcome}. Covers ${track.deliverables.join(", ")}.`,
+          teaches: track.deliverables,
+          provider: { '@id': organizationId },
+        },
+      })),
+    });
+    const [, internshipDescription] = pages['academy/internships']!;
+    graph.push({
+      '@type': 'EducationalOccupationalProgram',
+      '@id': `${seo.canonical}#internships`,
+      name: 'Nexara managed software internship, Visakhapatnam',
+      description: internshipDescription,
+      programType: 'Internship',
+      provider: { '@id': organizationId },
+      url: seo.canonical,
+    });
   }
 
   // Portfolio / client showcase schema for the Customers / Proof page
@@ -356,7 +406,7 @@ function pageFaqs(route: Pick<Route, 'theme' | 'page' | 'detail'>, fromSeo: [str
 }
 
 // Blog JSON-LD. Publisher is the same Organization node (@id) the rest of the site uses.
-const websiteNode = () => ({ '@type': 'WebSite', '@id': `${SITE_URL}/#website`, url: pageUrl('/'), name: 'Nexara', alternateName: ['Nexara Private Limited', 'nexaragroups.com'], publisher: { '@id': organizationId }, inLanguage: 'en-IN' });
+const websiteNode = () => ({ '@type': 'WebSite', '@id': `${SITE_URL}/#website`, url: pageUrl('/'), name: 'Nexara', alternateName: ['Nexara Private Limited', 'Nexara Groups', 'nexaragroups.com'], publisher: { '@id': organizationId }, inLanguage: 'en-IN' });
 const crumbs = (items: [string, string][]) => ({ '@type': 'BreadcrumbList', itemListElement: items.map(([name, item], i) => ({ '@type': 'ListItem', position: i + 1, name, item })) });
 export const blogUrl = (slug?: string) => `${SITE_URL}/blog${slug ? '/' + slug : ''}`;
 
