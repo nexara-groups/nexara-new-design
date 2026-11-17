@@ -199,3 +199,29 @@ export function answer(input: string, kb: AgentKnowledge, seed = 0): AgentReply 
 
   return { ...reply('not sure', "i don't have a good answer for that, and i'd rather say so than guess. try 'show me your work', 'what do you charge', or ask a person.", [{ type: 'brief', label: 'Start a quick brief' }, goto('/contact', 'Ask a person')]), fallback: true };
 }
+
+// ── Pure helpers for the hover-reading and the guided tour (kept here so they are unit tested) ──
+
+/** First sentence of a copy block, whitespace-collapsed, cut on a word boundary at `max` characters. */
+export function firstSentence(text: string, max = 120): string {
+  const t = (typeof text === 'string' ? text : '').replace(/\s+/g, ' ').trim();
+  if (!t) return '';
+  const m = t.match(/^.+?[.!?](?=\s|$)/);
+  const s = m ? m[0] : t;
+  if (s.length <= max) return s;
+  const cut = s.slice(0, max);
+  const at = cut.lastIndexOf(' ');
+  return `${(at > max * 0.5 ? cut.slice(0, at) : cut).replace(/[\s,;:.-]+$/, '')}…`;
+}
+
+/** Evenly spaced indices (always including the first) so a long page still gets a 4 to 5 stop tour. */
+export function pickEven(total: number, count: number): number[] {
+  if (total <= 0 || count <= 0) return [];
+  if (total <= count) return Array.from({ length: total }, (_, i) => i);
+  const out: number[] = [];
+  for (let i = 0; i < count; i++) {
+    const idx = Math.round((i * (total - 1)) / (count - 1));
+    if (!out.includes(idx)) out.push(idx);
+  }
+  return out;
+}

@@ -8,13 +8,13 @@ const SIZES: Record<string, [number, number]> = {
   '/brand/clients/rise-medical-hub.png': [240, 240],
   '/brand/clients/sai-nirmaan.png': [400, 201],
   '/brand/clients/sri-engineering-works.png': [268, 300],
-  '/brand/labs/voice.jpg': [400, 790],
-  '/brand/labs/agency.jpg': [400, 790],
-  '/brand/labs/grow.jpg': [400, 790],
-  '/brand/labs/forms.jpg': [600, 903],
+  '/brand/labs/voice.jpg': [1400, 790],
+  '/brand/labs/agency.jpg': [1400, 790],
+  '/brand/labs/grow.jpg': [1400, 790],
+  '/brand/labs/forms.jpg': [1600, 903],
   '/brand/labs/hr.jpg': [870, 528],
-  '/brand/labs/lms.jpg': [280, 720],
-  '/brand/labs/workflows.jpg': [280, 720],
+  '/brand/labs/lms.jpg': [1280, 720],
+  '/brand/labs/workflows.jpg': [1280, 720],
 };
 
 export function imgSize(src: string): { width?: number; height?: number } {

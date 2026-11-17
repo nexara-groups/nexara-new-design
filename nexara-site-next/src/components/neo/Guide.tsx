@@ -10,8 +10,8 @@ import { HAS_SCROLL_ANIMATION } from '@/lib/shared';
 import { DATA } from '@/lib/data';
 import { CLIENTS } from '@/lib/clients';
 import { LOCAL_FAQS } from '@/lib/seo';
-import { answer as agentAnswer, suggestions as agentSuggestions } from './guideAgent';
-import { startBrief, nextBrief } from './briefFlow';
+import { answer as agentAnswer, suggestions as agentSuggestions, firstSentence, pickEven } from './guideAgent';
+import { startBrief, nextBrief, briefLinks } from './briefFlow';
 import '@/styles/neo-guide.css';
 
 // See trust/Hero.tsx for why this is repeated per-file rather than centralized.
@@ -26,69 +26,69 @@ function NeoAvatarSVG({ id = "neo-avatar", className = "" }: NeoAvatarSVGProps) 
   return (
     <svg id={id} className={`neo-avatar-svg ${className}`} viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       {/* Signal rings */}
-      <circle className="neo-sig-ring-3" cx="50" cy="38" r="46" stroke="#ccff00" strokeWidth="0.4"/>
-      <circle className="neo-sig-ring-2" cx="50" cy="38" r="37" stroke="#00f0ff" strokeWidth="0.4"/>
-      <circle className="neo-sig-ring-1" cx="50" cy="38" r="28" stroke="#ccff00" strokeWidth="0.5"/>
+      <circle className="neo-sig-ring-3" cx="50" cy="38" r="46" stroke="var(--guide-accent, #ccff00)" strokeWidth="0.4"/>
+      <circle className="neo-sig-ring-2" cx="50" cy="38" r="37" stroke="var(--guide-accent-2, #00f0ff)" strokeWidth="0.4"/>
+      <circle className="neo-sig-ring-1" cx="50" cy="38" r="28" stroke="var(--guide-accent, #ccff00)" strokeWidth="0.5"/>
       {/* Core glow */}
       <polygon className="neo-core-glow" points="50,8 76,23 76,53 50,68 24,53 24,23" fill="rgba(0,240,255,0.04)"/>
       {/* Face plate */}
-      <polygon id={`${id}-hex`} points="50,8 76,23 76,53 50,68 24,53 24,23" fill="rgba(0,4,2,0.97)" stroke="#ccff00" strokeWidth="1.4"/>
+      <polygon id={`${id}-hex`} points="50,8 76,23 76,53 50,68 24,53 24,23" fill="rgba(0,4,2,0.97)" stroke="var(--guide-accent, #ccff00)" strokeWidth="1.4"/>
       {/* Inner ring */}
-      <polygon points="50,16 69,27 69,49 50,60 31,49 31,27" fill="none" stroke="#00f0ff" strokeWidth="0.4" strokeOpacity="0.32"/>
+      <polygon points="50,16 69,27 69,49 50,60 31,49 31,27" fill="none" stroke="var(--guide-accent-2, #00f0ff)" strokeWidth="0.4" strokeOpacity="0.32"/>
       {/* Circuit traces */}
-      <path d="M 24 38 L 33 38 L 33 29" stroke="#ccff00" strokeWidth="0.4" strokeOpacity="0.48" fill="none"/>
-      <path d="M 76 38 L 67 38 L 67 29" stroke="#ccff00" strokeWidth="0.4" strokeOpacity="0.48" fill="none"/>
-      <line x1="38" y1="21" x2="62" y2="21" stroke="#ccff00" strokeWidth="0.3" strokeOpacity="0.22"/>
+      <path d="M 24 38 L 33 38 L 33 29" stroke="var(--guide-accent, #ccff00)" strokeWidth="0.4" strokeOpacity="0.48" fill="none"/>
+      <path d="M 76 38 L 67 38 L 67 29" stroke="var(--guide-accent, #ccff00)" strokeWidth="0.4" strokeOpacity="0.48" fill="none"/>
+      <line x1="38" y1="21" x2="62" y2="21" stroke="var(--guide-accent, #ccff00)" strokeWidth="0.3" strokeOpacity="0.22"/>
       {/* Left eye */}
       <g id={`${id}-eye-l`} className="neo-eye-l">
         <circle cx="38" cy="36" r="5.5" fill="#001616"/>
         <g id={`${id}-pupil-l`} className="neo-pupil">
-          <circle cx="38" cy="36" r="4"   fill="#00f0ff"/>
-          <circle cx="38" cy="36" r="6.5" fill="#00f0ff" fillOpacity="0.1"/>
+          <circle cx="38" cy="36" r="4"   fill="var(--guide-accent-2, #00f0ff)"/>
+          <circle cx="38" cy="36" r="6.5" fill="var(--guide-accent-2, #00f0ff)" fillOpacity="0.1"/>
           <circle cx="39.2" cy="34.8" r="1.4" fill="rgba(255,255,255,0.88)"/>
           <circle cx="37"   cy="37.5" r="0.7" fill="rgba(255,255,255,0.4)"/>
         </g>
         {/* Sass brow — hidden until expression engine raises it */}
-        <line id={`${id}-brow-l`} x1="33" y1="29" x2="43" y2="29" stroke="#ccff00" strokeWidth="1.2" strokeLinecap="round" opacity="0"/>
+        <line id={`${id}-brow-l`} x1="33" y1="29" x2="43" y2="29" stroke="var(--guide-accent, #ccff00)" strokeWidth="1.2" strokeLinecap="round" opacity="0"/>
       </g>
       {/* Right eye */}
       <g id={`${id}-eye-r`} className="neo-eye-r">
         <circle cx="62" cy="36" r="5.5" fill="#001616"/>
         <g id={`${id}-pupil-r`} className="neo-pupil">
-          <circle cx="62" cy="36" r="4"   fill="#00f0ff"/>
-          <circle cx="62" cy="36" r="6.5" fill="#00f0ff" fillOpacity="0.1"/>
+          <circle cx="62" cy="36" r="4"   fill="var(--guide-accent-2, #00f0ff)"/>
+          <circle cx="62" cy="36" r="6.5" fill="var(--guide-accent-2, #00f0ff)" fillOpacity="0.1"/>
           <circle cx="63.2" cy="34.8" r="1.4" fill="rgba(255,255,255,0.88)"/>
           <circle cx="61"   cy="37.5" r="0.7" fill="rgba(255,255,255,0.4)"/>
         </g>
-        <line id={`${id}-brow-r`} x1="57" y1="29" x2="67" y2="29" stroke="#ccff00" strokeWidth="1.2" strokeLinecap="round" opacity="0"/>
+        <line id={`${id}-brow-r`} x1="57" y1="29" x2="67" y2="29" stroke="var(--guide-accent, #ccff00)" strokeWidth="1.2" strokeLinecap="round" opacity="0"/>
       </g>
       {/* Mouth */}
-      <path id={`${id}-mouth`} d="M 37 54 Q 50 60 63 54" stroke="#ccff00" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
+      <path id={`${id}-mouth`} d="M 37 54 Q 50 60 63 54" stroke="var(--guide-accent, #ccff00)" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
       {/* Antenna */}
-      <line x1="50" y1="8" x2="50" y2="1" stroke="#ccff00" strokeWidth="1"/>
-      <circle cx="50" cy="0" r="2.2" fill="#ccff00" className="neo-led-inner"/>
-      <circle cx="50" cy="0" r="4.5" fill="#ccff00" fillOpacity="0.18" className="neo-led-outer"/>
+      <line x1="50" y1="8" x2="50" y2="1" stroke="var(--guide-accent, #ccff00)" strokeWidth="1"/>
+      <circle cx="50" cy="0" r="2.2" fill="var(--guide-accent, #ccff00)" className="neo-led-inner"/>
+      <circle cx="50" cy="0" r="4.5" fill="var(--guide-accent, #ccff00)" fillOpacity="0.18" className="neo-led-outer"/>
       {/* Body stem */}
-      <line x1="50" y1="68" x2="50" y2="81" stroke="#ccff00" strokeWidth="0.9" strokeOpacity="0.7"/>
-      <circle cx="50" cy="84" r="3.8" fill="#ccff00" fillOpacity="0.88"/>
-      <circle cx="50" cy="84" r="6.5" fill="#ccff00" fillOpacity="0.12"/>
+      <line x1="50" y1="68" x2="50" y2="81" stroke="var(--guide-accent, #ccff00)" strokeWidth="0.9" strokeOpacity="0.7"/>
+      <circle cx="50" cy="84" r="3.8" fill="var(--guide-accent, #ccff00)" fillOpacity="0.88"/>
+      <circle cx="50" cy="84" r="6.5" fill="var(--guide-accent, #ccff00)" fillOpacity="0.12"/>
       {/* Left arm */}
       <g id={`${id}-arm-l`}>
-        <line id={`${id}-arm-l-line`} x1="24" y1="38" x2="13" y2="31" stroke="#00f0ff" strokeWidth="0.7" strokeOpacity="0.6"/>
-        <circle id={`${id}-arm-l-node`} cx="11" cy="30" r="2.8" fill="#00f0ff" fillOpacity="0.72"/>
-        <circle cx="11" cy="30" r="5" fill="#00f0ff" fillOpacity="0.11"/>
+        <line id={`${id}-arm-l-line`} x1="24" y1="38" x2="13" y2="31" stroke="var(--guide-accent-2, #00f0ff)" strokeWidth="0.7" strokeOpacity="0.6"/>
+        <circle id={`${id}-arm-l-node`} cx="11" cy="30" r="2.8" fill="var(--guide-accent-2, #00f0ff)" fillOpacity="0.72"/>
+        <circle cx="11" cy="30" r="5" fill="var(--guide-accent-2, #00f0ff)" fillOpacity="0.11"/>
       </g>
       {/* Right arm */}
       <g id={`${id}-arm-r`}>
-        <line id={`${id}-arm-r-line`} x1="76" y1="38" x2="87" y2="31" stroke="#00f0ff" strokeWidth="0.7" strokeOpacity="0.6"/>
-        <circle id={`${id}-arm-r-node`} cx="89" cy="30" r="2.8" fill="#00f0ff" fillOpacity="0.72"/>
-        <circle cx="89" cy="30" r="5" fill="#00f0ff" fillOpacity="0.11"/>
+        <line id={`${id}-arm-r-line`} x1="76" y1="38" x2="87" y2="31" stroke="var(--guide-accent-2, #00f0ff)" strokeWidth="0.7" strokeOpacity="0.6"/>
+        <circle id={`${id}-arm-r-node`} cx="89" cy="30" r="2.8" fill="var(--guide-accent-2, #00f0ff)" fillOpacity="0.72"/>
+        <circle cx="89" cy="30" r="5" fill="var(--guide-accent-2, #00f0ff)" fillOpacity="0.11"/>
       </g>
       {/* Bottom float nodes */}
-      <line x1="50" y1="84" x2="35" y2="97" stroke="#ccff00" strokeWidth="0.5" strokeOpacity="0.4"/>
-      <circle cx="33" cy="99" r="2.2" fill="#ccff00" fillOpacity="0.55"/>
-      <line x1="50" y1="84" x2="65" y2="97" stroke="#00f0ff" strokeWidth="0.5" strokeOpacity="0.4"/>
-      <circle cx="67" cy="99" r="2.2" fill="#00f0ff" fillOpacity="0.55"/>
+      <line x1="50" y1="84" x2="35" y2="97" stroke="var(--guide-accent, #ccff00)" strokeWidth="0.5" strokeOpacity="0.4"/>
+      <circle cx="33" cy="99" r="2.2" fill="var(--guide-accent, #ccff00)" fillOpacity="0.55"/>
+      <line x1="50" y1="84" x2="65" y2="97" stroke="var(--guide-accent-2, #00f0ff)" strokeWidth="0.5" strokeOpacity="0.4"/>
+      <circle cx="67" cy="99" r="2.2" fill="var(--guide-accent-2, #00f0ff)" fillOpacity="0.55"/>
     </svg>
   );
 }
@@ -111,6 +111,12 @@ function NeoGuide() {
   const inputRef    = React.useRef(null);
   const askBtnRef   = React.useRef(null);
   const panelCloseRef = React.useRef(null);
+  const hitRef      = React.useRef(null);
+  const radialRef   = React.useRef(null);
+  const shortcutsBtnRef = React.useRef(null);
+  const tourRef     = React.useRef(null);
+  const tourCountRef = React.useRef(null);
+  const tourSkipRef  = React.useRef(null);
 
   React.useEffect(() => {
     if (!HAS_SCROLL_ANIMATION) return;
@@ -132,6 +138,12 @@ function NeoGuide() {
     const inputEl   = inputRef.current;
     const askBtn    = askBtnRef.current;
     const panelClose = panelCloseRef.current;
+    const hitEl      = hitRef.current;
+    const radialEl   = radialRef.current;
+    const shortcutsBtn = shortcutsBtnRef.current;
+    const tourEl     = tourRef.current;
+    const tourCountEl = tourCountRef.current;
+    const tourSkipEl  = tourSkipRef.current;
     const body      = charWrap.querySelector(".neo-guide-body");
     const triggers  = [];
     const guideHomeHero = document.querySelector(".neo-scrolly-hero-wrap");
@@ -168,6 +180,11 @@ function NeoGuide() {
       const textFrom = (node, selector) => clean(node?.querySelector(selector)?.textContent);
       const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
       let guideLive = false;
+      // Declared up here because narrate/setInfo can run synchronously while ScrollTriggers are being created.
+      let radialOpen = false;       // desktop radial menu (menuOpen is also true while it is open)
+      let touring = false;          // guided tour running: hover/section/idle speech and cursor-follow stand down
+      let spunAt = 0;               // last time the rapid-click easter egg fired
+      let parkAway = () => {};      // set by whichever driver runs: hides him (footer / leaving the hero)
       let engageT;
       let lastKey = "";
       let activeInfo = null;
@@ -711,7 +728,7 @@ function NeoGuide() {
       //     bubble auto-collapses so it never sits on the copy. ---
       let narrateT;
       const narrate = (key, label, line, mood) => {
-        if (key === lastKey) return;               // only on a real beat change
+        if (touring || key === lastKey) return;        // the tour owns the bubble while it runs               // only on a real beat change
         lastKey = key;
         activeInfo = { label, line };
         setInfo(activeInfo);
@@ -765,7 +782,7 @@ function NeoGuide() {
       // scroll speed, long silence, coming back to the tab, copying contact
       // details, typing in a form, rapid clicks, and clicking through to a CTA.
       const say = (label, line, { mood, hold = 0 } = {}) => {
-        if (!guideLive) return;
+        if (!guideLive || touring) return;
         activeInfo = { label, line };
         setInfo(activeInfo);
         try { if (mood) express(mood); } catch (_) {}
@@ -792,7 +809,7 @@ function NeoGuide() {
       if (hasArms) { gsap.set(armL, { svgOrigin: "24 38" }); gsap.set(armR, { svgOrigin: "76 38" }); }
       if (body) gsap.set(body, { transformOrigin: "50% 85%" });
       let anticT, scrollEndT, cursorLeanT;
-      let lastMoveT = 0, lastMX = null;
+      let lastMoveT = 0, lastMX = null, lastMY = 0, cursorSpeed = 0;
 
       // Arms: positive rotation lifts the left arm, negative lifts the right.
       const armsTo = (l, r, dur = 0.25, ease = "back.out(2)") => {
@@ -882,7 +899,7 @@ function NeoGuide() {
       const scheduleAntic = () => {
         anticT = setTimeout(() => {
           const calm = performance.now() - lastInput > 2500 && !guide.classList.contains("is-scrolling");
-          if (guideLive && calm && !asleep && !menuOpen && !askOpen && !document.hidden) pick(ANTICS)();
+          if (guideLive && calm && !asleep && !menuOpen && !touring && !askOpen && !document.hidden) pick(ANTICS)();
           scheduleAntic();
         }, 7000 + Math.random() * 7000);
       };
@@ -919,7 +936,7 @@ function NeoGuide() {
       // 1. Sleep after a long silence; wake with a startle.
       let sleepT, asleep = false, lastInput = performance.now();
       const fallAsleep = () => {
-        if (!guideLive || asleep || menuOpen) { sleepT = setTimeout(fallAsleep, 8000); return; }
+        if (!guideLive || asleep || menuOpen || touring) { sleepT = setTimeout(fallAsleep, 8000); return; }
         asleep = true;
         guide.classList.add("is-asleep");
         if (hasFace) { gsap.to([eyeL, eyeR], { scaleY: 0.14, duration: 0.8, ease: "power2.out", overwrite: "auto" }); setMouth(MOUTH.flat, 0.6); look(0, 0.8); }
@@ -1028,6 +1045,7 @@ function NeoGuide() {
       const clickTimes = [];
       const spin = (line) => {
         if (!body || !ready("spin", 4000)) return;
+        spunAt = performance.now();
         gsap.timeline()
           .to(body, { rotation: 360, duration: 0.7, ease: "power3.inOut" })
           .set(body, { rotation: 0 });
@@ -1040,7 +1058,7 @@ function NeoGuide() {
         const now = performance.now();
         clickTimes.push(now);
         while (clickTimes.length && now - clickTimes[0] > 1500) clickTimes.shift();
-        if (clickTimes.length >= 5) { clickTimes.length = 0; spin(pick(["five clicks in a second. is this a stress test?", "ok ok, i'm dizzy. you win.", "rage clicking? it's not that deep."])); }
+        if (clickTimes.length >= 5) { clickTimes.length = 0; spunAt = performance.now(); spin(pick(["five clicks in a second. is this a stress test?", "ok ok, i'm dizzy. you win.", "rage clicking? it's not that deep."])); }
       };
       window.addEventListener("pointerdown", onRapid, { passive: true });
 
@@ -1089,11 +1107,13 @@ function NeoGuide() {
         { label: "What do you build?", say: "websites, SaaS, e-commerce and AI. in that order of how often.", run: () => scrollToSel("#divisions, .nx-cap-strip") },
         { label: "Ask me anything", say: "go ahead. i answer from what's on this site.", run: () => openAsk() },
         { label: "Start a quick brief", say: "six questions, then you send it on WhatsApp or email.", run: () => beginBrief() },
+        { label: "Show me around", run: () => startTour() },
       ];
       const closeMenu = () => {
         if (!menuOpen) return;
         menuOpen = false;
         guide.classList.remove("is-menu");
+        if (radialOpen) { radialOpen = false; hideRadial(); return; }   // desktop: his bubble stays, only the arc goes
         engage(1500);
         gsap.to([bubble, tag], { autoAlpha: 0, y: 8, duration: 0.25, overwrite: "auto" });
       };
@@ -1319,14 +1339,314 @@ function NeoGuide() {
         if (!uiEl) return;
         uiEl.classList.toggle("is-live", guideLive);
         uiEl.classList.toggle("is-touch", !isDesktopFollower);
-        if (!guideLive) closeAsk();
+        if (!guideLive) { closeAsk(); if (radialOpen) closeMenu(); if (touring) endTour(false); }
       }
+
+      // 11. Silent mode: CSS (.is-silent) hides his bubble and tag; he still moves, points and reacts.
+      //     Every line he says goes through the same bubble, so nothing leaks past it. Remembered per browser.
+      const SILENT_KEY = "nexara.guide.silent";
+      let silent = false;
+      try { silent = window.localStorage.getItem(SILENT_KEY) === "1"; } catch (_) {}
+      guide.classList.toggle("is-silent", silent);
+      const silentBtnRef = { el: null };
+      const syncSilentBtn = () => {
+        const b = silentBtnRef.el;
+        if (!b) return;
+        b.textContent = `Silent: ${silent ? "on" : "off"}`;
+        b.setAttribute("aria-checked", silent ? "true" : "false");
+        b.setAttribute("aria-label", `Silent mode is ${silent ? "on" : "off"}. Activate to turn it ${silent ? "off" : "on"}.`);
+      };
+      const setSilent = (on) => {
+        silent = on;
+        try { window.localStorage.setItem(SILENT_KEY, on ? "1" : "0"); } catch (_) {}
+        guide.classList.toggle("is-silent", on);
+        syncSilentBtn();
+      };
+
+      // 12. Desktop radial menu: click HIM (not the page) for six actions on an arc beside him.
+      //     Items live in the (non aria-hidden) UI layer as real buttons; they reuse the same handlers
+      //     the phone chips and the Ask panel use. While it is open he stops following the cursor.
+      const RADIAL_YS = [-135, -81, -27, 27, 81, 135];   // vertical slots; x follows a circle of RADIAL_R
+      const RADIAL_R = 150, RADIAL_PILL_W = 120, FACE_DX = 40, FACE_DY = 30;
+      let radialOpener = null, radialHideT, hitT = 0;
+      const RADIAL = [
+        { id: "brief", label: "Start a brief", run: () => beginBrief() },
+        { id: "call", label: "Call", run: () => runAction({ type: "tel", href: kb.phone.href }) },
+        { id: "wa", label: "WhatsApp", run: () => window.open(briefLinks("", briefCfg).whatsapp.replace(/\?text=$/, ""), "_blank", "noopener") },
+        { id: "ask", label: "Ask", run: () => openAsk() },
+        { id: "tour", label: "Tour", run: () => startTour() },
+        { id: "silent", label: "Silent", keepOpen: true, run: () => setSilent(!silent) },
+      ];
+      const radialButtons = [];
+      if (radialEl) {
+        radialEl.textContent = "";
+        RADIAL.forEach((m, i) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.setAttribute("role", m.id === "silent" ? "menuitemcheckbox" : "menuitem");
+          b.textContent = m.label;
+          b.style.setProperty("--i", String(i));
+          if (m.id === "silent") silentBtnRef.el = b;
+          b.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (!m.keepOpen) closeMenu();
+            if (hasFace) { setMouth(MOUTH.grin); ledFlash(); gsap.delayedCall(1, () => setMouth(MOUTH.smirk)); }
+            if (m.keepOpen) { m.run(); return; }
+            setTimeout(m.run, 160);
+          });
+          radialEl.appendChild(b);
+          radialButtons.push(b);
+        });
+        syncSilentBtn();
+      }
+      function hideRadial() {
+        if (!radialEl) return;
+        radialEl.classList.remove("is-open");
+        guide.classList.remove("is-radial");
+        shortcutsBtn && shortcutsBtn.setAttribute("aria-expanded", "false");
+        if (radialEl.contains(document.activeElement)) {
+          if (radialOpener === "fab" && shortcutsBtn) shortcutsBtn.focus({ preventScroll: true }); else document.activeElement.blur();
+        }
+        clearTimeout(radialHideT);
+        radialHideT = setTimeout(() => { if (!radialOpen) radialEl.hidden = true; }, 260);
+      }
+      function openRadial(opener = "him") {
+        if (!radialEl || !guideLive || menuOpen || touring) return;
+        if (askOpen) closeAsk();
+        radialOpener = opener;
+        const W = window.innerWidth, H = window.innerHeight;
+        const navEl = document.querySelector(".nx-nav") || document.querySelector(".nav");
+        const navBottom = navEl?.getBoundingClientRect().bottom ?? 74;
+        const side = (Number(gsap.getProperty(charWrap, "x")) || 0) + FACE_DX + RADIAL_R + RADIAL_PILL_W + 16 < W ? 1 : -1;
+        // He steps to a spot where the whole arc fits (clear of the nav and the bottom edge), then it opens.
+        const half = Math.max(...RADIAL_YS) + 24;
+        const x = side > 0 ? clamp(Number(gsap.getProperty(charWrap, "x")) || 0, 12, W - FACE_DX - RADIAL_R - RADIAL_PILL_W - 16)
+                           : clamp(Number(gsap.getProperty(charWrap, "x")) || 0, RADIAL_R + RADIAL_PILL_W + 16 - FACE_DX, W - 100);
+        const y = clamp((Number(gsap.getProperty(charWrap, "y")) || 0), navBottom + half - FACE_DY + 8, Math.max(navBottom + half - FACE_DY + 8, H - half - FACE_DY - 8));
+        gsap.to(charWrap, { x, y, duration: 0.3, ease: "power3.out", overwrite: "auto" });
+        gsap.to(spotlight, { top: y + 38, duration: 0.3, overwrite: "auto" });
+        charWrap.classList.toggle("is-flipped", side < 0);
+        radialEl.style.left = `${x + FACE_DX}px`;
+        radialEl.style.top = `${y + FACE_DY}px`;
+        radialEl.classList.toggle("is-left", side < 0);
+        radialButtons.forEach((b, i) => {
+          const dy = RADIAL_YS[i];
+          b.style.setProperty("--x", `${side * Math.round(Math.sqrt(RADIAL_R * RADIAL_R - dy * dy))}px`);
+          b.style.setProperty("--y", `${dy}px`);
+        });
+        menuOpen = true; radialOpen = true;
+        guide.classList.add("is-radial");
+        clearTimeout(radialHideT);
+        radialEl.hidden = false;
+        shortcutsBtn && shortcutsBtn.setAttribute("aria-expanded", "true");
+        setTimeout(() => { if (radialOpen) radialEl.classList.add("is-open"); }, 30);
+        setTimeout(() => { if (radialOpen && radialButtons[0]) radialButtons[0].focus({ preventScroll: true }); }, 60);
+        if (hasFace) { blink("r"); ledFlash(); setMouth(MOUTH.grin); gsap.delayedCall(0.6, () => setMouth(MOUTH.smirk)); }
+        hop(7); bump(0.2);
+      }
+      const onRadialKey = (e) => {
+        if (!radialOpen) return;
+        if (e.key === "Escape") { e.preventDefault(); closeMenu(); return; }
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+          e.preventDefault();
+          const i = radialButtons.indexOf(document.activeElement);
+          const n = radialButtons.length;
+          radialButtons[(i + (e.key === "ArrowDown" ? 1 : -1) + n) % n].focus({ preventScroll: true });
+        }
+      };
+      const onRadialOutside = (e) => {
+        if (!radialOpen) return;
+        if (radialEl.contains(e.target) || hitEl?.contains(e.target) || shortcutsBtn?.contains(e.target)) return;
+        closeMenu();
+      };
+      // One click on him opens the arc after a short beat. A second click inside that beat cancels it
+      // (rapid clicking is the spin easter egg, not a menu request), and so does the spin itself.
+      const onHitDown = (e) => {
+        if (!guideLive || e.button > 0) return;
+        if (hitT) { clearTimeout(hitT); hitT = 0; return; }
+        if (radialOpen) { closeMenu(); return; }
+        hitT = setTimeout(() => { hitT = 0; if (performance.now() - spunAt < 1500) return; openRadial("him"); }, 240);
+      };
+      const onShortcutsBtn = () => { if (radialOpen) closeMenu(); else openRadial("fab"); };
+      if (isDesktopFollower) {
+        hitEl && hitEl.addEventListener("pointerdown", onHitDown);
+        shortcutsBtn && shortcutsBtn.addEventListener("click", onShortcutsBtn);
+        document.addEventListener("keydown", onRadialKey);
+        document.addEventListener("pointerdown", onRadialOutside, true);
+      }
+
+      // 13. Guided tour ("Show me around"): 4 to 5 stops built from this page's real sections at the
+      //     moment it starts. Each stop scrolls there, puts him beside the section heading and says that
+      //     section's existing line (SECTION_LINES, else the section's own first sentence, else its heading).
+      //     Skip button + counter; Escape / wheel / touch / scroll keys cancel. Silent mode hides the line, not the UI.
+      let tourT = 0, tourStops = [], tourI = 0;
+      const TOUR_HOLD = 3500, TOUR_CHAR_W = 88, TOUR_STACK_H = 210;
+      const tourInstant = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const navBottomNow = () => {
+        const navEl = document.querySelector(".nx-nav") || document.querySelector(".nav");
+        return navEl?.getBoundingClientRect().bottom ?? 74;
+      };
+      const collectStops = () => {
+        const out = [];
+        document.querySelectorAll("#main section, main section").forEach((sec) => {
+          const r = sec.getBoundingClientRect();
+          if (r.height < 80) return;
+          const cs = getComputedStyle(sec);
+          if (cs.display === "none" || cs.visibility === "hidden") return;
+          const headEl = sec.querySelector("h2, h1, h3");
+          const heading = clean(headEl?.textContent);
+          const id = sec.id || [...sec.classList].find((c) => SECTION_LINES[c]) || "";
+          const curated = SECTION_LINES[id];
+          if (!curated && !heading) return;
+          let line, label;
+          if (curated) { [label, line] = curated; }
+          else {
+            // the section's own intro: a plain-text paragraph beside its heading (never a card's mixed markup)
+            const lede = [...(headEl?.parentElement?.querySelectorAll(":scope > p") || [])]
+              .filter((p) => !p.children.length).map((p) => clean(p.textContent)).find((t) => t.length >= 40 && t.length <= 400);
+            const bare = heading.replace(/[.\s]+$/, "");
+            label = shorten(bare, 26).toLowerCase();
+            line = lede ? firstSentence(lede, 150) : `“${shorten(bare, 40)}”. that's what this part is about.`;
+          }
+          out.push({ el: sec, headEl: headEl || sec, label, line, top: r.top + window.scrollY });
+        });
+        // outermost sections only, in page order
+        const seen = new Set();
+        const flat = out.filter((s) => !out.some((o) => o !== s && o.el.contains(s.el)))
+          .sort((a, b) => a.top - b.top)
+          .filter((s) => { const k = `${s.label}|${s.line}`; if (seen.has(k)) return false; seen.add(k); return true; });
+        return pickEven(flat.length, 5).map((i) => flat[i]);
+      };
+      const tourSay = (label, line) => {
+        setInfo({ label, line });
+        gsap.fromTo([bubble, tag], { autoAlpha: 0.5, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.22, overwrite: "auto" });
+        try { express("smirk"); } catch (_) {}
+        if (!isDesktopFollower) {
+          clearTimeout(narrateT);
+          narrateT = setTimeout(() => { if (touring) gsap.to([bubble, tag], { autoAlpha: 0, y: 8, duration: 0.3, overwrite: "auto" }); }, TOUR_HOLD - 300);
+        }
+      };
+      const placeBeside = (headEl) => {
+        const W = window.innerWidth, H = window.innerHeight, nb = navBottomNow();
+        let r;
+        try { const range = document.createRange(); range.selectNodeContents(headEl); r = range.getBoundingClientRect(); } catch (_) {}
+        if (!r || !r.width) r = headEl.getBoundingClientRect();
+        let x, y;
+        if (W - r.right - 20 >= TOUR_CHAR_W + 12) { x = r.right + 20; y = r.top - 6; }
+        else if (r.left - 20 >= TOUR_CHAR_W + 12) { x = r.left - TOUR_CHAR_W - 20; y = r.top - 6; }
+        else { x = r.right - TOUR_CHAR_W; y = r.bottom + 14; }
+        x = clamp(x, 12, W - 100);
+        y = clamp(y, nb + 86, Math.max(nb + 86, H - TOUR_STACK_H - 12));
+        const flip = x > W - 340;
+        charWrap.classList.toggle("is-flipped", flip);
+        guide.classList.remove("is-bubble-above");
+        const dur = tourInstant() ? 0 : 0.8;
+        gsap.to(charWrap, { x, y, duration: dur, ease: "power3.inOut", overwrite: "auto" });
+        gsap.to(spotlight, { autoAlpha: 1, top: y + 38, duration: dur, overwrite: "auto" });
+        // the step pill rides above his tag, on the same side the bubble opens
+        if (tourEl) {
+          tourEl.style.top = `${Math.max(nb + 4, y - 66)}px`;
+          if (flip) { tourEl.style.left = "auto"; tourEl.style.right = `${Math.max(8, W - (x + TOUR_CHAR_W))}px`; }
+          else { tourEl.style.right = "auto"; tourEl.style.left = `${x}px`; }
+        }
+        const cx = clamp(r.left + Math.min(r.width, 240) / 2, 0, W), cy = r.top + r.height / 2;
+        gsap.delayedCall(dur + 0.05, () => { if (touring) pointAt(cx, cy); });
+      };
+      const afterScroll = (cb) => {
+        let last = -1, still = 0;
+        const t0 = performance.now();
+        const tick = () => {
+          if (!touring) return;
+          const y = window.scrollY;
+          still = Math.abs(y - last) < 1 ? still + 50 : 0;
+          last = y;
+          if (still >= 150 || performance.now() - t0 > 3200) cb(); else tourT = setTimeout(tick, 50);
+        };
+        tourT = setTimeout(tick, 50);
+      };
+      const runStop = (i) => {
+        if (!touring) return;
+        tourI = i;
+        const s = tourStops[i];
+        if (tourCountEl) tourCountEl.textContent = `${i + 1}/${tourStops.length}`;
+        armsRest();
+        // Positions are read live each time: pinned sections add scroll distance after the page first laid out,
+        // so after the scroll settles he re-checks the heading is on screen and nudges once or twice if not.
+        const goTo = (attempt) => {
+          const top = Math.max(0, s.el.getBoundingClientRect().top + window.scrollY - navBottomNow() - 24);
+          window.scrollTo({ top, behavior: tourInstant() || attempt > 0 ? "auto" : "smooth" });
+          afterScroll(() => {
+            if (!touring) return;
+            const hr = s.headEl.getBoundingClientRect();
+            if (attempt < 2 && (hr.bottom < navBottomNow() || hr.top > window.innerHeight * 0.75)) { goTo(attempt + 1); return; }
+            arrive();
+          });
+        };
+        const arrive = () => {
+          if (isDesktopFollower) placeBeside(s.headEl);
+          tourSay(s.label, s.line);
+          if (hasFace) blink("r");
+          tourT = setTimeout(() => (i + 1 < tourStops.length ? runStop(i + 1) : endTour(true)), TOUR_HOLD);
+        };
+        goTo(0);
+      };
+      const onTourCancel = (e) => {
+        if (e.type === "keydown" && !/^(Escape|ArrowUp|ArrowDown|PageUp|PageDown|Home|End| )$/.test(e.key)) return;
+        endTour(false);
+      };
+      function startTour() {
+        if (touring || !guideLive) return;
+        if (menuOpen) closeMenu();
+        if (askOpen) closeAsk();
+        const stops = collectStops();
+        if (!stops.length) { speakBubble("tour", "there isn't much to walk through on this page."); return; }
+        tourStops = stops; touring = true; lastKey = "tour";
+        guide.classList.add("is-touring");
+        clearTimeout(narrateT); clearTimeout(engageT);
+        if (!isDesktopFollower) guide.classList.add("is-engaged");
+        if (tourEl) { tourEl.hidden = false; if (!isDesktopFollower) { tourEl.style.left = ""; tourEl.style.right = ""; tourEl.style.top = ""; } }
+        window.addEventListener("wheel", onTourCancel, { passive: true });
+        window.addEventListener("touchmove", onTourCancel, { passive: true });
+        window.addEventListener("keydown", onTourCancel);
+        if (hasFace) { setMouth(MOUTH.smile); ledFlash(); }
+        runStop(0);
+      }
+      function endTour(finished) {
+        if (!touring) return;
+        touring = false;
+        clearTimeout(tourT); clearTimeout(narrateT);
+        window.removeEventListener("wheel", onTourCancel);
+        window.removeEventListener("touchmove", onTourCancel);
+        window.removeEventListener("keydown", onTourCancel);
+        guide.classList.remove("is-touring");
+        if (tourEl) tourEl.hidden = true;
+        armsRest();
+        lastKey = "tour-end";
+        if (finished && hasFace) { setMouth(MOUTH.grin); gsap.delayedCall(1, () => setMouth(MOUTH.smirk)); }
+        if (!isDesktopFollower) {
+          gsap.to([bubble, tag], { autoAlpha: 0, y: 8, duration: 0.3, overwrite: "auto" });
+          engage(1200);
+        }
+        // the footer trigger was ignored while touring: tuck him away now if we ended down there
+        const foot = document.querySelector("footer");
+        if (foot && foot.getBoundingClientRect().top < window.innerHeight - 48) parkAway();
+      }
+      tourSkipEl && tourSkipEl.addEventListener("click", () => endTour(false));
 
       const livelinessCleanup = () => {
         clearTimeout(sleepT); clearTimeout(menuT); clearInterval(settleLean);
         clearTimeout(anticT); clearTimeout(engageT); clearTimeout(scrollEndT); clearTimeout(cursorLeanT);
         if (hasArms) gsap.killTweensOf([armL, armR]);
         document.removeEventListener("keydown", onAskKey);
+        document.removeEventListener("keydown", onRadialKey);
+        document.removeEventListener("pointerdown", onRadialOutside, true);
+        hitEl && hitEl.removeEventListener("pointerdown", onHitDown);
+        shortcutsBtn && shortcutsBtn.removeEventListener("click", onShortcutsBtn);
+        clearTimeout(hitT); clearTimeout(radialHideT); clearTimeout(tourT);
+        touring = false;
+        window.removeEventListener("wheel", onTourCancel);
+        window.removeEventListener("touchmove", onTourCancel);
+        window.removeEventListener("keydown", onTourCancel);
         formEl && formEl.removeEventListener("submit", onFormSubmit);
         if (askOpen) closeAsk();
         ["pointerdown", "keydown", "wheel", "touchstart"].forEach((evt) => window.removeEventListener(evt, wake));
@@ -1339,7 +1659,7 @@ function NeoGuide() {
         document.removeEventListener("focusout", onBlurField);
         document.removeEventListener("click", onCtaClick, true);
         if (body) gsap.killTweensOf(body);
-        guide.classList.remove("is-asleep", "is-menu", "is-engaged", "is-scrolling", "is-away", "is-hyped", "is-calm");
+        guide.classList.remove("is-asleep", "is-menu", "is-radial", "is-touring", "is-engaged", "is-scrolling", "is-away", "is-hyped", "is-calm");
       };
 
       // --- desktop driver: cursor-follow + hover-classify (mobile drives the same brain via its own branch) ---
@@ -1354,6 +1674,42 @@ function NeoGuide() {
       const STACK_H = 210; // face (~88) + below-bubble (~252px / 11.5px type) + gap
       const SIDE_GAP = 18;
 
+      const HERO_BLOCK = "a, button, h1, h2, h3, h4, p, li, input, textarea, select, summary, label, [role='button'], .neo-guide-ui";
+      let heroEls = [], heroScanT = 0, heroCur = null, heroT = 0, heroPoint = { x: 0, y: 0 };
+      const heroCandidate = (x, y, hit) => {
+        if (hit && (guide.contains(hit) || hit.closest(HERO_BLOCK))) return null;     // headline / CTAs keep their normal reading
+        const now = performance.now();
+        if (now - heroScanT > 800) { heroEls = [...document.querySelectorAll("[data-guide-label][data-guide-line]")]; heroScanT = now; }
+        let best = null, bestSlot = Infinity;
+        for (const el of heroEls) {
+          if (!el.isConnected) continue;
+          const r = el.getBoundingClientRect();
+          if (!r.width || !r.height || x < r.left || x > r.right || y < r.top || y > r.bottom) continue;
+          const cs = getComputedStyle(el);
+          if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) < 0.05) continue;
+          const slot = el.dataset.slot !== undefined ? Number(el.dataset.slot) : 50;      // front slot (0) wins an overlap
+          if (slot < bestSlot) { best = el; bestSlot = slot; }
+        }
+        return best;
+      };
+      const readHero = (el) => {
+        if (!guideLive || menuOpen || touring || heroCur !== el || !el.isConnected) return;
+        const label = clean(el.getAttribute("data-guide-label"));
+        const line = firstSentence(el.getAttribute("data-guide-line"), 130);
+        if (!label || !line) return;
+        const key = `hero-${keyOf(label)}`;
+        if (key === lastKey) return;
+        lastKey = key;
+        activeInfo = { key, label, line };
+        setInfo(activeInfo);
+        try { express("hype"); } catch (_) {}
+        const r = el.getBoundingClientRect();
+        pointAt(clamp(r.left + r.width / 2, 0, window.innerWidth), clamp(r.top + r.height / 2, 0, window.innerHeight));
+        boomAt(heroPoint.x, heroPoint.y);
+        bump(0.06);
+        gsap.fromTo([bubble, tag], { autoAlpha: 0.55, y: 4 }, { autoAlpha: 1, y: 0, duration: 0.18, overwrite: "auto" });
+      };
+
       const onMove = (event) => {
         if (!guideLive) return;
         // Cursor speed leans him into the move and feeds his energy; he settles
@@ -1365,11 +1721,24 @@ function NeoGuide() {
           clearTimeout(cursorLeanT); cursorLeanT = setTimeout(() => leanTo(0), 140);
           bump(Math.min(0.03, Math.abs(vx) * 0.02));
         }
-        lastMX = event.clientX; lastMoveT = nowM;
+        const mvSpeed = lastMX === null ? 0 : Math.hypot(event.clientX - lastMX, event.clientY - lastMY) / Math.max(8, nowM - lastMoveT);
+        cursorSpeed = cursorSpeed * 0.6 + mvSpeed * 0.4;
+        lastMX = event.clientX; lastMY = event.clientY; lastMoveT = nowM;
 
         const navEl = document.querySelector(".nx-nav") || document.querySelector(".nav");
         const navBottom = navEl?.getBoundingClientRect().bottom ?? 74;
         guide.classList.toggle("is-nav-hover", event.clientY < navBottom);
+
+        // Radial menu open or tour running: he stays put (the tour places him itself); just keep watching the cursor.
+        if (touring || menuOpen) {
+          try {
+            if (hasFace && faceSvg) {
+              const fr = faceSvg.getBoundingClientRect();
+              look(clamp((event.clientX - (fr.left + fr.width / 2)) / 130, -1, 1), clamp((event.clientY - (fr.top + fr.height * 0.34)) / 130, -1, 1));
+            }
+          } catch (_) {}
+          return;
+        }
 
         const dock = document.querySelector(".nx-finder.is-shown");
         const floorY = dock
@@ -1377,10 +1746,16 @@ function NeoGuide() {
           : window.innerHeight - 12;
 
         const hit = document.elementFromPoint(event.clientX, event.clientY);
+        // Catchable: the cursor is on his small hit area, or is slowly closing in on him. He holds still
+        // instead of sliding away from it (he normally trails 72px ahead), so a click can actually land.
+        const overSelf = !!(hit && guide.contains(hit));
+        const faceX = (Number(gsap.getProperty(charWrap, "x")) || 0) + 40, faceY = (Number(gsap.getProperty(charWrap, "y")) || 0) + 30;
+        const holdHim = overSelf || (Math.hypot(event.clientX - faceX, event.clientY - faceY) < 118 && cursorSpeed < 1);
         const surface = hit?.closest?.(READ_SURFACE);
         let x;
         let y;
         let bubbleAbove = false;
+        if (!holdHim) {
 
         if (surface) {
           // Park beside (or fully below/above) the read rect so avatar + bubble
@@ -1426,6 +1801,7 @@ function NeoGuide() {
         guide.classList.toggle("is-bubble-above", bubbleAbove);
         gsap.to(charWrap, { x, y, duration: 0.2, ease: "power3.out", overwrite: "auto" });
         gsap.to(spotlight, { autoAlpha: 1, top: y + 38, duration: 0.18, overwrite: "auto" });
+        }
 
         // pupils watch the actual cursor → side-eye sass (never let face code break the voice)
         try {
@@ -1436,7 +1812,19 @@ function NeoGuide() {
           }
         } catch (_) {}
 
-        const info = classifyTarget(hit);
+        // Hover-reading by geometry: elements that opt in with data-guide-label + data-guide-line (the Labs hero
+        // screens do) are hit-tested against their bounding boxes, because the hero art itself is pointer-events:none.
+        const heroEl = overSelf ? null : heroCandidate(event.clientX, event.clientY, hit);
+        if (heroEl) {
+          heroPoint = { x: event.clientX, y: event.clientY };
+          if (heroCur !== heroEl) { heroCur = heroEl; clearTimeout(heroT); heroT = setTimeout(() => readHero(heroEl), 250); }
+          return;            // no generic read while resting on the art: the product line is the read
+        }
+        if (heroCur) { heroCur = null; clearTimeout(heroT); }
+
+        const info = overSelf
+          ? { key: "self", label: "your guide", line: "click me for a brief, a call, whatsapp, ask or a tour." }
+          : classifyTarget(hit);
         if (info.key !== lastKey) {
           lastKey = info.key;
           activeInfo = info;
@@ -1453,6 +1841,7 @@ function NeoGuide() {
         }
       };
       const onLeave = () => {
+        if (touring || menuOpen) return;
         setInfo({ label: "your guide", line: "i'll hold your place. come back when you're ready." });
         setMouth(MOUTH.flat); brows(false); look(0, 0); armsRest();
       };
@@ -1475,6 +1864,7 @@ function NeoGuide() {
         gsap.to(spotlight, { autoAlpha: 0, duration: 0.22, overwrite: true });
       };
 
+      parkAway = hideFollower;
       const homeHero = guideHomeHero;
       if (homeHero) {
         triggers.push(ScrollTrigger.create({
@@ -1491,7 +1881,7 @@ function NeoGuide() {
         triggers.push(ScrollTrigger.create({
           trigger: footerEl,
           start: "top bottom-=48",
-          onEnter: hideFollower,
+          onEnter: () => { if (!touring) hideFollower(); },       // a tour that ends down here tucks him away itself (parkAway)
           onLeaveBack: () => {
             if (!homeHero || window.scrollY > homeHero.offsetHeight - window.innerHeight + 80) showFollower();
           },
@@ -1567,6 +1957,7 @@ function NeoGuide() {
       if (armLine) gsap.set(armLine, { attr: { x1: 24, y1: 38, x2: 13, y2: 31 } });
       if (armNode) gsap.set(armNode, { attr: { cx: 11, cy: 30 } });
     };
+    parkAway = hideScrollGuide;
     if (homeHero) {
       triggers.push(ScrollTrigger.create({
         trigger: homeHero,
@@ -1583,7 +1974,7 @@ function NeoGuide() {
       triggers.push(ScrollTrigger.create({
         trigger: footerEl,
         start: "top bottom-=48",
-        onEnter: hideScrollGuide,
+        onEnter: () => { if (!touring) hideScrollGuide(); },
         onLeaveBack: () => {
           if (!homeHero || homeHero.getBoundingClientRect().bottom < 80) showScrollGuide();
         },
@@ -1690,6 +2081,7 @@ function NeoGuide() {
               <div ref={beaconRef} className="neo-guide-beacon"/>
               <NeoAvatarSVG id="neo-guide-avatar" className="neo-guide-char-svg"/>
               <div ref={tagRef} className="neo-guide-tag"/>
+              <div ref={hitRef} className="neo-guide-hit"/>
             </div>
           </div>
         </div>
@@ -1708,7 +2100,13 @@ function NeoGuide() {
             <button type="submit">Ask</button>
           </form>
         </div>
+        <div ref={radialRef} className="neo-guide-radial" role="menu" aria-label="Neo shortcuts" hidden/>
+        <div ref={tourRef} className="neo-guide-tour" role="group" aria-label="Guided tour" hidden>
+          <span ref={tourCountRef} className="neo-guide-tour-count" aria-live="polite"/>
+          <button ref={tourSkipRef} type="button">Skip tour</button>
+        </div>
         <div className="neo-guide-fabs">
+          <button ref={shortcutsBtnRef} type="button" className="neo-guide-fab neo-guide-fab--menu" aria-haspopup="menu" aria-expanded="false" aria-label="Neo shortcuts: brief, call, WhatsApp, ask, tour"><span className="neo-guide-fab-ico" aria-hidden="true">+</span><span className="neo-guide-fab-txt">Shortcuts</span></button>
           <button ref={askBtnRef} type="button" className="neo-guide-fab neo-guide-fab--ask" aria-label="Ask Neo a question (press /)"><span className="neo-guide-fab-ico" aria-hidden="true">?</span><span className="neo-guide-fab-txt">Ask Neo</span></button>
         </div>
       </div>

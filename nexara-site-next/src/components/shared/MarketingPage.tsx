@@ -8,6 +8,8 @@ import { routePath, marketingFaqs } from '@/lib/seo';
 import { MARKETING_FLOW, MARKETING_TRACKS, voiced, type MarketingBlock, type Theme } from '@/lib/site';
 import { getLenis } from '../useSmoothScroll';
 import { PageFinder } from './PageFinder';
+import { beginRun, builtItems, finalSequence, jumpTo, sequenceDelay, stopSequence, tickSequence } from '@/lib/marketing-sequence';
+import { useHeroInView, useMagnet, usePointerTilt } from './useHeroMotion';
 
 // The marketing page: one scroll, shared by Neo and Trust. Order comes from MARKETING_FLOW, wording from
 // COPY.marketing + DATA.sections.marketing (voiced pairs), skin from the --nx-mk-* tokens in shared.css.
@@ -22,6 +24,79 @@ const Arrow = ({ size = 18 }: { size?: number }) => (
   </svg>
 );
 
+// The hero artefact, a small live version of the approach: a search types the query, then the result card builds up
+// through the four steps. Every label is text the page already carries (the approach steps and the Presence and
+// Performance package contents); nothing here is a result, a ranking or a number. One pass, then it rests, and any
+// interaction stops it. Server HTML and reduced motion show the finished card. State lives here so the typing never
+// re-renders the rest of the page.
+const PACKAGE = (name: string) => MARKETING.packages.find((p) => p.name === name)?.includes ?? [];
+const CARD_ITEMS = ([
+  [PACKAGE('Presence'), 'Website', 1],
+  [PACKAGE('Presence'), 'Google Business', 1],
+  [PACKAGE('Presence'), 'Enquiry path', 1],
+  [PACKAGE('Presence'), 'Brand identity', 2],
+  [PACKAGE('Performance'), 'Paid ads', 3],
+  [PACKAGE('Performance'), 'Retargeting', 3],
+  [PACKAGE('Performance'), 'Reporting', 4],
+] as const).filter(([list, label]) => list.includes(label)).map(([, label, step]) => ({ label, step }));
+const CARD_STEPS = CARD_ITEMS.map((item) => item.step);
+
+function MarketingEngine({ theme }: { theme: Theme }) {
+  const query = voiced(PAGE.hero.query, theme);
+  const steps = MARKETING.process;
+  const root = React.useRef<HTMLDivElement>(null);
+  usePointerTilt(root, { max: 4 });
+  const inView = useHeroInView(root);
+  const [seq, setSeq] = React.useState(() => finalSequence(query.length));
+
+  React.useEffect(() => {
+    if (!inView || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    setSeq((s) => beginRun(s));
+  }, [inView]);
+  React.useEffect(() => {
+    const delay = sequenceDelay(seq, query.length);
+    if (delay === null || !inView) return;
+    const id = window.setTimeout(() => setSeq((s) => tickSequence(s, query.length)), delay);
+    return () => window.clearTimeout(id);
+  }, [seq, inView, query.length]);
+
+  const stop = () => setSeq((s) => (s.phase === 'stopped' ? s : stopSequence(s, query.length)));
+  const built = builtItems(CARD_STEPS, seq.step);
+  const current = steps[seq.step - 1];
+
+  return (
+    <div className="nx-mk-engine nx-tilt" ref={root} onPointerEnter={stop} onFocus={stop} onClick={stop} onKeyDown={stop}>
+      <div className="nx-mk-query" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M13 13l4.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+        <span>{voiced(COPY.marketing.search, theme)}</span>
+        <strong>{query.slice(0, seq.typed)}</strong>
+        <i className="nx-mk-caret" />
+      </div>
+      <div className="nx-mk-card">
+        <span className="nx-mk-card-bar" aria-hidden="true" />
+        <ul className="nx-mk-chips">
+          {CARD_ITEMS.map((item, i) => (
+            <li key={item.label} className={built[i] ? 'is-on' : undefined} data-step={item.step} aria-hidden={built[i] ? undefined : true}>
+              <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 7.2l2.3 2.3 4.7-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              {item.label}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <ol className="nx-mk-steps">
+        {steps.map((step, i) => (
+          <li key={step.step}>
+            <button type="button" aria-pressed={seq.step === i + 1} onClick={() => setSeq((s) => jumpTo(s, query.length, i + 1))}>
+              <b>{step.step}</b><span>{step.title}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <p className="nx-mk-cap" aria-live={seq.phase === 'stopped' ? 'polite' : 'off'}><span key={seq.step}>{current?.body}</span></p>
+    </div>
+  );
+}
+
 // Key words in the story line get the division colour (Neo skin only, see shared.css), like the home manifesto.
 const HL = /^(find|trust|reach)\W*$/i;
 
@@ -31,6 +106,8 @@ export function MarketingPage({ theme }: { theme: Theme }) {
   const faqs = marketingFaqs(theme);
 
   const root = React.useRef<HTMLElement>(null);
+  const ctaRef = React.useRef<HTMLAnchorElement>(null);
+  useMagnet(ctaRef);
   const [reached, setReached] = React.useState(0);
   const [dock, setDock] = React.useState(false);
   const [open, setOpen] = React.useState<number[]>([0]);
@@ -152,20 +229,10 @@ export function MarketingPage({ theme }: { theme: Theme }) {
             <h1 className="nx-mk-h1">{t(PAGE.hero.lines).map((line) => <span className="nx-mk-ln" key={line}><span>{line}</span></span>)}</h1>
             <p className="nx-mk-leave">{t(PAGE.hero.leave)}</p>
             <div className="nx-hero-actions">
-              <Link prefetch={false} className="nx-mk-cta nx-mk-cta--lg" href={routePath(theme, 'contact', 'marketing')}>{t(copy.ask.cta)} <Arrow /></Link>
+              <Link ref={ctaRef} prefetch={false} className="nx-mk-cta nx-mk-cta--lg nx-magnet" href={routePath(theme, 'contact', 'marketing')}>{t(copy.ask.cta)} <Arrow /></Link>
             </div>
           </div>
-          <div className="nx-mk-engine" aria-hidden="true">
-            <div className="nx-mk-query">
-              <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M13 13l4.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-              <span>{t(copy.search)}</span>
-              <strong>{t(PAGE.hero.query)}</strong>
-              <i className="nx-mk-caret" aria-hidden="true" />
-            </div>
-            <ul className="nx-mk-results">
-              {PAGE.hero.results.map((r) => <li key={r.trust}><span>{t(r)}</span><span className="nx-mk-miss">{t(PAGE.hero.miss)}</span></li>)}
-            </ul>
-          </div>
+          <MarketingEngine theme={theme} />
         </div>
       </section>
     ),

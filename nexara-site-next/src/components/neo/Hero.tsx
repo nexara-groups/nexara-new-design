@@ -91,7 +91,7 @@ function NeoHeroUnravel({ copy, theme }: NeoHeroUnravelProps) {
           <button className="ch-link" onClick={() => routeTo('neo', 'academy')}>Enter Academy →</button>
         </div>
 
-        <div className="neo-hero-chapter ch-right" style={{ '--accent': '#ff5c8a' }} data-from="0.45" data-to="0.63" aria-hidden="true">
+        <div className="neo-hero-chapter ch-right" style={{ '--accent': '#ff9a3c' }} data-from="0.45" data-to="0.63" aria-hidden="true">
           <p className="ch-num">02 / DIVISION</p>
           <h2 className="ch-name">Labs<br /><span className="serif">we build intelligence.</span></h2>
           <p className="lede">Applied AI and automation systems, engineered from prototype to production with written specs and weekly demos.</p>

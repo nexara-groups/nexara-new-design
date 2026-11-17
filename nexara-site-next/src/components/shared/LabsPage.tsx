@@ -30,18 +30,13 @@ import {
   LABS_PIPE_NODES,
 } from './LabsMap';
 import { LabsProducts } from './LabsShowcase';
+import { useMagnet } from './useHeroMotion';
+import { LabsHeroScene, statusLabel } from './LabsHeroScene';
 
 const LABS = DATA.sections.labs;
 
 function goContact(theme: Theme) {
   (theme === 'neo' ? neoRouteTo : trustRouteTo)(theme, 'contact', 'labs');
-}
-
-function statusLabel(status: string, theme: Theme) {
-  const c = COPY.labs.products;
-  if (status === 'demo') return voiced(c.demo, theme);
-  if (status === 'building') return voiced(c.building, theme);
-  return voiced(c.live, theme);
 }
 
 function finderSegId(seg: LabsFinderSeg) {
@@ -54,6 +49,8 @@ function finderSegLabel(seg: LabsFinderSeg, theme: Theme) {
 
 function LabsHero({ theme, onOpen }: { theme: Theme; onOpen: (slug: string | null) => void }) {
   const hero = LABS.hero[theme];
+  const cta = React.useRef<HTMLAnchorElement>(null);
+  useMagnet(cta);
   const seeHow = (e: React.MouseEvent) => {
     e.preventDefault();
     const id = finderSegId('capabilities');
@@ -62,33 +59,19 @@ function LabsHero({ theme, onOpen }: { theme: Theme; onOpen: (slug: string | nul
   };
   return (
     <header className="nx-lab-hero" id="overview">
-      <div className="nx-lab-wrap nx-lab-hero-grid">
+      <LabsHeroScene theme={theme} />
+      <div className="nx-lab-wrap">
         <div className="nx-lab-hero-copy">
           <p className="nx-lab-kicker">{hero.eyebrow}</p>
           <h1 className="nx-lab-title">{hero.title}</h1>
           <p className="nx-lab-lede">{voiced(COPY.labs.heroLede, theme)}</p>
           <div className="nx-lab-actions">
-            <Link prefetch={false} className="nx-lab-cta" href={routePath(theme, 'contact', 'labs')}>
+            <Link ref={cta} prefetch={false} className="nx-lab-cta nx-magnet" href={routePath(theme, 'contact', 'labs')}>
               {hero.primary}
             </Link>
             <a className="nx-lab-cta nx-lab-cta--ghost" href={`#${finderSegId('capabilities')}`} onClick={seeHow}>
               {hero.secondary}
             </a>
-          </div>
-        </div>
-        <div className="nx-lab-hero-visual" aria-hidden="true">
-          <div className="nx-lab-rig">
-            <ol className="nx-lab-rail">
-              {LABS_PIPE_NODES.map(({ n, label }) => (
-                <li key={n}><b>{n}</b><span>{label}</span></li>
-              ))}
-            </ol>
-            <p className="nx-lab-rig-label">{voiced(COPY.labs.heroProducts, theme)}</p>
-            <ul className="nx-lab-live">
-              {LABS.products.filter((p) => p.status !== 'building').map((p) => (
-                <li key={p.id}><span>{p.name}</span><i data-status={p.status}>{statusLabel(p.status, theme)}</i></li>
-              ))}
-            </ul>
           </div>
         </div>
       </div>

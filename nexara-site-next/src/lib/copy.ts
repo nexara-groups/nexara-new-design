@@ -11,7 +11,6 @@ export const COPY = {
       'SaaS, products, integrations and AI where it fits. Four products you can open today.',
       'SaaS, B2B products and integrations, with AI where it earns its place. Four products are live or open for demonstration today.',
     ),
-    heroProducts: v('Open today', 'Live or open for demonstration'),
     nav: {
       label: v('Labs progress', 'Product Studio progress'),
       overview: v('Overview', 'Overview'),

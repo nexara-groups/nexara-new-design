@@ -183,7 +183,7 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
       || (navigator.hardwareConcurrency || 8) <= 4;
 
     const shape = section.id === "academy" ? "spiral" : section.id === "labs" ? "sphere" : "signal";
-    const rgb = section.id === "academy" ? [124, 92, 255] : section.id === "labs" ? [255, 92, 138] : [0, 229, 160];
+    const rgb = section.id === "academy" ? [124, 92, 255] : section.id === "labs" ? [255, 154, 60] : [0, 229, 160];
 
     const makeSprite = (cRgb: number[]) => {
       const s = document.createElement("canvas");
@@ -453,7 +453,7 @@ function NeoSectionHeroUnravel({ theme, section }: NeoSectionHeroUnravelProps) {
             {section.id === "academy" ? (
               <>We don't hire engineers.<br />We <em style={{ fontStyle: 'normal', color: '#7c5cff' }}>compile</em> them.</>
             ) : (
-              <>{copy.title}<br /><span className="serif" style={{ color: section.id === "labs" ? '#ff5c8a' : '#00e5a0' }}><CyclingWord words={(SECTION_HERO_WORDS as SectionHeroWordsMap).neo?.[section.id] || [copy.accent]} /></span></>
+              <>{copy.title}<br /><span className="serif" style={{ color: section.id === "labs" ? '#ff9a3c' : '#00e5a0' }}><CyclingWord words={(SECTION_HERO_WORDS as SectionHeroWordsMap).neo?.[section.id] || [copy.accent]} /></span></>
             )}
           </h1>
           <p className="lede" style={{ marginTop: '14px', maxWidth: '34em', color: 'var(--muted)' }}>{copy.body}</p>

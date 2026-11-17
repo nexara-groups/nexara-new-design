@@ -79,3 +79,23 @@ test('wanting a call or a project starts the quick brief and is honest about boo
   }
   assert.equal(answer('what is your phone number', kb).actions[0].type, 'tel');
 });
+
+const { firstSentence, pickEven } = await import('data:text/javascript;base64,' + Buffer.from(js).toString('base64'));
+
+test('firstSentence keeps one sentence and trims long ones on a word boundary', () => {
+  assert.equal(firstSentence('The portal our clients log into. More detail follows here.'), 'The portal our clients log into.');
+  assert.equal(firstSentence('  no   full stop here '), 'no full stop here');
+  assert.equal(firstSentence(''), '');
+  const long = firstSentence('word '.repeat(60), 40);
+  assert.ok(long.length <= 41 && long.endsWith('…'));
+});
+
+test('pickEven spaces stops across the page and never repeats', () => {
+  assert.deepEqual(pickEven(3, 5), [0, 1, 2]);
+  assert.deepEqual(pickEven(9, 5), [0, 2, 4, 6, 8]);
+  assert.deepEqual(pickEven(0, 5), []);
+  const idx = pickEven(6, 5);
+  assert.equal(new Set(idx).size, idx.length);
+  assert.equal(idx[0], 0);
+  assert.equal(idx[idx.length - 1], 5);
+});

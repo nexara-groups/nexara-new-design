@@ -7,6 +7,8 @@ import { LOCAL_FAQS } from '@/lib/seo';
 import { useBriefForm } from '@/lib/shared';
 import { divisionLabel, voiced, type Theme } from '@/lib/site';
 import { PageFinder } from './PageFinder';
+import { changedLines } from '@/lib/contact-hero';
+import { useMagnet, usePointerTilt } from './useHeroMotion';
 import { finderItems } from '@/lib/finder';
 import { FORMS_ENABLED, TurnstileWidget, WIDGET_THEME, submitForm } from '../TurnstileWidget';
 
@@ -16,6 +18,38 @@ const CHANNEL_TRACK: Record<string, 'presence' | 'visibility' | 'performance'> =
   labs: 'performance',
 };
 
+// The brief as a scope card: one row per answer, the row the visitor just changed flashes (opacity overlay, CSS only).
+// Rows are read from the same brief text the form sends; the page's own date line never flashes.
+function BriefPreview({ text }: { text: string }) {
+  const previous = React.useRef(text);
+  const [flash, setFlash] = React.useState<{ id: number; lines: number[] }>({ id: 0, lines: [] });
+  React.useEffect(() => {
+    const lines = changedLines(previous.current, text);
+    previous.current = text;
+    if (lines.length) setFlash((f) => ({ id: f.id + 1, lines }));
+  }, [text]);
+  const lines = text.split('\n');
+  const rows = lines.map((line, i) => ({ line, i })).filter(({ line }) => /^[^:]+: /.test(line) && !/^Generated on/.test(line));
+  const isEmpty = (v: string) => /not specified/i.test(v);
+  const filled = rows.filter(({ line }) => !isEmpty(line.slice(line.indexOf(': ') + 2))).length;
+  const title = lines[0] ?? '';
+  const stamp = lines.find((l) => /^Generated on/.test(l)) ?? '';
+  return (
+    <div className="nx-ct-preview" role="group" aria-label={title}>
+      <div className="nx-ct-pv-head"><b>{title}</b><span>{filled}/{rows.length}</span></div>
+      <div className="nx-ct-pv-bar" aria-hidden="true"><i style={{ width: `${(filled / Math.max(rows.length, 1)) * 100}%` }} /></div>
+      {rows.map(({ line, i }) => {
+        const cut = line.indexOf(': ');
+        const value = line.slice(cut + 2);
+        const changed = flash.lines.includes(i);
+        const cls = ['nx-ct-bl', changed ? 'is-changed' : '', isEmpty(value) ? 'is-empty' : ''].filter(Boolean).join(' ');
+        return <p key={changed ? `${i}-${flash.id}` : i} className={cls}><span>{line.slice(0, cut)}</span><b>{isEmpty(value) ? 'Not yet' : value}</b></p>;
+      })}
+      <p className="nx-ct-pv-foot">{stamp.replace('Generated on: ', 'Drafted ')}</p>
+    </div>
+  );
+}
+
 export function ContactPage({ theme, detail }: { theme: Theme; detail: string | null }) {
   const t = <T,>(value: { neo: T; trust: T }) => voiced(value, theme);
   const copy = COPY.contact;
@@ -23,6 +57,10 @@ export function ContactPage({ theme, detail }: { theme: Theme; detail: string | 
   const faqs = LOCAL_FAQS.contact || [];
   const [open, setOpen] = React.useState<number[]>([0]);
   const root = React.useRef<HTMLElement>(null);
+  const engineRef = React.useRef<HTMLDivElement>(null);
+  const ctaRef = React.useRef<HTMLAnchorElement>(null);
+  usePointerTilt(engineRef, { max: 4 });
+  useMagnet(ctaRef);
   const {
     formData,
     handleChange,
@@ -93,13 +131,28 @@ export function ContactPage({ theme, detail }: { theme: Theme; detail: string | 
             <h1 className="nx-ct-h1">{t(copy.lines).map((line) => <span className="nx-ct-ln" key={line}><span>{line}</span></span>)}</h1>
             <p className="nx-ct-leave">{t(copy.leave)}</p>
             <div className="nx-hero-actions">
-              <a className="nx-ct-cta nx-ct-cta--lg" href="#brief">{t(copy.start)}</a>
+              <a ref={ctaRef} className="nx-ct-cta nx-ct-cta--lg nx-magnet" href="#brief">{t(copy.start)}</a>
               <a className="nx-ct-mail" href={`mailto:${contact.accent}`}>{contact.accent}</a>
             </div>
           </div>
-          <div className="nx-ct-engine" aria-label={t(copy.preview)}>
+          <div className="nx-ct-engine nx-tilt" ref={engineRef} aria-label={t(copy.preview)}>
             <p className="nx-ct-preview-label">{t(copy.preview)}</p>
-            <pre className="nx-ct-preview">{briefText}</pre>
+            {/* Same state as the lanes in the form below: choosing here preselects the lane there. */}
+            <div className="nx-ct-lanes nx-ct-lanes--hero" role="group" aria-label={t(copy.channels)}>
+              {DATA.contact.channels.map((channel) => (
+                <button
+                  key={channel.section}
+                  type="button"
+                  className={formData.section === channel.section ? 'is-active' : undefined}
+                  data-track={CHANNEL_TRACK[channel.section] ?? 'presence'}
+                  aria-pressed={formData.section === channel.section}
+                  onClick={() => handleChange('section', channel.section)}
+                >
+                  {channelTitle(channel.section, channel.title)}
+                </button>
+              ))}
+            </div>
+            <BriefPreview text={briefText} />
           </div>
         </div>
       </section>
