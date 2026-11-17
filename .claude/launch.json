@@ -48,6 +48,24 @@
         "3050"
       ],
       "port": 3050
+    },
+    {
+      "name": "nexara-site-next-start",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd nexara-site-next && npx next start -p 3060"
+      ],
+      "port": 3060
+    },
+    {
+      "name": "nexara-site-next-worker",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd nexara-site-next && npx wrangler dev --port 8787 --ip 127.0.0.1"
+      ],
+      "port": 8787
     }
   ]
 }

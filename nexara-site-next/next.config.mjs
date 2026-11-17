@@ -3,8 +3,8 @@ import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
-  // Inline the (small) stylesheets so they stop blocking first paint and the font chain starts immediately.
-  experimental: { inlineCss: true },
+  // CSS ships as external, immutable-cached files. Inlining it (experimental.inlineCss) put ~326 KB of CSS in
+  // every HTML response twice (once in <style>, once in the RSC payload): ~700 KB per page, never cached.
   async headers() {
     // Baseline hardening, as on Happy Farms. No CSP yet: gtag, inline JSON-LD and the WebGL hero need an allowlist first.
     // The site uses no camera, mic, location or payments, so Permissions-Policy switches them off.
