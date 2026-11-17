@@ -6,6 +6,8 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
+        // Form endpoints and the newsletter confirmation page are not search landing pages.
+        disallow: ['/api/', '/newsletter/'],
       },
     ],
     sitemap: SITE_URL + '/sitemap.xml',

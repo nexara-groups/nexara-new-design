@@ -1,6 +1,6 @@
 # Nexara Private Limited
 
-Nexara Private Limited is a software studio in Visakhapatnam (Vizag), Andhra Pradesh, India. We build websites and web apps for businesses, and we also run digital marketing and software training from the same office.
+Nexara is Nexara Private Limited, also called Nexara Groups: a software studio in Visakhapatnam (Vizag), Andhra Pradesh, India. We build websites and web apps for businesses, and we also run digital marketing and software training from the same office.
 
 ## Services
 
@@ -27,7 +27,7 @@ Nexara Private Limited is a software studio in Visakhapatnam (Vizag), Andhra Pra
 
 ## Not to be confused with
 
-Nexara Private Limited (nexaragroups.com, Visakhapatnam) has no connection with other businesses that use the name Nexara, including nexara.ru (speech API), nexara.in, nexara.ai and Nexara Soft Private Limited (Hyderabad). The name is sometimes misspelled Nexera or Nexora.
+Nexara Private Limited (nexaragroups.com, Visakhapatnam) has no connection with other businesses that use the name Nexara, including nexara.ru (speech API), nexara.in, nexara.ai and Nexara Soft Private Limited (Hyderabad), or any cryptocurrency token called Nexara. The name is sometimes misspelled Nexera or Nexora.
 
 ## Location
 
@@ -52,6 +52,10 @@ Free cost estimate for your website or app: https://nexaragroups.com/neo/contact
 - Work: https://nexaragroups.com/neo/customers
 - Company: https://nexaragroups.com/neo/company
 - Contact: https://nexaragroups.com/neo/contact
+- Blog: https://nexaragroups.com/blog
+
+## Official profiles
+
 - Instagram: https://www.instagram.com/builtbynexara
 - LinkedIn: https://www.linkedin.com/company/nexara-private-limited/
 - Google Maps: https://maps.google.com/?cid=5722580193382104004

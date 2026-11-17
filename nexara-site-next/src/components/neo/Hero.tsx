@@ -71,7 +71,7 @@ function NeoHeroUnravel({ copy, theme }: NeoHeroUnravelProps) {
 
         {/* Chapters Overlays */}
         <div className="neo-hero-chapter" style={{opacity:1,pointerEvents:"auto"}} data-from="0" data-to="0.07">
-          <p className="kicker">An engineering company</p>
+          <p className="kicker">Software company in Vizag</p>
           <h1 ref={titleRef} className="neo-hero-title" aria-label="Nexara">
             <span>N</span><span>E</span><span>X</span><span>A</span><span>R</span><span>A</span>
           </h1>

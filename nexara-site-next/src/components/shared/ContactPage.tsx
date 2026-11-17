@@ -71,10 +71,7 @@ export function ContactPage({ theme, detail }: { theme: Theme; detail: string | 
       gsap.registerPlugin(ScrollTrigger);
       const q = (s: string) => el.querySelectorAll(s);
       const ctx = gsap.context(() => {
-        const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-        tl.from(q('.nx-ct-ln > span'), { yPercent: 105, duration: 1.1, stagger: 0.12 })
-          .from(q('.nx-ct-engine'), { y: 40, opacity: 0, scale: 0.97, duration: 1, ease: 'power3.out' }, 0.25)
-          .from(q('.nx-ct-leave'), { opacity: 0, y: 14, duration: 0.8, ease: 'power3.out' }, 1.4);
+        // Hero entrance is CSS-only (shared.css), so it never waits on this import.
         gsap.from(q('.nx-ct-form-card'), { opacity: 0, y: 28, duration: 0.85, ease: 'power3.out', scrollTrigger: { trigger: q('.nx-ct-form-card')[0], start: 'top 82%' } });
       }, el);
       ready();
@@ -95,7 +92,10 @@ export function ContactPage({ theme, detail }: { theme: Theme; detail: string | 
             <p className="nx-ct-kicker">{contact.eyebrow}</p>
             <h1 className="nx-ct-h1">{t(copy.lines).map((line) => <span className="nx-ct-ln" key={line}><span>{line}</span></span>)}</h1>
             <p className="nx-ct-leave">{t(copy.leave)}</p>
-            <a className="nx-ct-mail" href={`mailto:${contact.accent}`}>{contact.accent}</a>
+            <div className="nx-hero-actions">
+              <a className="nx-ct-cta nx-ct-cta--lg" href="#brief">{t(copy.start)}</a>
+              <a className="nx-ct-mail" href={`mailto:${contact.accent}`}>{contact.accent}</a>
+            </div>
           </div>
           <div className="nx-ct-engine" aria-label={t(copy.preview)}>
             <p className="nx-ct-preview-label">{t(copy.preview)}</p>

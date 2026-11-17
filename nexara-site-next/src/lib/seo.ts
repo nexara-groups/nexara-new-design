@@ -88,6 +88,10 @@ export const marketingFaqs = (theme: Theme | null): [string, string][] =>
 export const academyFaqs = (theme: Theme | null): [string, string][] =>
   theme === 'neo' ? DATA.sections.academy.page.faqsNeo : (DATA.sections.academy.faqs as [string, string][]);
 
+// Brand disambiguation, worded from the "Not to be confused with" section of public/llms.txt.
+const BRAND_NOT_SAME_Q = 'Is Nexara the same as Nexara Soft or the Nexara crypto token?';
+const BRAND_NOT_SAME_A = 'No. Nexara Private Limited (nexaragroups.com, Visakhapatnam) has no connection with other businesses that use the name Nexara, including nexara.ru (a speech API), nexara.in, nexara.ai, Nexara Soft Private Limited (Hyderabad) or any cryptocurrency token called Nexara. The name is sometimes misspelled Nexera or Nexora.';
+
 export const LOCAL_FAQS: Record<string, [string, string][]> = {
   'labs/ecommerce': [
     ['Do you build e-commerce websites in Visakhapatnam?', 'Yes. Nexara builds e-commerce and product sites: catalogues, model directories, calculators, quote and site-survey flows, and a blog. We agree the scope in writing before work starts.'],
@@ -117,6 +121,9 @@ export const LOCAL_FAQS: Record<string, [string, string][]> = {
     ['How do I confirm duration, fees and the schedule?', 'Send your preferred dates and college requirements to Nexara. Request written confirmation of the programme’s duration, schedule, fees, project deliverables and completion-report requirements before enrolling.'],
   ],
   home: [
+    ['What is Nexara?', 'Nexara is Nexara Private Limited, also called Nexara Groups: a software, web development, digital marketing and training company in MVP Colony, Visakhapatnam (Vizag), Andhra Pradesh, India. We build websites, custom software, SaaS and AI voice agents, run digital marketing, and teach software through Nexara Academy.'],
+    ['Where is Nexara based?', `Nexara is based at ${DATA.contact.address.full}. Our website is nexaragroups.com.`],
+    [BRAND_NOT_SAME_Q, BRAND_NOT_SAME_A],
     ['Is Nexara the same as Nexera, Nexora or Nexar?', 'No. We are Nexara, spelled N-E-X-A-R-A and often misspelled as Nexera or Nexora. Nexara Private Limited is based in MVP Colony, Visakhapatnam (Vizag), India, and our website is nexaragroups.com. We build custom software, web applications and digital marketing. We have no connection with other companies that use similar names.'],
     ['Is Nexara a registered software company in Vizag?', 'Yes. Nexara Private Limited is a registered software and IT company in Visakhapatnam (CIN U62012AP2026PTC126146). We build custom SaaS, web apps, AI voice agents and business workflows. Every project has a written scope and a named owner, is tested before launch, and ends with a handover in which you receive the full source code.'],
     ['How do I find the best websites contacts in Vizag?', `For websites and software, you can reach Nexara on +91 9257535757 or at info@nexaragroups.com. Our office is at ${DATA.contact.address.full}. If you prefer, describe your project in the intake planner on our contact page and we will reply with a scoped next step.`],
@@ -125,7 +132,9 @@ export const LOCAL_FAQS: Record<string, [string, string][]> = {
     ['Which clients has Nexara delivered websites and software for?', 'Our client work is live for businesses in Visakhapatnam and across Andhra Pradesh, including Sai Nirmaan Architects (portfolio website and digital marketing in Visakhapatnam), Sri Engineering Works (HVAC e-commerce, model directory, and inventory tracking), Happy Farms (agri-training SaaS and public portal), Rise Medical Hub (Madhurawada clinic website and medical library), and Qualigene Lifesciences (product website and calculators).'],
   ],
   company: [
+    ['What is Nexara Private Limited?', 'Nexara Private Limited, also called Nexara or Nexara Groups, is a software, web development, digital marketing and training company in MVP Colony, Visakhapatnam (Vizag), Andhra Pradesh, India. It was incorporated on 31 May 2026 and its directors are Seshu Kumar Puvvala and Pala Raju Garigipati.'],
     ['Where is Nexara based?', `${DATA.contact.address.full}.`],
+    [BRAND_NOT_SAME_Q, BRAND_NOT_SAME_A],
     ['What should I look for in a top IT company in Vizag?', 'Check the team’s relevant skills, delivery process, who owns the code and accounts, how they do QA and what support covers. At Nexara we start with a written brief and a named owner, so all of this is settled before a build.'],
     ['How can I contact Nexara for website or software projects in Vizag?', `Call us on 9257535757 or email info@nexaragroups.com. Our office is at ${DATA.contact.address.full}.`],
   ],
@@ -176,6 +185,25 @@ export function getRoutes() {
 }
 
 const organizationId = `${SITE_URL}/#organization`;
+const websiteId = `${SITE_URL}/#website`;
+const LANGUAGES = ['English', 'Telugu', 'Hindi'];
+
+// Founders are Person nodes on every page, referenced from Organization.founder by @id.
+// Only fields that exist in DATA are emitted; sameAs appears only once a profile URL is added there.
+const founderId = (i: number) => `${SITE_URL}/#founder-${i + 1}`;
+function founderNodes() {
+  return DATA.company.founders.map((f, i) => ({
+    '@type': 'Person',
+    '@id': founderId(i),
+    name: f.name,
+    jobTitle: f.role,
+    worksFor: { '@id': organizationId },
+    ...(f.photo ? { image: SITE_URL + f.photo } : {}),
+    ...(f.bio ? { description: f.bio } : {}),
+    ...(f.linkedin ? { sameAs: [f.linkedin] } : {}),
+  }));
+}
+
 function organizationNode() {
   return {
     '@type': ['Organization', 'LocalBusiness', 'ProfessionalService'],
@@ -199,6 +227,10 @@ function organizationNode() {
     url: pageUrl('/'),
     logo: `${SITE_URL}/brand/nexara-logo-512.png`,
     sameAs: DATA.contact.social.map(link => link.href),
+    brand: { '@type': 'Brand', name: 'Nexara', alternateName: ['Nexara Groups', 'Nexara Private Limited'] },
+    foundingLocation: { '@type': 'Place', name: 'Visakhapatnam, Andhra Pradesh, India' },
+    ...(DATA.company.founders.length ? { founder: DATA.company.founders.map((_, i) => ({ '@id': founderId(i) })) } : {}),
+    knowsLanguage: LANGUAGES,
     image: `${SITE_URL}/brand/og-image.png`,
     description: 'Software company in Vizag building custom software, websites, AI voice agents and digital marketing from MVP Colony, Visakhapatnam.',
     telephone: '+919257535757',
@@ -240,7 +272,7 @@ function organizationNode() {
       email: 'info@nexaragroups.com',
       contactType: 'project enquiries',
       areaServed: 'IN',
-      availableLanguage: ['English', 'Telugu', 'Hindi'],
+      availableLanguage: LANGUAGES,
     },
   };
 }
@@ -248,26 +280,19 @@ function organizationNode() {
 export function getStructuredData(route: Pick<Route, 'theme' | 'page' | 'detail'>) {
   const seo = getSeo(route);
   if (!seo.valid) return { '@context': 'https://schema.org', '@graph': [] };
-  const organization: ReturnType<typeof organizationNode> & { founder?: { '@id': string }[] } = organizationNode();
+  const organization = organizationNode();
   const webPageId = `${seo.canonical}#webpage`;
   const graph: Record<string, unknown>[] = [
     organization,
-    {
-      '@type': 'WebSite',
-      '@id': `${SITE_URL}/#website`,
-      url: pageUrl('/'),
-      name: 'Nexara',
-      alternateName: ['Nexara Private Limited', 'Nexara Groups', 'nexaragroups.com'],
-      publisher: { '@id': organizationId },
-      inLanguage: 'en-IN',
-    },
+    websiteNode(),
+    ...founderNodes(),
     {
       '@type': route.page === 'contact' ? 'ContactPage' : route.page === 'company' ? 'AboutPage' : 'WebPage',
       '@id': webPageId,
       url: seo.canonical,
       name: seo.title,
       description: seo.description,
-      isPartOf: { '@id': `${SITE_URL}/#website` },
+      isPartOf: { '@id': websiteId },
       about: { '@id': organizationId },
       inLanguage: 'en-IN',
       ...(route.page === 'contact' ? { mainEntity: { '@id': organizationId } } : {}),
@@ -278,12 +303,7 @@ export function getStructuredData(route: Pick<Route, 'theme' | 'page' | 'detail'
     if (route.page !== 'home') items.push({ '@type': 'ListItem', position: 2, name: sections[route.page]?.name || route.page[0]!.toUpperCase() + route.page.slice(1), item: SITE_URL + routePath('neo', route.page) });
     if (route.detail && route.page !== 'contact') items.push({ '@type': 'ListItem', position: items.length + 1, name: sections[route.page]?.subpages.find(item => item.slug === route.detail)?.title || sections[route.detail]?.name || route.detail, item: seo.canonical! });
     graph.push({ '@type': 'BreadcrumbList', '@id': `${seo.canonical}#breadcrumb`, itemListElement: items });
-    graph[2]!.breadcrumb = { '@id': `${seo.canonical}#breadcrumb` };
-  }
-  if (route.page === 'company' && DATA.company.founders.length) {
-    const people = DATA.company.founders.map((f, i) => ({ '@type': 'Person', '@id': `${SITE_URL}/#founder-${i + 1}`, name: f.name, jobTitle: f.role, worksFor: { '@id': organizationId }, ...(f.photo ? { image: SITE_URL + f.photo } : {}), ...(f.bio ? { description: f.bio } : {}), ...(f.linkedin ? { sameAs: [f.linkedin] } : {}) }));
-    organization.founder = people.map(person => ({ '@id': person['@id'] }));
-    graph.push(...people);
+    graph.find(node => node['@id'] === webPageId)!.breadcrumb = { '@id': `${seo.canonical}#breadcrumb` };
   }
   if (sections[route.page]) graph.push({ '@type': 'Service', '@id': `${seo.canonical}#service`, name: seo.heading, description: seo.body, url: seo.canonical, provider: { '@id': organizationId }, areaServed: organization.areaServed, mainEntityOfPage: { '@id': webPageId } });
 
@@ -406,27 +426,33 @@ function pageFaqs(route: Pick<Route, 'theme' | 'page' | 'detail'>, fromSeo: [str
 }
 
 // Blog JSON-LD. Publisher is the same Organization node (@id) the rest of the site uses.
-const websiteNode = () => ({ '@type': 'WebSite', '@id': `${SITE_URL}/#website`, url: pageUrl('/'), name: 'Nexara', alternateName: ['Nexara Private Limited', 'Nexara Groups', 'nexaragroups.com'], publisher: { '@id': organizationId }, inLanguage: 'en-IN' });
+function websiteNode() { return { '@type': 'WebSite', '@id': websiteId, url: pageUrl('/'), name: 'Nexara', alternateName: ['Nexara Private Limited', 'Nexara Groups', 'nexaragroups.com'], publisher: { '@id': organizationId }, inLanguage: 'en-IN' }; }
 const crumbs = (items: [string, string][]) => ({ '@type': 'BreadcrumbList', itemListElement: items.map(([name, item], i) => ({ '@type': 'ListItem', position: i + 1, name, item })) });
 export const blogUrl = (slug?: string) => `${SITE_URL}/blog${slug ? '/' + slug : ''}`;
 
 export function getBlogIndexStructuredData() {
   const url = blogUrl();
   return { '@context': 'https://schema.org', '@graph': [
-    organizationNode(), websiteNode(),
+    organizationNode(), websiteNode(), ...founderNodes(),
     { '@type': 'Blog', '@id': `${url}#blog`, url, name: 'Nexara Blog', description: BLOG_DESCRIPTION, publisher: { '@id': organizationId }, isPartOf: { '@id': `${SITE_URL}/#website` }, inLanguage: 'en-IN',
       blogPost: BLOG_POSTS.map(post => ({ '@type': 'BlogPosting', '@id': `${blogUrl(post.slug)}#post`, headline: post.title, url: blogUrl(post.slug), datePublished: post.date })) },
     { ...crumbs([['Nexara', pageUrl('/')], ['Blog', url]]), '@id': `${url}#breadcrumb` },
   ] };
 }
 
+// A post written by a named founder points at that Person; anything else (today: "Nexara Team") stays an Organization.
+function blogAuthor(post: BlogPost) {
+  const i = DATA.company.founders.findIndex(f => f.name === (post.author as string));
+  return i >= 0 ? { '@id': founderId(i) } : { '@type': 'Organization', name: post.author, url: pageUrl('/'), parentOrganization: { '@id': organizationId } };
+}
+
 export function getBlogPostStructuredData(post: BlogPost) {
   const url = blogUrl(post.slug);
   const words = post.body.reduce((n, b) => n + (b.type === 'ul' ? b.items.join(' ') : b.text).split(/\s+/).length, 0);
   return { '@context': 'https://schema.org', '@graph': [
-    organizationNode(), websiteNode(),
+    organizationNode(), websiteNode(), ...founderNodes(),
     { '@type': 'BlogPosting', '@id': `${url}#post`, headline: post.title, description: post.description, url, mainEntityOfPage: { '@type': 'WebPage', '@id': url }, datePublished: post.date, dateModified: post.date,
-      author: { '@type': 'Organization', name: post.author, url: pageUrl('/') }, publisher: { '@id': organizationId }, isPartOf: { '@id': `${blogUrl()}#blog` },
+      author: blogAuthor(post), publisher: { '@id': organizationId }, isPartOf: { '@type': 'Blog', '@id': `${blogUrl()}#blog`, url: blogUrl(), name: 'Nexara Blog' },
       image: `${SITE_URL}/brand/og-image.png`, keywords: post.tags.join(', '), wordCount: words, inLanguage: 'en-IN', breadcrumb: { '@id': `${url}#breadcrumb` } },
     { ...crumbs([['Nexara', pageUrl('/')], ['Blog', blogUrl()], [post.title, url]]), '@id': `${url}#breadcrumb` },
   ] };

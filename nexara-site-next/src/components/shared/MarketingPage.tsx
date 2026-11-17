@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { DATA } from '@/lib/data';
 import { COPY } from '@/lib/copy';
+import { RelatedPosts } from './RelatedPosts';
 import { routePath, marketingFaqs } from '@/lib/seo';
 import { MARKETING_FLOW, MARKETING_TRACKS, voiced, type MarketingBlock, type Theme } from '@/lib/site';
 import { getLenis } from '../useSmoothScroll';
@@ -100,14 +101,7 @@ export function MarketingPage({ theme }: { theme: Theme }) {
       gsap.registerPlugin(ScrollTrigger);
       const q = (s: string) => el.querySelectorAll(s);
       const ctx = gsap.context(() => {
-        const query = el.querySelector<HTMLElement>('.nx-mk-query strong');
-        const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-        tl.from(q('.nx-mk-ln > span'), { yPercent: 105, duration: 1.1, stagger: 0.12 })
-          .from(q('.nx-mk-engine'), { y: 40, opacity: 0, scale: 0.97, duration: 1, ease: 'power3.out' }, 0.25);
-        if (query) tl.fromTo(query, { maxWidth: 0 }, { maxWidth: query.scrollWidth + 2, duration: 0.9, ease: 'steps(17)', clearProps: 'maxWidth' }, 0.75);
-        tl.from(q('.nx-mk-results li'), { opacity: 0, y: 12, duration: 0.5, stagger: 0.1, ease: 'power3.out' }, 1.55)
-          .from(q('.nx-mk-miss'), { opacity: 0, scale: 0.6, duration: 0.45, stagger: 0.1, ease: 'back.out(2.4)' }, 1.75)
-          .from(q('.nx-mk-leave'), { opacity: 0, y: 14, duration: 0.8, ease: 'power3.out' }, 2.25);
+        // Hero entrance is CSS-only (shared.css), so it never waits on this import.
 
         // Story: words ink in as you read.
         gsap.fromTo(q('.nx-mk-w'), { opacity: 0.16 }, { opacity: 1, stagger: 0.05, ease: 'none', scrollTrigger: { trigger: q('.nx-mk-story')[0], start: 'top 70%', end: 'bottom 55%', scrub: 0.6 } });
@@ -157,8 +151,11 @@ export function MarketingPage({ theme }: { theme: Theme }) {
           <div>
             <h1 className="nx-mk-h1">{t(PAGE.hero.lines).map((line) => <span className="nx-mk-ln" key={line}><span>{line}</span></span>)}</h1>
             <p className="nx-mk-leave">{t(PAGE.hero.leave)}</p>
+            <div className="nx-hero-actions">
+              <Link prefetch={false} className="nx-mk-cta nx-mk-cta--lg" href={routePath(theme, 'contact', 'marketing')}>{t(copy.ask.cta)} <Arrow /></Link>
+            </div>
           </div>
-          <div className="nx-mk-engine">
+          <div className="nx-mk-engine" aria-hidden="true">
             <div className="nx-mk-query">
               <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M13 13l4.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
               <span>{t(copy.search)}</span>
@@ -261,6 +258,7 @@ export function MarketingPage({ theme }: { theme: Theme }) {
       </div>
     ),
     faqs: () => (
+      <>
       <div className="nx-mk-wrap nx-mk-block nx-mk-faq-grid">
         <h2 className="nx-mk-sec-h">{t(copy.faqs)}</h2>
         <dl className="nx-mk-faqs">
@@ -279,6 +277,8 @@ export function MarketingPage({ theme }: { theme: Theme }) {
           })}
         </dl>
       </div>
+      <RelatedPosts theme={theme} page="marketing" wrap="nx-mk-wrap" />
+      </>
     ),
     ask: () => (
       <section className="nx-mk-ask" id="ask">

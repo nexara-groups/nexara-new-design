@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { imgSize } from '@/components/ui/image-size';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -207,7 +208,7 @@ function CaseView({ client, theme }: { client: ClientWork; theme: Theme }) {
     <article className="nx-builds-case" aria-labelledby="nx-builds-case-h">
       <div className="nx-builds-case-top">
         <span className="nx-builds-logo">
-          <img src={client.logo} alt="" loading="lazy" decoding="async" />
+          <img src={client.logo} alt={`${client.name} logo`} {...imgSize(client.logo)} loading="lazy" decoding="async" />
         </span>
         <div>
           <div className="nx-builds-meta">
@@ -349,7 +350,7 @@ export function Builds({
                     onClick={() => setSelectedUrl(client.url)}
                   >
                     <span className="nx-builds-case-tab-logo">
-                      <img src={client.logo} alt="" loading="lazy" decoding="async" />
+                      <img src={client.logo} alt="" {...imgSize(client.logo)} loading="lazy" decoding="async" />
                     </span>
                     <span className="nx-builds-case-tab-copy">
                       <span className="nx-builds-case-tab-name">{client.name}</span>

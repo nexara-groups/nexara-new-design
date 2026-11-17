@@ -6,6 +6,7 @@ import { COPY } from '@/lib/copy';
 import { routePath } from '@/lib/seo';
 import { voiced, type Theme } from '@/lib/site';
 import { labsAnchor } from './LabsMap';
+import { imgSize } from '@/components/ui/image-size';
 
 const LABS = DATA.sections.labs;
 
@@ -26,7 +27,7 @@ export function LabsProducts({ theme }: { theme: Theme }) {
         <article id={labsAnchor('product', p.id)} key={p.id} data-status={p.status}>
           {'shot' in p && p.shot ? (
             <Link prefetch={false} className="nx-labs-shot" href={routePath(theme, 'labs', p.id)} tabIndex={-1} aria-hidden="true">
-              <img src={p.shot} alt="" loading="lazy" decoding="async" />
+              <img src={p.shot} alt={`${p.name} product screenshot`} {...imgSize(p.shot)} loading="lazy" decoding="async" />
             </Link>
           ) : (
             <span className="nx-labs-shot is-empty" aria-hidden="true">

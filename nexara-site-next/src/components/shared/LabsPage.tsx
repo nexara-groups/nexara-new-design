@@ -20,11 +20,11 @@ import { useSectionTabs } from '../useSectionTabs';
 import { NotFound } from '../NotFound';
 import { PackageGrid } from '../ui/package-card';
 import { FaqBand } from './FaqBand';
+import { RelatedPosts } from './RelatedPosts';
 import { PageFinder, scrollToSection } from './PageFinder';
 import {
   LabsLayerMap,
   LabsModuleMeta,
-  LabsPipeline,
   LabsProofMap,
   LabsStages,
   LABS_PIPE_NODES,
@@ -66,8 +66,7 @@ function LabsHero({ theme, onOpen }: { theme: Theme; onOpen: (slug: string | nul
         <div className="nx-lab-hero-copy">
           <p className="nx-lab-kicker">{hero.eyebrow}</p>
           <h1 className="nx-lab-title">{hero.title}</h1>
-          <p className="nx-lab-accent">{hero.accent}</p>
-          <p className="nx-lab-lede">{hero.body}</p>
+          <p className="nx-lab-lede">{voiced(COPY.labs.heroLede, theme)}</p>
           <div className="nx-lab-actions">
             <Link prefetch={false} className="nx-lab-cta" href={routePath(theme, 'contact', 'labs')}>
               {hero.primary}
@@ -78,7 +77,19 @@ function LabsHero({ theme, onOpen }: { theme: Theme; onOpen: (slug: string | nul
           </div>
         </div>
         <div className="nx-lab-hero-visual" aria-hidden="true">
-          <LabsPipeline nodes={LABS_PIPE_NODES} />
+          <div className="nx-lab-rig">
+            <ol className="nx-lab-rail">
+              {LABS_PIPE_NODES.map(({ n, label }) => (
+                <li key={n}><b>{n}</b><span>{label}</span></li>
+              ))}
+            </ol>
+            <p className="nx-lab-rig-label">{voiced(COPY.labs.heroProducts, theme)}</p>
+            <ul className="nx-lab-live">
+              {LABS.products.filter((p) => p.status !== 'building').map((p) => (
+                <li key={p.id}><span>{p.name}</span><i data-status={p.status}>{statusLabel(p.status, theme)}</i></li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </header>
@@ -147,7 +158,12 @@ function LabsOverview({ theme, onOpen }: { theme: Theme; onOpen: (slug: string |
         </div>
       </section>
     ),
-    faqs: () => <FaqBand theme={theme} copy={COPY.labs.faqs} faqs={LABS.faqs as [string, string][]} id="nx-lab-faq" />,
+    faqs: () => (
+      <>
+        <FaqBand theme={theme} copy={COPY.labs.faqs} faqs={LABS.faqs as [string, string][]} id="nx-lab-faq" />
+        <RelatedPosts theme={theme} page="labs" wrap="nx-lab-wrap" />
+      </>
+    ),
     cta: () => (
       <section className="nx-lab-ask">
         <div className="nx-lab-wrap">

@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { DATA } from '@/lib/data';
 import { COPY } from '@/lib/copy';
+import { RelatedPosts } from './RelatedPosts';
 import { ABOUT_FLOW, voiced, type AboutBlock, type Theme } from '@/lib/site';
 import { routePath, LOCAL_FAQS } from '@/lib/seo';
 import { Inline, resolveHref } from '../BlogContent';
@@ -108,11 +109,7 @@ export function About({ theme }: { theme: Theme }) {
       gsap.registerPlugin(ScrollTrigger);
       const q = (s: string) => el.querySelectorAll(s);
       const ctx = gsap.context(() => {
-        const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-        tl.from(q('.nx-ab-ln > span'), { yPercent: 105, duration: 1.1, stagger: 0.12 })
-          .from(q('.nx-ab-dossier'), { y: 40, opacity: 0, scale: 0.97, duration: 1, ease: 'power3.out' }, 0.25)
-          .from(q('.nx-ab-reg li'), { opacity: 0, y: 12, duration: 0.5, stagger: 0.08, ease: 'power3.out' }, 0.7)
-          .from(q('.nx-ab-leave'), { opacity: 0, y: 14, duration: 0.8, ease: 'power3.out' }, 1.1);
+        // Hero entrance is CSS-only (shared.css), so it never waits on this import.
         gsap.fromTo(q('.nx-ab-w'), { opacity: 0.16 }, {
           opacity: 1, stagger: 0.05, ease: 'none',
           scrollTrigger: { trigger: q('.nx-ab-story')[0], start: 'top 70%', end: 'bottom 55%', scrub: 0.6 },
@@ -157,6 +154,9 @@ export function About({ theme }: { theme: Theme }) {
             </h1>
             <p className="nx-ab-leave">{t(copy.hero.leave)}</p>
             <p className="nx-ab-lead">{hero.body}</p>
+            <div className="nx-hero-actions">
+              <Link prefetch={false} className="nx-ab-cta nx-ab-cta--lg" href={routePath(theme, 'contact')}>{t(copy.cta.primary)} <Arrow /></Link>
+            </div>
           </div>
           <aside className="nx-ab-dossier" aria-label={t(copy.hero.record)}>
             <div className="nx-ab-rec-head">
@@ -313,6 +313,7 @@ export function About({ theme }: { theme: Theme }) {
       </section>
     ),
     faqs: () => !faqs.length ? null : (
+      <>
       <div className="nx-ab-wrap nx-ab-block nx-ab-faq-grid" id="faqs">
         <h2 className="nx-ab-sec-h" id="nx-ab-faq-h">{t(copy.faqs.title)}</h2>
         <dl className="nx-ab-faqs">
@@ -331,6 +332,8 @@ export function About({ theme }: { theme: Theme }) {
           })}
         </dl>
       </div>
+      <RelatedPosts theme={theme} page="company" wrap="nx-ab-wrap" />
+      </>
     ),
     cta: () => (
       <section className="nx-ab-ask" id="ask" aria-label={t(copy.cta.title)}>

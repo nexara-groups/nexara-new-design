@@ -7,6 +7,11 @@ const v = (neo: string, trust: string): Voiced => ({ neo, trust });
 
 export const COPY = {
   labs: {
+    heroLede: v(
+      'SaaS, products, integrations and AI where it fits. Four products you can open today.',
+      'SaaS, B2B products and integrations, with AI where it earns its place. Four products are live or open for demonstration today.',
+    ),
+    heroProducts: v('Open today', 'Live or open for demonstration'),
     nav: {
       label: v('Labs progress', 'Product Studio progress'),
       overview: v('Overview', 'Overview'),
@@ -357,8 +362,10 @@ export const COPY = {
     kicker: v('Questions', 'Questions'),
     title: v('Straight answers.', 'Common questions about Nexara.'),
   },
+  related: { title: v('Worth a read', 'Further reading') },
   blog: {
     kicker: v('Blog', 'Blog'),
+    latest: v('Latest post', 'Latest article'),
     title: v('Notes from the build.', 'Notes from our delivery work.'),
     lines: { neo: ['Notes from', 'the build.'], trust: ['Notes from', 'our delivery work.'] } as Voiced<string[]>,
     lede: v(
@@ -383,6 +390,7 @@ export const COPY = {
   contact: {
     lines: { neo: ['Tell us what', "you're building."], trust: ['Every project starts', 'with one conversation.'] } as Voiced<string[]>,
     leave: v('We send a scoped next step.', 'We return a scoped next step and a named owner.'),
+    start: v('Start your brief', 'Start the brief'),
     preview: v('Your brief', 'Brief preview'),
     channels: v('Pick a lane', 'Select a section'),
     channelsBody: v(

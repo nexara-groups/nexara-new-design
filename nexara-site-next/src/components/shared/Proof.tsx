@@ -89,11 +89,7 @@ export function Proof({ theme, detail }: { theme: Theme; detail: string | null }
       gsap.registerPlugin(ScrollTrigger);
       const q = (s: string) => el.querySelectorAll(s);
       const ctx = gsap.context(() => {
-        const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-        tl.from(q('.nx-pf-ln > span'), { yPercent: 105, duration: 1.1, stagger: 0.12 })
-          .from(q('.nx-pf-index'), { y: 40, opacity: 0, scale: 0.97, duration: 1, ease: 'power3.out' }, 0.25)
-          .from(q('.nx-pf-frames > li'), { opacity: 0, y: 14, scale: 0.96, duration: 0.5, stagger: 0.07, ease: 'power3.out' }, 0.7)
-          .from(q('.nx-pf-leave'), { opacity: 0, y: 14, duration: 0.8, ease: 'power3.out' }, 1.05);
+        // Hero entrance is CSS-only (shared.css), so it never waits on this import.
         q('.nx-pf-fact b').forEach((node) => {
           const to = Number(node.getAttribute('data-to'));
           if (!Number.isFinite(to) || to === 0) return;
@@ -144,6 +140,9 @@ export function Proof({ theme, detail }: { theme: Theme; detail: string | null }
             </h1>
             <p className="nx-pf-leave">{accent}</p>
             <p className="nx-pf-lead">{body}</p>
+            <div className="nx-hero-actions">
+              <Link prefetch={false} className="nx-pf-cta nx-pf-cta--lg" href={routePath(theme, 'contact')}>{t(copy.hero.yoursCta)} <Arrow /></Link>
+            </div>
           </div>
           <aside className="nx-pf-index" aria-label={t(copy.hero.wall)}>
             <div className="nx-pf-rec-head">
@@ -237,7 +236,7 @@ export function Proof({ theme, detail }: { theme: Theme; detail: string | null }
                   <p>{t(card.body)}</p>
                   {i === copy.why.cards.length - 1 && (
                     <span className="nx-pf-why-logos" aria-hidden="true">
-                      {logos.map((c) => <span className="nx-pf-why-logo" key={c.url}><img src={c.logo} alt="" loading="lazy" decoding="async" /></span>)}
+                      {logos.map((c) => <span className="nx-pf-why-logo" key={c.url}><img src={c.logo} alt={`${c.name} logo`} loading="lazy" decoding="async" /></span>)}
                       <span className="nx-pf-why-logo nx-pf-why-logo--you">{t(copy.why.yours)}</span>
                     </span>
                   )}
@@ -300,7 +299,7 @@ export function Proof({ theme, detail }: { theme: Theme; detail: string | null }
                   <p className="nx-pf-result-k">{t(copy.match.proof)}</p>
                   {client ? (
                     <a href={client.url} target="_blank" rel="noopener noreferrer" className="nx-pf-result-client">
-                      <span className="nx-pf-why-logo"><img src={client.logo} alt="" loading="lazy" decoding="async" /></span>
+                      <span className="nx-pf-why-logo"><img src={client.logo} alt={`${client.name} logo`} loading="lazy" decoding="async" /></span>
                       <span><b>{client.name}</b><small>{client.line}</small></span>
                       <span className="nx-pf-result-open">{t(copy.match.open)} ↗</span>
                     </a>

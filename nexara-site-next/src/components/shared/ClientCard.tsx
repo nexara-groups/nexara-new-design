@@ -5,6 +5,7 @@ import { DATA, neoLabel } from '@/lib/data';
 import { COPY } from '@/lib/copy';
 import { voiced, type Theme } from '@/lib/site';
 import { routePath } from '@/lib/seo';
+import { imgSize } from '@/components/ui/image-size';
 
 // Same card the production site uses: live mark, index, logo plate, one line, scope, url.
 // Both themes share the structure. Colour comes from the theme tokens.
@@ -20,7 +21,7 @@ export function ClientCard({ client, index, theme }: { client: ClientWork; index
         </span>
         <span>{n} / {client.sector}</span>
       </span>
-      <span className="nx-client-logo"><img src={client.logo} alt="" loading="lazy" decoding="async" /></span>
+      <span className="nx-client-logo"><img src={client.logo} alt={`${client.name} logo`} {...imgSize(client.logo)} loading="lazy" decoding="async" /></span>
       <h3>
         {client.name}
         <span className="nx-sr"> ({domain}, {voiced(COPY.clients.opens, theme)})</span>
@@ -66,7 +67,7 @@ export function ClientStrip({ theme }: { theme: Theme }) {
         <p className="nx-strip-label">{voiced(COPY.clients.stripLabel, theme)}</p>
         <ul className="nx-strip-logos">
           {CLIENTS.map((c) => (
-            <li key={c.url} title={c.name}><img src={c.logo} alt={c.name} loading="lazy" decoding="async" /></li>
+            <li key={c.url} title={c.name}><img src={c.logo} alt={`${c.name} logo`} {...imgSize(c.logo)} loading="lazy" decoding="async" /></li>
           ))}
         </ul>
         <Link prefetch={false} className="nx-text-link" href={routePath(theme, 'customers')}>{voiced(COPY.clients.stripAll, theme)} →</Link>

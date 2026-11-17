@@ -31,13 +31,35 @@ function StartRow({ post, theme, track, as: H = 'h2' }: { post: BlogPost; theme:
 
 export function BlogIndexView({ theme }: { theme: Theme }) {
   const t = <T,>(value: { neo: T; trust: T }) => voiced(value, theme);
+  const latest = postsByDate()[0];
   return (
     <main className="nx-bl">
       <section className="nx-bl-hero" id="overview">
-        <div className="nx-bl-wrap">
-          <p className="nx-bl-kicker">{t(COPY.blog.kicker)}</p>
-          <h1 className="nx-bl-h1">{t(COPY.blog.lines).map((line) => <span className="nx-bl-ln" key={line}><span>{line}</span></span>)}</h1>
-          <p className="nx-bl-leave">{t(COPY.blog.lede)}</p>
+        <div className="nx-bl-wrap nx-bl-hero-grid">
+          <div>
+            <p className="nx-bl-kicker">{t(COPY.blog.kicker)}</p>
+            <h1 className="nx-bl-h1">{t(COPY.blog.lines).map((line) => <span className="nx-bl-ln" key={line}><span>{line}</span></span>)}</h1>
+            <p className="nx-bl-leave">{t(COPY.blog.lede)}</p>
+            <div className="nx-hero-actions">
+              <Link prefetch={false} className="nx-bl-cta nx-bl-cta--lg" href={routePath(theme, 'contact')}>{t(COPY.blog.cta)} <Arrow /></Link>
+            </div>
+          </div>
+          {latest && (
+            <aside className="nx-bl-feature" aria-label={t(COPY.blog.latest)} data-track="presence">
+              <p className="nx-bl-feature-label">{t(COPY.blog.latest)}</p>
+              <Link prefetch={false} className="nx-bl-feature-link" href={routePath(theme, 'blog', latest.slug)}>
+                <strong>{latest.title}</strong>
+                <span>{latest.description}</span>
+                <small>
+                  <time dateTime={latest.date}>{formatPostDate(latest.date)}</time>
+                  <i aria-hidden="true">·</i>
+                  {latest.readMins} {t(COPY.blog.min)}
+                  <b>{t(COPY.blog.read)} <Arrow size={16} /></b>
+                </small>
+              </Link>
+              {latest.tags.length > 0 && <p className="nx-bl-feature-tags">{latest.tags.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}</p>}
+            </aside>
+          )}
         </div>
       </section>
       <div className="nx-bl-wrap nx-bl-block" id="posts">

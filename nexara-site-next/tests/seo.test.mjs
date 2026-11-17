@@ -5,7 +5,7 @@ import ts from 'typescript';
 const moduleOf = source => import('data:text/javascript;base64,' + Buffer.from(ts.transpileModule(source, {compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText).toString('base64'));
 const { DATA, GOOGLE_ENTITY_URL, GOOGLE_KGMID, INSTAGRAM_URL, OFFICE_ADDRESS } = await moduleOf(fs.readFileSync(new URL('../src/lib/data.ts', import.meta.url), 'utf8'));
 const source = fs.readFileSync(new URL('../src/lib/seo.ts', import.meta.url), 'utf8').replace("import { DATA, GOOGLE_ENTITY_URL, GOOGLE_KGMID } from './data';", 'const DATA = ' + JSON.stringify(DATA) + '; const GOOGLE_ENTITY_URL = ' + JSON.stringify(GOOGLE_ENTITY_URL) + '; const GOOGLE_KGMID = ' + JSON.stringify(GOOGLE_KGMID) + ';').replace(/import \{ BLOG_POSTS[^\n]*\n/, "const BLOG_POSTS = [], BLOG_DESCRIPTION = '';\n");
-const { getSeo, getRoutes, getStructuredData, pageUrl } = await moduleOf(source);
+const { getSeo, getRoutes, getStructuredData, getBlogPostStructuredData, getBlogIndexStructuredData, pageUrl, LOCAL_FAQS } = await moduleOf(source);
 test('all existing detail pages and intake links have valid metadata', () => {
  const routes = getRoutes(); assert.equal(routes.length, 52); // +8 labs products × 2 themes; academy-sports merged into forms
  for (const route of routes) { const seo=getSeo(route); assert.equal(seo.valid,true,route.path); assert.ok(seo.title.includes('Nexara')); assert.ok(seo.description.length>80); }
@@ -149,7 +149,7 @@ test('titles and descriptions fit a search result', () => {
   for (const route of getRoutes()) {
     const seo = getSeo(route);
     assert.ok(seo.title.length <= 60, `${seo.title} (${seo.title.length})`);
-    assert.ok(seo.description.length >= 80 && seo.description.length <= 160, `${route.path} description ${seo.description.length}: ${seo.description}`);
+    assert.ok(seo.description.length >= 110 && seo.description.length <= 160, `${route.path} description ${seo.description.length}: ${seo.description}`);
   }
 });
 
@@ -190,5 +190,91 @@ test('all routes have targeted keywords populated', () => {
     const seo = getSeo(route);
     assert.ok(seo.keywords, `keywords for ${route.path}`);
     assert.ok(seo.keywords.length > 20, `keywords length for ${route.path}`);
+  }
+});
+
+const danglingRefs = graph => {
+  const ids = new Set(graph.map(node => node['@id']).filter(Boolean));
+  const refs = [...JSON.stringify(graph).matchAll(/\{"@id":"([^"]+)"\}/g)].map(match => match[1]);
+  return refs.filter(id => !ids.has(id));
+};
+
+test('every page emits the full Organization, WebSite "Nexara" and the founders it references', () => {
+  for (const route of getRoutes()) {
+    const graph = getStructuredData(route)['@graph'];
+    const org = graph.find(x => x['@type']?.includes('Organization'));
+    assert.ok(org, `organization on ${route.path}`);
+    assert.equal(graph.find(x => x['@type'] === 'WebSite').name, 'Nexara');
+    assert.deepEqual(org.founder.map(f => f['@id']), DATA.company.founders.map((_, i) => `https://nexaragroups.com/#founder-${i + 1}`));
+    assert.equal(graph.filter(x => x['@type'] === 'Person').length, DATA.company.founders.length, `people on ${route.path}`);
+    assert.deepEqual(danglingRefs(graph), [], `dangling @id on ${route.path}`);
+    assert.equal(JSON.stringify(graph).includes('undefined'), false);
+    assert.equal(org.brand.name, 'Nexara');
+    assert.ok(org.foundingLocation && org.knowsLanguage.includes('Telugu'));
+  }
+});
+
+test('blog JSON-LD carries Organization, founders and valid references', () => {
+  const post = { slug: 'x', title: 'T', description: 'D', date: '2026-10-10', tags: ['a'], author: 'Nexara Team', body: [{ type: 'p', text: 'one two three' }] };
+  const graphs = [getBlogPostStructuredData(post)['@graph'], getBlogIndexStructuredData()['@graph']];
+  for (const graph of graphs) {
+    assert.ok(graph.find(x => x['@type']?.includes('Organization')));
+    assert.equal(graph.filter(x => x['@type'] === 'Person').length, DATA.company.founders.length);
+    assert.deepEqual(danglingRefs(graph), []);
+  }
+  const posting = graphs[0].find(x => x['@type'] === 'BlogPosting');
+  assert.equal(posting.author['@type'], 'Organization');
+  const byFounder = getBlogPostStructuredData({ ...post, author: DATA.company.founders[0].name })['@graph'].find(x => x['@type'] === 'BlogPosting');
+  assert.deepEqual(byFounder.author, { '@id': 'https://nexaragroups.com/#founder-1' });
+});
+
+test('home and company FAQ answer the brand questions, and the same text feeds the schema', () => {
+  for (const page of ['home', 'company']) {
+    const questions = LOCAL_FAQS[page].map(([q]) => q);
+    assert.ok(questions.some(q => /^What is Nexara/.test(q)), `${page}: what is`);
+    assert.ok(questions.includes('Where is Nexara based?'), `${page}: where`);
+    const notSame = LOCAL_FAQS[page].find(([q]) => /Nexara Soft/.test(q));
+    assert.ok(notSame, `${page}: not the same as Nexara Soft`);
+    assert.match(notSame[1], /nexara\.ru/); assert.match(notSame[1], /Hyderabad/);
+    const faq = getStructuredData({ theme: 'neo', page, detail: null })['@graph'].find(x => x['@type'] === 'FAQPage');
+    assert.deepEqual(faq.mainEntity.map(q => q.name), questions);
+  }
+  for (const [, items] of Object.entries(LOCAL_FAQS)) for (const [q, a] of items) assert.equal(/\u2014/.test(q + a), false, 'no em dashes');
+});
+
+test('home and company titles lead with the brand; no title or description repeats between canonicals', () => {
+  const seen = new Map(); const titles = new Set(); const descriptions = new Set();
+  for (const route of getRoutes()) {
+    const seo = getSeo(route); if (seen.has(seo.canonical)) continue; seen.set(seo.canonical, 1);
+    assert.equal(titles.has(seo.title), false, seo.title); titles.add(seo.title);
+    assert.equal(descriptions.has(seo.description), false, seo.description); descriptions.add(seo.description);
+  }
+  assert.ok(getSeo({ theme: 'neo', page: 'home', detail: null }).title.startsWith('Nexara'));
+  assert.match(getSeo({ theme: 'neo', page: 'company', detail: null }).title, /About Nexara|Nexara Private Limited/);
+});
+
+test('llms.txt product URLs are real routes and the disambiguation covers the contested names', () => {
+  const llms = fs.readFileSync(new URL('../public/llms.txt', import.meta.url), 'utf8');
+  const paths = new Set(getRoutes().map(r => '/' + r.path));
+  for (const [, path] of llms.matchAll(/https:\/\/nexaragroups\.com(\/[a-z/-]+)/g)) assert.ok(paths.has(path) || path === '/blog', path);
+  for (const product of DATA.sections.labs.products.filter(p => p.status === 'live' || p.status === 'demo')) assert.ok(llms.includes(`/neo/labs/${product.id}`), product.id);
+  assert.match(llms, /Nexara Soft Private Limited/); assert.match(llms, /cryptocurrency token/);
+});
+
+test('informative images carry alt text and dimensions; only duplicates of adjacent text stay decorative', () => {
+  const read = f => fs.readFileSync(new URL('../src/components/shared/' + f, import.meta.url), 'utf8');
+  assert.match(read('ClientCard.tsx'), /alt=\{`\$\{client\.name\} logo`\}/);
+  assert.match(read('LabsShowcase.tsx'), /alt=\{`\$\{p\.name\} product screenshot`\}/);
+  assert.match(read('ClientSpotlight.tsx'), /alt=\{`\$\{client\.name\} logo`\}/);
+  assert.match(read('LabsMap.tsx'), /alt=\{`\$\{client\.name\} logo`\}/);
+  assert.match(read('SiteFooter.tsx'), /About Nexara/);
+  for (const f of ['ClientCard.tsx', 'LabsShowcase.tsx', 'LabsMap.tsx']) assert.match(read(f), /imgSize\(/, f);
+});
+
+test('blog post titles and descriptions fit a search result', async () => {
+  const blog = await moduleOf(fs.readFileSync(new URL('../src/lib/blog.ts', import.meta.url), 'utf8').replace(/import \{ OFFICE_ADDRESS \}[^\n]*\n/, `const OFFICE_ADDRESS = ${JSON.stringify(OFFICE_ADDRESS)};\n`));
+  for (const post of blog.BLOG_POSTS) {
+    assert.ok(post.title.length <= 60, post.title);
+    assert.ok(post.description.length >= 110 && post.description.length <= 160, `${post.slug} ${post.description.length}`);
   }
 });

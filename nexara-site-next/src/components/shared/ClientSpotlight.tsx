@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { imgSize } from '@/components/ui/image-size';
 import Link from 'next/link';
 import { CLIENTS, clientDomain, type ClientWork } from '@/lib/clients';
 import { COPY } from '@/lib/copy';
@@ -102,7 +103,7 @@ export function ClientSpotlight({ theme }: { theme: Theme }) {
               aria-current={i === active ? 'true' : undefined}
               onClick={() => go(i)}
             >
-              <span className="nx-spot-thumb-logo" aria-hidden="true"><img src={c.logo} alt="" loading="lazy" decoding="async" /></span>
+              <span className="nx-spot-thumb-logo" aria-hidden="true"><img src={c.logo} alt="" {...imgSize(c.logo)} loading="lazy" decoding="async" /></span>
               <b aria-hidden="true">{c.name}</b>
               <span aria-hidden="true">{c.sector}</span>
             </button>
@@ -119,7 +120,7 @@ function SpotSlide({ client, theme, index }: { client: ClientWork; theme: Theme;
   return (
     <article className="nx-spot-slide">
       <div className="nx-spot-visual">
-        <span className="nx-spot-logo"><img src={client.logo} alt="" /></span>
+        <span className="nx-spot-logo"><img src={client.logo} alt={`${client.name} logo`} {...imgSize(client.logo)} /></span>
       </div>
       <div className="nx-spot-copy">
         <span className="nx-spot-meta">

@@ -21,6 +21,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     if (url === `${SITE_URL}/` || info.page === 'home') {
       priority = 1.0;
       changeFrequency = 'weekly';
+    } else if (info.detail) {
+      // Detail pages (labs products, delivery models) sit below their section page.
+      priority = 0.7;
     } else if (info.page === 'labs' || info.page === 'marketing' || info.page === 'customers' || info.page === 'contact') {
       priority = 0.9;
       changeFrequency = 'weekly';

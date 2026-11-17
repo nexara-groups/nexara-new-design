@@ -1197,8 +1197,6 @@ main.nx-mk .nx-mk-h1 { max-width: 11ch; margin: 0 0 28px; font-size: clamp(3rem,
 .nx-mk-results li > span:first-child::after { content: ""; display: block; width: 72%; height: 7px; border-radius: 9px; background: linear-gradient(90deg, var(--nx-mk-line-2), var(--nx-mk-line-2) 60%, transparent); }
 .nx-mk-miss { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px 5px 10px; border-radius: 999px; background: var(--nx-mk-lost-wash); color: var(--nx-mk-lost); font-size: 14px; font-weight: 600; }
 .nx-mk-miss::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-/* Hidden only until the entrance timeline has set its start state (JS on; no-js and reduced motion never hide). */
-html:not(.no-js) .nx-mk:not(.is-ready) :is(.nx-mk-ln > span, .nx-mk-leave, .nx-mk-engine) { visibility: hidden; }
 
 /* story */
 .nx-mk-story { padding: 120px 0 112px; background: var(--nx-mk-paper); border-block: 1px solid var(--nx-mk-line-2); }
@@ -1441,7 +1439,6 @@ main.nx-ac .nx-ac-h1 { max-width: 10ch; margin: 0 0 24px; font-size: clamp(3rem,
 .nx-ac-chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .nx-ac-pulse { position: absolute; inset: -2px; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--nx-ac-lost) 35%, transparent); animation: nx-ac-pulse 2.2s ease-in-out infinite; pointer-events: none; }
 @keyframes nx-ac-pulse { 50% { opacity: .35; transform: scale(1.02); } }
-html:not(.no-js) .nx-ac:not(.is-ready) :is(.nx-ac-ln > span, .nx-ac-leave, .nx-ac-folio, .nx-ac-brand) { visibility: hidden; }
 
 /* thesis */
 .nx-ac-thesis { padding: 96px 0 88px; background: var(--nx-ac-paper); border-block: 1px solid var(--nx-ac-line-2); }
@@ -1738,7 +1735,6 @@ main.nx-ct .nx-ct-h1 { max-width: 13ch; margin: 0 0 22px; font-size: clamp(2.8re
 .nx-ct-engine { min-width: 0; padding: 22px; background: var(--nx-ct-card); border: 1px solid var(--nx-ct-line); border-radius: 24px; box-shadow: 0 30px 60px -36px var(--nx-ct-shadow); }
 .nx-ct-preview-label { margin: 0 0 12px; font-family: var(--font-display); font-size: 1.1rem; font-weight: 650; }
 .nx-ct-preview { margin: 0; max-height: 360px; overflow: auto; padding: 16px; border-radius: 14px; background: var(--nx-ct-paper); border: 1px solid var(--nx-ct-line-2); color: var(--nx-ct-ink-2); font-family: var(--font-body); font-size: 13.5px; line-height: 1.55; white-space: pre-wrap; }
-html:not(.no-js) .nx-ct:not(.is-ready) :is(.nx-ct-ln > span, .nx-ct-leave, .nx-ct-engine) { visibility: hidden; }
 
 .nx-ct-block { padding-top: 72px; }
 .nx-ct-block:last-child { padding-bottom: 96px; }
@@ -1902,7 +1898,6 @@ main.nx-ab h1.nx-ab-h1 { max-width: 14ch; margin: 0 0 24px; font-size: clamp(2.8
 .nx-ab-tick path { stroke-dasharray: 16; stroke-dashoffset: 16; transition: stroke-dashoffset .45s .1s var(--nx-ab-ease); }
 .nx-ab-reg li.is-found .nx-ab-tick { background: var(--nx-ab-presence); border-color: var(--nx-ab-presence); border-style: solid; }
 .nx-ab-reg li.is-found .nx-ab-tick path { stroke-dashoffset: 0; }
-html:not(.no-js) .nx-ab:not(.is-ready) :is(.nx-ab-ln > span, .nx-ab-leave, .nx-ab-dossier) { visibility: hidden; }
 
 .nx-ab-story { padding: 120px 0 112px; background: var(--nx-ab-paper); border-block: 1px solid var(--nx-ab-line-2); }
 main.nx-ab h2.nx-ab-sec-h { max-width: 18ch; margin: 0 0 28px; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: var(--nx-ab-display-weight); line-height: 1; letter-spacing: -0.04em; }
@@ -2090,7 +2085,6 @@ main.nx-pf h1.nx-pf-h1 { max-width: 12ch; margin: 0 0 24px; font-size: clamp(2.8
 .nx-pf-frame-you b { font-family: var(--font-display); font-size: 1.1rem; font-weight: 650; letter-spacing: -0.02em; }
 .nx-pf-frame-you a > span:last-child { display: inline-flex; align-items: center; gap: 8px; color: var(--nx-pf-cta); font-size: .92rem; font-weight: 600; }
 .nx-pf-empty { padding: 16px 4px 20px; color: var(--nx-pf-muted); }
-html:not(.no-js) .nx-pf:not(.is-ready) :is(.nx-pf-ln > span, .nx-pf-leave, .nx-pf-index) { visibility: hidden; }
 
 .nx-pf-nav { padding: 8px 0 24px; }
 .nx-pf-nav .nx-pf-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -2395,3 +2389,144 @@ main.nx-pf .nx-pf-result h3 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); font-weig
 .nx-confirm a { color: #dce8f8; text-underline-offset: 4px; }
 .nx-confirm-btn { min-height: 50px; padding: 0 28px; border: 0; border-radius: 999px; background: #215f94; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 .nx-confirm-btn:disabled { opacity: .6; cursor: progress; }
+
+/* ═══ Sub-page hero system ═══════════════════════════════════════════════════════════
+   One recipe for the seven sub-page heroes (Labs, Marketing, Academy, Customers, Company, Contact, Blog).
+   Each hero keeps its own --nx-XX-* tokens; this block only maps them onto four hero roles (--h-*) and adds
+   depth (two accent glows over a paper wash, the existing dot grid, one fine accent rule at the base),
+   a CSS-only entrance, a CTA row and the small-screen rules.
+   Neo and Trust differ only by the three --nx-hero-* tokens below; there are no theme checks.
+   The entrance is keyframes with a `from` state only: if animation never runs the content is simply
+   visible, and prefers-reduced-motion never starts it. */
+.neo { --nx-hero-glow: 22%; --nx-hero-glow-2: 12%; --nx-hero-rule: 38%; }
+.trust { --nx-hero-glow: 10%; --nx-hero-glow-2: 6%; --nx-hero-rule: 55%; }
+
+.nx-lab-hero { --h-accent: var(--nx-lp-cta); --h-bg: var(--nx-lp-bg); --h-paper: var(--nx-lp-paper); }
+.nx-mk-hero { --h-accent: var(--nx-mk-cta); --h-bg: var(--nx-mk-bg); --h-paper: var(--nx-mk-paper); }
+.nx-ac-hero { --h-accent: var(--nx-ac-cta); --h-bg: var(--nx-ac-bg); --h-paper: var(--nx-ac-paper); }
+.nx-pf-hero { --h-accent: var(--nx-pf-cta); --h-bg: var(--nx-pf-bg); --h-paper: var(--nx-pf-paper); }
+.nx-ab-hero { --h-accent: var(--nx-ab-cta); --h-bg: var(--nx-ab-bg); --h-paper: var(--nx-ab-paper); }
+.nx-ct-hero { --h-accent: var(--nx-ct-cta); --h-bg: var(--nx-ct-bg); --h-paper: var(--nx-ct-paper); }
+.nx-bl-hero { --h-accent: var(--nx-bl-cta); --h-bg: var(--nx-bl-bg); --h-paper: var(--nx-bl-paper); }
+
+:is(.nx-lab-hero, .nx-mk-hero, .nx-ac-hero, .nx-pf-hero, .nx-ab-hero, .nx-ct-hero, .nx-bl-hero) {
+  position: relative; isolation: isolate; overflow: clip;
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--h-accent) var(--nx-hero-rule), transparent) 50%, transparent) bottom / 100% 1px no-repeat,
+    linear-gradient(180deg, var(--h-bg), color-mix(in srgb, var(--h-paper) 70%, var(--h-bg)));
+  border-bottom: 0; min-height: 0;
+  padding-block: clamp(28px, 5vh, 48px) clamp(40px, 7vh, 72px);
+}
+:is(.nx-lab-hero, .nx-mk-hero, .nx-ac-hero, .nx-pf-hero, .nx-ab-hero, .nx-ct-hero, .nx-bl-hero)::after {
+  content: ""; position: absolute; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(55% 75% at 88% 12%, color-mix(in srgb, var(--h-accent) var(--nx-hero-glow), transparent), transparent 72%),
+    radial-gradient(45% 60% at 4% 100%, color-mix(in srgb, var(--h-accent) var(--nx-hero-glow-2), transparent), transparent 70%);
+}
+.nx-lab-hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: radial-gradient(color-mix(in srgb, var(--h-accent) 22%, transparent) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(70% 70% at 78% 45%, #000 0%, transparent 70%); mask-image: radial-gradient(70% 70% at 78% 45%, #000 0%, transparent 70%);
+}
+:is(.nx-mk-hero, .nx-ac-hero, .nx-pf-hero, .nx-ab-hero, .nx-ct-hero, .nx-bl-hero)::before { z-index: -1; }
+
+/* Headline lines: no clip mask, so a line is never half drawn. */
+:is(.nx-mk-ln, .nx-ac-ln, .nx-pf-ln, .nx-ab-ln, .nx-ct-ln, .nx-bl-ln) { overflow: visible; }
+
+.nx-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin-top: 26px; }
+.nx-hero-actions > :is(.nx-mk-cta, .nx-ac-cta, .nx-pf-cta, .nx-ab-cta, .nx-ct-cta, .nx-bl-cta) { min-height: 52px; padding: 0 26px; font-size: 16px; }
+.nx-hero-actions .nx-ct-mail { margin-top: 0; }
+
+/* Labs: lede and visual (the rail of four stages over the four products you can open today). */
+.nx-lab-hero { padding-block: clamp(32px, 6vh, 56px) clamp(40px, 7vh, 72px); }
+.nx-lab-hero .nx-lab-title { max-width: 16ch; font-size: clamp(2.2rem, 5.2vw, 4rem); }
+.nx-lab-hero .nx-lab-lede { max-width: 46ch; margin-top: 18px; font-size: 1.12rem; }
+.nx-lab-hero-visual { display: block; min-width: 0; }
+.nx-lab-rig {
+  padding: clamp(16px, 2.2vw, 24px); background: var(--nx-lp-bg); border: 1px solid var(--nx-lp-line); border-radius: 22px;
+  box-shadow: 0 30px 60px -36px color-mix(in srgb, var(--nx-lp-cta) 40%, transparent), 0 0 0 10px color-mix(in srgb, var(--nx-lp-cta) 6%, transparent);
+}
+.nx-lab-rail { list-style: none; margin: 0 0 20px; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; position: relative; counter-reset: none; }
+.nx-lab-rail::before { content: ""; position: absolute; left: 6%; right: 6%; top: 18px; height: 2px; background: linear-gradient(90deg, var(--nx-lp-track), var(--nx-lp-track-3)); opacity: .55; }
+.nx-lab-rail li { position: relative; display: grid; justify-items: center; gap: 8px; text-align: center; min-width: 0; }
+.nx-lab-rail b { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--nx-lp-cta); color: var(--nx-lp-on-cta); font: 700 13px var(--nx-mono); box-shadow: 0 0 0 5px var(--nx-lp-bg); }
+.nx-lab-rail span { font: 700 clamp(13px, 1.3vw, 15px) var(--font-display); color: var(--nx-lp-ink); overflow-wrap: anywhere; }
+.nx-lab-rig-label { margin: 0 0 8px; font: 600 11px var(--nx-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--nx-lp-muted); }
+.nx-lab-live { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--nx-lp-line); }
+.nx-lab-live li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 2px; border-bottom: 1px solid var(--nx-lp-line); }
+.nx-lab-live li:last-child { border-bottom: 0; padding-bottom: 2px; }
+.nx-lab-live span { font-weight: 600; color: var(--nx-lp-ink); min-width: 0; }
+.nx-lab-live i { flex: none; font: 600 11px var(--nx-mono); letter-spacing: .08em; text-transform: uppercase; font-style: normal; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--nx-lp-line); color: var(--nx-lp-ink-2); }
+.nx-lab-live i[data-status="live"] { color: var(--nx-lp-cta-deep); border-color: color-mix(in srgb, var(--nx-lp-cta) 45%, var(--nx-lp-line)); background: color-mix(in srgb, var(--nx-lp-cta) 8%, transparent); }
+.neo .nx-lab-live i[data-status="live"] { color: var(--nx-lp-cta); }
+
+/* Blog: featured latest post. */
+.nx-bl-hero-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
+main.nx-bl .nx-bl-hero .nx-bl-h1 { max-width: 12ch; font-size: clamp(2.6rem, 5.6vw, 4.8rem); }
+.nx-bl-feature { padding: 22px; background: var(--nx-bl-bg); border: 1px solid var(--nx-bl-line); border-radius: 22px; box-shadow: 0 30px 60px -36px color-mix(in srgb, var(--nx-bl-cta) 40%, transparent), 0 0 0 10px color-mix(in srgb, var(--nx-bl-cta) 5%, transparent); }
+.nx-bl-feature-label { margin: 0 0 12px; font: 600 11px var(--nx-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--nx-bl-muted); }
+.nx-bl-feature-link { display: grid; gap: 12px; color: inherit; text-decoration: none; }
+.nx-bl-feature-link strong { font-family: var(--font-display); font-size: clamp(1.3rem, 2.2vw, 1.8rem); font-weight: var(--nx-bl-display-weight); line-height: 1.12; letter-spacing: -0.03em; color: var(--nx-bl-ink); }
+.nx-bl-feature-link:hover strong { color: var(--nx-bl-cta-deep); }
+.nx-bl-feature-link > span { color: var(--nx-bl-ink-2); font-size: 15px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.nx-bl-feature-link small { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; color: var(--nx-bl-muted); font-size: 13px; }
+.nx-bl-feature-link small b { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-left: auto; color: var(--nx-bl-cta-deep); font-size: 14px; font-weight: 600; }
+.nx-bl-feature-link small i { font-style: normal; }
+.nx-bl-feature-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 0; }
+.nx-bl-feature-tags span { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--nx-bl-line); color: var(--nx-bl-muted); font-size: 12px; }
+
+/* Academy: the folio cover opens by CSS and then leaves the layout, so it can never stay shut. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes nx-hero-rise { from { opacity: .3; transform: translateY(14px); } }
+  @keyframes nx-hero-open { to { transform: scaleX(0); visibility: hidden; } }
+  :is(.nx-mk-ln, .nx-ac-ln, .nx-pf-ln, .nx-ab-ln, .nx-ct-ln, .nx-bl-ln) > span,
+  :is(.nx-lab-title) { animation: nx-hero-rise .5s cubic-bezier(.2, .7, .2, 1) both; }
+  :is(.nx-mk-ln, .nx-ac-ln, .nx-pf-ln, .nx-ab-ln, .nx-ct-ln, .nx-bl-ln):nth-child(2) > span { animation-delay: .07s; }
+  :is(.nx-lab-kicker, .nx-ac-brand, .nx-pf-kicker, .nx-ab-kicker, .nx-ct-kicker, .nx-bl-kicker):is(.nx-lab-hero *, .nx-ac-hero *, .nx-pf-hero *, .nx-ab-hero *, .nx-ct-hero *, .nx-bl-hero *) { animation: nx-hero-rise .45s ease-out both; }
+  :is(.nx-mk-leave, .nx-ac-leave, .nx-pf-leave, .nx-pf-lead, .nx-ab-leave, .nx-ab-lead, .nx-ct-leave, .nx-bl-leave, .nx-lab-hero .nx-lab-lede) { animation: nx-hero-rise .5s .12s cubic-bezier(.2, .7, .2, 1) both; }
+  :is(.nx-hero-actions, .nx-lab-actions) { animation: nx-hero-rise .5s .2s cubic-bezier(.2, .7, .2, 1) both; }
+  :is(.nx-mk-engine, .nx-ac-folio, .nx-pf-index, .nx-ab-dossier, .nx-ct-engine, .nx-bl-feature, .nx-lab-rig) { animation: nx-hero-rise .6s .1s cubic-bezier(.2, .7, .2, 1) both; }
+  .nx-ac-folio-cover { animation: nx-hero-open .6s .25s cubic-bezier(.65, 0, .35, 1) forwards; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nx-ac-folio-cover { display: none; }
+}
+
+@media (max-width: 1100px) {
+  .nx-bl-hero-grid { grid-template-columns: 1fr; gap: 32px; }
+  .nx-bl-feature { max-width: 640px; }
+}
+@media (max-width: 800px) {
+  :is(.nx-lab-hero, .nx-mk-hero, .nx-ac-hero, .nx-pf-hero, .nx-ab-hero, .nx-ct-hero, .nx-bl-hero) { min-height: 0; padding-block: 24px 36px; }
+  /* Ledes stay within three lines on a phone; the artefact follows the CTA. */
+  :is(.nx-pf-lead, .nx-ab-lead, .nx-bl-leave, .nx-lab-hero .nx-lab-lede) { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 1rem; }
+  :is(.nx-mk-leave, .nx-ac-leave, .nx-pf-leave, .nx-ab-leave, .nx-ct-leave) { font-size: 1.05rem; }
+  main.nx-mk .nx-mk-h1, main.nx-ac .nx-ac-h1, main.nx-ct .nx-ct-h1, main.nx-ab h1.nx-ab-h1, main.nx-pf h1.nx-pf-h1, main.nx-bl .nx-bl-hero .nx-bl-h1 { max-width: none; margin-bottom: 14px; font-size: clamp(2.1rem, 10.4vw, 3rem); }
+  .nx-lab-hero .nx-lab-title { font-size: clamp(2rem, 9.4vw, 2.6rem); }
+  .nx-hero-actions, .nx-lab-actions { margin-top: 18px; }
+  .nx-hero-actions > :is(.nx-mk-cta, .nx-ac-cta, .nx-pf-cta, .nx-ab-cta, .nx-ct-cta, .nx-bl-cta), .nx-lab-actions .nx-lab-cta { flex: 1 1 auto; min-height: 48px; }
+  .nx-hero-actions .nx-ct-mail { flex: 1 1 100%; justify-content: center; }
+  .nx-lab-hero-grid { gap: 28px; }
+  .nx-ac-folio { min-height: 0; }
+}
+/* Short desktop windows: cap the headline by viewport height so lede and CTA stay above the fold and clear of the consent bar. */
+@media (min-width: 801px) {
+  main.nx-mk .nx-mk-h1 { font-size: min(6.6rem, var(--nx-mk-h1-fit), 11vh); }
+  /* Academy's headline is four lines, so its cap grows with height (about 64px at 720, full size by ~1000) instead of a flat 11vh. */
+  main.nx-ac .nx-ac-h1 { font-size: min(6.4rem, 7.2vw, max(3rem, calc(64px + (100vh - 720px) * .13))); }
+  main.nx-ct .nx-ct-h1 { font-size: min(5.6rem, var(--nx-ct-h1-fit), 11vh); }
+  main.nx-ab h1.nx-ab-h1 { font-size: min(5.6rem, var(--nx-ab-h1-fit), 11vh); }
+  main.nx-pf h1.nx-pf-h1 { font-size: min(5.8rem, var(--nx-pf-h1-fit), 11vh); }
+  .nx-hero-actions { margin-top: 20px; }
+  .nx-ac-brand { margin-bottom: 12px; }
+  :is(.nx-pf-lead, .nx-ab-lead) { max-width: 60ch; font-size: 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+}
+
+/* Related articles on service pages: small and quiet, sits under the FAQ. */
+.nx-related { padding: var(--space-6) 0; border-top: 1px solid var(--line); }
+.nx-related-h { margin: 0 0 12px; font-family: var(--nx-mono); font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: var(--nx-upper); color: var(--nx-copy); }
+.nx-related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 28px; }
+.nx-related-list a { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; line-height: 1.4; color: var(--nx-ink); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; transition: text-decoration-color .2s; }
+.nx-related-list a:hover { text-decoration-color: currentColor; }
+.nx-related-list a:focus-visible { outline: 2px solid var(--nx-focus); outline-offset: 2px; }

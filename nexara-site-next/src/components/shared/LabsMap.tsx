@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { imgSize } from '@/components/ui/image-size';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DATA } from '@/lib/data';
@@ -171,9 +172,9 @@ export function LabsProofMap({ theme }: { theme: Theme }) {
   return (
     <div className="nx-labs-proof">
       <article className="nx-labs-proof-card is-wide" id={labsAnchor('proof', 'websites')}>
-        <span className="nx-labs-proof-logos" aria-hidden="true">
+        <span className="nx-labs-proof-logos">
           {websiteLogos.map((client) => (
-            <img key={client.name} src={client.logo} alt="" loading="lazy" decoding="async" />
+            <img key={client.name} src={client.logo} alt={`${client.name} logo`} {...imgSize(client.logo)} loading="lazy" decoding="async" />
           ))}
         </span>
         <h3>{voiced(c.websitesTitle, theme)}</h3>
@@ -198,8 +199,8 @@ export function LabsProofMap({ theme }: { theme: Theme }) {
         const built = record ? voiced(record.result, theme) : client.scope.slice(0, 3).join(' · ');
         return (
           <article className="nx-labs-proof-card" id={labsAnchor('proof', p.client)} key={p.client}>
-            <span className="nx-labs-proof-logo" aria-hidden="true">
-              <img src={client.logo} alt="" loading="lazy" decoding="async" />
+            <span className="nx-labs-proof-logo">
+              <img src={client.logo} alt={`${client.name} logo`} {...imgSize(client.logo)} loading="lazy" decoding="async" />
             </span>
             <h3>{client.name}</h3>
             <p>

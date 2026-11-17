@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { DATA } from '@/lib/data';
 import { COPY } from '@/lib/copy';
+import { RelatedPosts } from './RelatedPosts';
 import { routePath, academyFaqs } from '@/lib/seo';
 import { ACADEMY_FLOW, ACADEMY_TRACKS, ACADEMY_TRACK_ROLES, voiced, type AcademyBlock, type Theme } from '@/lib/site';
 import { getLenis } from '../useSmoothScroll';
@@ -92,15 +93,7 @@ export function AcademyPage({ theme }: { theme: Theme }) {
       gsap.registerPlugin(ScrollTrigger);
       const q = (s: string) => el.querySelectorAll(s);
       const ctx = gsap.context(() => {
-        const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-        tl.from(q('.nx-ac-brand'), { opacity: 0, y: 16, duration: 0.7 })
-          .from(q('.nx-ac-ln > span'), { yPercent: 105, duration: 1.1, stagger: 0.12 }, 0.15)
-          .from(q('.nx-ac-folio'), { y: 36, opacity: 0, duration: 1, ease: 'power3.out' }, 0.2)
-          .fromTo(q('.nx-ac-folio-cover'), { scaleX: 1 }, { scaleX: 0, transformOrigin: 'left center', duration: 0.9, ease: 'power3.inOut' }, 0.55)
-          .from(q('.nx-ac-slot'), { opacity: 0, y: 18, duration: 0.5, stagger: 0.1, ease: 'power3.out' }, 1.1)
-          .from(q('.nx-ac-demo-slot'), { opacity: 0, scale: 0.92, duration: 0.55, ease: 'power3.out' }, 1.3)
-          .from(q('.nx-ac-chip'), { opacity: 0, scale: 0.6, duration: 0.45, stagger: 0.1, ease: 'back.out(2.4)' }, 1.45)
-          .from(q('.nx-ac-leave'), { opacity: 0, y: 14, duration: 0.75, ease: 'power3.out' }, 1.8);
+        // Hero entrance is CSS-only (shared.css), so it never waits on this import.
 
         gsap.fromTo(q('.nx-ac-w'), { opacity: 0.16 }, {
           opacity: 1, stagger: 0.05, ease: 'none',
@@ -182,6 +175,9 @@ export function AcademyPage({ theme }: { theme: Theme }) {
               ))}
             </h1>
             <p className="nx-ac-leave">{t(PAGE.hero.leave)}</p>
+            <div className="nx-hero-actions">
+              <Link prefetch={false} className="nx-ac-cta nx-ac-cta--lg" href={routePath(theme, 'contact', 'academy')}>{t(copy.ask.cta)} <Arrow /></Link>
+            </div>
           </div>
           <div className="nx-ac-folio" aria-label={t(copy.portfolio)}>
             <div className="nx-ac-folio-cover" aria-hidden="true">
@@ -364,6 +360,7 @@ export function AcademyPage({ theme }: { theme: Theme }) {
       </section>
     ),
     faqs: () => (
+      <>
       <section className="nx-ac-faqs-band" aria-labelledby="nx-ac-faqs-h">
         <div className="nx-ac-wrap">
           <h2 id="nx-ac-faqs-h" className="nx-ac-sec-h">{t(copy.faqs)}</h2>
@@ -386,6 +383,8 @@ export function AcademyPage({ theme }: { theme: Theme }) {
           </dl>
         </div>
       </section>
+      <RelatedPosts theme={theme} page="academy" wrap="nx-ac-wrap" />
+      </>
     ),
     ask: () => (
       <section className="nx-ac-ask" id="ask">
